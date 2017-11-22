@@ -316,6 +316,12 @@
         <!-- PMD dependencies -->
         <!-- Language modules are runtime scope to not record accidental dependencies -->
         <dependency>
+            <groupId>org.bitbucket.cowwoc.diff-match-patch</groupId>
+            <artifactId>diff-match-patch</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-apex</artifactId>
             <version>${pmd.core.version}</version>
