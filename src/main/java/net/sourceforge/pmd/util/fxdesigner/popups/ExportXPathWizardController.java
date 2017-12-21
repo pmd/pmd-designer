@@ -242,7 +242,6 @@ public class ExportXPathWizardController implements Initializable {
 
     public void shutdown() {
         activeSubs.forEach(Subscription::unsubscribe);
-        exportResultArea.setSyntaxHighlighter(null);
     }
 
 

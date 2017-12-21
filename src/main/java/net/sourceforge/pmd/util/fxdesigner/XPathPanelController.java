@@ -8,7 +8,6 @@ package net.sourceforge.pmd.util.fxdesigner;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExceptionMessage;
 
 import java.io.IOException;
-import java.lang.ref.SoftReference;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +47,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluationException;
 import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluator;
 import net.sourceforge.pmd.util.fxdesigner.popups.ExportXPathWizardController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.CompletionResultSource;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.XPathAutocompleteProvider;
@@ -103,6 +103,7 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
     private static final Duration XPATH_REFRESH_DELAY = Duration.ofMillis(100);
     private final XPathEvaluator xpathEvaluator = new XPathEvaluator();
     private final ObservableXPathRuleBuilder ruleBuilder = new ObservableXPathRuleBuilder();
+    private final SoftReferenceCache<Stage> exportWizard = new SoftReferenceCache<>(this::createExportWizard);
 
 
     @FXML
@@ -314,16 +315,7 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
 
     /** Show the export wizard, creating it if needed. */
     public void showExportXPathToRuleWizard() {
-
-        if (exportWizardCache == null || exportWizardCache.get() == null) {
-            try {
-                exportWizardCache = new SoftReference<>(createExportWizard());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        Stage dialog = exportWizardCache.get();
+        Stage dialog = exportWizard.get();
         ExportXPathWizardController wizard = (ExportXPathWizardController) dialog.getUserData();
         Platform.runLater(() -> {
             this.bindToExportWizard(wizard);

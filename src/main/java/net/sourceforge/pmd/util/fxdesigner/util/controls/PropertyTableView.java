@@ -14,6 +14,8 @@ import net.sourceforge.pmd.properties.PropertyTypeId;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.popups.EditPropertyDialogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.PropertyDescriptorSpec;
+import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 
 import javafx.application.Platform;
@@ -44,8 +46,8 @@ import javafx.util.StringConverter;
  * Controls a table view used to inspect and edit the properties of
  * the rule being built. This component is made to be reused in several
  * views.
- * <p>
- * TODO: would be great to make it directly editable without compromising content validation
+ *
+ * <p>TODO: would be great to make it directly editable without compromising content validation
  *
  * @author Clément Fournier
  * @since 6.0.0
