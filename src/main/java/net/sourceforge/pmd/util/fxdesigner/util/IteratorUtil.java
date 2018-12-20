@@ -18,7 +18,7 @@ import javafx.scene.control.TreeItem;
 
 /**
  * @author Clément Fournier
- * @since 6.6.0
+ * @since 6.11.0
  */
 public final class IteratorUtil {
 
