@@ -5,7 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner.popups;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.getSupportedLanguageVersions;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.rewire;
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.rewireInit;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.stringConverter;
 
 import java.net.URL;
@@ -142,14 +142,14 @@ public class ExportXPathWizardController implements Initializable {
 
     public void bindToRuleBuilder(ObservableXPathRuleBuilder ruleBuilder) {
         // Rewire the rulebuilder to be updated by the ui, initialise the values of the ui
-        rewire(ruleBuilder.nameProperty(), this.nameProperty(), this::setName);
-        rewire(ruleBuilder.descriptionProperty(), this.descriptionProperty(), this::setDescription);
-        rewire(ruleBuilder.languageProperty(), this.languageProperty(), this::setLanguage);
-        rewire(ruleBuilder.messageProperty(), this.messageProperty(), this::setMessage);
-        rewire(ruleBuilder.priorityProperty(), this.priorityProperty(), this::setPriority);
-        rewire(ruleBuilder.rulePropertiesProperty(), this.rulePropertiesProperty(), this::setRuleProperties);
-        rewire(ruleBuilder.xpathVersionProperty(), this.xpathVersionProperty(), this::setXpathVersion);
-        rewire(ruleBuilder.xpathExpressionProperty(), this.xpathExpressionProperty(), this::setXpathExpression);
+        rewireInit(ruleBuilder.nameProperty(), this.nameProperty(), this::setName);
+        rewireInit(ruleBuilder.descriptionProperty(), this.descriptionProperty(), this::setDescription);
+        rewireInit(ruleBuilder.languageProperty(), this.languageProperty(), this::setLanguage);
+        rewireInit(ruleBuilder.messageProperty(), this.messageProperty(), this::setMessage);
+        rewireInit(ruleBuilder.priorityProperty(), this.priorityProperty(), this::setPriority);
+        rewireInit(ruleBuilder.rulePropertiesProperty(), this.rulePropertiesProperty(), this::setRuleProperties);
+        rewireInit(ruleBuilder.xpathVersionProperty(), this.xpathVersionProperty(), this::setXpathVersion);
+        rewireInit(ruleBuilder.xpathExpressionProperty(), this.xpathExpressionProperty(), this::setXpathExpression);
 
         addSubscription(changeSubscription(ruleBuilder.getRuleProperties()));
 
