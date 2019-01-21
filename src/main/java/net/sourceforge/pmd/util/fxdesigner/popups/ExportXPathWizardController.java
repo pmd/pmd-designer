@@ -4,6 +4,10 @@
 
 package net.sourceforge.pmd.util.fxdesigner.popups;
 
+import static com.github.oowekyala.rxstring.ItemRenderer.asString;
+import static com.github.oowekyala.rxstring.ItemRenderer.indented;
+import static com.github.oowekyala.rxstring.ItemRenderer.surrounded;
+import static com.github.oowekyala.rxstring.ItemRenderer.wrapped;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.getSupportedLanguageVersions;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.rewireInit;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.stringConverter;
@@ -31,8 +35,10 @@ import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlSyntaxHighlighter;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView;
 
+import com.github.oowekyala.rxstring.ItemRenderer;
 import com.github.oowekyala.rxstring.LiveTemplate;
 import com.github.oowekyala.rxstring.LiveTemplateBuilder;
 import javafx.application.Platform;
@@ -91,6 +97,8 @@ public class ExportXPathWizardController implements Initializable {
     private Accordion infoAccordion;
     @FXML
     private PropertyTableView propertyView;
+    @FXML
+    private LanguageVersionRangeSlider languageVersionRangeSlider;
 
 
     @Override
@@ -113,6 +121,7 @@ public class ExportXPathWizardController implements Initializable {
         Platform.runLater(() -> infoAccordion.setExpandedPane((TitledPane) infoAccordion.getChildrenUnmodifiable().get(0)));
         Platform.runLater(this::registerValidators);
 
+        languageVersionRangeSlider.currentLanguageProperty().bind(this.languageProperty());
     }
 
 
@@ -126,6 +135,8 @@ public class ExportXPathWizardController implements Initializable {
         rewireInit(ruleBuilder.rulePropertiesProperty(), this.rulePropertiesProperty());
         rewireInit(ruleBuilder.xpathVersionProperty(), this.xpathVersionProperty());
         rewireInit(ruleBuilder.xpathExpressionProperty(), this.xpathExpressionProperty());
+        rewireInit(ruleBuilder.minimumVersionProperty(), this.languageVersionRangeSlider.minVersionProperty());
+        rewireInit(ruleBuilder.maximumVersionProperty(), this.languageVersionRangeSlider.maxVersionProperty());
 
         initialiseAreaContextMenu();
         exportResultArea.setSyntaxHighlighter(new XmlSyntaxHighlighter());
@@ -254,16 +265,18 @@ public class ExportXPathWizardController implements Initializable {
 
     /** Gets the template used to initialise the code area. */
     private static LiveTemplateBuilder<ObservableXPathRuleBuilder> liveTemplateBuilder() {
-        return LiveTemplate.<ObservableXPathRuleBuilder>builder()
+        return LiveTemplate.<ObservableXPathRuleBuilder>newBuilder()
             .withDefaultIndent("      ")
             .withDefaultEscape(StringEscapeUtils::escapeXml10)
             .append("<rule name=\"").bind(ObservableRuleBuilder::nameProperty).appendLine("\"")
             .appendIndent(1).append("language=\"").bind(ObservableRuleBuilder::languageProperty, Language::getTerseName).appendLine("\"")
+            .bind(ObservableRuleBuilder::minimumVersionProperty, indented(2, surrounded("minimumLanguageVersion=\"", "\"\n", asString(LanguageVersion::getTerseName))))
+            .bind(ObservableRuleBuilder::maximumVersionProperty, indented(2, surrounded("maximumLanguageVersion=\"", "\"\n", asString(LanguageVersion::getTerseName))))
             .appendIndent(1).append("message=\"").bind(ObservableRuleBuilder::messageProperty).appendLine("\"")
             .appendIndent(1).append("class=\"").bind(ObservableRuleBuilder::clazzProperty, Class::getCanonicalName).appendLine("\">")
             .withDefaultIndent("   ")
             .appendIndent(1).appendLine("<description>")
-            .bind(ObservableRuleBuilder::descriptionProperty).endLine()
+            .bind(ObservableRuleBuilder::descriptionProperty, wrapped(60, asString())).endLine()
             .appendIndent(1).appendLine("</description>")
             .appendIndent(1).append("<priority>").bind(ObservableRuleBuilder::priorityProperty, p -> "" + p.getPriority()).appendLine("</priority>")
             .appendIndent(1).appendLine("<properties>")

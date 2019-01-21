@@ -20,6 +20,8 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea?>
+<?import org.controlsfx.control.RangeSlider?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider?>
 <AnchorPane prefHeight="444.0" prefWidth="761.0" stylesheets="@../css/designer.css" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1">
     <children>
           <AnchorPane layoutX="1.0" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -81,7 +83,16 @@
                                   </TitledPane>
                                   <TitledPane animated="false" expanded="false" text="Language version">
                                       <content>
-                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+
+                                              <LanguageVersionRangeSlider fx:id="languageVersionRangeSlider" orientation="VERTICAL"
+                                                                          showTickLabels="true"
+                                                                          showTickMarks="true"
+                                                                          AnchorPane.leftAnchor="10"
+                                                                          AnchorPane.bottomAnchor="0.0"
+                                                                          AnchorPane.topAnchor="0.0"/>
+
+                                          </AnchorPane>
                                       </content>
                                   </TitledPane>
                                   <TitledPane animated="false" text="Properties">

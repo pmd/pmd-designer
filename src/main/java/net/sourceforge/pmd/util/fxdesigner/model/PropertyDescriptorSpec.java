@@ -192,16 +192,6 @@ public class PropertyDescriptorSpec implements SettingsOwner {
     }
 
 
-    /** Extractor for observable lists. */
-    public static Callback<PropertyDescriptorSpec, Observable[]> extractor() {
-        return spec -> new Observable[]{spec.nameProperty(), spec.typeIdProperty(), spec.valueProperty()};
-    }
-
-
-    public static ObservableList<PropertyDescriptorSpec> observableList() {
-        return FXCollections.observableArrayList(extractor());
-    }
-
 
     /**
      * Pushes an event every time the rule owning this property needs to be re-evaluated.
