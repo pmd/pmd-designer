@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.reactfx.Subscription;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
@@ -193,7 +194,7 @@ public final class DesignerUtil {
 
     public static StringConverter<LanguageVersion> languageVersionStringConverter() {
         return DesignerUtil.stringConverter(LanguageVersion::getShortName,
-            s -> LanguageRegistry.findLanguageVersionByTerseName(s.toLowerCase(Locale.ROOT)));
+                                            s -> LanguageRegistry.findLanguageVersionByTerseName(s.toLowerCase(Locale.ROOT)));
     }
 
 
@@ -238,9 +239,10 @@ public final class DesignerUtil {
 
 
     /** Like the other overload, using the setter of the ui property. */
-    public static <T> void rewireInit(Property<T> underlying, Property<T> ui) {
-        rewireInit(underlying, ui, ui::setValue);
+    public static <T> Subscription rewireInit(Property<T> underlying, Property<T> ui) {
+        return rewireInit(underlying, ui, ui::setValue);
     }
+
 
     /**
      * Binds the underlying property to a source of values (UI property). The UI
@@ -251,16 +253,17 @@ public final class DesignerUtil {
      * @param setter     Setter to initialise the UI value
      * @param <T>        Type of values
      */
-    public static <T> void rewireInit(Property<T> underlying, ObservableValue<? extends T> ui, Consumer<? super T> setter) {
+    public static <T> Subscription rewireInit(Property<T> underlying, ObservableValue<? extends T> ui, Consumer<? super T> setter) {
         setter.accept(underlying.getValue());
-        rewire(underlying, ui);
+        return rewire(underlying, ui);
     }
 
 
     /** Like rewireInit, with no initialisation. */
-    public static <T> void rewire(Property<T> underlying, ObservableValue<? extends T> source) {
+    public static <T> Subscription rewire(Property<T> underlying, ObservableValue<? extends T> source) {
         underlying.unbind();
         underlying.bind(source); // Bindings are garbage collected after the popup dies
+        return underlying::unbind;
     }
 
 
@@ -311,6 +314,26 @@ public final class DesignerUtil {
 
     public static Var<Boolean> booleanVar(BooleanProperty p) {
         return Var.mapBidirectional(p, Boolean::booleanValue, Function.identity());
+    }
+
+
+    public static Callback<Class<?>, Object> controllerFactoryKnowing(Object... controllers) {
+        return type -> {
+
+            for (Object o : controllers) {
+                if (o.getClass().equals(type)) {
+                    return o;
+                }
+            }
+
+            // default behavior for controllerFactory:
+            try {
+                return type.newInstance();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                throw new RuntimeException(exc); // fatal, just bail...
+            }
+        };
     }
 
 

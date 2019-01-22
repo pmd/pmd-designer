@@ -22,7 +22,9 @@
 <?import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea?>
 <?import org.controlsfx.control.RangeSlider?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider?>
-<AnchorPane prefHeight="444.0" prefWidth="761.0" stylesheets="@../css/designer.css" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1">
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<AnchorPane prefHeight="444.0" prefWidth="761.0" stylesheets="@../css/designer.css" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.pmd.util.fxdesigner.popups.ExportXPathWizardController">
     <children>
           <AnchorPane layoutX="1.0" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <children>
@@ -107,7 +109,7 @@
                                           </AnchorPane>
                                       </content>
                                   </TitledPane>
-                                  <TitledPane animated="false" expanded="false" styleClass="bar-sep" text="Example">
+                                  <TitledPane animated="false" expanded="false" text="Example">
                                       <content>
                                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                               <children>
@@ -137,8 +139,20 @@
                                   </TitledPane>
                               </panes>
                           </Accordion>
-                          <SyntaxHighlightingCodeArea fx:id="exportResultArea" prefHeight="221.0" prefWidth="563.0" stylesheets="@../css/editor-theme.css" />
+                          <ToolbarTitledPane>
+                              <toolbarItems>
+                                  <Button styleClass="icon-button" fx:id="copyButton">
+                                      <graphic>
+                                          <FontIcon iconLiteral="fas-copy"/>
+                                      </graphic>
+                                  </Button>
+                              </toolbarItems>
+                              <SyntaxHighlightingCodeArea fx:id="exportResultArea"
+                                                          prefHeight="221.0"
+                                                          prefWidth="563.0"
+                                                          stylesheets="@../css/editor-theme.css" />
 
+                          </ToolbarTitledPane>
                       </items>
                   </SplitPane>
               </children>

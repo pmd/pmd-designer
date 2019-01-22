@@ -8,10 +8,12 @@ import static com.github.oowekyala.rxstring.ItemRenderer.asString;
 import static com.github.oowekyala.rxstring.ItemRenderer.indented;
 import static com.github.oowekyala.rxstring.ItemRenderer.surrounded;
 import static com.github.oowekyala.rxstring.ItemRenderer.wrapped;
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.controllerFactoryKnowing;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.getSupportedLanguageVersions;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.rewireInit;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.stringConverter;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -29,6 +31,7 @@ import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.properties.PropertyTypeId;
+import net.sourceforge.pmd.util.fxdesigner.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
@@ -38,14 +41,16 @@ import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlS
 import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView;
 
-import com.github.oowekyala.rxstring.ItemRenderer;
 import com.github.oowekyala.rxstring.LiveTemplate;
 import com.github.oowekyala.rxstring.LiveTemplateBuilder;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -62,6 +67,8 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 
 /**
@@ -69,17 +76,18 @@ import javafx.scene.input.MouseButton;
  * which is updated in real time with the values typed in the form.
  *
  * <p>This wizard is supposed to offer the most customization options about the user's rules. In terms of state, it's
- * wired to the XPathPanel's rule builder while it's open. That way the rule metadata can be saved.
+ * wired to the XPathPanel's rule builder while it's open. That way the rule metadata can be persisted.
  *
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class ExportXPathWizardController implements Initializable {
+public final class ExportXPathWizardController implements Initializable {
 
 
     private final Var<String> xpathExpression = Var.newSimpleVar("");
     private final Var<String> xpathVersion = Var.newSimpleVar(DesignerUtil.defaultXPathVersion());
-    private Val<Language> language = Val.wrap(null);
+    private final Stage myPopupStage;
+    private Var<Language> languageUIProperty = Var.newSimpleVar(null);
     private Val<RulePriority> priority = Val.wrap(null);
     @FXML
     private SyntaxHighlightingCodeArea exportResultArea;
@@ -101,11 +109,17 @@ public class ExportXPathWizardController implements Initializable {
     private LanguageVersionRangeSlider languageVersionRangeSlider;
 
 
+    public ExportXPathWizardController(DesignerRoot root) {
+
+        this.myPopupStage = createStage(root.getMainStage());
+    }
+
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initialiseLanguageChoiceBox();
 
-        language = Val.wrap(languageChoiceBox.getSelectionModel().selectedItemProperty());
+        languageUIProperty = Var.fromVal(languageChoiceBox.getSelectionModel().selectedItemProperty(), languageChoiceBox.getSelectionModel()::select);
         priority = Val.map(prioritySlider.valueProperty(), Number::intValue).map(RulePriority::valueOf);
 
         Platform.runLater(() -> { // Fixes blurry text in the description text area
@@ -121,28 +135,30 @@ public class ExportXPathWizardController implements Initializable {
         Platform.runLater(() -> infoAccordion.setExpandedPane((TitledPane) infoAccordion.getChildrenUnmodifiable().get(0)));
         Platform.runLater(this::registerValidators);
 
+        initialiseAreaContextMenu();
+        exportResultArea.setSyntaxHighlighter(new XmlSyntaxHighlighter());
+        exportResultArea.setEditable(false);
+
         languageVersionRangeSlider.currentLanguageProperty().bind(this.languageProperty());
     }
 
 
     public Subscription bindToRuleBuilder(ObservableXPathRuleBuilder ruleBuilder) {
-        // Rewire the rulebuilder to be updated by the ui, initialise the values of the ui
-        rewireInit(ruleBuilder.nameProperty(), this.nameProperty());
-        rewireInit(ruleBuilder.descriptionProperty(), this.descriptionProperty());
-        rewireInit(ruleBuilder.languageProperty(), this.languageProperty());
-        rewireInit(ruleBuilder.messageProperty(), this.messageProperty());
-        rewireInit(ruleBuilder.priorityProperty(), this.priorityProperty());
-        rewireInit(ruleBuilder.rulePropertiesProperty(), this.rulePropertiesProperty());
-        rewireInit(ruleBuilder.xpathVersionProperty(), this.xpathVersionProperty());
-        rewireInit(ruleBuilder.xpathExpressionProperty(), this.xpathExpressionProperty());
-        rewireInit(ruleBuilder.minimumVersionProperty(), this.languageVersionRangeSlider.minVersionProperty());
-        rewireInit(ruleBuilder.maximumVersionProperty(), this.languageVersionRangeSlider.maxVersionProperty());
-
-        initialiseAreaContextMenu();
-        exportResultArea.setSyntaxHighlighter(new XmlSyntaxHighlighter());
-        exportResultArea.setEditable(false);
-
-        return liveTemplateBuilder().toTemplateSubscription(ruleBuilder, exportResultArea::replaceText);
+        return Subscription.multi(
+            // Rewire the rulebuilder to be updated by the ui, initialise the values of the ui
+            rewireInit(ruleBuilder.nameProperty(), this.nameProperty()),
+            rewireInit(ruleBuilder.descriptionProperty(), this.descriptionProperty()),
+            rewireInit(ruleBuilder.languageProperty(), this.languageProperty()),
+            rewireInit(ruleBuilder.messageProperty(), this.messageProperty()),
+            rewireInit(ruleBuilder.priorityProperty(), this.priorityProperty()),
+            rewireInit(ruleBuilder.rulePropertiesProperty(), this.rulePropertiesProperty()),
+            rewireInit(ruleBuilder.xpathVersionProperty(), this.xpathVersionProperty()),
+            rewireInit(ruleBuilder.xpathExpressionProperty(), this.xpathExpressionProperty()),
+            rewireInit(ruleBuilder.minimumVersionProperty(), this.languageVersionRangeSlider.minVersionProperty()),
+            rewireInit(ruleBuilder.maximumVersionProperty(), this.languageVersionRangeSlider.maxVersionProperty()),
+            // Initialise the live template
+            liveTemplateBuilder().toTemplateSubscription(ruleBuilder, exportResultArea::replaceText)
+        );
     }
 
 
@@ -213,53 +229,74 @@ public class ExportXPathWizardController implements Initializable {
     }
 
 
-    public Var<String> nameProperty() {
+    private Var<String> nameProperty() {
         return Var.fromVal(nameField.textProperty(), nameField::setText);
     }
 
 
-    public Var<String> messageProperty() {
+    private Var<String> messageProperty() {
         return Var.fromVal(messageField.textProperty(), messageField::setText);
     }
 
 
-    public Var<String> descriptionProperty() {
+    private Var<String> descriptionProperty() {
         return Var.fromVal(descriptionArea.textProperty(), descriptionArea::setText);
     }
 
 
-    public Var<RulePriority> priorityProperty() {
+    private Var<RulePriority> priorityProperty() {
         return Var.doubleVar(prioritySlider.valueProperty()).mapBidirectional(d -> RulePriority.valueOf(d.intValue()), p -> Double.valueOf(p.getPriority()));
     }
 
 
-    public Var<String> xpathExpressionProperty() {
+    private Var<String> xpathExpressionProperty() {
         return xpathExpression;
     }
 
 
-    public Var<String> xpathVersionProperty() {
+    private Var<String> xpathVersionProperty() {
         return xpathVersion;
     }
 
 
-    public Language getLanguage() {
-        return language.getValue();
-    }
-
-
-    public RulePriority getPriority() {
-        return priority.getValue();
-    }
-
-
     public Var<Language> languageProperty() {
-        return Var.fromVal(language, languageChoiceBox.getSelectionModel()::select);
+        return languageUIProperty;
     }
 
 
-    public Var<ObservableList<PropertyDescriptorSpec>> rulePropertiesProperty() {
+    private Var<ObservableList<PropertyDescriptorSpec>> rulePropertiesProperty() {
         return Var.fromVal(propertyView.rulePropertiesProperty(), propertyView::setRuleProperties);
+    }
+
+
+    /** Set the given subscription as close handler and show. */
+    public void showYourself(Subscription parentBinding) {
+        myPopupStage.setOnCloseRequest(e -> parentBinding.unsubscribe());
+        myPopupStage.show();
+    }
+
+
+    /** Builds the new stage, done in the constructor. */
+    private Stage createStage(Stage mainStage) {
+        FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("xpath-export-wizard.fxml"));
+        loader.setControllerFactory(controllerFactoryKnowing(this));
+
+        final Stage dialog = new Stage();
+
+        dialog.initOwner(mainStage);
+        dialog.initModality(Modality.WINDOW_MODAL);
+
+        Parent root;
+        try {
+            root = loader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Scene scene = new Scene(root);
+        dialog.setTitle("Export XPath expression to rule");
+        dialog.setScene(scene);
+        dialog.setUserData(this);
+        return dialog;
     }
 
 
@@ -276,7 +313,7 @@ public class ExportXPathWizardController implements Initializable {
             .appendIndent(1).append("class=\"").bind(ObservableRuleBuilder::clazzProperty, Class::getCanonicalName).appendLine("\">")
             .withDefaultIndent("   ")
             .appendIndent(1).appendLine("<description>")
-            .bind(ObservableRuleBuilder::descriptionProperty, wrapped(60, asString())).endLine()
+            .bind(ObservableRuleBuilder::descriptionProperty, wrapped(55, 2, true, asString())).endLine()
             .appendIndent(1).appendLine("</description>")
             .appendIndent(1).append("<priority>").bind(ObservableRuleBuilder::priorityProperty, p -> "" + p.getPriority()).appendLine("</priority>")
             .appendIndent(1).appendLine("<properties>")
