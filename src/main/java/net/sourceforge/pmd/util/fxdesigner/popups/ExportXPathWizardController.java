@@ -102,7 +102,7 @@ public final class ExportXPathWizardController implements Initializable {
     @FXML
     private Accordion infoAccordion;
     @FXML
-    private PropertyTableView propertyView;
+    private PropertyTableView propertyTableView;
     @FXML
     private LanguageVersionRangeSlider languageVersionRangeSlider;
 
@@ -238,7 +238,7 @@ public final class ExportXPathWizardController implements Initializable {
 
 
     private Var<ObservableList<PropertyDescriptorSpec>> rulePropertiesProperty() {
-        return Var.fromVal(propertyView.rulePropertiesProperty(), propertyView::setRuleProperties);
+        return Var.fromVal(propertyTableView.rulePropertiesProperty(), propertyTableView::setRuleProperties);
     }
 
 
@@ -290,12 +290,14 @@ public final class ExportXPathWizardController implements Initializable {
             .appendIndent(1).appendLine("</description>")
             .appendIndent(1).append("<priority>").bind(ObservableRuleBuilder::priorityProperty, p -> "" + p.getPriority()).appendLine("</priority>")
             .appendIndent(1).appendLine("<properties>")
-            .bindTemplatedSeq(ObservableRuleBuilder::getRuleProperties,
-                              prop -> prop.appendIndent(2)
-                                          .append("<property name=\"").bind(PropertyDescriptorSpec::nameProperty)
-                                          .append("\" type=\"").bind(PropertyDescriptorSpec::typeIdProperty, PropertyTypeId::getStringId)
-                                          .append("\" value=\"").bind(PropertyDescriptorSpec::valueProperty)
-                                          .appendLine("\"/>"))
+            .bindTemplatedSeq(
+                ObservableRuleBuilder::getRuleProperties,
+                prop -> prop.appendIndent(2)
+                            .append("<property name=\"").bind(PropertyDescriptorSpec::nameProperty)
+                            .append("\" type=\"").bind(PropertyDescriptorSpec::typeIdProperty, PropertyTypeId::getStringId)
+                            .append("\" value=\"").bind(PropertyDescriptorSpec::valueProperty)
+                            .appendLine("\"/>")
+            )
             .appendIndent(2).append("<property name=\"version\" value=\"").bind(ObservableXPathRuleBuilder::xpathVersionProperty).appendLine("\"/>")
             .appendIndent(2).appendLine("<property name=\"xpath\">")
             .appendIndent(3).appendLine("<value>")

@@ -6,9 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.controlsfx.control.RangeSlider;
 import org.reactfx.value.Var;
@@ -30,7 +28,6 @@ public class LanguageVersionRangeSlider extends RangeSlider {
     private static final String NO_MIN_STR = "No minimum";
     private static final String NO_MAX_STR = "No maximum";
     private final Var<Language> currentLanguage = Var.newSimpleVar(null);
-    private final Map<Integer, LanguageVersion> tickToVersionMap = new HashMap<>();
     private List<LanguageVersion> curVersions = new ArrayList<>();
 
 
@@ -93,19 +90,26 @@ public class LanguageVersionRangeSlider extends RangeSlider {
     }
 
 
+    private LanguageVersion fromIndex(int idx) {
+        return idx < 0 || idx >= curVersions.size() ? null : curVersions.get(idx);
+    }
+
+
     public Var<LanguageVersion> minVersionProperty() {
-        return Var.mapBidirectional(lowValueProperty(),
-                                    num -> num.intValue() < 0 || num.intValue() >= curVersions.size()
-                                           ? null : curVersions.get(num.intValue()),
-                                    ver -> ver == null ? -1 : curVersions.indexOf(ver));
+        return Var.mapBidirectional(
+            lowValueProperty(),
+            num -> fromIndex(num.intValue()),
+            ver -> ver == null ? -1 : curVersions.indexOf(ver)
+        );
     }
 
 
     public Var<LanguageVersion> maxVersionProperty() {
-        return Var.mapBidirectional(highValueProperty(),
-                                    num -> num.intValue() < 0 || num.intValue() >= curVersions.size()
-                                           ? null : curVersions.get(num.intValue()),
-                                    ver -> ver == null ? curVersions.size() : curVersions.indexOf(ver));
+        return Var.mapBidirectional(
+            highValueProperty(),
+            num -> fromIndex(num.intValue()),
+            ver -> ver == null ? curVersions.size() : curVersions.indexOf(ver)
+        );
     }
 
 
