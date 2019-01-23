@@ -124,7 +124,7 @@ public class MainDesignerController extends AbstractController<AbstractControlle
         setupAuxclasspathMenuItem.setOnAction(e -> sourceEditorController.showAuxclasspathSetupPopup());
 
         openEventLogMenuItem.setOnAction(e -> {
-            EventLogController wizard = eventLogController.getValue();
+            EventLogController wizard = eventLogController.get();
             Subscription parentToWizSubscription = wizard.errorNodesProperty().values().subscribe(sourceEditorController.currentErrorNodesProperty()::setValue);
             wizard.showPopup(parentToWizSubscription);
         });

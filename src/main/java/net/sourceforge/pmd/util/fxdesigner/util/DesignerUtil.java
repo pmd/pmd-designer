@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -38,8 +37,6 @@ import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
-import org.reactfx.collection.LiveList;
-import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.Language;
@@ -56,7 +53,6 @@ import net.sourceforge.pmd.lang.symboltable.ScopedNode;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Toggle;
@@ -320,26 +316,6 @@ public final class DesignerUtil {
     }
 
 
-    public static Callback<Class<?>, Object> controllerFactoryKnowing(Object... controllers) {
-        return type -> {
-
-            for (Object o : controllers) {
-                if (o.getClass().equals(type)) {
-                    return o;
-                }
-            }
-
-            // default behavior for controllerFactory:
-            try {
-                return type.newInstance();
-            } catch (Exception exc) {
-                exc.printStackTrace();
-                throw new RuntimeException(exc); // fatal, just bail...
-            }
-        };
-    }
-
-
     // Creating a real function Val<LiveList<T>> => LiveList<T> or LiveList<Val<T>> => LiveList<T> would
     // allow implementing LiveList.flatMap, which is a long-standing feature request in ReactFX
     // These utilities are very inefficient, but sufficient for our use case...
@@ -379,9 +355,9 @@ public final class DesignerUtil {
 
     /**
      * Reduces the given stream on the given duration. If reduction of two values is not possible
-     * (canReduce returns false), then the last value is emitted and the new one will
-     * be tested for reduction with the next ones. If no new event is pushed during the duration, the last reduction
-     * result is emitted.
+     * (canReduce returns false), then the last value is emitted and the new one will be tested for
+     * reduction with the next ones. If no new event is pushed during the duration, the last
+     * reduction result is emitted.
      */
     public static <T> EventStream<T> reduceIfPossible(EventStream<T> input, BiPredicate<T, T> canReduce, BinaryOperator<T> reduction, Duration duration) {
         EventSource<T> source = new EventSource<>();
@@ -402,10 +378,10 @@ public final class DesignerUtil {
 
 
     /**
-     * Like reduce if possible, but can be used if the events to reduce are emitted in extremely close
-     * succession, so close that some unrelated events may be mixed up. This reduces each new event
-     * with a related event in the pending notification chain instead of just considering the last one
-     * as a possible reduction target.
+     * Like reduce if possible, but can be used if the events to reduce are emitted in extremely
+     * close succession, so close that some unrelated events may be mixed up. This reduces each new
+     * event with a related event in the pending notification chain instead of just considering the
+     * last one as a possible reduction target.
      */
     public static <T> EventStream<T> reduceEntangledIfPossible(EventStream<T> input, BiPredicate<T, T> canReduce, BinaryOperator<T> reduction, Duration duration) {
         EventSource<T> source = new EventSource<>();
@@ -433,6 +409,25 @@ public final class DesignerUtil {
              });
 
         return source;
+    }
+
+    public static Callback<Class<?>, Object> controllerFactoryKnowing(Object... controllers) {
+        return type -> {
+
+            for (Object o : controllers) {
+                if (o.getClass().equals(type)) {
+                    return o;
+                }
+            }
+
+            // default behavior for controllerFactory:
+            try {
+                return type.newInstance();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                throw new RuntimeException(exc); // fatal, just bail...
+            }
+        };
     }
 
 
