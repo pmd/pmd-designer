@@ -23,7 +23,6 @@ import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.reactfx.Subscription;
-import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.RulePriority;
@@ -54,19 +53,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.MouseButton;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -83,12 +79,14 @@ import javafx.stage.Stage;
  */
 public final class ExportXPathWizardController implements Initializable {
 
-
+    // those are not configurable in the form and so need their own property
     private final Var<String> xpathExpression = Var.newSimpleVar("");
     private final Var<String> xpathVersion = Var.newSimpleVar(DesignerUtil.defaultXPathVersion());
     private final Stage myPopupStage;
-    private Var<Language> languageUIProperty = Var.newSimpleVar(null);
-    private Val<RulePriority> priority = Val.wrap(null);
+    @FXML
+    private Button resetMetadataButton;
+    @FXML
+    private Button copyResultButton;
     @FXML
     private SyntaxHighlightingCodeArea exportResultArea;
     @FXML
@@ -110,7 +108,6 @@ public final class ExportXPathWizardController implements Initializable {
 
 
     public ExportXPathWizardController(DesignerRoot root) {
-
         this.myPopupStage = createStage(root.getMainStage());
     }
 
@@ -118,9 +115,6 @@ public final class ExportXPathWizardController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initialiseLanguageChoiceBox();
-
-        languageUIProperty = Var.fromVal(languageChoiceBox.getSelectionModel().selectedItemProperty(), languageChoiceBox.getSelectionModel()::select);
-        priority = Val.map(prioritySlider.valueProperty(), Number::intValue).map(RulePriority::valueOf);
 
         Platform.runLater(() -> { // Fixes blurry text in the description text area
             descriptionArea.setCache(false);
@@ -135,11 +129,31 @@ public final class ExportXPathWizardController implements Initializable {
         Platform.runLater(() -> infoAccordion.setExpandedPane((TitledPane) infoAccordion.getChildrenUnmodifiable().get(0)));
         Platform.runLater(this::registerValidators);
 
-        initialiseAreaContextMenu();
         exportResultArea.setSyntaxHighlighter(new XmlSyntaxHighlighter());
         exportResultArea.setEditable(false);
 
+        copyResultButton.setOnAction(e -> {
+            final ClipboardContent content = new ClipboardContent();
+            content.putString(exportResultArea.getText());
+            Clipboard.getSystemClipboard().setContent(content);
+        });
+
+        resetMetadataButton.setOnAction(e -> {
+            Alert alert = new Alert(AlertType.CONFIRMATION, "Wipe out the rule's metadata?",
+                                    ButtonType.YES, ButtonType.CANCEL);
+            alert.showAndWait();
+
+            exportResultArea.setSyntaxHighlighter(new XmlSyntaxHighlighter());
+            if (alert.getResult() == ButtonType.YES) {
+                nameProperty().setValue("");
+                descriptionProperty().setValue("");
+                messageProperty().setValue("");
+                priorityProperty().setValue(RulePriority.MEDIUM);
+            }
+        });
+
         languageVersionRangeSlider.currentLanguageProperty().bind(this.languageProperty());
+        Platform.runLater(() -> exportResultArea.moveTo(0));
     }
 
 
@@ -169,47 +183,6 @@ public final class ExportXPathWizardController implements Initializable {
                                                                           .collect(Collectors.toList()));
 
         languageChoiceBox.setConverter(stringConverter(Language::getShortName, LanguageRegistry::findLanguageByShortName));
-    }
-
-
-    private void initialiseAreaContextMenu() {
-
-        // TODO move to a ToolBar
-
-        MenuItem copyToClipBoardItem = new MenuItem("Copy to clipboard");
-        copyToClipBoardItem.setOnAction(e -> {
-            final ClipboardContent content = new ClipboardContent();
-            content.putString(exportResultArea.getText());
-            Clipboard.getSystemClipboard().setContent(content);
-        });
-
-        MenuItem resetMetadataItem = new MenuItem("Reset rule metadata");
-        resetMetadataItem.setOnAction(e -> {
-            Alert alert = new Alert(AlertType.CONFIRMATION, "Wipe out the rule's metadata?",
-                                    ButtonType.YES, ButtonType.CANCEL);
-            alert.showAndWait();
-
-            exportResultArea.setSyntaxHighlighter(new XmlSyntaxHighlighter());
-            if (alert.getResult() == ButtonType.YES) {
-                nameProperty().setValue("");
-                descriptionProperty().setValue("");
-                messageProperty().setValue("");
-                priorityProperty().setValue(RulePriority.MEDIUM);
-            }
-        });
-
-        final ContextMenu contextMenu = new ContextMenu(copyToClipBoardItem, new SeparatorMenuItem(), resetMetadataItem);
-        exportResultArea.setOnMouseClicked(event -> {
-            if (event.getButton() == MouseButton.SECONDARY) {
-                contextMenu.show(
-                    exportResultArea,
-                    event.getScreenX(),
-                    event.getScreenY()
-                );
-            } else if (event.getButton() == MouseButton.PRIMARY) {
-                contextMenu.hide();
-            }
-        });
     }
 
 
@@ -260,7 +233,7 @@ public final class ExportXPathWizardController implements Initializable {
 
 
     public Var<Language> languageProperty() {
-        return languageUIProperty;
+        return Var.fromVal(languageChoiceBox.getSelectionModel().selectedItemProperty(), languageChoiceBox.getSelectionModel()::select);
     }
 
 

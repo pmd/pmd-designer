@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
@@ -19,146 +23,215 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea?>
-<?import org.controlsfx.control.RangeSlider?>
-<?import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider?>
-<?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
-<AnchorPane prefHeight="444.0" prefWidth="761.0" stylesheets="@../css/designer.css" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.pmd.util.fxdesigner.popups.ExportXPathWizardController">
+<AnchorPane prefHeight="444.0"
+            prefWidth="819.0"
+            stylesheets="@../css/designer.css"
+            xmlns="http://javafx.com/javafx/8.0.172-ea"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="net.sourceforge.pmd.util.fxdesigner.popups.ExportXPathWizardController">
     <children>
-          <AnchorPane layoutX="1.0" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <children>
-                  <SplitPane dividerPositions="0.3689064558629776" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                      <items>
-                          <Accordion fx:id="infoAccordion">
-                              <panes>
-                                  <TitledPane animated="false" expanded="true" text="Required information">
-                                      <content>
-                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                              <children>
-                                                  <GridPane hgap="5.0" vgap="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                      <columnConstraints>
-                                                          <ColumnConstraints hgrow="NEVER" maxWidth="85.0" minWidth="73.0" prefWidth="80.0" />
-                                                          <ColumnConstraints hgrow="ALWAYS" maxWidth="185.0" minWidth="10.0" prefWidth="114.0" />
-                                                      </columnConstraints>
-                                                      <rowConstraints>
-                                                          <RowConstraints maxHeight="41.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
-                                                          <RowConstraints maxHeight="58.0" minHeight="10.0" prefHeight="42.0" vgrow="SOMETIMES" />
-                                                          <RowConstraints maxHeight="47.0" minHeight="10.0" prefHeight="39.0" vgrow="SOMETIMES" />
-                                                          <RowConstraints maxHeight="67.0" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES" />
-                                                          <RowConstraints maxHeight="48.0" minHeight="0.0" prefHeight="24.0" vgrow="SOMETIMES" />
-                                                          <RowConstraints maxHeight="103.0" minHeight="10.0" prefHeight="103.0" vgrow="SOMETIMES" />
-                                                      </rowConstraints>
-                                                      <children>
-                                                          <TextField fx:id="nameField" promptText="Rule name..." GridPane.columnIndex="1">
-                                                                </TextField>
-                                                          <Label text="Name">
-                                                              <tooltip>
-                                                                  <Tooltip text="The name of the rule" />
-                                                              </tooltip>
-                                                          </Label>
-                                                          <Label text="Language" GridPane.rowIndex="1">
-                                                              <tooltip>
-                                                                  <Tooltip text="The language to which the rule applies" />
-                                                              </tooltip>
-                                                          </Label>
-                                                          <ChoiceBox fx:id="languageChoiceBox" prefHeight="28.0" prefWidth="181.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
-                                                          <Label text="Message" GridPane.rowIndex="2">
-                                                              <tooltip>
-                                                                  <Tooltip text="Violation message added to the report" />
-                                                              </tooltip>
-                                                          </Label>
-                                                          <Label text="Priority" GridPane.rowIndex="3">
-                                                              <tooltip>
-                                                                  <Tooltip text="Determines the severity of the violation. 5 is an informational warning, 1 is critical." />
-                                                              </tooltip>
-                                                          </Label>
-                                                          <TextField fx:id="messageField" promptText="Violation message..." GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
-                                                          <Slider fx:id="prioritySlider" blockIncrement="1.0" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="3.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
-                                                          <Label text="Description" GridPane.rowIndex="4" />
-                                                          <TextArea fx:id="descriptionArea" focusTraversable="true" prefHeight="52.0" prefWidth="199.0" promptText="Enter a description..." wrapText="true" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
-                                                      </children>
-                                                  </GridPane>
-                                              </children>
-                                          </AnchorPane>
-                                      </content>
-                                  </TitledPane>
-                                  <TitledPane animated="false" expanded="false" text="Language version">
-                                      <content>
-                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+        <SplitPane dividerPositions="0.35006119951040393"
+                   layoutY="-1.0"
+                   prefHeight="200.0"
+                   prefWidth="200.0"
+                   AnchorPane.bottomAnchor="0.0"
+                   AnchorPane.leftAnchor="0.0"
+                   AnchorPane.rightAnchor="0.0"
+                   AnchorPane.topAnchor="0.0">
+            <items>
+                <Accordion fx:id="infoAccordion">
+                    <panes>
+                        <TitledPane animated="false" expanded="true" prefHeight="365.0" prefWidth="150.0" text="Required information">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <GridPane hgap="5.0"
+                                                  vgap="5.0"
+                                                  AnchorPane.bottomAnchor="0.0"
+                                                  AnchorPane.leftAnchor="0.0"
+                                                  AnchorPane.rightAnchor="0.0"
+                                                  AnchorPane.topAnchor="0.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="NEVER"
+                                                                   maxWidth="-Infinity"
+                                                                   minWidth="-Infinity"
+                                                                   prefWidth="80.0" />
+                                                <ColumnConstraints hgrow="ALWAYS" minWidth="0.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints maxHeight="41.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
+                                                <RowConstraints maxHeight="58.0" minHeight="10.0" prefHeight="42.0" vgrow="SOMETIMES" />
+                                                <RowConstraints maxHeight="47.0" minHeight="10.0" prefHeight="39.0" vgrow="SOMETIMES" />
+                                                <RowConstraints maxHeight="67.0" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES" />
+                                                <RowConstraints maxHeight="48.0" minHeight="0.0" prefHeight="24.0" vgrow="SOMETIMES" />
+                                                <RowConstraints maxHeight="103.0" minHeight="10.0" prefHeight="103.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                            <children>
+                                                <TextField fx:id="nameField" promptText="Rule name..." GridPane.columnIndex="1">
+                                                </TextField>
+                                                <Label text="Name">
+                                                    <tooltip>
+                                                        <Tooltip text="The name of the rule" />
+                                                    </tooltip>
+                                                </Label>
+                                                <Label text="Language" GridPane.rowIndex="1">
+                                                    <tooltip>
+                                                        <Tooltip text="The language to which the rule applies" />
+                                                    </tooltip>
+                                                </Label>
+                                                <ChoiceBox fx:id="languageChoiceBox"
+                                                           prefHeight="28.0"
+                                                           prefWidth="181.0"
+                                                           GridPane.columnIndex="1"
+                                                           GridPane.rowIndex="1" />
+                                                <Label text="Message" GridPane.rowIndex="2">
+                                                    <tooltip>
+                                                        <Tooltip text="Violation message added to the report" />
+                                                    </tooltip>
+                                                </Label>
+                                                <Label text="Priority" GridPane.rowIndex="3">
+                                                    <tooltip>
+                                                        <Tooltip text="Determines the severity of the violation. 5 is an informational warning, 1 is critical." />
+                                                    </tooltip>
+                                                </Label>
+                                                <TextField fx:id="messageField"
+                                                           promptText="Violation message..."
+                                                           GridPane.columnIndex="1"
+                                                           GridPane.rowIndex="2" />
+                                                <Slider fx:id="prioritySlider"
+                                                        blockIncrement="1.0"
+                                                        majorTickUnit="1.0"
+                                                        max="5.0"
+                                                        min="1.0"
+                                                        minorTickCount="0"
+                                                        showTickLabels="true"
+                                                        showTickMarks="true"
+                                                        snapToTicks="true"
+                                                        value="3.0"
+                                                        GridPane.columnIndex="1"
+                                                        GridPane.rowIndex="3" />
+                                                <Label text="Description" GridPane.rowIndex="4" />
+                                                <TextArea fx:id="descriptionArea"
+                                                          focusTraversable="true"
+                                                          prefHeight="52.0"
+                                                          prefWidth="199.0"
+                                                          promptText="Enter a description..."
+                                                          wrapText="true"
+                                                          GridPane.columnSpan="2"
+                                                          GridPane.rowIndex="5" />
+                                            </children>
+                                        </GridPane>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </TitledPane>
+                        <TitledPane animated="false" expanded="false" text="Language version">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
 
-                                              <LanguageVersionRangeSlider fx:id="languageVersionRangeSlider" orientation="VERTICAL"
-                                                                          showTickLabels="true"
-                                                                          showTickMarks="true"
-                                                                          AnchorPane.leftAnchor="10"
-                                                                          AnchorPane.bottomAnchor="0.0"
-                                                                          AnchorPane.topAnchor="0.0"/>
+                                    <LanguageVersionRangeSlider fx:id="languageVersionRangeSlider"
+                                                                orientation="VERTICAL"
+                                                                showTickLabels="true"
+                                                                showTickMarks="true"
+                                                                AnchorPane.bottomAnchor="0.0"
+                                                                AnchorPane.leftAnchor="10"
+                                                                AnchorPane.topAnchor="0.0" />
 
-                                          </AnchorPane>
-                                      </content>
-                                  </TitledPane>
-                                  <TitledPane animated="false" text="Properties">
-                                      <content>
-                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                              <children>
-                                                  <PropertyTableView fx:id="propertyView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                              </children>
-                                              <padding>
-                                                  <Insets bottom="-0.5" left="-0.5" right="-0.5" top="-0.5" />
-                                              </padding>
-                                          </AnchorPane>
-                                      </content>
-                                  </TitledPane>
-                                  <TitledPane animated="false" expanded="false" text="Example">
-                                      <content>
-                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                              <children>
-                                                  <VBox layoutX="10.399999618530273" layoutY="10.399999618530273" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                      <children>
-                                                          <ToolBar prefHeight="40.0" prefWidth="200.0" styleClass="info-title-bar">
-                                                              <items>
-                                                                  <Button maxHeight="22.0" minHeight="22.0" mnemonicParsing="false" prefHeight="22.0" text="Use sample code">
-                                                                      <padding>
-                                                                          <Insets bottom="-3.0" left="5.0" right="5.0" top="-3.0" />
-                                                                      </padding>
-                                                                  </Button>
-                                                              </items>
-                                                          </ToolBar>
-                                                          <ListView prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                                                      </children>
-                                                      <padding>
-                                                          <Insets top="-1.0" />
-                                                      </padding>
-                                                  </VBox>
-                                              </children>
-                                              <padding>
-                                                  <Insets top="-0.01" />
-                                              </padding>
-                                          </AnchorPane>
-                                      </content>
-                                  </TitledPane>
-                              </panes>
-                          </Accordion>
-                          <ToolbarTitledPane>
-                              <toolbarItems>
-                                  <Button styleClass="icon-button" fx:id="copyButton">
-                                      <graphic>
-                                          <FontIcon iconLiteral="fas-copy"/>
-                                      </graphic>
-                                  </Button>
-                              </toolbarItems>
-                              <SyntaxHighlightingCodeArea fx:id="exportResultArea"
-                                                          prefHeight="221.0"
-                                                          prefWidth="563.0"
-                                                          stylesheets="@../css/editor-theme.css" />
+                                </AnchorPane>
+                            </content>
+                        </TitledPane>
+                        <TitledPane animated="false" text="Properties">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <PropertyTableView fx:id="propertyView"
+                                                           AnchorPane.bottomAnchor="0.0"
+                                                           AnchorPane.leftAnchor="0.0"
+                                                           AnchorPane.rightAnchor="0.0"
+                                                           AnchorPane.topAnchor="0.0" />
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="-0.5" left="-0.5" right="-0.5" top="-0.5" />
+                                    </padding>
+                                </AnchorPane>
+                            </content>
+                        </TitledPane>
+                        <TitledPane animated="false" expanded="false" text="Example">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="10.399999618530273"
+                                              layoutY="10.399999618530273"
+                                              AnchorPane.bottomAnchor="0.0"
+                                              AnchorPane.leftAnchor="0.0"
+                                              AnchorPane.rightAnchor="0.0"
+                                              AnchorPane.topAnchor="0.0">
+                                            <children>
+                                                <ToolBar prefHeight="40.0" prefWidth="200.0" styleClass="info-title-bar">
+                                                    <items>
+                                                        <Button maxHeight="22.0"
+                                                                minHeight="22.0"
+                                                                mnemonicParsing="false"
+                                                                prefHeight="22.0"
+                                                                text="Use sample code">
+                                                            <padding>
+                                                                <Insets bottom="-3.0" left="5.0" right="5.0" top="-3.0" />
+                                                            </padding>
+                                                        </Button>
+                                                    </items>
+                                                </ToolBar>
+                                                <ListView prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                            </children>
+                                            <padding>
+                                                <Insets top="-1.0" />
+                                            </padding>
+                                        </VBox>
+                                    </children>
+                                    <padding>
+                                        <Insets top="-0.01" />
+                                    </padding>
+                                </AnchorPane>
+                            </content>
+                        </TitledPane>
+                    </panes>
+                </Accordion>
+                <AnchorPane>
+                    <children>
+                        <ToolbarTitledPane animated="false"
+                                           collapsible="false"
+                                           layoutY="5.0"
+                                           title="Export result"
+                                           AnchorPane.bottomAnchor="0.0"
+                                           AnchorPane.leftAnchor="0.0"
+                                           AnchorPane.rightAnchor="0.0"
+                                           AnchorPane.topAnchor="0.0">
+                            <toolbarItems>
+                                <Button fx:id="copyResultButton" styleClass="icon-button">
+                                    <graphic>
+                                        <FontIcon iconLiteral="fas-copy" />
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Copy to clipboard" />
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="resetMetadataButton" styleClass="icon-button">
+                                    <graphic>
+                                        <FontIcon iconLiteral="fas-undo" />
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Reset metadata (excluding properties)" />
+                                    </tooltip>
+                                </Button>
+                            </toolbarItems>
+                            <SyntaxHighlightingCodeArea fx:id="exportResultArea"
+                                                        prefHeight="221.0"
+                                                        prefWidth="563.0"
+                                                        stylesheets="@../css/editor-theme.css" />
 
-                          </ToolbarTitledPane>
-                      </items>
-                  </SplitPane>
-              </children>
-              <padding>
-                  <Insets top="-1.0" />
-              </padding>
-          </AnchorPane>
+                        </ToolbarTitledPane>
+                    </children>
+                </AnchorPane>
+            </items>
+        </SplitPane>
     </children>
 </AnchorPane>
