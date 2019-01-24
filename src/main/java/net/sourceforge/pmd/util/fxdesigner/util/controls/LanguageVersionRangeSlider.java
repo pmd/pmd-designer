@@ -7,6 +7,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.controlsfx.control.RangeSlider;
 import org.reactfx.value.Var;
@@ -79,14 +80,12 @@ public class LanguageVersionRangeSlider extends RangeSlider {
             return;
         }
 
-        curVersions = language.getVersions();
-
-        Collections.sort(language.getVersions());
+        // for some reason Collections.sort doesn't work
+        curVersions = language.getVersions().stream().sorted(LanguageVersion::compareTo).collect(Collectors.toList());
 
         setDisable(curVersions.size() < 2);
 
         setMax(curVersions.size());
-        setSnapToTicks(true);
     }
 
 

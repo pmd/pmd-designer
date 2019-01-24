@@ -39,11 +39,11 @@
                    AnchorPane.rightAnchor="0.0"
                    AnchorPane.topAnchor="0.0">
             <items>
-                <Accordion fx:id="infoAccordion">
+                <Accordion fx:id="infoAccordion" prefWidth="200.0">
                     <panes>
-                        <TitledPane animated="false" expanded="true" prefHeight="365.0" prefWidth="150.0" text="Required information">
+                        <TitledPane text="Required information">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                <AnchorPane>
                                     <children>
                                         <GridPane hgap="5.0"
                                                   vgap="5.0"
@@ -112,7 +112,6 @@
                                                         GridPane.rowIndex="3" />
                                                 <Label text="Description" GridPane.rowIndex="4" />
                                                 <TextArea fx:id="descriptionArea"
-                                                          focusTraversable="true"
                                                           prefHeight="52.0"
                                                           prefWidth="199.0"
                                                           promptText="Enter a description..."
@@ -125,24 +124,24 @@
                                 </AnchorPane>
                             </content>
                         </TitledPane>
-                        <TitledPane animated="false" expanded="false" text="Language version">
+                        <TitledPane expanded="false" text="Language version">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                <AnchorPane>
 
                                     <LanguageVersionRangeSlider fx:id="languageVersionRangeSlider"
                                                                 orientation="VERTICAL"
                                                                 showTickLabels="true"
                                                                 showTickMarks="true"
-                                                                AnchorPane.bottomAnchor="0.0"
+                                                                AnchorPane.bottomAnchor="5.0"
                                                                 AnchorPane.leftAnchor="10"
-                                                                AnchorPane.topAnchor="0.0" />
+                                                                AnchorPane.topAnchor="5.0" />
 
                                 </AnchorPane>
                             </content>
                         </TitledPane>
-                        <TitledPane animated="false" text="Properties">
+                        <TitledPane animated="false" expanded="false" text="Properties">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                <AnchorPane>
                                     <children>
                                         <PropertyTableView fx:id="propertyTableView"
                                                            AnchorPane.bottomAnchor="0.0"
@@ -156,9 +155,9 @@
                                 </AnchorPane>
                             </content>
                         </TitledPane>
-                        <TitledPane animated="false" expanded="false" text="Example">
+                        <TitledPane animated="false" expanded="false" text="Examples">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                <AnchorPane>
                                     <children>
                                         <VBox layoutX="10.399999618530273"
                                               layoutY="10.399999618530273"
@@ -223,11 +222,13 @@
                                     </tooltip>
                                 </Button>
                             </toolbarItems>
-                            <SyntaxHighlightingCodeArea fx:id="exportResultArea"
-                                                        prefHeight="221.0"
-                                                        prefWidth="563.0"
-                                                        stylesheets="@../css/editor-theme.css" />
+                            <content>
+                                <SyntaxHighlightingCodeArea fx:id="exportResultArea"
+                                                            prefHeight="221.0"
+                                                            prefWidth="563.0"
+                                                            stylesheets="@../css/editor-theme.css" />
 
+                            </content>
                         </ToolbarTitledPane>
                     </children>
                 </AnchorPane>

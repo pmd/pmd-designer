@@ -142,6 +142,17 @@
   -fx-color: -fx-base;
 }
 
+.titled-pane {
+
+  & > .title {
+    -fx-background-color: @app-darker-slate-color;
+  }
+
+  &.full-size-title > .title {
+    .fix-height(30);
+  }
+}
+
 // Supports the ToolbarTitledPane
 .titled-pane.tool-bar-title {
 
@@ -150,9 +161,7 @@
   }
 
   & > .title {
-
     -fx-padding: 0 6 0 6;
-    -fx-background-color: @app-darker-slate-color;
     -fx-pref-height: 24; // TODO make the default at least 30 and prop up font size, maybe remove .full-size-title
 
     & > .tool-bar {
