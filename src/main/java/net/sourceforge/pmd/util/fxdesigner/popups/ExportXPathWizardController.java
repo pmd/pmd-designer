@@ -35,6 +35,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.PropertyDescriptorSpec;
+import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighlighters;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlSyntaxHighlighter;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider;
@@ -245,6 +246,7 @@ public final class ExportXPathWizardController implements Initializable {
     /** Set the given subscription as close handler and show. */
     public void showYourself(Subscription parentBinding) {
         myPopupStage.setOnCloseRequest(e -> parentBinding.unsubscribe());
+        exportResultArea.setSyntaxHighlighter(new XmlSyntaxHighlighter());
         myPopupStage.show();
     }
 
