@@ -8,6 +8,9 @@ import static com.github.oowekyala.rxstring.ItemRenderer.asString;
 import static com.github.oowekyala.rxstring.ItemRenderer.indented;
 import static com.github.oowekyala.rxstring.ItemRenderer.surrounded;
 import static com.github.oowekyala.rxstring.ItemRenderer.wrapped;
+import static net.sourceforge.pmd.RulePriority.HIGH;
+import static net.sourceforge.pmd.RulePriority.LOW;
+import static net.sourceforge.pmd.RulePriority.MEDIUM;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.controllerFactoryKnowing;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.getSupportedLanguageVersions;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.rewireInit;
@@ -40,6 +43,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeA
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlSyntaxHighlighter;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.RulePrioritySlider;
 
 import com.github.oowekyala.rxstring.LiveTemplate;
 import com.github.oowekyala.rxstring.LiveTemplateBuilder;
@@ -95,7 +99,7 @@ public final class ExportXPathWizardController implements Initializable {
     @FXML
     private TextField messageField;
     @FXML
-    private Slider prioritySlider;
+    private RulePrioritySlider prioritySlider;
     @FXML
     private ChoiceBox<Language> languageChoiceBox;
     @FXML
@@ -219,7 +223,7 @@ public final class ExportXPathWizardController implements Initializable {
 
 
     private Var<RulePriority> priorityProperty() {
-        return Var.doubleVar(prioritySlider.valueProperty()).mapBidirectional(d -> RulePriority.valueOf(d.intValue()), p -> Double.valueOf(p.getPriority()));
+        return prioritySlider.priorityProperty();
     }
 
 

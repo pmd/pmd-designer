@@ -4,6 +4,7 @@
 <?import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.RulePrioritySlider?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
@@ -11,7 +12,6 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
@@ -98,18 +98,11 @@
                                                            promptText="Violation message..."
                                                            GridPane.columnIndex="1"
                                                            GridPane.rowIndex="2" />
-                                                <Slider fx:id="prioritySlider"
-                                                        blockIncrement="1.0"
-                                                        majorTickUnit="1.0"
-                                                        max="5.0"
-                                                        min="1.0"
-                                                        minorTickCount="0"
-                                                        showTickLabels="true"
-                                                        showTickMarks="true"
-                                                        snapToTicks="true"
-                                                        value="3.0"
-                                                        GridPane.columnIndex="1"
-                                                        GridPane.rowIndex="3" />
+                                                <RulePrioritySlider fx:id="prioritySlider"
+                                                                    showTickMarks="true"
+                                                                    showTickLabels="true"
+                                                                    GridPane.columnIndex="1"
+                                                                    GridPane.rowIndex="3" />
                                                 <Label text="Description" GridPane.rowIndex="4" />
                                                 <TextArea fx:id="descriptionArea"
                                                           prefHeight="52.0"
