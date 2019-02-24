@@ -36,6 +36,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
+import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
@@ -55,6 +56,9 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Toggle;
@@ -261,6 +265,19 @@ public final class DesignerUtil {
     public static <T> void rewire(Property<T> underlying, ObservableValue<? extends T> source) {
         underlying.unbind();
         underlying.bind(source); // Bindings are garbage collected after the popup dies
+    }
+
+
+    /**
+     * Adds an event handler and returns a subscription that removes it. There's probably
+     * a utility like that in ReactFX but I couldn't find it.
+     */
+    public static <T extends Event> Subscription installEventHandler(javafx.scene.Node node,
+                                                                     EventType<T> eventType,
+                                                                     EventHandler<? super T> eventHandler) {
+
+        node.addEventHandler(eventType, eventHandler);
+        return () -> node.removeEventHandler(eventType, eventHandler);
     }
 
 

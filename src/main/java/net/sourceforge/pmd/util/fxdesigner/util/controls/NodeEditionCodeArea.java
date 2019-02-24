@@ -6,7 +6,11 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.installEventHandler;
+import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.findNodeAt;
+import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.getPmdLineAndColumnFromOffset;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +20,10 @@ import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.richtext.event.MouseOverTextEvent;
+import org.reactfx.EventSource;
 import org.reactfx.EventStreams;
+import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -30,11 +37,13 @@ import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighlighters;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea;
+import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.LineRelativeCoordinates;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea.StyleLayerIds;
 
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.css.PseudoClass;
+import javafx.scene.input.KeyEvent;
 
 
 /**
@@ -49,6 +58,10 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     private final Var<List<Node>> currentErrorNodes = Var.newSimpleVar(Collections.emptyList());
     private final Var<List<NameOccurrence>> currentNameOccurrences = Var.newSimpleVar(Collections.emptyList());
     private final DesignerRoot designerRoot;
+    private final EventSource<Node> selectionEvts = new EventSource<>();
+
+    private final Var<Boolean> isCtrlDown = Var.newSimpleVar(false);
+
 
     /** Only provided for scenebuilder, not used at runtime. */
     public NodeEditionCodeArea() {
@@ -69,6 +82,37 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         currentRuleResultsProperty().values().subscribe(this::highlightXPathResults);
         currentErrorNodesProperty().values().subscribe(this::highlightErrorNodes);
         currentNameOccurrences.values().subscribe(this::highlightNameOccurrences);
+
+        // TODO this should be global to the app
+        addEventHandler(KeyEvent.KEY_PRESSED, e -> isCtrlDown.setValue(e.isControlDown()));
+        addEventHandler(KeyEvent.KEY_RELEASED, e -> isCtrlDown.setValue(e.isControlDown()));
+
+        initNodeSelectionHandling(designerRoot, selectionEvts, true);
+
+        enableCtrlSelection();
+    }
+
+
+    private Subscription enableCtrlSelection() {
+
+        setMouseOverTextDelay(Duration.ofMillis(100));
+        return installEventHandler(
+            this,
+            MouseOverTextEvent.MOUSE_OVER_TEXT_BEGIN,
+            ev -> {
+                if (!isCtrlDown.getValue()) {
+                    return;
+                }
+                Node currentRoot = getDesignerRoot().currentCompilationUnitProperty().getValue();
+                if (currentRoot == null) {
+                    return;
+                }
+
+                LineRelativeCoordinates target = getPmdLineAndColumnFromOffset(this, ev.getCharacterIndex());
+
+                findNodeAt(currentRoot, target).ifPresent(selectionEvts::push);
+            }
+        ).and(() -> setMouseOverTextDelay(null));
     }
 
     /** Scroll the editor to a node and makes it visible. */
@@ -137,7 +181,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
     /** Highlights name occurrences (secondary highlight). */
     private void highlightNameOccurrences(Collection<? extends NameOccurrence> occs) {
-        styleNodes(occs.stream().map(NameOccurrence::getLocation).collect(Collectors.toList()), StyleLayerIds.NAME_OCCURENCE, true);
+        styleNodes(occs.stream().map(NameOccurrence::getLocation).collect(Collectors.toList()), StyleLayerIds.NAME_OCCURRENCE, true);
     }
 
 
@@ -198,7 +242,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         /** For the currently selected node. */
         FOCUS,
         /** For declaration usages. */
-        NAME_OCCURENCE,
+        NAME_OCCURRENCE,
         /** For nodes in error. */
         ERROR,
         /** For xpath results. */
