@@ -40,7 +40,7 @@ public final class PmdCoordinatesSystem {
         Position pos = codeArea.offsetToPosition(absoluteOffset, Bias.Backward);
         int indentationOffset = indentationOffset(codeArea, pos.getMajor());
 
-        return new TextPos2D(pos.getMajor() + 1, pos.getMinor() + indentationOffset);
+        return new TextPos2D(pos.getMajor() + 1, pos.getMinor() + indentationOffset + 1);
     }
 
 
