@@ -1,6 +1,7 @@
 package net.sourceforge.pmd.util.fxdesigner.util.codearea;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -34,12 +35,12 @@ public final class PmdCoordinatesSystem {
      * obtained from the given code area into the line and column a PMD parser would have assigned to
      * it.
      */
-    public static LineRelativeCoordinates getPmdLineAndColumnFromOffset(CodeArea codeArea, int absoluteOffset) {
+    public static TextPos2D getPmdLineAndColumnFromOffset(CodeArea codeArea, int absoluteOffset) {
 
         Position pos = codeArea.offsetToPosition(absoluteOffset, Bias.Backward);
         int indentationOffset = indentationOffset(codeArea, pos.getMajor());
 
-        return new LineRelativeCoordinates(pos.getMajor() + 1, pos.getMinor() + indentationOffset);
+        return new TextPos2D(pos.getMajor() + 1, pos.getMinor() + indentationOffset);
     }
 
 
@@ -71,51 +72,68 @@ public final class PmdCoordinatesSystem {
      * Locates the innermost node in the given [root] that contains the
      * position at [textOffset] in the [codeArea].
      */
-    public static Optional<Node> findNodeAt(Node root, LineRelativeCoordinates target) {
-        return contains(root, target) ? findNodeRec(root, target) : Optional.empty();
+    public static Optional<Node> findNodeAt(Node root, TextPos2D target) {
+        return Optional.ofNullable(findNodeRec(root, target)).filter(it -> contains(it, target));
     }
 
 
-    private static Optional<Node> findNodeRec(Node subject, LineRelativeCoordinates target) {
-        // This is a simple divide and conquer algo
-        // Like UniformStyleCollection, we assume that the text bounds of a node
-        // contains the bounds of any of its descendants.
-        // Then we only have to explore one node at each level of the tree,
-        // and we quickly hit the bottom.
+    /**
+     * Simple recursive search algo. Makes the same assumptions about text bounds
+     * as {@link UniformStyleCollection#toSpans()}. Then:
+     * - We only have to explore one node at each level of the tree, and we quickly
+     * hit the bottom (average depth of a Java AST ~20-25, with 6.x.x grammar).
+     * - At each level, the next node to explore is chosen via binary search.
+     */
+    private static Node findNodeRec(Node subject, TextPos2D target) {
+        Node child = binarySearchInChildren(subject, target);
+        return child == null ? subject : findNodeRec(child, target);
+    }
 
-        for (int i = 0; i < subject.jjtGetNumChildren(); i++) {
-            Node child = subject.jjtGetChild(i);
-            if (contains(child, target)) {
-                return findNodeRec(child, target);
+    // returns the child of the [parent] that contains the target
+    // it's assumed to be unique
+    private static Node binarySearchInChildren(Node parent, TextPos2D target) {
+
+        int low = 0;
+        int high = parent.jjtGetNumChildren() - 1;
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            Node child = parent.jjtGetChild(mid);
+            int cmp = startPosition(child).compareTo(target);
+
+            if (cmp < 0) {
+                // node start is before target
+                low = mid + 1;
+                if (endPosition(child).compareTo(target) >= 0) {
+                    // node end is after target
+                    return child;
+                }
+            } else if (cmp > 0) {
+                high = mid - 1;
+            } else {
+                // target is node start position
+                return child; // key found
             }
         }
-
-        return Optional.of(subject);
+        return null;  // key not found
     }
 
 
     /**
      * Returns true if the given node contains the position.
      */
-    public static boolean contains(Node node, LineRelativeCoordinates pos) {
+    public static boolean contains(Node node, TextPos2D pos) {
+        return startPosition(node).compareTo(pos) <= 0 && endPosition(node).compareTo(pos) >= 0;
+    }
 
-        if (pos.line < node.getBeginLine() || pos.line > node.getEndLine()) {
-            return false;
-        }
 
-        if (node.getBeginLine() == node.getEndLine()) {
-            return pos.column >= node.getBeginColumn() && pos.column < node.getEndColumn();
-        }
+    public static TextPos2D startPosition(Node node) {
+        return new TextPos2D(node.getBeginLine(), node.getBeginColumn());
+    }
 
-        if (pos.line == node.getBeginLine()) {
-            return pos.column >= node.getBeginColumn();
-        }
 
-        if (pos.line == node.getEndLine()) {
-            return pos.column <= node.getEndColumn();
-        }
-
-        return true;
+    public static TextPos2D endPosition(Node node) {
+        return new TextPos2D(node.getEndLine(), node.getEndColumn());
     }
 
 
@@ -124,15 +142,25 @@ public final class PmdCoordinatesSystem {
      *
      * @author Clément Fournier
      */
-    public static final class LineRelativeCoordinates {
+    public static final class TextPos2D implements Comparable<TextPos2D> {
 
         public final int line;
         public final int column;
 
 
-        public LineRelativeCoordinates(int line, int column) {
+        public static final Comparator<TextPos2D> COMPARATOR =
+            Comparator.<TextPos2D>comparingInt(o -> o.line).thenComparing(o -> o.column);
+
+
+        public TextPos2D(int line, int column) {
             this.line = line;
             this.column = column;
+        }
+
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(line, column);
         }
 
 
@@ -144,15 +172,15 @@ public final class PmdCoordinatesSystem {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            LineRelativeCoordinates that = (LineRelativeCoordinates) o;
+            TextPos2D that = (TextPos2D) o;
             return line == that.line &&
                 column == that.column;
         }
 
 
         @Override
-        public int hashCode() {
-            return Objects.hash(line, column);
+        public int compareTo(TextPos2D o) {
+            return COMPARATOR.compare(this, o);
         }
     }
 }

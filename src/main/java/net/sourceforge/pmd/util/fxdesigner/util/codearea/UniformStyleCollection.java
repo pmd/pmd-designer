@@ -124,6 +124,10 @@ public class UniformStyleCollection {
      *
      * E.g. [    m        ] but not [  m  ]
      *        [ n ] [ n' ]              [   n   ]
+     *
+     * In other words:
+     * - the text bounds of a node contain the bounds of any of its descendants.
+     * - the text bounds of two siblings don't overlap
      */
     public StyleSpans<Collection<String>> toSpans() {
         // We cache the result so that eg if only the focus node changes,

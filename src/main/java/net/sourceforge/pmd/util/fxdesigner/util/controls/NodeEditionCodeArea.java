@@ -35,7 +35,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighlighters;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.LineRelativeCoordinates;
+import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea.StyleLayerIds;
 
 import javafx.application.Platform;
@@ -102,7 +102,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
                     return;
                 }
 
-                LineRelativeCoordinates target = getPmdLineAndColumnFromOffset(this, ev.getCharacterIndex());
+                TextPos2D target = getPmdLineAndColumnFromOffset(this, ev.getCharacterIndex());
 
                 findNodeAt(currentRoot, target).ifPresent(selectionEvts::push);
             }
