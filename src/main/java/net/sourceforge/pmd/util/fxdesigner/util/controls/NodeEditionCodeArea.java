@@ -6,7 +6,6 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.installEventHandler;
 import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.findNodeAt;
 import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.getPmdLineAndColumnFromOffset;
 
@@ -23,7 +22,6 @@ import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.event.MouseOverTextEvent;
 import org.reactfx.EventSource;
 import org.reactfx.EventStreams;
-import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -43,7 +41,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea.Sty
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.css.PseudoClass;
-import javafx.scene.input.KeyEvent;
 
 
 /**
@@ -60,7 +57,6 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     private final DesignerRoot designerRoot;
     private final EventSource<Node> selectionEvts = new EventSource<>();
 
-    private final Var<Boolean> isCtrlDown = Var.newSimpleVar(false);
 
 
     /** Only provided for scenebuilder, not used at runtime. */
@@ -83,24 +79,22 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         currentErrorNodesProperty().values().subscribe(this::highlightErrorNodes);
         currentNameOccurrences.values().subscribe(this::highlightNameOccurrences);
 
-        // TODO this should be global to the app
-        addEventHandler(KeyEvent.KEY_PRESSED, e -> isCtrlDown.setValue(e.isControlDown()));
-        addEventHandler(KeyEvent.KEY_RELEASED, e -> isCtrlDown.setValue(e.isControlDown()));
-
         initNodeSelectionHandling(designerRoot, selectionEvts, true);
 
         enableCtrlSelection();
     }
 
 
-    private Subscription enableCtrlSelection() {
+    /**
+     * TODO does this need to be disableable? Maybe some keyboards use the CTRL key in ways I don't
+     */
+    private void enableCtrlSelection() {
 
         setMouseOverTextDelay(Duration.ofMillis(100));
-        return installEventHandler(
-            this,
+        addEventHandler(
             MouseOverTextEvent.MOUSE_OVER_TEXT_BEGIN,
             ev -> {
-                if (!isCtrlDown.getValue()) {
+                if (!getDesignerRoot().isCtrlDownProperty().getValue()) {
                     return;
                 }
                 Node currentRoot = getDesignerRoot().currentCompilationUnitProperty().getValue();
@@ -112,7 +106,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
                 findNodeAt(currentRoot, target).ifPresent(selectionEvts::push);
             }
-        ).and(() -> setMouseOverTextDelay(null));
+        );
     }
 
     /** Scroll the editor to a node and makes it visible. */

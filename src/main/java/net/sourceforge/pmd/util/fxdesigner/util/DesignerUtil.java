@@ -269,19 +269,6 @@ public final class DesignerUtil {
 
 
     /**
-     * Adds an event handler and returns a subscription that removes it. There's probably
-     * a utility like that in ReactFX but I couldn't find it.
-     */
-    public static <T extends Event> Subscription installEventHandler(javafx.scene.Node node,
-                                                                     EventType<T> eventType,
-                                                                     EventHandler<? super T> eventHandler) {
-
-        node.addEventHandler(eventType, eventHandler);
-        return () -> node.removeEventHandler(eventType, eventHandler);
-    }
-
-
-    /**
      * Works out an xpath query that matches the node
      * which was being visited during the failure.
      *

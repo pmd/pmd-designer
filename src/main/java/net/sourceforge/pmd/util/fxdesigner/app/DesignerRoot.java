@@ -1,6 +1,7 @@
 package net.sourceforge.pmd.util.fxdesigner.app;
 
 import org.reactfx.value.Val;
+import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
 
@@ -44,4 +45,5 @@ public interface DesignerRoot {
     Val<Node> currentCompilationUnitProperty();
 
 
+    Val<Boolean> isCtrlDownProperty();
 }
