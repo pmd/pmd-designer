@@ -1,3 +1,29 @@
+# TODO before going public
+
+* Review release procedure, packaging method, etc
+
+
+## Differences from the current pmd-ui in the main repo
+
+* Some IntelliJ config files are checked in VCS to ease installation
+* The jar artifact is a shaded Jar:
+*  It doesn't ship the pmd dependencies
+  *  It relocates dependencies that are both depended-on by pmd-core and this
+     module (apache)
+  *  It must be built with profile `-PuberJar` otherwise pmd dependencies are
+     included (this is not very cool but I couldn't get it to work in another way)
+
+Maybe it would be better to package
+* a fat jar with pmd dependencies as the main jar artifact
+* and another artifact with no pmd dependencies and a special classifier, that
+  would be depended-on by pmd-dist?
+
+
+
+
+---------------
+---------------
+
 # PMD Rule Designer
 
 
