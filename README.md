@@ -11,7 +11,8 @@
     *  It relocates dependencies that are both depended-on by pmd-core and this
        module (apache)
     *  It must be built with profile `-PuberJar` otherwise pmd dependencies are
-       included (this is not very cool but I couldn't get it to work in another way)
+       included (this is not very cool but I couldn't get it to work in another way). 
+       Would you know another way?
 
 Maybe it would be better to package
 * a fat jar with pmd dependencies as the main jar artifact
