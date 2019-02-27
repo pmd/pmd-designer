@@ -278,7 +278,12 @@
             <artifactId>controlsfx</artifactId>
             <version>8.40.13</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.oowekyala</groupId>
+            <artifactId>fx-live-templates</artifactId>
+            <version>1.0</version>
+        </dependency>
+        
         <!-- Those are shaded to avoid duplication -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -300,11 +305,7 @@
             <artifactId>commons-beanutils-core</artifactId>
             <version>1.8.3</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.oowekyala</groupId>
-            <artifactId>fx-live-templates</artifactId>
-            <version>1.0</version>
-        </dependency>
+
 
         <!-- Icon packs -->
         <dependency>

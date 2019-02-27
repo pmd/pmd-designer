@@ -14,8 +14,6 @@ import net.sourceforge.pmd.properties.PropertyTypeId;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.popups.EditPropertyDialogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.PropertyDescriptorSpec;
-import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 
 import javafx.application.Platform;
@@ -149,7 +147,7 @@ public class PropertyTableView extends TableView<PropertyDescriptorSpec> {
      * @param edited The edited property descriptor
      */
     private void popEditPropertyDialog(PropertyDescriptorSpec edited) {
-        Stage dialog = editPropertyDialogCache.getValue();
+        Stage dialog = editPropertyDialogCache.get();
         EditPropertyDialogController wizard = (EditPropertyDialogController) dialog.getUserData();
         Platform.runLater(() -> wizard.bindToDescriptor(edited, getRuleProperties()));
         dialog.setOnHiding(e -> {

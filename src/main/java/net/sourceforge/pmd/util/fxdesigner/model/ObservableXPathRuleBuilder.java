@@ -5,7 +5,6 @@
 package net.sourceforge.pmd.util.fxdesigner.model;
 
 import org.reactfx.EventStream;
-import org.reactfx.collection.LiveList;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
@@ -64,7 +63,7 @@ public class ObservableXPathRuleBuilder extends ObservableRuleBuilder {
         return nameProperty().values()
                              .or(xpathVersion.values())
                              .or(xpathExpression.values())
-                             .or(LiveList.changesOf(rulePropertiesProperty()));
+                             .or(rulePropertiesProperty().changes());
     }
 
     // TODO: Once the xpath expression changes, we'll need to rebuild the rule

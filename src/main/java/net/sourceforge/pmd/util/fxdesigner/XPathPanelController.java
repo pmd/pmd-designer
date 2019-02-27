@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
-import org.reactfx.Change;
 import org.kordamp.ikonli.javafx.FontIcon;
+import org.reactfx.Change;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 import org.reactfx.SuspendableEventStream;
@@ -34,14 +34,11 @@ import org.reactfx.value.Var;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.lang.rule.XPathRule;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
-import net.sourceforge.pmd.util.fxdesigner.model.LogEntry;
-import net.sourceforge.pmd.util.fxdesigner.model.LogEntry.Category;
-import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
+import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluationException;
 import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluator;
@@ -124,11 +121,11 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
     private Var<String> xpathVersionUIProperty = Var.newSimpleVar(XPathRuleQuery.XPATH_2_0);
 
     private SuspendableEventStream<TextAwareNodeWrapper> selectionEvents;
-    private SoftReference<Stage> exportWizardCache;
+    private SoftReferenceCache<Stage> exportWizardCache;
 
     public XPathPanelController(MainDesignerController mainController) {
         super(mainController);
-        exportWizard = new SoftReferenceCache<>(() -> new ExportXPathWizardController(designerRoot));
+        exportWizard = new SoftReferenceCache<>(() -> new ExportXPathWizardController(getDesignerRoot()));
     }
 
 
