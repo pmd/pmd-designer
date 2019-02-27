@@ -9,7 +9,7 @@
 
 * Some IntelliJ config files are checked in VCS to ease installation
 * The jar artifact is a shaded Jar:
-*  It doesn't ship the pmd dependencies
+    *  It doesn't ship the pmd dependencies
     *  It relocates dependencies that are both depended-on by pmd-core and this
        module (apache)
     *  It must be built with profile `-PuberJar` otherwise pmd dependencies are
