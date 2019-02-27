@@ -8,22 +8,14 @@
 ## Differences from the current pmd-ui in the main repo
 
 * Some IntelliJ config files are checked in VCS to ease installation
+  * You're welcome to check in Eclipse config files as well
 * The jar artifact is a shaded Jar:
-    *  It doesn't ship the pmd dependencies
+    *  It doesn't include the pmd dependencies
     *  It relocates dependencies that are both depended-on by pmd-core and this
        module (apache)
-    *  It must be built with profile `-PuberJar` otherwise pmd dependencies are
-       included (this is not very cool but I couldn't get it to work in another way). 
-       Would you know another way?
-
-Maybe it would be better to package
-* a fat jar with pmd dependencies as the main jar artifact
-* and another jar with no pmd dependencies and a special classifier, that
-  would be depended-on by pmd-dist
-  
-Wdyt?
-
-
+    *  There are profiles for IDE maven import (m2e and IJ) to avoid having the
+    language modules as provided. This is similar to what pmd-core does with the
+    Jaxen shaded jar.
 
 
 ---------------
