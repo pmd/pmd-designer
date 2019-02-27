@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<ruleset name="pmd-ui-dogfood"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+    <description>Rules specific to the UI module.</description>
+
+    <rule ref="net/sourceforge/pmd/pmd-dogfood-config.xml" />
+
+    <rule name="FxIdNamingConvention"
+          language="java"
+          since="6.5.0"
+          message="Injected FXML fields should be suffixed by their type, eg 'HelloButton'"
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+            Injected FXML fields should be suffixed by their type
+        </description>
+        <priority>1</priority>
+        <properties>
+            <property name="version" value="2.0" />
+            <property name="xpath">
+                <value><![CDATA[
+
+//FieldDeclaration[../Annotation[pmd-java:typeIs('javafx.fxml.FXML')]]
+                  [not(ends-with(@VariableName, Type/@TypeImage))]
+
+                  (: The following are the exceptions to the rule :)
+                  [not(ends-with(@VariableName, 'Controller') and ends-with(Type/@TypeImage, 'Controller'))]
+                  [not(Type/@TypeImage = 'TextField' and ends-with(@VariableName, 'Field'))]
+                  [not(Type/@TypeImage = 'ToggleButton' and ends-with(@VariableName, 'Toggle'))]
+                  [not(Type/@TypeImage = 'TextArea' or ends-with(Type/@TypeImage, 'CodeArea') and ends-with(@VariableName, 'Area'))]
+                  [not(Type/@TypeImage = 'TableColumn' and ends-with(@VariableName, 'Column'))]
+                  [not(ends-with(Type/@TypeImage, 'TitledPane') and ends-with(@VariableName, 'Pane'))]
+                  (: This last clause allows variables to be named the same as their type, modulo Camel case :)
+                  (: Ideally we would only allow this for our custom types, but there's currently no easy :)
+                  (: way to get the type name of a node to check the package. :)
+                  (: We should create a function for that, eg typeNameOf :)
+                  [not(string-length(Type/@TypeImage) = string-length(@VariableName)
+                       and substring(Type/@TypeImage, 2) = substring(@VariableName, 2))]
+            ]]></value>
+            </property>
+        </properties>
+    </rule>
+
+</ruleset>

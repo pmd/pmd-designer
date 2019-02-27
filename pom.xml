@@ -202,7 +202,6 @@
                         </relocation>
                     </relocations>
 
-
                     <!-- Merge resource provider files like Ikonli icon resolvers -->
                     <transformers>
                         <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
