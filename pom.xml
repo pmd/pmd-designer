@@ -207,24 +207,6 @@
                     <transformers>
                         <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                     </transformers>
-
-                    <!--<minimizeJar>true</minimizeJar>-->
-                    <!--We can minimize the jar only if classes used in FXML are included -->
-                    <!--And dependencies like icon packs resolvers-->
-                    <filters>
-                        <filter>
-                            <artifact>org.kordamp.ikonli:*</artifact>
-                            <includes>
-                                <include>**</include>
-                            </includes>
-                        </filter>
-                        <!--<filter>-->
-                        <!--<artifact>commons-logging:commons-logging</artifact>-->
-                        <!--<includes>-->
-                        <!--<include>**</include>-->
-                        <!--</includes>-->
-                        <!--</filter>-->
-                    </filters>
                 </configuration>
                 <executions>
                     <execution>
