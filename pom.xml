@@ -178,15 +178,15 @@
                     <additionalJOptions>
                         <additionalJOption>-html5</additionalJOption>
                     </additionalJOptions>
-                    <additionalDependencies>
-                        <!-- TODO: this is only needed to make javadoc happy -->
-                        <additionalDependency>
-                            <groupId>org.apache.ant</groupId>
-                            <artifactId>ant</artifactId>
-                            <version>${ant.version}</version>
-                        </additionalDependency>
-                    </additionalDependencies>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -199,9 +199,6 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                        <!--<configuration>-->
-                        <!--<shadedClassifierName>shaded</shadedClassifierName>-->
-                        <!--</configuration>-->
                     </execution>
                 </executions>
             </plugin>
