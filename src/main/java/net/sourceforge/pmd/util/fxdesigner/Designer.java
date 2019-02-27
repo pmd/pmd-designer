@@ -54,6 +54,7 @@ public class Designer extends Application {
     public void start(Stage stage) throws IOException {
         parseParameters(getParameters());
 
+        // TODO should display the 4 segment version number
         stage.setTitle("PMD Rule Designer (v " + PMDVersion.VERSION + ')');
         setIcons(stage);
 
