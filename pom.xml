@@ -193,6 +193,16 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.1</version>
+                <configuration>
+                    <minimizeJar>true</minimizeJar>
+                    <relocations>
+                        <!-- Relocate apache dependencies because they're included in the binary dist-->
+                        <relocation>
+                            <pattern>org.apache.commons</pattern>
+                            <shadedPattern>org.shaded.apache.commons</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -207,6 +217,7 @@
 
 
     <dependencies>
+        <!-- This is provided in the über jar. -->
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-core</artifactId>
@@ -268,6 +279,17 @@
             <artifactId>commons-beanutils-core</artifactId>
             <version>1.8.3</version>
         </dependency>
+        <!-- Those are shaded to avoid duplication -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
 
         <!-- Icon packs -->
         <dependency>
@@ -281,62 +303,63 @@
             <version>2.3.0</version>
         </dependency>
 
-        <!-- PMD dependencies (provided) -->
+        <!-- PMD dependencies -->
+        <!-- Language modules are runtime scope to not record accidental dependencies -->
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-apex</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-java</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-javascript</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-jsp</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-plsql</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-visualforce</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-vm</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-xml</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -346,7 +369,7 @@
         </dependency>
     </dependencies>
 
-    <!-- Mark PMD dependencies as provided to exclude them from the über-jar -->
+    <!-- Mark PMD-core as provided to exclude it from the über-jar -->
     <profiles>
         <profile>
             <id>uberJar</id>
@@ -355,6 +378,62 @@
                     <groupId>net.sourceforge.pmd</groupId>
                     <artifactId>pmd-core</artifactId>
                     <version>${pmd.core.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge.pmd</groupId>
+                    <artifactId>pmd-apex</artifactId>
+                    <version>${pmd.core.version}</version>
+                    <optional>true</optional>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge.pmd</groupId>
+                    <artifactId>pmd-java</artifactId>
+                    <version>${pmd.core.version}</version>
+                    <optional>true</optional>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge.pmd</groupId>
+                    <artifactId>pmd-javascript</artifactId>
+                    <version>${pmd.core.version}</version>
+                    <optional>true</optional>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge.pmd</groupId>
+                    <artifactId>pmd-jsp</artifactId>
+                    <version>${pmd.core.version}</version>
+                    <optional>true</optional>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge.pmd</groupId>
+                    <artifactId>pmd-plsql</artifactId>
+                    <version>${pmd.core.version}</version>
+                    <optional>true</optional>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge.pmd</groupId>
+                    <artifactId>pmd-visualforce</artifactId>
+                    <version>${pmd.core.version}</version>
+                    <optional>true</optional>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge.pmd</groupId>
+                    <artifactId>pmd-vm</artifactId>
+                    <version>${pmd.core.version}</version>
+                    <optional>true</optional>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge.pmd</groupId>
+                    <artifactId>pmd-xml</artifactId>
+                    <version>${pmd.core.version}</version>
+                    <optional>true</optional>
                     <scope>provided</scope>
                 </dependency>
             </dependencies>
