@@ -18,7 +18,7 @@
 
 Maybe it would be better to package
 * a fat jar with pmd dependencies as the main jar artifact
-* and another artifact with no pmd dependencies and a special classifier, that
+* and another jar with no pmd dependencies and a special classifier, that
   would be depended-on by pmd-dist
   
 Wdyt?
@@ -70,6 +70,11 @@ mvn process-resources # Generate CSS resources
 ```
 * Invoke the Reimport All Maven Projects Action
 * You can now run the designer with the provided Run Configurations
+
+* Install the [File Watchers](https://plugins.jetbrains.com/plugin/7177-file-watchers)
+  plugin to compile the Less files to CSS when you edit them. The CSS files are
+  generated into an ignored resource directory so that the integrated
+  SceneBuilder picks up on them.
 
 TODO make Gifs?
 
