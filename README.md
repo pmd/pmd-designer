@@ -1,6 +1,8 @@
 # TODO before going public
 
-* Review release procedure, packaging method, etc
+* Review release procedure
+    * Do we need a release script to select profiles?
+    * How do we configure the maven release plugin and with which credentials?
 * This repo is to be moved to the pmd org
 
 ## Differences from the current pmd-ui in the main repo
