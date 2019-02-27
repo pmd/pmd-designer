@@ -1,7 +1,7 @@
 # TODO before going public
 
 * Review release procedure, packaging method, etc
-
+* This repo is to be moved to the pmd org
 
 ## Differences from the current pmd-ui in the main repo
 
