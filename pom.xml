@@ -194,7 +194,6 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
-                    <minimizeJar>true</minimizeJar>
                     <relocations>
                         <!-- Relocate apache dependencies because they're included in the binary dist-->
                         <relocation>
@@ -202,6 +201,30 @@
                             <shadedPattern>org.shaded.apache.commons</shadedPattern>
                         </relocation>
                     </relocations>
+
+
+                    <!-- Merge resource provider files like Ikonli icon resolvers -->
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                    </transformers>
+
+                    <!--<minimizeJar>true</minimizeJar>-->
+                    <!--We can minimize the jar only if classes used in FXML are included -->
+                    <!--And dependencies like icon packs resolvers-->
+                    <filters>
+                        <filter>
+                            <artifact>org.kordamp.ikonli:*</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                        <!--<filter>-->
+                        <!--<artifact>commons-logging:commons-logging</artifact>-->
+                        <!--<includes>-->
+                        <!--<include>**</include>-->
+                        <!--</includes>-->
+                        <!--</filter>-->
+                    </filters>
                 </configuration>
                 <executions>
                     <execution>
@@ -295,12 +318,12 @@
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-javafx</artifactId>
-            <version>2.3.0</version>
+            <version>2.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-fontawesome5-pack</artifactId>
-            <version>2.3.0</version>
+            <version>2.4.0</version>
         </dependency>
 
         <!-- PMD dependencies -->
