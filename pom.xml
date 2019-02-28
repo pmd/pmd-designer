@@ -17,6 +17,7 @@
 
         <checkstyle.version>3.0.0</checkstyle.version>
         <pmd.plugin.version>3.11.0</pmd.plugin.version>
+        <pmd.tool.version>6.11.0</pmd.tool.version>
         <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
         <source.plugin.version>3.0.1</source.plugin.version>
         <jar.plugin.version>3.1.0</jar.plugin.version>
@@ -147,16 +148,15 @@
                     <printFailingErrors>true</printFailingErrors>
                 </configuration>
                 <dependencies>
-                    <!-- Note: we can't use a property for the version here due to https://issues.apache.org/jira/browse/MRELEASE-932 -->
                     <dependency>
                         <groupId>net.sourceforge.pmd</groupId>
                         <artifactId>pmd-core</artifactId>
-                        <version>6.11.0</version>
+                        <version>${pmd.tool.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>net.sourceforge.pmd</groupId>
                         <artifactId>pmd-java</artifactId>
-                        <version>6.11.0</version>
+                        <version>${pmd.tool.version}</version>
                     </dependency>
                     <!-- This contains the main dogfood ruleset -->
                     <dependency>
