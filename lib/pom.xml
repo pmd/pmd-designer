@@ -3,13 +3,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.sourceforge.pmd.controlsfx.custom</groupId>
+    <groupId>org.controlsfx.custom</groupId>
     <artifactId>controlsfx-mr-jar</artifactId>
     <version>1.0</version>
 
     <!-- This is used to build the controlsfx multi-release jar. -->
-    <!-- It's not supposed to be pushed to maven central. -->
-    <!-- It's mostly a hack, and it's the responsibility of the -->
+    <!-- It's deployed to a local VCSed maven repo. That's because the shade plugin -->
+    <!-- doesn't consider "system"-scoped dependencies. -->
+    <!-- It's not supposed to be pushed to maven central, -->
+    <!-- because it's mostly a hack, and it's the responsibility of the -->
     <!-- controlsfx project to release an airtight implementation. -->
     <!-- That doesn't seem to be in their priorities: https://github.com/controlsfx/controlsfx/issues/1014 -->
 
@@ -17,13 +19,23 @@
 
     <properties>
 
+        <local.lib.repo>${project.basedir}/mvn-repo</local.lib.repo>
+        <jar.artifact.name>${project.artifactId}-${project.version}</jar.artifact.name>
+
         <cfx.java8.version>8.40.13</cfx.java8.version>
         <cfx.java9.version>9.0.0</cfx.java9.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <build.version.dir>${project.build.outputDirectory}/META-INF/versions</build.version.dir>
-        <maven.install.skip>true</maven.install.skip>
     </properties>
+
+    <!-- Use mvn deploy to update. -->
+    <distributionManagement>
+        <repository>
+            <id>local-libs</id>
+            <url>file://${local.lib.repo}</url>
+        </repository>
+    </distributionManagement>
 
     <build>
         <plugins>
@@ -101,7 +113,7 @@
                             <Multi-Release>true</Multi-Release>
                         </manifestEntries>
                     </archive>
-                    <finalName>${project.artifactId}-${project.version}</finalName>
+                    <finalName>${jar.artifact.name}</finalName>
                 </configuration>
             </plugin>
         </plugins>

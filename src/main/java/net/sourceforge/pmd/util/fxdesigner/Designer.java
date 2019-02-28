@@ -148,6 +148,7 @@ public class Designer extends Application {
     }
 
 
+    @SuppressWarnings("PMD.AvoidCatchingThrowable")
     public static void main(String[] args) {
         try {
             launch(args);

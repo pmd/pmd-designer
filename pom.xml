@@ -13,7 +13,7 @@
         <java.version>8</java.version>
 
 
-        <build.mr.java9.output>${project.build.outputDirectory}/META-INF/versions/9</build.mr.java9.output>
+        <local.lib.repo>${project.basedir}/lib/mvn-repo</local.lib.repo>
 
         <checkstyle.version>3.0.0</checkstyle.version>
         <pmd.plugin.version>3.11.0</pmd.plugin.version>
@@ -63,8 +63,6 @@
             </plugin>
 
             <!-- Compiles Less files into CSS files. Currently compatible with Less 1.7.0 -->
-            <!-- If need be, we can probably update the Less version by using the lessJs
-                 configuration property and having a custom less.js file around. -->
             <!-- See https://github.com/marceloverdijk/lesscss-maven-plugin -->
             <plugin>
                 <groupId>org.lesscss</groupId>
@@ -256,6 +254,12 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>local-libs</id>
+            <url>file://${local.lib.repo}</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <!-- OpenJFX dependencies are provided. OpenJFX needs to be installed separately. -->
@@ -310,7 +314,7 @@
         <!-- So we need to build it ourselves. But IntelliJ's maven integration doesn't support -->
         <!-- that very well. -->
         <!-- The simplest way I found to have it work both in the IDE and in the shaded jar -->
-        <!-- is to build locally a multi-release jar of controlsfx and add it as a system dependency. -->
+        <!-- is to build and deploy locally a multi-release jar. -->
         <!-- Previously the maven build created that Jar, but the IDE was confused and couldn't run the project -->
         <!-- on JRE 9. -->
 
@@ -321,11 +325,9 @@
         <!-- want an update (there's a pom provided in the lib dir for that). -->
 
         <dependency>
-            <groupId>net.sourceforge.pmd.controlsfx.custom</groupId>
+            <groupId>org.controlsfx.custom</groupId>
             <artifactId>controlsfx-mr-jar</artifactId>
             <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/controlsfx-mr-jar-1.0.jar</systemPath>
         </dependency>
 
         <!-- Those are shaded to avoid duplication -->
