@@ -33,15 +33,8 @@ be confusing to users, and there’s probably not many releases left before 7.0.
     *  It relocates dependencies that are both depended-on by pmd-core and this
        module (apache)
     *  It's a multi-release jar. That's because ControlsFX has two incompatible
-    versions to support JavaFX 8 and 9+. They're unpacked into versioned directories
-    to make it possible to use those controls that aren't compatible with
-    Java 9+ (e.g. BreadCrumbBar, RangeSlider).
-       * The built artifact works, but the IDE is confused and can't run the
-       project on Java 9...
-       * Maybe having another maven project to build the ControlsFX MR jar
-       would be tidier? Could maybe be part of build-tools. Idk how to organise
-       this. Ideally ControlsFX would release a MR jar themselves but that
-       doesn't seem to be in their priorities: https://github.com/controlsfx/controlsfx/issues/1014
+    versions to support JavaFX 8 and 9+. More is explained in comments in the
+    POM.
     *  There are profiles for IDE maven import (m2e and IJ) to avoid having the
     language modules as provided. This is similar to what pmd-core does with the
     Jaxen shaded jar.
