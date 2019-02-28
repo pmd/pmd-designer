@@ -17,7 +17,7 @@ be confusing to users, and there’s probably not many releases left before 7.0.
   * Close the designer project on pmd/pmd
 
 * Delete the pmd-ui directory from the main repo
-  * Fix parent pom.xml
+  * Basically just https://github.com/oowekyala/pmd/commit/cc44bac3c3b8e0e680f8dd6c9da2898c2e39b7d9
   * Document the change:
     * in CONTRIBUTING.md, README.md
     * in the issue template of pmd/pmd
