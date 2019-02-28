@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.controlsfx.custom</groupId>
+    <artifactId>controlsfx-mr-jar</artifactId>
+    <version>1.0</version>
+
+    <!-- This is used to build the controlsfx multi-release jar. -->
+    <!-- It's deployed to a local VCSed maven repo. That's because the shade plugin -->
+    <!-- doesn't consider "system"-scoped dependencies. -->
+    <!-- It's not supposed to be pushed to maven central, -->
+    <!-- because it's mostly a hack, and it's the responsibility of the -->
+    <!-- controlsfx project to release an airtight implementation. -->
+    <!-- That doesn't seem to be in their priorities: https://github.com/controlsfx/controlsfx/issues/1014 -->
+
+    <name>controlsfx-mr-jar</name>
+
+    <properties>
+
+        <local.lib.repo>${project.basedir}/mvn-repo</local.lib.repo>
+        <jar.artifact.name>${project.artifactId}-${project.version}</jar.artifact.name>
+
+        <cfx.java8.version>8.40.13</cfx.java8.version>
+        <cfx.java9.version>9.0.0</cfx.java9.version>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <build.version.dir>${project.build.outputDirectory}/META-INF/versions</build.version.dir>
+    </properties>
+
+    <!-- Use mvn deploy to update. -->
+    <distributionManagement>
+        <repository>
+            <id>local-libs</id>
+            <url>file://${local.lib.repo}</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <!-- Unpack Java 8 specific dependencies into the root output dir -->
+            <!-- Code specific to higher versions is unpacked into META-INF/versions/n -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <id>layout-java-8-specific-code</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifact>org.controlsfx:controlsfx:${cfx.java8.version}</artifact>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <excludes>**/MANIFEST.MF</excludes>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>layout-java-9-specific-code</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifact>org.controlsfx:controlsfx:${cfx.java9.version}</artifact>
+                            <outputDirectory>${build.version.dir}/9</outputDirectory>
+                            <excludes>**/MANIFEST.MF</excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <!-- Finalize multi-release jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Multi-Release>true</Multi-Release>
+                        </manifestEntries>
+                    </archive>
+                    <finalName>${jar.artifact.name}</finalName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
