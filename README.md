@@ -10,10 +10,9 @@ be confusing to users, and there’s probably not many releases left before 7.0.
     ranges than 6.12.0
 
 * This repo is to be moved to the pmd org
-  * @oowekyala I don't have permissions to create the repo
+
 
 * Move [open issues](https://github.com/pmd/pmd/labels/in%3Aui)
-  * @oowekyala I don't have permissions
   * Close the designer project on pmd/pmd
 
 * Delete the pmd-ui directory from the main repo
