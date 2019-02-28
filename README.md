@@ -16,7 +16,9 @@
     *  There are profiles for IDE maven import (m2e and IJ) to avoid having the
     language modules as provided. This is similar to what pmd-core does with the
     Jaxen shaded jar.
-
+* The PMD ruleset specific to pmd-ui is in this repo (see config dir)
+  * It was a pain to update build-tools when we add a new control with a
+  specific naming convention
 
 ---------------
 ---------------

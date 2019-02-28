@@ -194,15 +194,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
-                    <!-- TODO the jar built without a profile is shitty -->
-                    <!-- TODO to be safe, if the shaded artifact contains some pmd modules, then relocation should occur for -->
-                    <!--   * every n.s.pmd package except n.s.pmd.util.fxdesigner -->
-                    <!--   * all transitive dependencies of n.s.pmd artifacts -->
-                    <!--     * except dependencies that are only provided by this pom, to avoid reflection errors with FXML -->
-                    <!--   That would ensure that if the built jar contains pmd lang modules or pmd-core, -->
-                    <!--   no conflict arises when it's put into a lib dir of a pmd distribution -->
-                    <!--   We could also not handle this case and just document it clearly. -->
-                    <relocations>
+                  <relocations>
                         <!-- Relocate apache dependencies because they're included in the binary dist-->
                         <relocation>
                             <pattern>org.apache.commons</pattern>
