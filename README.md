@@ -1,7 +1,6 @@
 # TODO before going public
 
 * Review release procedure
-    * Do we need a release script to select profiles?
     * How do we configure the maven release plugin and with which credentials?
 * This repo is to be moved to the pmd org
 
@@ -30,7 +29,7 @@
 # PMD Rule Designer
 
 
-The Rule Designer is a program that helps PMD users develop their custom PMD
+The Rule Designer is a graphical tool that helps PMD users develop their custom
 rules.
 
 TODO Gifs
