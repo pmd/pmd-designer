@@ -85,7 +85,7 @@ rm ikonli-* \
    commons-beanutils-core-1.8.3.jar
 ```
 
-Then you can just replace `pmd-ui-6.11.0.jar` with your `pmd-ui-6.13.0-SNAPSHOT.jar`
+Then you can just copy your `pmd-ui-6.13.0-SNAPSHOT.jar`
 and run the designer as usual with run.sh.
 
 ---------------
