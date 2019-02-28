@@ -2,7 +2,28 @@
 
 * Review release procedure
     * How do we configure the maven release plugin and with which credentials?
+* Should we introduce the 4-segment versioning system for pmd-ui before 7.0.0? It could
+be confusing to users, and there’s probably not many releases left before 7.0.0 anyway
+    * E.g. releasing pmd-ui:6.12.0.1 instead of 6.13.0 could be weird,
+    especially so since that version is in fact compatible with pmd-core:6.11.0.
+    pmd-ui:6.11.0.1 would be even weirder and would in fact be lower in version
+    ranges than 6.12.0
+
 * This repo is to be moved to the pmd org
+  * @oowekyala I don't have permissions to create the repo
+
+* Move [open issues](https://github.com/pmd/pmd/labels/in%3Aui)
+  * @oowekyala I don't have permissions
+  * Close the designer project on pmd/pmd
+
+* Delete the pmd-ui directory from the main repo
+  * Fix parent pom.xml
+  * Document the change:
+    * in CONTRIBUTING.md, README.md
+    * in the issue template of pmd/pmd
+    * on the mailing list?
+
+
 
 ## Differences from the current pmd-ui in the main repo
 

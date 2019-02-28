@@ -386,7 +386,7 @@
         </dependency>
 
         <!-- PMD dependencies -->
-        <!-- All those are provided to exclude them from the shaded jar -->
+        <!-- All those are "provided" to exclude them from the shaded jar -->
         <!-- When importing project in an IDE, the profiles updates their scope to compile/runtime -->
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
