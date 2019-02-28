@@ -184,7 +184,8 @@
                             <artifact>org.controlsfx:controlsfx:8.40.13</artifact>
                             <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                             <includes>**/*</includes>
-                            <excludes>MANIFEST.MF</excludes>
+                            <excludes>**/MANIFEST.MF</excludes>
+                            <excludes>**/module-info.class</excludes>
                         </configuration>
                     </execution>
 
@@ -198,7 +199,8 @@
                             <artifact>org.controlsfx:controlsfx:9.0.0</artifact>
                             <outputDirectory>${build.mr.java9.output}</outputDirectory>
                             <includes>**/*</includes>
-                            <excludes>MANIFEST.MF</excludes>
+                            <excludes>**/MANIFEST.MF</excludes>
+                            <excludes>**/module-info.class</excludes>
                         </configuration>
                     </execution>
                 </executions>
@@ -479,6 +481,12 @@
             <dependencies>
                 <dependency>
                     <groupId>net.sourceforge.pmd</groupId>
+                    <artifactId>pmd-core</artifactId>
+                    <version>${pmd.core.version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge.pmd</groupId>
                     <artifactId>pmd-apex</artifactId>
                     <version>${pmd.core.version}</version>
                     <optional>true</optional>
@@ -544,6 +552,12 @@
                 </property>
             </activation>
             <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.pmd</groupId>
+                    <artifactId>pmd-core</artifactId>
+                    <version>${pmd.core.version}</version>
+                    <scope>compile</scope>
+                </dependency>
                 <dependency>
                     <groupId>net.sourceforge.pmd</groupId>
                     <artifactId>pmd-apex</artifactId>

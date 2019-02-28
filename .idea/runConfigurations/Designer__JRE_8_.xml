@@ -5,6 +5,7 @@
     <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
     <option name="MAIN_CLASS_NAME" value="net.sourceforge.pmd.util.fxdesigner.DesignerStarter" />
     <module name="pmd-ui" />
+    <option name="PROGRAM_PARAMETERS" value="-v" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="net.sourceforge.pmd.util.fxdesigner.*" />

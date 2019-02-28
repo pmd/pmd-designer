@@ -149,6 +149,11 @@ public class Designer extends Application {
 
 
     public static void main(String[] args) {
-        launch(args);
+        try {
+            launch(args);
+        } catch (Throwable unrecoverable) {
+            unrecoverable.printStackTrace();
+            System.exit(1);
+        }
     }
 }
