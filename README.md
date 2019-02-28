@@ -78,21 +78,20 @@ TODO describe packaging procedure, branching model, versioning system
 
 #### IntelliJ IDEA
 
-* Clone the repository
-* Open in IntelliJ
-* Open IntelliJ's terminal and paste the following:
+1. Clone the repository
+1. Open in IntelliJ
+1. Open IntelliJ's terminal and paste the following:
 ```shell
-
 git update-index --skip-worktree -- .idea/misc.xml pmd-ui.iml # Ignore some config files
 mvn process-resources # Generate CSS resources
 ```
-* Invoke the Reimport All Maven Projects Action
-* You can now run the designer with the provided Run Configurations
+4. Invoke the Reimport All Maven Projects Action
+1. You can now run the designer with the existing Run Configurations
 
-* Install the [File Watchers](https://plugins.jetbrains.com/plugin/7177-file-watchers)
-  plugin to compile the Less files to CSS when you edit them. The CSS files are
-  generated into an ignored resource directory so that the integrated
-  SceneBuilder picks up on them.
+1. Install the [File Watchers](https://plugins.jetbrains.com/plugin/7177-file-watchers) 
+plugin to compile the Less files to CSS when you edit them. Configuration is already
+in your repo because it was cloned in step 1. The CSS files are generated into an 
+ignored resource directory so that the integrated SceneBuilder picks up on them.
 
 TODO make Gifs?
 
