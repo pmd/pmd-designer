@@ -13,6 +13,10 @@
     *  It doesn't include the pmd dependencies
     *  It relocates dependencies that are both depended-on by pmd-core and this
        module (apache)
+    *  It's a multi-release jar. That's because ControlsFX has two incompatible
+    versions to support JavaFX 8 and 9+. They're unpacked into versioned directories
+    to make it possible to use those controls that aren't compatible with
+    Java 9+ (e.g. BreadCrumbBar, RangeSlider).
     *  There are profiles for IDE maven import (m2e and IJ) to avoid having the
     language modules as provided. This is similar to what pmd-core does with the
     Jaxen shaded jar.
