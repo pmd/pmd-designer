@@ -104,6 +104,7 @@ buildNumber.properties
 !.idea/.name
 !.idea/watcherTasks.xml
 !.idea/encodings.xml
+!.idea/cssdialects.xml
 # This allows to have a working config just by cloning & opening dir
 # But that file includes config from many plugins activated in IJ
 # So you should run `git update-index --skip-worktree .idea/misc.xml`

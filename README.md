@@ -80,12 +80,15 @@ TODO describe packaging procedure, branching model, versioning system
 
 1. Clone the repository
 1. Open in IntelliJ
-1. Open IntelliJ's terminal and paste the following:
+1. [Open IntelliJ's terminal](https://stackoverflow.com/a/28044371/6245827) and
+paste the following:
 ```shell
 git update-index --skip-worktree -- .idea/misc.xml pmd-ui.iml # Ignore some config files
 mvn process-resources # Generate CSS resources
 ```
-4. Invoke the Reimport All Maven Projects Action
+
+4. [Synchronize the directory contents](https://stackoverflow.com/a/4599243/6245827) to pick-up on the new CSS files
+1. Invoke the [Reimport All Maven Projects Action](https://stackoverflow.com/a/29765077/6245827)
 1. You can now run the designer with the existing Run Configurations
 
 1. Install the [File Watchers](https://plugins.jetbrains.com/plugin/7177-file-watchers) 
