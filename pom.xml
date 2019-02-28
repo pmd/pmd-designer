@@ -13,20 +13,13 @@
         <java.version>8</java.version>
 
 
-        <!-- Workaround for https://youtrack.jetbrains.com/issue/IDEA-188690 -->
-        <maven.compiler.source>1.${java.version}</maven.compiler.source>
-        <maven.compiler.target>1.${java.version}</maven.compiler.target>
         <build.mr.java9.output>${project.build.outputDirectory}/META-INF/versions/9</build.mr.java9.output>
-
-        <maven.compiler.test.source>1.8</maven.compiler.test.source>
-        <maven.compiler.test.target>1.8</maven.compiler.test.target>
-
-        <kotlin.compiler.jvmTarget>${maven.compiler.test.target}</kotlin.compiler.jvmTarget>
-        <kotlin.version>1.2.61</kotlin.version>
 
         <checkstyle.version>3.0.0</checkstyle.version>
         <pmd.plugin.version>3.11.0</pmd.plugin.version>
         <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
+        <source.plugin.version>3.0.1</source.plugin.version>
+        <jar.plugin.version>3.1.0</jar.plugin.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -62,6 +55,11 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
 
             <!-- Compiles Less files into CSS files. Currently compatible with Less 1.7.0 -->
             <!-- If need be, we can probably update the Less version by using the lessJs
@@ -169,27 +167,6 @@
                 </dependencies>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${javadoc.plugin.version}</version>
-                <configuration>
-                    <quiet>true</quiet>
-                    <doclint>none</doclint>
-                    <additionalJOptions>
-                        <additionalJOption>-html5</additionalJOption>
-                    </additionalJOptions>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Unpack Java 8 specific dependencies into the root output dir -->
             <!-- Code specific to higher versions is unpacked into META-INF/versions/n -->
 
@@ -232,6 +209,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>${jar.plugin.version}</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -272,6 +250,42 @@
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${javadoc.plugin.version}</version>
+                <configuration>
+                    <quiet>true</quiet>
+                    <doclint>none</doclint>
+                    <additionalJOptions>
+                        <additionalJOption>-html5</additionalJOption>
+                    </additionalJOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${source.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
