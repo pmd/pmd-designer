@@ -12,28 +12,10 @@
   <profiles>
     <profile>
       <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-                <configuration>
-                  <keyname>${env.CI_SIGN_KEYNAME}</keyname>
-                  <passphrase>${env.CI_SIGN_PASSPHRASE}</passphrase>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
+      <properties>
+        <gpg.keyname>${env.CI_SIGN_KEYNAME}</gpg.keyname>
+        <gpg.passphrase>${env.CI_SIGN_PASSPHRASE}</gpg.passphrase>
+      </properties>
     </profile>
   </profiles>
 </settings>

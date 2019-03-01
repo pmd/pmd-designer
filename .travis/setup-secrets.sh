@@ -6,13 +6,9 @@ if [ "${TRAVIS_PULL_REQUEST}" != "false" ] || [ "${TRAVIS_SECURE_ENV_VARS}" != "
     exit 0
 fi
 
-
-# TODO - setup via travis command line client:
-#  travis login --com
-#  travis encrypt-file .travis/pmd-designer-release-signing-key.sec
-#
-#openssl aes-256-cbc -K $encrypted_cb4f24b6413c_key -iv $encrypted_cb4f24b6413c_iv -in .travis/pmd-designer-release-signing-key.sec.enc -out .travis/pmd-designer-release-signing-key.sec -d
+# encrypted via "travis encrypt-file"
+openssl aes-256-cbc -K $encrypted_f8e4782b4fdb_key -iv $encrypted_f8e4782b4fdb_iv -in .travis/pmd-designer-release-signing-key-0x8C2E4C5B-pub-sec.asc.enc -out .travis/pmd-designer-release-signing-key-0x8C2E4C5B-pub-sec.asc -d
 
 mkdir -p "$HOME/.gpg"
-#gpg --batch --import .travis/pmd-designer-release-signing-key.sec
-#rm .travis/pmd-designer-release-signing-key.sec
+gpg --batch --import .travis/pmd-designer-release-signing-key-0x8C2E4C5B-pub-sec.asc
+rm .travis/pmd-designer-release-signing-key-0x8C2E4C5B-pub-sec.asc

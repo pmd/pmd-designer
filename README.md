@@ -1,17 +1,16 @@
-# TODO before going public
+# PMD Rule Designer
 
-* ci build with travis
-* Review release procedure
-    * How do we configure the maven release plugin and with which credentials?
+[![Build Status](https://travis-ci.com/pmd/pmd-designer.svg?branch=master)](https://travis-ci.com/pmd/pmd-designer)
+
+## TODOs
+
+* Review release procedure: short howto (locally mvn release:prepare, travis will deploy the tag)
 * Should we introduce the 4-segment versioning system for pmd-ui before 7.0.0? It could
 be confusing to users, and there’s probably not many releases left before 7.0.0 anyway
     * E.g. releasing pmd-ui:6.12.0.1 instead of 6.13.0 could be weird,
     especially so since that version is in fact compatible with pmd-core:6.11.0.
     pmd-ui:6.11.0.1 would be even weirder and would in fact be lower in version
     ranges than 6.12.0
-
-* This repo is to be moved to the pmd org
-
 
 * Move [open issues](https://github.com/pmd/pmd/labels/in%3Aui)
   * Close the designer project on pmd/pmd
