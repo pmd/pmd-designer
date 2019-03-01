@@ -7,6 +7,31 @@
     <name>PMD Designer</name>
     <version>6.13.0-SNAPSHOT</version>
 
+    <inceptionYear>2017</inceptionYear>
+    <licenses>
+        <license>
+            <name>BSD-2-Clause</name>
+            <url>http://pmd.sourceforge.net/license.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git://github.com/pmd/pmd-designer.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/pmd/pmd-designer.git</developerConnection>
+        <url>https://github.com/pmd/pmd-designer</url>
+        <tag>HEAD</tag>
+    </scm>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <pmd.core.version>6.12.0</pmd.core.version>
         <openjfx.version>11</openjfx.version>
@@ -241,6 +266,27 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M2</version>
+            </plugin>
+            <executions>
+                <execution>
+                    <id>enforce-versions</id>
+                    <goals>
+                        <goal>enforce</goal>
+                    </goals>
+                    <configuration>
+                        <rules>
+                            <requireJavaVersion>
+                                <version>[10,)</version>
+                            </requireJavaVersion>
+                        </rules>
+                    </configuration>
+                </execution>
+            </executions>
         </plugins>
     </build>
 
@@ -430,6 +476,19 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <!-- Those profiles are activated when importing project in eclipse or IntelliJ-->
     <!-- They're only there to shift the "provided" scope to "runtime", to avoid recording -->
@@ -584,6 +643,5 @@
             </dependencies>
         </profile>
     </profiles>
-
 
 </project>

@@ -1,0 +1,27 @@
+language: java
+jdk: openjdk11
+before_install:
+  - 'mkdir -p ${HOME}/.m2'
+  - 'cp .travis/maven-settings.xml ${HOME}/.m2/settings.xml'
+  - 'bash .travis/setup-secrets.sh'
+install: './mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V'
+script:
+  - 'if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then ./mvnw test -B -V; fi'
+  - 'if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_SECURE_ENV_VARS}" = "true" ]; then bash .travis/deploy.sh; fi'
+
+cache:
+  directories:
+  - "$HOME/.m2"
+
+#
+# Required secure variables, add via
+# travis encrypt --com SOMEVAR="secretvalue"
+#
+# CI_DEPLOY_USERNAME / CI_DEPLOY_PASSWORD
+# Used in .m2/settings.xml for deploying into https://oss.sonatype.org/
+# The user needs write permission for group net.sourceforge.pmd.*
+#
+# CI_SIGN_KEYNAME / CI_SIGN_PASSPHRASE
+# Used in .m2/settings.xml
+# GPG key used to sign the release jar before uploading to maven central
+#
