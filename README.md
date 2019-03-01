@@ -1,5 +1,6 @@
 # TODO before going public
 
+* ci build with travis
 * Review release procedure
     * How do we configure the maven release plugin and with which credentials?
 * Should we introduce the 4-segment versioning system for pmd-ui before 7.0.0? It could
@@ -21,7 +22,12 @@ be confusing to users, and there’s probably not many releases left before 7.0.
     * in CONTRIBUTING.md, README.md
     * in the issue template of pmd/pmd
     * on the mailing list?
+    * leave a pmd-ui/README.md behind, which says: The designer lives now at pmd/pmd-designer
 
+* Update release_procedure/do_release.sh
+  * Before releasing PMD, we need to check and update the pmd-ui/designer
+    dependency to the latest release, so that the latest version is included
+    in the binary distribution.
 
 
 ## Differences from the current pmd-ui in the main repo
@@ -135,9 +141,9 @@ mvn process-resources # Generate CSS resources
 1. Invoke the [Reimport All Maven Projects Action](https://stackoverflow.com/a/29765077/6245827)
 1. You can now run the designer with the existing Run Configurations
 
-1. Install the [File Watchers](https://plugins.jetbrains.com/plugin/7177-file-watchers) 
+1. Install the [File Watchers](https://plugins.jetbrains.com/plugin/7177-file-watchers)
 plugin to compile the Less files to CSS when you edit them. Configuration is already
-in your repo because it was cloned in step 1. The CSS files are generated into an 
+in your repo because it was cloned in step 1. The CSS files are generated into an
 ignored resource directory so that the integrated SceneBuilder picks up on them.
 
 TODO make Gifs?
@@ -146,4 +152,3 @@ TODO make Gifs?
 #### Eclipse
 
 TODO
-

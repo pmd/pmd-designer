@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.sourceforge.pmd</groupId>
     <artifactId>pmd-ui</artifactId>
-    <name>PMD UI Applications</name>
+    <name>PMD Designer</name>
     <version>6.13.0-SNAPSHOT</version>
 
     <properties>
