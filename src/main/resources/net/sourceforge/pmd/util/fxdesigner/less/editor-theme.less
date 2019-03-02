@@ -71,11 +71,16 @@
   &:is-node-selection {
     .code.identifier {
       -fx-fill: darken(@selection-focus-color, 10%);
+      -rtfx-underline-width: 0;
 
-      &.focus-highlight {
-
+      &.class-identifier {
+        -fx-fill: darken(@selection-focus-color, 20%);
       }
 
+      &.focus-highlight {
+        -rtfx-underline-color: darken(@selection-focus-color, 15%);
+        -rtfx-underline-width: 1;
+      }
     }
   }
 

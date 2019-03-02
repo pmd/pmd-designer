@@ -8,6 +8,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.findNodeAt;
 import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.getPmdLineAndColumnFromOffset;
+import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.getRtfxParIndexFromPmdLine;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -144,11 +145,21 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
         int visibleLength = lastVisibleParToAllParIndex() - firstVisibleParToAllParIndex();
 
-        if (node.getEndLine() - node.getBeginLine() > visibleLength
-            || node.getBeginLine() < firstVisibleParToAllParIndex()) {
+        boolean fitsViewPort = node.getEndLine() - node.getBeginLine() <= visibleLength;
+        boolean isStartVisible =
+            getRtfxParIndexFromPmdLine(node.getBeginLine()) >= firstVisibleParToAllParIndex();
+        boolean isEndVisible =
+            getRtfxParIndexFromPmdLine(node.getEndLine()) <= lastVisibleParToAllParIndex();
+
+        if (fitsViewPort) {
+            if (!isStartVisible) {
+                showParagraphAtTop(Math.max(node.getBeginLine() - 2, 0));
+            }
+            if (!isEndVisible) {
+                showParagraphAtBottom(Math.min(node.getEndLine(), getParagraphs().size()));
+            }
+        } else if (!isStartVisible) {
             showParagraphAtTop(Math.max(node.getBeginLine() - 2, 0));
-        } else if (node.getEndLine() > lastVisibleParToAllParIndex()) {
-            showParagraphAtBottom(Math.min(node.getEndLine(), getParagraphs().size()));
         }
     }
 

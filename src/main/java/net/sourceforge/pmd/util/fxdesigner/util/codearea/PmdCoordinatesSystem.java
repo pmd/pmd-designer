@@ -34,6 +34,13 @@ public final class PmdCoordinatesSystem {
 
     }
 
+    public static int getRtfxParIndexFromPmdLine(int line) {
+        return line - 1;
+    }
+
+    public static int getPmdLineFromRtfxParIndex(int line) {
+        return line + 1;
+    }
 
     /**
      * Inverse of {@link #getOffsetFromPmdPosition(CodeArea, int, int)}. Converts an absolute offset
@@ -45,7 +52,8 @@ public final class PmdCoordinatesSystem {
         Position pos = codeArea.offsetToPosition(absoluteOffset, Bias.Backward);
         int indentationOffset = indentationOffset(codeArea, pos.getMajor());
 
-        return new TextPos2D(pos.getMajor() + 1, pos.getMinor() + indentationOffset + 1);
+        return new TextPos2D(getPmdLineFromRtfxParIndex(pos.getMajor()),
+                             pos.getMinor() + indentationOffset + 1);
     }
 
 
@@ -59,7 +67,8 @@ public final class PmdCoordinatesSystem {
      * Also, PMD lines start at 1 but paragraph nums start at 0 in the code area.
      */
     public static int getOffsetFromPmdPosition(CodeArea codeArea, int line, int column) {
-        return codeArea.getAbsolutePosition(line - 1, column) - indentationOffset(codeArea, line - 1);
+        return codeArea.getAbsolutePosition(getRtfxParIndexFromPmdLine(line), column)
+            - indentationOffset(codeArea, line - 1);
     }
 
 
