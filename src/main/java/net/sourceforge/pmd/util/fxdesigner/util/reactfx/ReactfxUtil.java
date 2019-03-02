@@ -43,7 +43,7 @@ public final class ReactfxUtil {
      * only if they're not vetoed by a "false" value emitted during the veto period. "false" values
      * are reflected immediately.
      */
-    public static Val<Boolean> vetoableYes(Val<Boolean> values, Duration vetoPeriod) {
-        return latestValue(VetoableEventStream.vetoableYes(values.values(), vetoPeriod));
+    public static Val<Boolean> vetoableYes(Val<Boolean> base, Duration vetoPeriod) {
+        return latestValue(VetoableEventStream.vetoableYes(base.values(), vetoPeriod)).orElseConst(false);
     }
 }

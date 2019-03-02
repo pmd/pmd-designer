@@ -51,6 +51,17 @@ import javafx.css.PseudoClass;
  */
 public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> implements NodeSelectionSource {
 
+    /**
+     * Minimum duration during which the CTRL key must be continually pressed before the code area
+     * toggles node selection mode.
+     */
+    private static final Duration CTRL_SELECTION_VETO_PERIOD = Duration.ofMillis(1000);
+
+    /**
+     * Minimum hover duration to select a node.
+     */
+    private static final Duration NODE_SELECTION_HOVER_DELAY = Duration.ofMillis(100);
+
     private final Var<Node> currentFocusNode = Var.newSimpleVar(null);
     private final Var<List<Node>> currentRuleResults = Var.newSimpleVar(Collections.emptyList());
     private final Var<List<Node>> currentErrorNodes = Var.newSimpleVar(Collections.emptyList());
@@ -92,8 +103,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     private void enableCtrlSelection() {
 
         final Val<Boolean> isNodeSelectionMode =
-            ReactfxUtil.vetoableYes(getDesignerRoot().isCtrlDownProperty(), Duration.ofMillis(1000))
-                       .orElseConst(false);
+            ReactfxUtil.vetoableYes(getDesignerRoot().isCtrlDownProperty(), CTRL_SELECTION_VETO_PERIOD);
 
         addEventHandler(
             MouseOverTextEvent.MOUSE_OVER_TEXT_BEGIN,
@@ -115,7 +125,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
         isNodeSelectionMode.values().distinct().subscribe(isSelectionMode -> {
             pseudoClassStateChanged(PseudoClass.getPseudoClass("is-node-selection"), isSelectionMode);
-            setMouseOverTextDelay(isSelectionMode ? Duration.ofMillis(100) : null);
+            setMouseOverTextDelay(isSelectionMode ? NODE_SELECTION_HOVER_DELAY : null);
         });
     }
 
@@ -260,7 +270,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         }
 
 
-        /** focus-highlight, xpath-highlight, error-highlight, name-occurrence-highlight */
+        /** focus-highlight, xpath-result-highlight, error-highlight, name-occurrence-highlight */
         @Override
         public String getStyleClass() {
             return styleClass;
