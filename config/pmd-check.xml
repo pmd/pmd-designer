@@ -7,6 +7,27 @@
 
     <rule ref="net/sourceforge/pmd/pmd-dogfood-config.xml" />
 
+
+    <rule name="InternalApiUsage"
+          language="java"
+          since="6.5.0"
+          message="This module should not use pmd-core''s internal API"
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+            Injected FXML fields should be suffixed by their type
+        </description>
+        <priority>1</priority>
+        <properties>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value><![CDATA[
+                //ImportDeclaration/Name[starts-with(@Image, "net.sourceforge.pmd.") and contains(@Image, ".internal")]
+            ]]></value>
+            </property>
+        </properties>
+    </rule>
+
+
     <rule name="FxIdNamingConvention"
           language="java"
           since="6.5.0"

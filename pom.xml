@@ -4,34 +4,52 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.sourceforge.pmd</groupId>
     <artifactId>pmd-ui</artifactId>
-    <name>PMD UI Applications</name>
+    <name>PMD Designer</name>
     <version>6.13.0-SNAPSHOT</version>
+
+    <inceptionYear>2017</inceptionYear>
+    <licenses>
+        <license>
+            <name>BSD-2-Clause</name>
+            <url>http://pmd.sourceforge.net/license.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git://github.com/pmd/pmd-designer.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/pmd/pmd-designer.git</developerConnection>
+        <url>https://github.com/pmd/pmd-designer</url>
+        <tag>HEAD</tag>
+    </scm>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <properties>
         <pmd.core.version>6.12.0</pmd.core.version>
         <openjfx.version>11</openjfx.version>
         <java.version>8</java.version>
 
-
         <local.lib.repo>${project.basedir}/lib/mvn-repo</local.lib.repo>
 
         <checkstyle.version>3.0.0</checkstyle.version>
         <pmd.plugin.version>3.11.0</pmd.plugin.version>
-        <pmd.tool.version>6.11.0</pmd.tool.version>
         <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
         <source.plugin.version>3.0.1</source.plugin.version>
         <jar.plugin.version>3.1.0</jar.plugin.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <pmd.website.baseurl>https://pmd.github.io/pmd</pmd.website.baseurl>
-
-        <argLine>-Xmx512m -Dfile.encoding=${project.build.sourceEncoding}</argLine>
-
-        <pmd.ruleset.location>config/pmd-check.xml</pmd.ruleset.location>
-        <pmd.check.version>6.12.0</pmd.check.version>
 
         <pmd.build-tools.version>1.4.0</pmd.build-tools.version>
+        <pmd.check.version>6.12.0</pmd.check.version>
     </properties>
 
     <build>
@@ -135,10 +153,7 @@
                     <minimumTokens>100</minimumTokens>
                     <targetJdk>1.${java.version}</targetJdk>
                     <rulesets>
-                        <!-- Common ruleset for the project -->
-                        <ruleset>/net/sourceforge/pmd/pmd-dogfood-config.xml</ruleset>
-                        <!-- Custom pmd-ui ruleset -->
-                        <ruleset>${pmd.ruleset.location}</ruleset>
+                        <ruleset>config/pmd-check.xml</ruleset>
                     </rulesets>
                     <skipPmdError>false</skipPmdError>
                     <failurePriority>2</failurePriority>
@@ -149,12 +164,12 @@
                     <dependency>
                         <groupId>net.sourceforge.pmd</groupId>
                         <artifactId>pmd-core</artifactId>
-                        <version>${pmd.tool.version}</version>
+                        <version>${pmd.check.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>net.sourceforge.pmd</groupId>
                         <artifactId>pmd-java</artifactId>
-                        <version>${pmd.tool.version}</version>
+                        <version>${pmd.check.version}</version>
                     </dependency>
                     <!-- This contains the main dogfood ruleset -->
                     <dependency>
@@ -258,6 +273,17 @@
         <repository>
             <id>local-libs</id>
             <url>file://${local.lib.repo}</url>
+        </repository>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
@@ -440,7 +466,6 @@
         </dependency>
     </dependencies>
 
-
     <!-- Those profiles are activated when importing project in eclipse or IntelliJ-->
     <!-- They're only there to shift the "provided" scope to "runtime", to avoid recording -->
     <!-- accidental compile dependencies. -->
@@ -593,7 +618,27 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>release</id>
+            <build>
+              <plugins>
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-gpg-plugin</artifactId>
+                  <version>1.6</version>
+                  <executions>
+                    <execution>
+                      <id>sign-artifacts</id>
+                      <phase>verify</phase>
+                      <goals>
+                        <goal>sign</goal>
+                      </goals>
+                    </execution>
+                  </executions>
+                </plugin>
+              </plugins>
+            </build>
+        </profile>
     </profiles>
-
 
 </project>

@@ -18,7 +18,6 @@ import org.reactfx.EventStreams;
 import org.reactfx.SuspendableEventStream;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.internal.util.IteratorUtil;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.ast.xpath.Attribute;
 import net.sourceforge.pmd.lang.metrics.LanguageMetricsProvider;
@@ -26,6 +25,7 @@ import net.sourceforge.pmd.lang.symboltable.NameDeclaration;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.model.MetricResult;
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ScopeHierarchyTreeCell;
@@ -163,7 +163,7 @@ public class NodeInfoPanelController extends AbstractController<MainDesignerCont
             // Otherwise, when you select a node in the scope tree, since focus of the app is shifted to that
             // node, the scope hierarchy is reset and you lose the selection - even though obviously the node
             // you selected is in its own scope hierarchy so it looks buggy.
-            int maxDepth = IteratorUtil.count(parentIterator(previousSelection, true));
+            int maxDepth = DesignerIteratorUtil.count(parentIterator(previousSelection, true));
             rootScope.tryFindNode(previousSelection.getValue(), maxDepth)
                      // suspend notifications while selecting
                      .ifPresent(item -> myScopeItemSelectionEvents.suspendWhile(() -> scopeHierarchyTreeView.getSelectionModel().select(item)));
