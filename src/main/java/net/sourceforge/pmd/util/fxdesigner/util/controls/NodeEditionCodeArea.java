@@ -47,6 +47,10 @@ import javafx.css.PseudoClass;
 /**
  * A layered code area made to display nodes. Handles the presentation of nodes in place of {@link SourceEditorController}.
  *
+ * <p>This type of area has a special "node selection mode", in which you can select any node by
+ * hovering the mouse above its text.
+ *
+ * @since 6.12.0
  * @author Clément Fournier
  */
 public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> implements NodeSelectionSource {

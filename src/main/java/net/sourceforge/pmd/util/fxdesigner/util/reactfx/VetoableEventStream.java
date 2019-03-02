@@ -1,3 +1,7 @@
+/**
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
 package net.sourceforge.pmd.util.fxdesigner.util.reactfx;
 
 import java.time.Duration;
@@ -67,7 +71,7 @@ public final class VetoableEventStream<I> extends EventStreamBase<I> implements 
     }
 
     @Override
-    protected final Subscription observeInputs() {
+    protected Subscription observeInputs() {
         return input.subscribe(this::handleEvent);
     }
 
@@ -111,12 +115,27 @@ public final class VetoableEventStream<I> extends EventStreamBase<I> implements 
     }
 
 
+    /**
+     * Low-level method to create a vetoable event stream.
+     *
+     * @param input             Input event stream
+     * @param vetoableReduction Reduces two vetoable events, if a new vetoable event is recorded
+     *                          while another one was already pending. The pending event is passed
+     *                          as the first parameter. If the result of the reduction is vetoable,
+     *                          then it's enqueued and treated as pending. Otherwise it's emitted as
+     *                          a normal event.
+     * @param isVetoable        Predicate that accepts events that should wait for the veto period
+     *                          before it's emitted.
+     * @param isVeto            Predicate that accepts events that cancel a pending vetoable event
+     * @param timerFactory      Factory that produces a timer for the veto period of a vetoable
+     *                          event
+     */
     public static <I> AwaitingEventStream<I> vetoableFrom(EventStream<I> input,
                                                           BiFunction<I, I, I> vetoableReduction,
-                                                          Predicate<I> shouldWait,
-                                                          Predicate<I> cancelSignal,
+                                                          Predicate<I> isVetoable,
+                                                          Predicate<I> isVeto,
                                                           Function<Runnable, Timer> timerFactory) {
-        return new VetoableEventStream<>(input, vetoableReduction, shouldWait, cancelSignal, timerFactory);
+        return new VetoableEventStream<>(input, vetoableReduction, isVetoable, isVeto, timerFactory);
     }
 
 
@@ -125,11 +144,14 @@ public final class VetoableEventStream<I> extends EventStreamBase<I> implements 
                                                           Predicate<I> shouldWait,
                                                           Predicate<I> cancelSignal,
                                                           Duration vetoPeriod) {
+
         Function<Runnable, Timer> timerFactory = action -> FxTimer.create(vetoPeriod, action);
         return vetoableFrom(input, vetoableReduction, shouldWait, cancelSignal, timerFactory);
     }
 
-
+    /**
+     * @see ReactfxUtil#vetoableYes(Val, Duration)
+     */
     public static AwaitingEventStream<Boolean> vetoableYes(EventStream<Boolean> input, Duration vetoPeriod) {
         return vetoableFrom(input, (a, b) -> b, b -> b, b -> !b, vetoPeriod);
     }

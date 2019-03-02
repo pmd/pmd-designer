@@ -1,7 +1,10 @@
+/**
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
 package net.sourceforge.pmd.util.fxdesigner.app;
 
 import org.reactfx.value.Val;
-import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
 

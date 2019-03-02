@@ -1,3 +1,7 @@
+/**
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
 package net.sourceforge.pmd.util.fxdesigner.util.codearea;
 
 import java.util.Collection;
@@ -19,6 +23,7 @@ import net.sourceforge.pmd.lang.ast.Node;
  * Maps PMD's (line, column) coordinate system to and from the code
  * area's one-dimensional (absolute offset-based) system.
  *
+ * @since 6.13.0
  * @author Clément Fournier
  */
 public final class PmdCoordinatesSystem {
@@ -173,8 +178,8 @@ public final class PmdCoordinatesSystem {
                 return false;
             }
             TextPos2D that = (TextPos2D) o;
-            return line == that.line &&
-                column == that.column;
+            return line == that.line
+                && column == that.column;
         }
 
 

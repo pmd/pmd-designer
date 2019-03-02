@@ -1,3 +1,7 @@
+/**
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
 package net.sourceforge.pmd.util.fxdesigner.util.reactfx;
 
 import java.time.Duration;
@@ -8,6 +12,10 @@ import org.reactfx.value.Val;
 import org.reactfx.value.ValBase;
 
 /**
+ * Extensions to ReactFX Val and EventStreams. Some can be deemed as too
+ * general for this project: I'd like them to be moved to the reactfx main
+ * project.
+ *
  * @author Clément Fournier
  */
 public final class ReactfxUtil {
@@ -17,7 +25,8 @@ public final class ReactfxUtil {
     }
 
     /**
-     * Converts an event stream to a val.
+     * Converts an event stream to a val, that always holds the latest
+     * emitted value of the stream.
      */
     public static <T> Val<T> latestValue(EventStream<T> values) {
         return new ValBase<T>() {

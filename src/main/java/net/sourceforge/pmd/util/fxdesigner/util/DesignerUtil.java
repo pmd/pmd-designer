@@ -193,7 +193,7 @@ public final class DesignerUtil {
 
     public static StringConverter<LanguageVersion> languageVersionStringConverter() {
         return DesignerUtil.stringConverter(LanguageVersion::getShortName,
-                                            s -> LanguageRegistry.findLanguageVersionByTerseName(s.toLowerCase(Locale.ROOT)));
+            s -> LanguageRegistry.findLanguageVersionByTerseName(s.toLowerCase(Locale.ROOT)));
     }
 
 
