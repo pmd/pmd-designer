@@ -36,7 +36,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
-import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
@@ -56,9 +55,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Toggle;
@@ -197,7 +193,7 @@ public final class DesignerUtil {
 
     public static StringConverter<LanguageVersion> languageVersionStringConverter() {
         return DesignerUtil.stringConverter(LanguageVersion::getShortName,
-            s -> LanguageRegistry.findLanguageVersionByTerseName(s.toLowerCase(Locale.ROOT)));
+                                            s -> LanguageRegistry.findLanguageVersionByTerseName(s.toLowerCase(Locale.ROOT)));
     }
 
 

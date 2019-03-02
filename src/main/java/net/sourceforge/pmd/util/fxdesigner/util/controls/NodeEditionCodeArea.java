@@ -37,6 +37,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighligh
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea.StyleLayerIds;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
@@ -90,11 +91,14 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
      */
     private void enableCtrlSelection() {
 
-        setMouseOverTextDelay(Duration.ofMillis(100));
+        final Val<Boolean> isNodeSelectionMode =
+            ReactfxUtil.vetoableYes(getDesignerRoot().isCtrlDownProperty(), Duration.ofMillis(1000))
+                       .orElseConst(false);
+
         addEventHandler(
             MouseOverTextEvent.MOUSE_OVER_TEXT_BEGIN,
             ev -> {
-                if (!getDesignerRoot().isCtrlDownProperty().getValue()) {
+                if (!isNodeSelectionMode.getValue()) {
                     return;
                 }
                 Node currentRoot = getDesignerRoot().currentCompilationUnitProperty().getValue();
@@ -107,6 +111,12 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
                 findNodeAt(currentRoot, target).ifPresent(selectionEvts::push);
             }
         );
+
+
+        isNodeSelectionMode.values().distinct().subscribe(isSelectionMode -> {
+            pseudoClassStateChanged(PseudoClass.getPseudoClass("is-node-selection"), isSelectionMode);
+            setMouseOverTextDelay(isSelectionMode ? Duration.ofMillis(100) : null);
+        });
     }
 
     /** Scroll the editor to a node and makes it visible. */

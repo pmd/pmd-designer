@@ -88,3 +88,14 @@
     @ruleset();
   }
 }
+
+.standard-border {
+  -fx-border-color: -fx-text-box-border;
+  -fx-border-insets: 0;
+  -fx-border-width: 1.4;
+  -fx-padding: 0;
+
+  &:focused {
+    -fx-border-color: @selection-focus-color;
+  }
+}

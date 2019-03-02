@@ -51,7 +51,7 @@
     -rtfx-background-color: lightcoral;
 }
 
-.name-occurence-highlight.depth-0 {
+.name-occurrence-highlight.depth-0 {
     -rtfx-border-stroke-color: olivedrab;
     -rtfx-background-color: palegreen;
 }
@@ -65,9 +65,19 @@
 /* Base */
 .styled-text-area {
     -fx-background-color: @area-background-color;
-    -fx-border-color: -fx-outer-border, -fx-text-box-border;
-    -fx-border-insets: 0, 0;
-    -fx-padding: 0;
+
+  .standard-border();
+
+  &:is-node-selection {
+    .code.identifier {
+      -fx-fill: darken(@selection-focus-color, 10%);
+
+      &.focus-highlight {
+
+      }
+
+    }
+  }
 
     .scroll-bar {
         * {
