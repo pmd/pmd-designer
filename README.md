@@ -2,15 +2,11 @@
 
 [![Build Status](https://travis-ci.com/pmd/pmd-designer.svg?branch=master)](https://travis-ci.com/pmd/pmd-designer)
 
+WIP: the designer is being moved from [pmd/pmd/pmd-ui](https://github.com/pmd/pmd/tree/master/pmd-ui) to this repository. 
+
 ## TODOs
 
 * Review release procedure: short howto (locally mvn release:prepare, travis will deploy the tag)
-* Should we introduce the 4-segment versioning system for pmd-ui before 7.0.0? It could
-be confusing to users, and there’s probably not many releases left before 7.0.0 anyway
-    * E.g. releasing pmd-ui:6.12.0.1 instead of 6.13.0 could be weird,
-    especially so since that version is in fact compatible with pmd-core:6.11.0.
-    pmd-ui:6.11.0.1 would be even weirder and would in fact be lower in version
-    ranges than 6.12.0
 
 * Move [open issues](https://github.com/pmd/pmd/labels/in%3Aui)
   * Close the designer project on pmd/pmd
@@ -47,52 +43,6 @@ be confusing to users, and there’s probably not many releases left before 7.0.
   * It was a pain to update build-tools when we add a new control with a
   specific naming convention
 
-
-If you want to test that the multi-release jar works:
-
-```shell
-# NB: set variable $YOUR_PMD_SOURCE_REPO
-
-# that branch uses the bread crumb bar, whose java 8 implementation is
-# incompatible with JRE 9+
-# On master the multi-release jar isn't necessary yet
-
-git co designer-breadcrumbbar
-mvn install
-cd $YOUR_PMD_SOURCE_REPO
-mvn package -Dmaven.javadoc.skip -DskipTests -pl pmd-dist
-
-tmpdir=$(mktemp -d)
-
-cp -f pmd-dist/target/pmd-bin-6.13.0-SNAPSHOT.zip "$tmpdir"
-cd "$tmpdir"
-
-unzip -o pmd-bin-6.13.0-SNAPSHOT.zip
-pmd-bin-6.13.0-SNAPSHOT/bin/run.sh designer -v &disown
-
-# then switch java versions and check it still works
-
-```
-
-If you want to try plugging the artifact into eg a pmd-bin-6.11.0,
-go into the lib dir and delete the following dependencies:
-
-```shell
-
-rm ikonli-* \
-   pmd-ui-6.11.0.jar \
-   controlsfx-8.40.13.jar \
-   undofx-2.1.0.jar \
-   richtextfx-0.9.2.jar \
-   flowless-0.6.jar \
-   wellbehavedfx-0.3.3.jar \
-   reactfx-2.0-M5.jar \
-   commons-beanutils-core-1.8.3.jar
-```
-
-Then you can just copy your `pmd-ui-6.13.0-SNAPSHOT.jar`
-and run the designer as usual with run.sh.
-
 ---------------
 ---------------
 
@@ -109,8 +59,6 @@ TODO Gifs
 ## Installation
 
 The designer is part of PMD's binary distributions.
-
-TODO release a fat jar containing PMD too using classifiers?
 
 TODO describe minimum Java config
 
@@ -144,8 +92,6 @@ mvn process-resources # Generate CSS resources
 plugin to compile the Less files to CSS when you edit them. Configuration is already
 in your repo because it was cloned in step 1. The CSS files are generated into an
 ignored resource directory so that the integrated SceneBuilder picks up on them.
-
-TODO make Gifs?
 
 
 #### Eclipse
