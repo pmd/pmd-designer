@@ -121,7 +121,6 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
     private Var<String> xpathVersionUIProperty = Var.newSimpleVar(XPathRuleQuery.XPATH_2_0);
 
     private SuspendableEventStream<TextAwareNodeWrapper> selectionEvents;
-    private SoftReferenceCache<Stage> exportWizardCache;
 
     public XPathPanelController(MainDesignerController mainController) {
         super(mainController);

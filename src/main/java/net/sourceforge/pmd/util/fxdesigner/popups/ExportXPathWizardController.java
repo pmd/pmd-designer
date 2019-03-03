@@ -64,6 +64,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 
 /**
@@ -93,7 +94,7 @@ public final class ExportXPathWizardController implements Initializable {
     @FXML
     private TextField messageField;
     @FXML
-    private RulePrioritySlider prioritySlider;
+    private RulePrioritySlider rulePrioritySlider;
     @FXML
     private ChoiceBox<Language> languageChoiceBox;
     @FXML
@@ -217,7 +218,7 @@ public final class ExportXPathWizardController implements Initializable {
 
 
     private Var<RulePriority> priorityProperty() {
-        return prioritySlider.priorityProperty();
+        return rulePrioritySlider.priorityProperty();
     }
 
 
@@ -258,6 +259,7 @@ public final class ExportXPathWizardController implements Initializable {
 
         dialog.initOwner(mainStage);
         dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initStyle(StageStyle.DECORATED);
 
         Parent root;
         try {
@@ -282,6 +284,7 @@ public final class ExportXPathWizardController implements Initializable {
             .appendIndent(1).append("language=\"").bind(ObservableRuleBuilder::languageProperty, Language::getTerseName).appendLine("\"")
             .bind(ObservableRuleBuilder::minimumVersionProperty, indented(2, surrounded("minimumLanguageVersion=\"", "\"\n", asString(LanguageVersion::getTerseName))))
             .bind(ObservableRuleBuilder::maximumVersionProperty, indented(2, surrounded("maximumLanguageVersion=\"", "\"\n", asString(LanguageVersion::getTerseName))))
+            // TODO should use MessageFormat escaping
             .appendIndent(1).append("message=\"").bind(ObservableRuleBuilder::messageProperty).appendLine("\"")
             .appendIndent(1).append("class=\"").bind(ObservableRuleBuilder::clazzProperty, Class::getCanonicalName).appendLine("\">")
             .withDefaultIndent("   ")

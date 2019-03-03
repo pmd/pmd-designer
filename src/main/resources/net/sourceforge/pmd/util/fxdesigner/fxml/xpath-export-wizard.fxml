@@ -98,7 +98,7 @@
                                                            promptText="Violation message..."
                                                            GridPane.columnIndex="1"
                                                            GridPane.rowIndex="2" />
-                                                <RulePrioritySlider fx:id="prioritySlider"
+                                                <RulePrioritySlider fx:id="rulePrioritySlider"
                                                                     showTickMarks="true"
                                                                     showTickLabels="true"
                                                                     GridPane.columnIndex="1"
