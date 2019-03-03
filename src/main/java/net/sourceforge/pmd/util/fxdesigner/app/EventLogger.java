@@ -9,7 +9,6 @@ import static net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category.PARSE_OK
 import static net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category.SELECTION_EVENT_TRACING;
 import static net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category.XPATH_EVALUATION_EXCEPTION;
 import static net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category.XPATH_OK;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.countNotMatching;
 
 import java.time.Duration;
 import java.util.EnumSet;
@@ -25,6 +24,8 @@ import org.reactfx.value.Val;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.LogEntryWithData;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+
+import com.github.oowekyala.rxstring.ReactfxExtensions;
 
 
 /**
@@ -76,9 +77,9 @@ public class EventLogger implements ApplicationComponent {
 
     /** Number of log entries that were not yet examined by the user. */
     public Val<Integer> numNewLogEntriesProperty() {
-        return countNotMatching(fullLog.map(LogEntry::wasExaminedProperty));
+        return LiveList.sizeOf(ReactfxExtensions.flattenVals(fullLog.map(LogEntry::wasExaminedProperty))
+                                                .filtered(read -> !read));
     }
-
 
     @Override
     public DesignerRoot getDesignerRoot() {

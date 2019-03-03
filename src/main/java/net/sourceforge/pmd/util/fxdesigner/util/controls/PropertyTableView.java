@@ -44,8 +44,8 @@ import javafx.util.StringConverter;
  * Controls a table view used to inspect and edit the properties of
  * the rule being built. This component is made to be reused in several
  * views.
- * <p>
- * TODO: would be great to make it directly editable without compromising content validation
+ *
+ * <p>TODO: would be great to make it directly editable without compromising content validation
  *
  * @author Clément Fournier
  * @since 6.0.0
@@ -147,7 +147,7 @@ public class PropertyTableView extends TableView<PropertyDescriptorSpec> {
      * @param edited The edited property descriptor
      */
     private void popEditPropertyDialog(PropertyDescriptorSpec edited) {
-        Stage dialog = editPropertyDialogCache.getValue();
+        Stage dialog = editPropertyDialogCache.get();
         EditPropertyDialogController wizard = (EditPropertyDialogController) dialog.getUserData();
         Platform.runLater(() -> wizard.bindToDescriptor(edited, getRuleProperties()));
         dialog.setOnHiding(e -> {

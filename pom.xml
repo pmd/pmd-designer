@@ -369,7 +369,12 @@
             <artifactId>controlsfx-mr-jar</artifactId>
             <version>1.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.oowekyala</groupId>
+            <artifactId>fx-live-templates</artifactId>
+            <version>1.0</version>
+        </dependency>
+        
         <!-- Those are shaded to avoid duplication -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -392,6 +397,7 @@
             <version>1.8.3</version>
         </dependency>
 
+
         <!-- Icon packs -->
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
@@ -413,6 +419,7 @@
             <version>${pmd.core.version}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-apex</artifactId>

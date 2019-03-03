@@ -5,41 +5,55 @@
 package net.sourceforge.pmd.util.fxdesigner.util;
 
 import java.lang.ref.SoftReference;
-import java.util.function.Supplier;
 
 
 /**
+ * Caches a value with a soft reference.
+ *
  * @author Clément Fournier
- * @since 7.0.0
+ * @since 6.1.0
  */
 public class SoftReferenceCache<T> {
 
-    private final Supplier<T> mySupplier;
-    private SoftReference<T> myRef;
+    private final UnsafeSupplier<T> valueSupplier;
+    private SoftReference<T> ref;
 
 
-    public SoftReferenceCache(Supplier<T> supplier) {
-        this.mySupplier = supplier;
+    public SoftReferenceCache(UnsafeSupplier<T> supplier) {
+        this.valueSupplier = supplier;
     }
-
 
     public boolean hasValue() {
-        return myRef != null && myRef.get() != null;
+        return ref != null && ref.get() != null;
     }
 
-    public T getValue() {
-        if (myRef == null || myRef.get() == null) {
-            T val = mySupplier.get();
-            if (val == null) {
-                throw new IllegalStateException();
+    /**
+     * Gets the value of this cache. Uses the supplier function
+     * in cache of cache miss.
+     *
+     * @return The value
+     */
+    public T get() {
+        if (ref == null || ref.get() == null) {
+            try {
+                ref = new SoftReference<>(valueSupplier.get());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-
-            myRef = new SoftReference<>(val);
-            return val;
         }
 
-        return myRef.get();
+        return ref.get();
     }
 
+
+    /**
+     * Supplier which can throw exceptions.
+     *
+     * @param <T> Type of value
+     */
+    @FunctionalInterface
+    public interface UnsafeSupplier<T> {
+        T get() throws Exception;
+    }
 
 }
