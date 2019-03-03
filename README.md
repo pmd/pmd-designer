@@ -11,37 +11,12 @@ WIP: the designer is being moved from [pmd/pmd/pmd-ui](https://github.com/pmd/pm
 * Move [open issues](https://github.com/pmd/pmd/labels/in%3Aui)
   * Close the designer project on pmd/pmd
 
-* Delete the pmd-ui directory from the main repo
-  * Basically just https://github.com/oowekyala/pmd/commit/cc44bac3c3b8e0e680f8dd6c9da2898c2e39b7d9
-  * Document the change:
-    * in CONTRIBUTING.md, README.md
-    * in the issue template of pmd/pmd
-    * on the mailing list?
-    * leave a pmd-ui/README.md behind, which says: The designer lives now at pmd/pmd-designer
+* Delete the pmd-ui directory from the main repo (PR pending)
 
 * Update release_procedure/do_release.sh
   * Before releasing PMD, we need to check and update the pmd-ui/designer
     dependency to the latest release, so that the latest version is included
     in the binary distribution.
-
-
-## Differences from the current pmd-ui in the main repo
-
-* Some IntelliJ config files are checked in VCS to ease installation
-  * You're welcome to check in Eclipse config files as well
-* The jar artifact is a shaded Jar:
-    *  It doesn't include the pmd dependencies
-    *  It relocates dependencies that are both depended-on by pmd-core and this
-       module (apache)
-    *  It's a multi-release jar. That's because ControlsFX has two incompatible
-    versions to support JavaFX 8 and 9+. More is explained in comments in the
-    POM.
-    *  There are profiles for IDE maven import (m2e and IJ) to avoid having the
-    language modules as provided. This is similar to what pmd-core does with the
-    Jaxen shaded jar.
-* The PMD ruleset specific to pmd-ui is in this repo (see config dir)
-  * It was a pain to update build-tools when we add a new control with a
-  specific naming convention
 
 ---------------
 ---------------
@@ -69,11 +44,22 @@ TODO put usage doc on the main website
 
 ## Contributing
 
-TODO describe packaging procedure, branching model, versioning system
+* Bug reports and specific feature requests can be submitted on the [issue tracker](https://github.com/pmd/pmd-designer/issues).
+* If you'd like to give usability feedback without a particular direction, or need some help using the app, please start a chat on the [Gitter channel](https://gitter.im/pmd/pmd-designer)
 
-### IDE Setup
+### Code contributions
 
-#### IntelliJ IDEA
+* PRs are welcome anytime
+
+#### Clean build from source
+
+* Clone the repository
+* Run `./mvnw clean verify`
+* The artifact can then be found in the `target` directory
+
+#### IDE Setup
+
+##### IntelliJ IDEA
 
 1. Clone the repository
 1. Open in IntelliJ
@@ -94,6 +80,6 @@ in your repo because it was cloned in step 1. The CSS files are generated into a
 ignored resource directory so that the integrated SceneBuilder picks up on them.
 
 
-#### Eclipse
+##### Eclipse
 
 TODO
