@@ -1,97 +1,22 @@
 # PMD Rule Designer
 
-[![Build Status](https://travis-ci.com/pmd/pmd-designer.svg?branch=master)](https://travis-ci.com/pmd/pmd-designer)
+[![Build Status](https://travis-ci.com/pmd/pmd-designer.svg?branch=master)](https://travis-ci.com/pmd/pmd-designer) [![Join the chat at https://gitter.im/pmd/pmd-designer](https://badges.gitter.im/pmd/pmd-designer.svg)](https://gitter.im/pmd/pmd-designer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+WIP: the designer is being moved from [pmd/pmd/pmd-ui](https://github.com/pmd/pmd/tree/master/pmd-ui) to this repository. 
 
 ## TODOs
 
 * Review release procedure: short howto (locally mvn release:prepare, travis will deploy the tag)
-* Should we introduce the 4-segment versioning system for pmd-ui before 7.0.0? It could
-be confusing to users, and there’s probably not many releases left before 7.0.0 anyway
-    * E.g. releasing pmd-ui:6.12.0.1 instead of 6.13.0 could be weird,
-    especially so since that version is in fact compatible with pmd-core:6.11.0.
-    pmd-ui:6.11.0.1 would be even weirder and would in fact be lower in version
-    ranges than 6.12.0
 
 * Move [open issues](https://github.com/pmd/pmd/labels/in%3Aui)
   * Close the designer project on pmd/pmd
 
-* Delete the pmd-ui directory from the main repo
-  * Basically just https://github.com/oowekyala/pmd/commit/cc44bac3c3b8e0e680f8dd6c9da2898c2e39b7d9
-  * Document the change:
-    * in CONTRIBUTING.md, README.md
-    * in the issue template of pmd/pmd
-    * on the mailing list?
-    * leave a pmd-ui/README.md behind, which says: The designer lives now at pmd/pmd-designer
+* Delete the pmd-ui directory from the main repo (PR pending)
 
 * Update release_procedure/do_release.sh
   * Before releasing PMD, we need to check and update the pmd-ui/designer
     dependency to the latest release, so that the latest version is included
     in the binary distribution.
-
-
-## Differences from the current pmd-ui in the main repo
-
-* Some IntelliJ config files are checked in VCS to ease installation
-  * You're welcome to check in Eclipse config files as well
-* The jar artifact is a shaded Jar:
-    *  It doesn't include the pmd dependencies
-    *  It relocates dependencies that are both depended-on by pmd-core and this
-       module (apache)
-    *  It's a multi-release jar. That's because ControlsFX has two incompatible
-    versions to support JavaFX 8 and 9+. More is explained in comments in the
-    POM.
-    *  There are profiles for IDE maven import (m2e and IJ) to avoid having the
-    language modules as provided. This is similar to what pmd-core does with the
-    Jaxen shaded jar.
-* The PMD ruleset specific to pmd-ui is in this repo (see config dir)
-  * It was a pain to update build-tools when we add a new control with a
-  specific naming convention
-
-
-If you want to test that the multi-release jar works:
-
-```shell
-# NB: set variable $YOUR_PMD_SOURCE_REPO
-
-# that branch uses the bread crumb bar, whose java 8 implementation is
-# incompatible with JRE 9+
-# On master the multi-release jar isn't necessary yet
-
-git co designer-breadcrumbbar
-mvn install
-cd $YOUR_PMD_SOURCE_REPO
-mvn package -Dmaven.javadoc.skip -DskipTests -pl pmd-dist
-
-tmpdir=$(mktemp -d)
-
-cp -f pmd-dist/target/pmd-bin-6.13.0-SNAPSHOT.zip "$tmpdir"
-cd "$tmpdir"
-
-unzip -o pmd-bin-6.13.0-SNAPSHOT.zip
-pmd-bin-6.13.0-SNAPSHOT/bin/run.sh designer -v &disown
-
-# then switch java versions and check it still works
-
-```
-
-If you want to try plugging the artifact into eg a pmd-bin-6.11.0,
-go into the lib dir and delete the following dependencies:
-
-```shell
-
-rm ikonli-* \
-   pmd-ui-6.11.0.jar \
-   controlsfx-8.40.13.jar \
-   undofx-2.1.0.jar \
-   richtextfx-0.9.2.jar \
-   flowless-0.6.jar \
-   wellbehavedfx-0.3.3.jar \
-   reactfx-2.0-M5.jar \
-   commons-beanutils-core-1.8.3.jar
-```
-
-Then you can just copy your `pmd-ui-6.13.0-SNAPSHOT.jar`
-and run the designer as usual with run.sh.
 
 ---------------
 ---------------
@@ -108,11 +33,14 @@ TODO Gifs
 
 ## Installation
 
-The designer is part of PMD's binary distributions.
+The designer is part of PMD's binary distributions. To install a distribution, see the [documentation page](https://pmd.github.io/latest/pmd_userdocs_installation.html) about installing PMD.
 
-TODO release a fat jar containing PMD too using classifiers?
+The app needs JRE 1.8 or above to run. Be aware that on JRE 11+, the JavaFX distribution should be installed separately. Visit [the download page](https://gluonhq.com/products/javafx/) to download a distribution, extract it, and set the `JAVAFX_HOME` environment variable.
 
-TODO describe minimum Java config
+If the `bin` directory of your PMD distribution is on your shell's path, then you can launch the app with
+* `run.sh designer` on Linux/ OSX
+* `designer.bat` on Windows
+
 
 ## Usage
 
@@ -121,11 +49,22 @@ TODO put usage doc on the main website
 
 ## Contributing
 
-TODO describe packaging procedure, branching model, versioning system
+* Bug reports and specific feature requests can be submitted on the [issue tracker](https://github.com/pmd/pmd-designer/issues).
+* If you'd like to give usability feedback without a particular direction, or need some help using the app, please start a chat on the [Gitter channel](https://gitter.im/pmd/pmd-designer)
 
-### IDE Setup
+### Code contributions
 
-#### IntelliJ IDEA
+* PRs are welcome anytime
+
+#### Clean build from source
+
+* Clone the repository
+* Run `./mvnw clean verify`
+* The artifact can then be found in the `target` directory
+
+#### IDE Setup
+
+##### IntelliJ IDEA
 
 1. Clone the repository
 1. Open in IntelliJ
@@ -145,9 +84,7 @@ plugin to compile the Less files to CSS when you edit them. Configuration is alr
 in your repo because it was cloned in step 1. The CSS files are generated into an
 ignored resource directory so that the integrated SceneBuilder picks up on them.
 
-TODO make Gifs?
 
-
-#### Eclipse
+##### Eclipse
 
 TODO
