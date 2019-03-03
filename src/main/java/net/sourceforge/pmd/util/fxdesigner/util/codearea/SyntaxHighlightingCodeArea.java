@@ -120,7 +120,10 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
 
     private Subscription subscribeSyntaxHighlighting(EventStream<?> ticks, SyntaxHighlighter highlighter) {
         // captured in the closure, shutdown when unsubscribing
-        final ExecutorService executorService = Executors.newSingleThreadExecutor();
+        // captured in the closure, shutdown when unsubscribing
+        final ExecutorService executorService = Executors.newSingleThreadExecutor(
+            r -> new Thread(r, "Code-area-" + this.hashCode() + "-"
+                + highlighter.getLanguageTerseName() + "-highlighter"));
         return ticks.successionEnds(TEXT_CHANGE_DELAY)
                     .supplyTask(() -> computeHighlightingAsync(executorService, highlighter, this.getText()))
                     .awaitLatest(ticks)
