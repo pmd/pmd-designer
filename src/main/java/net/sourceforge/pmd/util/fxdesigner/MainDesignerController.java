@@ -174,7 +174,8 @@ public class MainDesignerController extends AbstractController<AbstractControlle
      * Otherwise does nothing.
      */
     public void refreshXPathResults() {
-        sourceEditorController.getCompilationUnit().ifPresent(root -> xpathPanelController.evaluateXPath(root, getLanguageVersion()));
+        getDesignerRoot().currentCompilationUnitProperty().getOpt()
+                         .ifPresent(root -> xpathPanelController.evaluateXPath(root, getLanguageVersion()));
     }
 
 
@@ -196,9 +197,9 @@ public class MainDesignerController extends AbstractController<AbstractControlle
      * @throws XPathEvaluationException if the query fails
      */
     public List<Node> runXPathQuery(String query) throws XPathEvaluationException {
-        return sourceEditorController.getCompilationUnit()
-                                     .map(n -> xpathPanelController.runXPathQuery(n, getLanguageVersion(), query))
-                                     .orElseGet(Collections::emptyList);
+        return getDesignerRoot().currentCompilationUnitProperty().getOpt()
+                                .map(n -> xpathPanelController.runXPathQuery(n, getLanguageVersion(), query))
+                                .orElseGet(Collections::emptyList);
     }
 
 
@@ -275,9 +276,7 @@ public class MainDesignerController extends AbstractController<AbstractControlle
      * Called when the AST is updated to update all parts of the UI.
      */
     public void invalidateAst() {
-        nodeInfoPanelController.setFocusNode(null);
         xpathPanelController.invalidateResultsExternal(false);
-        getDesignerRoot().getNodeSelectionChannel().pushEvent(this, null);
     }
 
 

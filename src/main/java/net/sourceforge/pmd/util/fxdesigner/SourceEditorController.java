@@ -34,7 +34,6 @@ import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
-import net.sourceforge.pmd.util.fxdesigner.util.controls.ASTTreeItem;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
@@ -177,8 +176,7 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
     private void setUpToDateCompilationUnit(Node node) {
         parent.invalidateAst();
         editorTitledPane.errorMessageProperty().setValue("");
-        ASTTreeItem root = ASTTreeItem.getRoot(node);
-        astTreeView.setRoot(root);
+        astTreeView.setAstRoot(node);
     }
 
     public Var<List<Node>> currentRuleResultsProperty() {
@@ -209,14 +207,6 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
 
     public Var<LanguageVersion> languageVersionProperty() {
         return languageVersionUIProperty;
-    }
-
-
-    /**
-     * Returns the most up-to-date compilation unit, or empty if it can't be parsed.
-     */
-    public Optional<Node> getCompilationUnit() {
-        return astManager.getCompilationUnit();
     }
 
 

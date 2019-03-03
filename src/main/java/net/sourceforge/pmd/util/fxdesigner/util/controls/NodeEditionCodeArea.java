@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.event.MouseOverTextEvent;
 import org.reactfx.EventSource;
-import org.reactfx.EventStreams;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -38,6 +37,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighligh
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea.StyleLayerIds;
+import net.sourceforge.pmd.util.fxdesigner.util.datakeys.DataHolderUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.application.Platform;
@@ -86,9 +86,6 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         super(StyleLayerIds.class);
 
         this.designerRoot = root;
-
-        // never emits selection events itself for now, but handles events from other sources
-        initNodeSelectionHandling(root, EventStreams.never(), false);
 
         setParagraphGraphicFactory(lineNumberFactory());
 
@@ -232,9 +229,16 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
     @Override
     public void setFocusNode(Node node) {
+
+
         // editor is always scrolled when re-selecting a node
+        if (node != null && DataHolderUtil.getUserData(SHOULD_MOVE_CARET, node)) {
+            scrollToNode(node);
+        }
+
         if (node != null) {
-            Platform.runLater(() -> scrollToNode(node));
+            // reset
+            DataHolderUtil.putUserData(SHOULD_MOVE_CARET, true, node);
         }
 
         if (Objects.equals(node, currentFocusNode.getValue())) {

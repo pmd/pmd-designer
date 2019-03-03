@@ -9,6 +9,7 @@ import org.reactfx.EventStream;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.XPathPanelController;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
+import net.sourceforge.pmd.util.fxdesigner.util.datakeys.DataKey;
 
 
 /**
@@ -21,6 +22,11 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
  * @author Clément Fournier
  */
 public interface NodeSelectionSource extends ApplicationComponent {
+
+    /**
+     * This is more of a band-aid than anything else..
+     */
+    DataKey<Boolean> SHOULD_MOVE_CARET = new DataKey<>("node.selection.should.move.caret", true);
 
 
     /**
