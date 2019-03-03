@@ -71,7 +71,6 @@
   &:is-node-selection {
     .code.identifier {
       -fx-fill: darken(@selection-focus-color, 10%);
-      -rtfx-underline-width: 0;
 
       &.class-identifier {
         -fx-fill: darken(@selection-focus-color, 20%);
@@ -98,6 +97,7 @@
     .text {
         -fx-fill: @code-color;
         -fx-font-size: 10.5pt;
+        -rtfx-underline-width: 0;
     }
 
 }
