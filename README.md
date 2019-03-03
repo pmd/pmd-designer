@@ -33,9 +33,14 @@ TODO Gifs
 
 ## Installation
 
-The designer is part of PMD's binary distributions.
+The designer is part of PMD's binary distributions. To install a distribution, see the [documentation page](https://pmd.github.io/latest/pmd_userdocs_installation.html) about installing PMD.
 
-TODO describe minimum Java config
+The app needs JRE 1.8 or above to run. Be aware that on JRE 11+, the JavaFX distribution should be installed separately. Visit [the download page](https://gluonhq.com/products/javafx/) to download a distribution, extract it, and set the `JAVAFX_HOME` environment variable.
+
+If the `bin` directory of your PMD distribution is on your shell's path, then you can launch the app with
+* `run.sh designer` on Linux/ OSX
+* `designer.bat` on Windows
+
 
 ## Usage
 
