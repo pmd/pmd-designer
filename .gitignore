@@ -101,7 +101,6 @@ buildNumber.properties
 !.idea/compiler.xml
 !.idea/modules.xml
 !.idea/vcs.xml
-!.idea/.name
 !.idea/watcherTasks.xml
 !.idea/encodings.xml
 !.idea/cssdialects.xml
