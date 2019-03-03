@@ -22,6 +22,9 @@
         <local.lib.repo>${project.basedir}/mvn-repo</local.lib.repo>
         <jar.artifact.name>${project.artifactId}-${project.version}</jar.artifact.name>
 
+        <unpacked.javadoc.dir>${project.build.directory}/apidocs</unpacked.javadoc.dir>
+        <unpacked.sources.dir>${project.build.directory}/fake-sources</unpacked.sources.dir>
+
         <cfx.java8.version>8.40.13</cfx.java8.version>
         <cfx.java9.version>9.0.0</cfx.java9.version>
 
@@ -29,6 +32,7 @@
         <build.version.dir>${project.build.outputDirectory}/META-INF/versions</build.version.dir>
     </properties>
 
+    <!-- Use mvn deploy to update. -->
     <distributionManagement>
         <repository>
             <id>local-libs</id>
@@ -44,9 +48,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.7.0</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
                 <executions>
                     <execution>
                         <id>default-compile</id>
@@ -72,6 +73,33 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.1.1</version>
                 <executions>
+
+                    <execution>
+                        <id>unpack-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifact>org.controlsfx:controlsfx:${cfx.java9.version}:jar:sources</artifact>
+                            <outputDirectory>${unpacked.sources.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+
+
+                    <execution>
+                        <id>unpack-javadocs</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifact>org.controlsfx:controlsfx:${cfx.java8.version}:jar:javadoc</artifact>
+                            <outputDirectory>${unpacked.javadoc.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+
+
                     <execution>
                         <id>layout-java-8-specific-code</id>
                         <phase>generate-sources</phase>
@@ -100,20 +128,57 @@
                 </executions>
             </plugin>
 
-
-            <!-- Finalize multi-release jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <Multi-Release>true</Multi-Release>
-                        </manifestEntries>
-                    </archive>
-                    <finalName>${jar.artifact.name}</finalName>
-                </configuration>
+                <version>3.1.1</version>
+                <executions>
+
+                    <!-- Finalize multi-release jar -->
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Multi-Release>true</Multi-Release>
+                                </manifestEntries>
+                            </archive>
+                            <finalName>${jar.artifact.name}</finalName>
+                        </configuration>
+                    </execution>
+
+                    <!-- Create attached sources & javadocs from unpacked -->
+
+                    <execution>
+                        <id>bundle-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>sources</classifier>
+                            <classesDirectory>${unpacked.sources.dir}</classesDirectory>
+                            <finalName>${jar.artifact.name}</finalName>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>bundle-javadoc</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>javadoc</classifier>
+                            <classesDirectory>${unpacked.javadoc.dir}</classesDirectory>
+                            <finalName>${jar.artifact.name}</finalName>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
