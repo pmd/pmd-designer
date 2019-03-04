@@ -6,11 +6,14 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="pmd-designer" />
+        <module name="pmd-ui" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="pmd-designer" target="8" />
+      <module name="pmd-ui" target="8" />
     </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="PREFER_TARGET_JDK_COMPILER" value="false" />
   </component>
 </project>
