@@ -6,7 +6,11 @@ package net.sourceforge.pmd.util.fxdesigner;
 
 import javax.swing.JOptionPane;
 
+/**
+ * Main class of the app, checking for prerequisites to launching {@link Designer}.
+ */
 public final class DesignerStarter {
+
     private static final String MISSING_JAVAFX = "You seem to be missing the JavaFX runtime. Please install JavaFX on your system and try again.";
 
     private DesignerStarter() {
