@@ -56,7 +56,12 @@ public interface NodeSelectionSource extends ApplicationComponent {
 
 
     enum SelectionOption {
-        NO_SCROLL
+        /**
+         * This selection is the reselection of a node across a parsing.
+         * Stuff like scrolling or external style changes should be avoided,
+         * only the internal model should be affected.
+         */
+        SELECTION_RECOVERY
     }
 
     class NodeSelectionEvent {

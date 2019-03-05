@@ -5,7 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import static java.util.Collections.emptySet;
-import static net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.SelectionOption.NO_SCROLL;
+import static net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.SelectionOption.SELECTION_RECOVERY;
 import static net.sourceforge.pmd.util.fxdesigner.util.AstTraversalUtil.findOldNodeInNewAst;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.parentIterator;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.toIterable;
@@ -93,7 +93,7 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
         if (root != null && selectedTreeItem != null && selectedTreeItem.getValue() != null) {
             Node newSelection = findOldNodeInNewAst(selectedTreeItem.getValue(), root).orElse(null);
             if (newSelection != null) {
-                baseSelectionEvents.push(NodeSelectionEvent.of(newSelection, EnumSet.of(NO_SCROLL)));
+                baseSelectionEvents.push(NodeSelectionEvent.of(newSelection, EnumSet.of(SELECTION_RECOVERY)));
                 setFocusNode(newSelection, emptySet()); // rehandle
             } else {
                 baseSelectionEvents.push(NodeSelectionEvent.of(null));

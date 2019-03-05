@@ -234,7 +234,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
         // editor must not be scrolled when finding a new selection in a
         // tree that is being edited
-        if (node != null && !options.contains(SelectionOption.NO_SCROLL)) {
+        if (node != null && !options.contains(SelectionOption.SELECTION_RECOVERY)) {
             scrollToNode(node);
         }
 
