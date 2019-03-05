@@ -27,6 +27,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
 
 
@@ -70,6 +71,14 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
            .values()
            .filter(Objects::nonNull)
             .subscribe(c -> c.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, autoCloseHandler));
+
+
+        // prevent ALT from focusing menu
+        addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (e.isAltDown()) {
+                e.consume();
+            }
+        });
     }
 
 

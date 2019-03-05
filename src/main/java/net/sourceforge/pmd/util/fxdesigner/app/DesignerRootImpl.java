@@ -17,6 +17,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NodeSelection
 import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
@@ -47,8 +48,9 @@ public final class DesignerRootImpl implements DesignerRoot {
         this.developerMode = developerMode;
         this.logger = new EventLogger(this);
 
-        mainStage.addEventHandler(KeyEvent.KEY_PRESSED, e -> isCtrlDown.setValue(e.isControlDown()));
-        mainStage.addEventHandler(KeyEvent.KEY_RELEASED, e -> isCtrlDown.setValue(e.isControlDown()));
+        // vetoed by any other key press, so that eg CTRL+V repeatedly vetoes it
+        mainStage.addEventHandler(KeyEvent.KEY_PRESSED, e -> isCtrlDown.setValue(e.isControlDown() && e.getCode() == KeyCode.CONTROL));
+        mainStage.addEventHandler(KeyEvent.KEY_RELEASED, e -> isCtrlDown.setValue(e.isControlDown() && e.getCode() == KeyCode.CONTROL));
     }
 
 

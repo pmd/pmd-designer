@@ -90,5 +90,9 @@ public interface DesignerRoot {
     <T> void registerService(AppServiceDescriptor<T> descriptor, T component);
 
 
+    /**
+     * Returns true if the ctrl key is being pressed.
+     * Vetoed by any other key press.
+     */
     Val<Boolean> isCtrlDownProperty();
 }

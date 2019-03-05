@@ -126,7 +126,7 @@ public class MainDesignerController extends AbstractController {
             wizard.showPopup(parentToWizSubscription);
         });
         openEventLogMenuItem.textProperty().bind(
-            getLogger().numNewLogEntriesProperty().map(i -> "Event log (" + (i > 0 ? i : "no") + " new)")
+            getLogger().numNewLogEntriesProperty().map(i -> "Event _Log (" + (i > 0 ? i : "no") + " new)")
         );
 
     }
