@@ -87,6 +87,7 @@ public class EventLogger implements ApplicationComponent {
 
 
     private static EventStream<LogEntry> deleteOnSignal(EventStream<LogEntry> input, Category normal, Category deleteSignal) {
+        // TODO replace with vetoable event stream
         return DesignerUtil.deleteOnSignal(
             filterOnCategory(input, false, normal, deleteSignal),
             x -> x.getCategory() == deleteSignal,

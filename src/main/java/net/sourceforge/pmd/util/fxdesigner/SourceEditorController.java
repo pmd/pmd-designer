@@ -174,7 +174,6 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
 
 
     private void setUpToDateCompilationUnit(Node node) {
-        parent.invalidateAst();
         editorTitledPane.errorMessageProperty().setValue("");
         astTreeView.setAstRoot(node);
     }

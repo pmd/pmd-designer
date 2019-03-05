@@ -98,8 +98,6 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
             } else {
                 baseSelectionEvents.push(NodeSelectionEvent.of(null));
             }
-        } else {
-            baseSelectionEvents.push(NodeSelectionEvent.of(null));
         }
     }
 

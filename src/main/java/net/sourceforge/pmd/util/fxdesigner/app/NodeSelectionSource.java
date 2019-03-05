@@ -71,6 +71,11 @@ public interface NodeSelectionSource extends ApplicationComponent {
             this.options = options;
         }
 
+        @Override
+        public String toString() {
+            return getClass().getName() + "(node=" + selected + ", options=" + options + ")";
+        }
+
         public static NodeSelectionEvent of(Node selected) {
             return new NodeSelectionEvent(selected, emptySet());
         }

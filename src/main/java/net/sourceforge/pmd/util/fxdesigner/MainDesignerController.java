@@ -272,14 +272,6 @@ public class MainDesignerController extends AbstractController<AbstractControlle
     }
 
 
-    /**
-     * Called when the AST is updated to update all parts of the UI.
-     */
-    public void invalidateAst() {
-        xpathPanelController.invalidateResultsExternal(false);
-    }
-
-
     public LanguageVersion getLanguageVersion() {
         return sourceEditorController.getLanguageVersion();
     }
