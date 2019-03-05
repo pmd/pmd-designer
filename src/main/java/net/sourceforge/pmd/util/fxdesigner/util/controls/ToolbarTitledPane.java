@@ -101,6 +101,8 @@ public final class ToolbarTitledPane extends TitledPane {
     private Label buildErrorLabel() {
         Label errorLabel = new Label();
 
+        errorLabel.getStyleClass().addAll("error-label");
+
         FontIcon errorIcon = new FontIcon("fas-exclamation-triangle");
         errorLabel.setGraphic(errorIcon);
         errorLabel.tooltipProperty().bind(
