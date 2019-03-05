@@ -6,16 +6,14 @@ import java.util.List;
 import java.util.Objects;
 
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 /**
  * Placeholder for an empty control. Can suggest actions to take to make the area non-empty.
@@ -36,23 +34,12 @@ public class HelpfulPlaceholder extends HBox {
 
         VBox messageVBox = new VBox();
 
-        Text messageLabel = new Text();
+        Label messageLabel = new Label();
         messageLabel.textProperty().bind(message);
-
-        Val<Number> messageWidthProp = Val.wrap(
-            leftColumn == null
-            ? Val.wrap(widthProperty())
-            : Bindings.createDoubleBinding(() -> getWidth() - messageVBox.getPrefWidth(),
-                                           messageVBox.prefWidthProperty(),
-                                           widthProperty()
-            )
-        );
-
-        messageLabel.wrappingWidthProperty().bind(messageVBox.widthProperty());
+        messageLabel.setWrapText(true);
 
         messageVBox.getChildren().addAll(messageLabel);
         messageVBox.getChildren().addAll(actions);
-
 
         if (leftColumn != null) {
             getChildren().add(leftColumn);
@@ -61,7 +48,8 @@ public class HelpfulPlaceholder extends HBox {
         getChildren().add(messageVBox);
 
         // TODO move to css
-        setSpacing(10);
+        setSpacing(15);
+        setFillHeight(true);
         setAlignment(CENTER);
         messageVBox.setAlignment(CENTER);
     }
