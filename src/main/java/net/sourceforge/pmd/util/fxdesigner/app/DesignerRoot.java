@@ -9,6 +9,8 @@ import org.reactfx.value.Val;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NodeSelectionEvent;
+import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
+import net.sourceforge.pmd.util.fxdesigner.app.services.RichTextMapper;
 
 import javafx.stage.Stage;
 
@@ -19,6 +21,11 @@ import javafx.stage.Stage;
  * @author Clément Fournier
  */
 public interface DesignerRoot {
+
+
+    AppServiceDescriptor<RichTextMapper> RICH_TEXT_MAPPER = new AppServiceDescriptor<>(RichTextMapper.class);
+
+
     /**
      * Gets the logger of the application.
      *
@@ -65,6 +72,23 @@ public interface DesignerRoot {
     default LanguageVersion getGlobalLanguageVersion() {
         return globalLanguageVersionProperty().getValue();
     }
+
+
+    /**
+     * Gets the instance of a service shared by the app.
+     *
+     * @param descriptor Service descriptor
+     */
+    <T> T getService(AppServiceDescriptor<T> descriptor);
+
+
+    /**
+     * Register a service for the given descriptor.
+     *
+     * @throws IllegalStateException if the service was already registered to some other component
+     */
+    <T> void registerService(AppServiceDescriptor<T> descriptor, T component);
+
 
     Val<Boolean> isCtrlDownProperty();
 }

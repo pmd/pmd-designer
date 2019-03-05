@@ -35,6 +35,7 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.rule.XPathRule;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
@@ -377,7 +378,7 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
 
         xpathResultListView.setPlaceholder(emptyLabel);
 
-        xpathResultListView.setItems(results.stream().map(parent::wrapNode).collect(Collectors.toCollection(LiveArrayList::new)));
+        xpathResultListView.setItems(results.stream().map(getDesignerRoot().getService(DesignerRoot.RICH_TEXT_MAPPER)::wrapNode).collect(Collectors.toCollection(LiveArrayList::new)));
         this.currentResults.setValue(results);
         // only show the error label here when it's an xpath error
         expressionTitledPane.errorMessageProperty().setValue(xpathError ? emptyResultsPlaceholder : "");

@@ -4,6 +4,9 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -11,6 +14,7 @@ import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NodeSelectionEvent;
+import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 import javafx.scene.input.KeyEvent;
@@ -34,6 +38,8 @@ public final class DesignerRootImpl implements DesignerRoot {
     private final Var<Boolean> isCtrlDown = Var.newSimpleVar(false);
 
     private final MessageChannel<NodeSelectionEvent> nodeSelectionChannel = new MessageChannel<>(Category.SELECTION_EVENT_TRACING);
+
+    private final Map<AppServiceDescriptor<?>, Object> services = new HashMap<>();
 
 
     public DesignerRootImpl(Stage mainStage, boolean developerMode) {
@@ -75,10 +81,24 @@ public final class DesignerRootImpl implements DesignerRoot {
         return globalCompilationUnit;
     }
 
-
     @Override
     public Var<LanguageVersion> globalLanguageVersionProperty() {
         return globalLanguageVersion;
+    }
+
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getService(AppServiceDescriptor<T> descriptor) {
+        return (T) services.get(descriptor);
+    }
+
+    @Override
+    public <T> void registerService(AppServiceDescriptor<T> descriptor, T component) {
+        if (services.containsKey(descriptor)) {
+            throw new IllegalStateException("Duplicate app service for descriptor " + descriptor);
+        }
+        services.put(descriptor, component);
     }
 
     @Override

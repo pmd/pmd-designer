@@ -155,15 +155,6 @@ public class MainDesignerController extends AbstractController<AbstractControlle
     }
 
 
-    /**
-     * Returns a wrapper around the given node that gives access
-     * to its textual representation in the editor area.
-     */
-    public TextAwareNodeWrapper wrapNode(Node node) {
-        return sourceEditorController.wrapNode(node);
-    }
-
-
     private void onFileMenuShowing() {
         openRecentMenu.setDisable(recentFiles.isEmpty());
     }

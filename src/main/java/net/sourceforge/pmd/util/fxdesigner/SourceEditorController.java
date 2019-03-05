@@ -27,6 +27,7 @@ import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.ClasspathClassLoader;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
 import net.sourceforge.pmd.util.fxdesigner.model.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
@@ -138,6 +139,8 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
     protected void afterParentInit() {
         rewire(astManager.languageVersionProperty(), languageVersionUIProperty);
         nodeEditionCodeArea.moveCaret(0, 0);
+
+        getDesignerRoot().registerService(DesignerRoot.RICH_TEXT_MAPPER, nodeEditionCodeArea);
     }
 
 
@@ -203,11 +206,6 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
 
     public Var<List<Node>> currentErrorNodesProperty() {
         return nodeEditionCodeArea.currentErrorNodesProperty();
-    }
-
-
-    public TextAwareNodeWrapper wrapNode(Node node) {
-        return nodeEditionCodeArea.wrapNode(node);
     }
 
 

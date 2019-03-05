@@ -33,6 +33,7 @@ import net.sourceforge.pmd.lang.symboltable.ScopedNode;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
+import net.sourceforge.pmd.util.fxdesigner.app.services.RichTextMapper;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighlighters;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea;
@@ -54,7 +55,7 @@ import javafx.css.PseudoClass;
  * @since 6.12.0
  * @author Clément Fournier
  */
-public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> implements NodeSelectionSource {
+public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> implements NodeSelectionSource, RichTextMapper {
 
     /**
      * Minimum duration during which the CTRL key must be continually pressed before the code area
