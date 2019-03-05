@@ -9,6 +9,7 @@ import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
+import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NodeSelectionEvent;
 
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
@@ -29,7 +30,7 @@ public final class DesignerRootImpl implements DesignerRoot {
     private final Var<Node> currentCompilationUnit = Var.newSimpleVar(null);
     private final Var<Boolean> isCtrlDown = Var.newSimpleVar(false);
 
-    private final MessageChannel<Node> nodeSelectionChannel = new MessageChannel<>(Category.SELECTION_EVENT_TRACING);
+    private final MessageChannel<NodeSelectionEvent> nodeSelectionChannel = new MessageChannel<>(Category.SELECTION_EVENT_TRACING);
 
 
     public DesignerRootImpl(Stage mainStage, boolean developerMode) {
@@ -61,7 +62,7 @@ public final class DesignerRootImpl implements DesignerRoot {
 
 
     @Override
-    public MessageChannel<Node> getNodeSelectionChannel() {
+    public MessageChannel<NodeSelectionEvent> getNodeSelectionChannel() {
         return nodeSelectionChannel;
     }
 

@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -142,7 +143,8 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
         selectionEvents = EventStreams.valuesOf(xpathResultListView.getSelectionModel().selectedItemProperty()).suppressible();
 
         initNodeSelectionHandling(getDesignerRoot(),
-                                  selectionEvents.filter(Objects::nonNull).map(TextAwareNodeWrapper::getNode), false);
+                                  selectionEvents.filter(Objects::nonNull).map(TextAwareNodeWrapper::getNode).map(NodeSelectionEvent::of),
+                                  false);
 
         violationsTitledPane.titleProperty().bind(currentResults.map(List::size).map(n -> "Matched nodes (" + n + ")"));
     }
@@ -235,7 +237,7 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
     }
 
     @Override
-    public void setFocusNode(Node node) {
+    public void setFocusNode(Node node, Set<SelectionOption> options) {
         Optional<TextAwareNodeWrapper> firstResult = xpathResultListView.getItems().stream()
                            .filter(wrapper -> wrapper.getNode().equals(node))
                            .findFirst();

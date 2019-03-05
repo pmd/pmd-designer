@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighligh
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea.StyleLayerIds;
-import net.sourceforge.pmd.util.fxdesigner.util.datakeys.DataHolderUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.application.Platform;
@@ -72,7 +72,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     private final Var<List<Node>> currentErrorNodes = Var.newSimpleVar(Collections.emptyList());
     private final Var<List<NameOccurrence>> currentNameOccurrences = Var.newSimpleVar(Collections.emptyList());
     private final DesignerRoot designerRoot;
-    private final EventSource<Node> selectionEvts = new EventSource<>();
+    private final EventSource<NodeSelectionEvent> selectionEvts = new EventSource<>();
 
 
 
@@ -120,7 +120,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
                 TextPos2D target = getPmdLineAndColumnFromOffset(this, ev.getCharacterIndex());
 
-                findNodeAt(currentRoot, target).ifPresent(selectionEvts::push);
+                findNodeAt(currentRoot, target).map(NodeSelectionEvent::of).ifPresent(selectionEvts::push);
             }
         );
 
@@ -228,17 +228,13 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
 
     @Override
-    public void setFocusNode(Node node) {
+    public void setFocusNode(Node node, Set<SelectionOption> options) {
 
 
-        // editor is always scrolled when re-selecting a node
-        if (node != null && DataHolderUtil.getUserData(SHOULD_MOVE_CARET, node)) {
+        // editor must not be scrolled when finding a new selection in a
+        // tree that is being edited
+        if (node != null && !options.contains(SelectionOption.NO_SCROLL)) {
             scrollToNode(node);
-        }
-
-        if (node != null) {
-            // reset
-            DataHolderUtil.putUserData(SHOULD_MOVE_CARET, true, node);
         }
 
         if (Objects.equals(node, currentFocusNode.getValue())) {

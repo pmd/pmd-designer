@@ -4,11 +4,15 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
+import static java.util.Collections.emptySet;
+import static net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.SelectionOption.NO_SCROLL;
 import static net.sourceforge.pmd.util.fxdesigner.util.AstTraversalUtil.findOldNodeInNewAst;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.parentIterator;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.toIterable;
 
+import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 import org.reactfx.EventSource;
@@ -18,9 +22,7 @@ import org.reactfx.SuspendableEventStream;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
-import net.sourceforge.pmd.util.fxdesigner.util.datakeys.DataHolderUtil;
 
-import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeItem;
@@ -38,8 +40,8 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
 
     private final TreeViewWrapper<Node> myWrapper = new TreeViewWrapper<>(this);
 
-    private final EventSource<Node> baseSelectionEvents;
-    private final SuspendableEventStream<Node> suppressibleSelectionEvents;
+    private final EventSource<NodeSelectionEvent> baseSelectionEvents;
+    private final SuspendableEventStream<NodeSelectionEvent> suppressibleSelectionEvents;
     private final DesignerRoot designerRoot;
 
 
@@ -66,6 +68,7 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
         //  * The selection changes
         EventStreams.valuesOf(getSelectionModel().selectedItemProperty())
                     .filterMap(Objects::nonNull, TreeItem::getValue)
+                    .map(NodeSelectionEvent::of)
                     .subscribe(baseSelectionEvents::push);
 
         //  * the currently selected cell is explicitly clicked
@@ -75,7 +78,7 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
             // only push an event if the node was already selected
             if (selectedTreeItem != null && selectedTreeItem.getValue() != null
                 && selectedTreeItem.getValue().equals(n)) {
-                baseSelectionEvents.push(n);
+                baseSelectionEvents.push(NodeSelectionEvent.of(n));
             }
         }));
 
@@ -90,10 +93,13 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
         if (root != null && selectedTreeItem != null && selectedTreeItem.getValue() != null) {
             Node newSelection = findOldNodeInNewAst(selectedTreeItem.getValue(), root).orElse(null);
             if (newSelection != null) {
-                DataHolderUtil.putUserData(SHOULD_MOVE_CARET, false, newSelection);
-                baseSelectionEvents.push(newSelection);
-                setFocusNode(newSelection); // rehandle
+                baseSelectionEvents.push(NodeSelectionEvent.of(newSelection, EnumSet.of(NO_SCROLL)));
+                setFocusNode(newSelection, emptySet()); // rehandle
+            } else {
+                baseSelectionEvents.push(NodeSelectionEvent.of(null));
             }
+        } else {
+            baseSelectionEvents.push(NodeSelectionEvent.of(null));
         }
     }
 
@@ -102,7 +108,7 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
      * Focus the given node, handling scrolling if needed.
      */
     @Override
-    public void setFocusNode(Node node) {
+    public void setFocusNode(Node node, Set<SelectionOption> options) {
         SelectionModel<TreeItem<Node>> selectionModel = getSelectionModel();
 
 

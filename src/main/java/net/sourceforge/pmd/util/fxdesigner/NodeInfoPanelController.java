@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.reactfx.EventStream;
@@ -101,10 +102,11 @@ public class NodeInfoPanelController extends AbstractController<MainDesignerCont
         // suppress as early as possible in the pipeline
         myScopeItemSelectionEvents = EventStreams.valuesOf(scopeHierarchyTreeView.getSelectionModel().selectedItemProperty()).suppressible();
 
-        EventStream<Node> selectionEvents = myScopeItemSelectionEvents.filter(Objects::nonNull)
-                                                                      .map(TreeItem::getValue)
-                                                                      .filterMap(o -> o instanceof NameDeclaration, o -> (NameDeclaration) o)
-                                                                      .map(NameDeclaration::getNode);
+        EventStream<NodeSelectionEvent> selectionEvents = myScopeItemSelectionEvents.filter(Objects::nonNull)
+                                                                                    .map(TreeItem::getValue)
+                                                                                    .filterMap(o -> o instanceof NameDeclaration, o -> (NameDeclaration) o)
+                                                                                    .map(NameDeclaration::getNode)
+                                                                                    .map(NodeSelectionEvent::of);
 
         // TODO split this into independent NodeSelectionSources
         initNodeSelectionHandling(getDesignerRoot(), selectionEvents, true);
@@ -116,9 +118,10 @@ public class NodeInfoPanelController extends AbstractController<MainDesignerCont
      * Displays info about a node. If null, the panels are reset.
      *
      * @param node Node to inspect
+     * @param options
      */
     @Override
-    public void setFocusNode(Node node) {
+    public void setFocusNode(Node node, Set<SelectionOption> options) {
         if (node == null) {
             invalidateInfo();
             return;

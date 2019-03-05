@@ -4,12 +4,15 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app;
 
+import static java.util.Collections.emptySet;
+
+import java.util.Set;
+
 import org.reactfx.EventStream;
 
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.XPathPanelController;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
-import net.sourceforge.pmd.util.fxdesigner.util.datakeys.DataKey;
 
 
 /**
@@ -23,17 +26,12 @@ import net.sourceforge.pmd.util.fxdesigner.util.datakeys.DataKey;
  */
 public interface NodeSelectionSource extends ApplicationComponent {
 
-    /**
-     * This is more of a band-aid than anything else..
-     */
-    DataKey<Boolean> SHOULD_MOVE_CARET = new DataKey<>("node.selection.should.move.caret", true);
-
 
     /**
      * Updates the UI to react to a change in focus node. This is called whenever some selection source
      * in the tree records a change.
      */
-    void setFocusNode(Node node);
+    void setFocusNode(Node node, Set<SelectionOption> options);
 
 
     /**
@@ -49,11 +47,36 @@ public interface NodeSelectionSource extends ApplicationComponent {
      *                              Splitting it into separate controls will remove the need for that.
      */
     default void initNodeSelectionHandling(DesignerRoot root,
-                                           EventStream<? extends Node> mySelectionEvents,
+                                           EventStream<? extends NodeSelectionEvent> mySelectionEvents,
                                            boolean alwaysHandleSelection) {
-        MessageChannel<Node> channel = root.getNodeSelectionChannel();
+        MessageChannel<NodeSelectionEvent> channel = root.getNodeSelectionChannel();
         mySelectionEvents.subscribe(n -> channel.pushEvent(this, n));
-        channel.messageStream(alwaysHandleSelection, this).subscribe(this::setFocusNode);
+        channel.messageStream(alwaysHandleSelection, this).subscribe(evt -> setFocusNode(evt.selected, evt.options));
     }
 
+
+    enum SelectionOption {
+        NO_SCROLL
+    }
+
+    class NodeSelectionEvent {
+
+        // RRR data class
+
+        public final Node selected;
+        public final Set<SelectionOption> options;
+
+        private NodeSelectionEvent(Node selected, Set<SelectionOption> options) {
+            this.selected = selected;
+            this.options = options;
+        }
+
+        public static NodeSelectionEvent of(Node selected) {
+            return new NodeSelectionEvent(selected, emptySet());
+        }
+
+        public static NodeSelectionEvent of(Node selected, Set<SelectionOption> options) {
+            return new NodeSelectionEvent(selected, options);
+        }
+    }
 }

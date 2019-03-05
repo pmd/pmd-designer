@@ -7,6 +7,7 @@ package net.sourceforge.pmd.util.fxdesigner.app;
 import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NodeSelectionEvent;
 
 import javafx.stage.Stage;
 
@@ -42,7 +43,7 @@ public interface DesignerRoot {
     /**
      * Channel used to transmit node selection events to all interested components.
      */
-    MessageChannel<Node> getNodeSelectionChannel();
+    MessageChannel<NodeSelectionEvent> getNodeSelectionChannel();
 
 
     Val<Node> currentCompilationUnitProperty();
