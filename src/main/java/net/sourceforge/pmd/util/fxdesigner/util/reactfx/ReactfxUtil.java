@@ -14,7 +14,7 @@ import org.reactfx.value.ValBase;
 /**
  * Extensions to ReactFX Val and EventStreams. Some can be deemed as too
  * general for this project: I'd like them to be moved to the reactfx main
- * project.
+ * project -> but it's unmaintained.
  *
  * @author Clément Fournier
  */
