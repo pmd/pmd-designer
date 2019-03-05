@@ -88,7 +88,7 @@ import javafx.stage.StageStyle;
  * @see ExportXPathWizardController
  * @since 6.0.0
  */
-public class XPathPanelController extends AbstractController<MainDesignerController> implements NodeSelectionSource {
+public class XPathPanelController extends AbstractController implements NodeSelectionSource {
 
     private static final String NO_MATCH_MESSAGE = "No match in text";
     private static final Duration XPATH_REFRESH_DELAY = Duration.ofMillis(100);
@@ -116,8 +116,8 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
 
     private SuspendableEventStream<TextAwareNodeWrapper> selectionEvents;
 
-    public XPathPanelController(MainDesignerController mainController) {
-        super(mainController);
+    public XPathPanelController(DesignerRoot designerRoot) {
+        super(designerRoot);
         getRuleBuilder().setClazz(XPathRule.class);
     }
 

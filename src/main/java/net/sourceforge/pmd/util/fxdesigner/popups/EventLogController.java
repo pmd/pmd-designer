@@ -19,8 +19,8 @@ import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.util.fxdesigner.MainDesignerController;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.EventLogger;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
@@ -55,7 +55,7 @@ import javafx.stage.Stage;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public final class EventLogController extends AbstractController<MainDesignerController> {
+public final class EventLogController extends AbstractController {
 
     private static final PseudoClass NEW_ENTRY = PseudoClass.getPseudoClass("new-entry");
 
@@ -76,8 +76,8 @@ public final class EventLogController extends AbstractController<MainDesignerCon
     private final Stage myPopupStage;
 
 
-    public EventLogController(MainDesignerController mediator) {
-        super(mediator);
+    public EventLogController(DesignerRoot designerRoot) {
+        super(designerRoot);
         // the FXML fields are injected and initialize is called in createStage
         this.myPopupStage = createStage(getMainStage());
     }

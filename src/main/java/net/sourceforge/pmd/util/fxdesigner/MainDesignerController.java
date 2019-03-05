@@ -21,7 +21,6 @@ import org.apache.commons.io.IOUtils;
 import org.reactfx.Subscription;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
@@ -29,10 +28,10 @@ import net.sourceforge.pmd.util.fxdesigner.popups.EventLogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LimitedSizeStack;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
-import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 
+import javafx.beans.NamedArg;
 import javafx.fxml.FXML;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
@@ -57,7 +56,7 @@ import javafx.stage.FileChooser;
  * @since 6.0.0
  */
 @SuppressWarnings("PMD.UnusedPrivateField")
-public class MainDesignerController extends AbstractController<AbstractController<?>> {
+public class MainDesignerController extends AbstractController {
 
 
     /* Menu bar */
@@ -96,9 +95,9 @@ public class MainDesignerController extends AbstractController<AbstractControlle
     private final Stack<File> recentFiles = new LimitedSizeStack<>(5);
 
 
-    public MainDesignerController(DesignerRoot owner) {
-        super(owner, null);
-        eventLogController = new SoftReferenceCache<>(() -> new EventLogController(this));
+    public MainDesignerController(@NamedArg("designerRoot") DesignerRoot designerRoot) {
+        super(designerRoot);
+        eventLogController = new SoftReferenceCache<>(() -> new EventLogController(designerRoot));
     }
 
 
@@ -259,7 +258,7 @@ public class MainDesignerController extends AbstractController<AbstractControlle
 
 
     @Override
-    public List<AbstractController<MainDesignerController>> getChildren() {
+    public List<AbstractController> getChildren() {
         return Arrays.asList(xpathPanelController, sourceEditorController, nodeInfoPanelController);
     }
 

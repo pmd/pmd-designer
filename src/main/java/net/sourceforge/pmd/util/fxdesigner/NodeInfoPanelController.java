@@ -24,6 +24,7 @@ import net.sourceforge.pmd.lang.ast.xpath.Attribute;
 import net.sourceforge.pmd.lang.metrics.LanguageMetricsProvider;
 import net.sourceforge.pmd.lang.symboltable.NameDeclaration;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.model.MetricResult;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil;
@@ -52,7 +53,7 @@ import javafx.scene.control.TreeView;
  * @since 6.0.0
  */
 @SuppressWarnings("PMD.UnusedPrivateField")
-public class NodeInfoPanelController extends AbstractController<MainDesignerController> implements NodeSelectionSource {
+public class NodeInfoPanelController extends AbstractController implements NodeSelectionSource {
 
 
     /** List of attribute names that are ignored if {@link #isHideCommonAttributes()} is true. */
@@ -81,8 +82,8 @@ public class NodeInfoPanelController extends AbstractController<MainDesignerCont
     private SuspendableEventStream<TreeItem<Object>> myScopeItemSelectionEvents;
 
 
-    public NodeInfoPanelController(MainDesignerController mainController) {
-        super(mainController);
+    public NodeInfoPanelController(DesignerRoot designerRoot) {
+        super(designerRoot);
     }
 
 

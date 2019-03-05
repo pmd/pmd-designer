@@ -33,7 +33,6 @@ import net.sourceforge.pmd.util.fxdesigner.model.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
@@ -53,7 +52,7 @@ import javafx.scene.control.ToggleGroup;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class SourceEditorController extends AbstractController<MainDesignerController> {
+public class SourceEditorController extends AbstractController {
 
     private static final Duration AST_REFRESH_DELAY = Duration.ofMillis(100);
     private final ASTManager astManager;
@@ -79,9 +78,9 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
     private Var<LanguageVersion> languageVersionUIProperty;
 
 
-    public SourceEditorController(MainDesignerController mainController) {
-        super(mainController);
-        astManager = new ASTManager(mainController.getDesignerRoot());
+    public SourceEditorController(DesignerRoot designerRoot) {
+        super(designerRoot);
+        astManager = new ASTManager(designerRoot);
     }
 
 
