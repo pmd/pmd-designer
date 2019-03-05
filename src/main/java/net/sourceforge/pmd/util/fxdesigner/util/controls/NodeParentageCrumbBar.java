@@ -9,6 +9,7 @@ import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.asRe
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.count;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.parentIterator;
 
+import java.util.Set;
 import java.util.function.Function;
 
 import org.controlsfx.control.BreadCrumbBar;
@@ -89,7 +90,7 @@ public class NodeParentageCrumbBar extends BreadCrumbBar<Node> implements NodeSe
 
         initNodeSelectionHandling(
             designerRoot,
-            selectionEvents,
+            selectionEvents.map(NodeSelectionEvent::of),
             true
         );
 
@@ -104,7 +105,7 @@ public class NodeParentageCrumbBar extends BreadCrumbBar<Node> implements NodeSe
      * the node to be the deepest one of the crumb bar. Noop if node is null.
      */
     @Override
-    public void setFocusNode(Node node) {
+    public void setFocusNode(Node node, Set<SelectionOption> options) {
         if (node == null) {
             return;
         }
