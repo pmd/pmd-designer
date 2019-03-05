@@ -110,6 +110,27 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
                                tick.ifRight(c -> astTreeView.setRoot(null));
                                refreshAST();
                            });
+
+        // default text, will be overwritten by settings restore
+        // TODO this doesn't handle the case where java is not on the classpath
+        setText("class Foo {\n"
+                    + "\n"
+                    + "    /*\n"
+                    + "        Welcome to the PMD Rule designer :)\n"
+                    + "\n"
+                    + "        Type some code in this area\n"
+                    + "        \n"
+                    + "        On the right, the Abstract Syntax Tree is displayed\n"
+                    + "        On the left, you can examine the XPath attributes of\n"
+                    + "        the nodes you select\n"
+                    + "        \n"
+                    + "        You can set the language you'd like to work in with\n"
+                    + "        the cog icon above this code area\n"
+                    + "     */\n"
+                    + "\n"
+                    + "    int i = 0;\n"
+                    + "}");
+
     }
 
 
