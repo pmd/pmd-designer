@@ -88,7 +88,7 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
         // fetch the selected item before setting the root
         ASTTreeItem selectedTreeItem = (ASTTreeItem) getSelectionModel().getSelectedItem();
 
-        setRoot(ASTTreeItem.getRoot(root));
+        setRoot(root == null ? null : ASTTreeItem.buildRoot(root));
 
         if (root != null && selectedTreeItem != null && selectedTreeItem.getValue() != null) {
             Node newSelection = findOldNodeInNewAst(selectedTreeItem.getValue(), root).orElse(null);

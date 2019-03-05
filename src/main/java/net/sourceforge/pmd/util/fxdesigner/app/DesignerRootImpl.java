@@ -7,9 +7,11 @@ package net.sourceforge.pmd.util.fxdesigner.app;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NodeSelectionEvent;
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
@@ -27,7 +29,8 @@ public final class DesignerRootImpl implements DesignerRoot {
     private final Stage mainStage;
     private final EventLogger logger;
     private final boolean developerMode;
-    private final Var<Node> currentCompilationUnit = Var.newSimpleVar(null);
+    private final Var<Node> globalCompilationUnit = Var.newSimpleVar(null);
+    private final Var<LanguageVersion> globalLanguageVersion = Var.newSimpleVar(DesignerUtil.defaultLanguageVersion());
     private final Var<Boolean> isCtrlDown = Var.newSimpleVar(false);
 
     private final MessageChannel<NodeSelectionEvent> nodeSelectionChannel = new MessageChannel<>(Category.SELECTION_EVENT_TRACING);
@@ -68,10 +71,15 @@ public final class DesignerRootImpl implements DesignerRoot {
 
 
     @Override
-    public Var<Node> currentCompilationUnitProperty() {
-        return currentCompilationUnit;
+    public Var<Node> globalCompilationUnitProperty() {
+        return globalCompilationUnit;
     }
 
+
+    @Override
+    public Var<LanguageVersion> globalLanguageVersionProperty() {
+        return globalLanguageVersion;
+    }
 
     @Override
     public Val<Boolean> isCtrlDownProperty() {

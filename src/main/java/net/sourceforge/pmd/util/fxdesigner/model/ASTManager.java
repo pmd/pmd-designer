@@ -56,7 +56,7 @@ public class ASTManager implements ApplicationComponent {
 
     public ASTManager(DesignerRoot owner) {
         this.designerRoot = owner;
-        Var<Node> smoothCompilationUnit = ((DesignerRootImpl) owner).currentCompilationUnitProperty();
+        Var<Node> smoothCompilationUnit = ((DesignerRootImpl) owner).globalCompilationUnitProperty();
 
         // veto null events to ignore null compilation units if they're
         // followed by a valid one quickly
@@ -88,7 +88,7 @@ public class ASTManager implements ApplicationComponent {
 
 
     public Optional<Node> getCompilationUnit() {
-        return getDesignerRoot().currentCompilationUnitProperty().getOpt();
+        return getDesignerRoot().globalCompilationUnitProperty().getOpt();
     }
 
 

@@ -113,7 +113,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
                 if (!isNodeSelectionMode.getValue()) {
                     return;
                 }
-                Node currentRoot = getDesignerRoot().currentCompilationUnitProperty().getValue();
+                Node currentRoot = getDesignerRoot().globalCompilationUnitProperty().getValue();
                 if (currentRoot == null) {
                     return;
                 }

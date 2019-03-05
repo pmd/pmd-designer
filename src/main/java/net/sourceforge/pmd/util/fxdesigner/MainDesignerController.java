@@ -14,19 +14,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.reactfx.Subscription;
-import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluationException;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
 import net.sourceforge.pmd.util.fxdesigner.popups.EventLogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LimitedSizeStack;
@@ -138,9 +136,11 @@ public class MainDesignerController extends AbstractController<AbstractControlle
     @Override
     protected void afterChildrenInit() {
         updateRecentFilesMenu();
-        refreshAST(); // initial refreshing
 
         sourceEditorController.currentRuleResultsProperty().bind(xpathPanelController.currentResultsProperty());
+
+        ((DesignerRootImpl) getDesignerRoot()).globalLanguageVersionProperty().bind(sourceEditorController.languageVersionProperty());
+
     }
 
 
@@ -156,52 +156,12 @@ public class MainDesignerController extends AbstractController<AbstractControlle
 
 
     /**
-     * Attempts to refresh the AST with the up-to-date source,
-     * also updating XPath results.
-     */
-    public void refreshAST() {
-        Optional<Node> root = sourceEditorController.refreshAST();
-
-        if (root.isPresent()) {
-            xpathPanelController.evaluateXPath(root.get(), getLanguageVersion());
-        } else {
-            xpathPanelController.invalidateResultsExternal(true);
-        }
-    }
-
-    /**
-     * Refreshes the XPath results if the compilation unit is valid.
-     * Otherwise does nothing.
-     */
-    public void refreshXPathResults() {
-        getDesignerRoot().currentCompilationUnitProperty().getOpt()
-                         .ifPresent(root -> xpathPanelController.evaluateXPath(root, getLanguageVersion()));
-    }
-
-
-    /**
      * Returns a wrapper around the given node that gives access
      * to its textual representation in the editor area.
      */
     public TextAwareNodeWrapper wrapNode(Node node) {
         return sourceEditorController.wrapNode(node);
     }
-
-
-    /**
-     * Runs an XPath (2.0) query on the current AST.
-     * Performs no side effects.
-     *
-     * @param query the query
-     * @return the matched nodes
-     * @throws XPathEvaluationException if the query fails
-     */
-    public List<Node> runXPathQuery(String query) throws XPathEvaluationException {
-        return getDesignerRoot().currentCompilationUnitProperty().getOpt()
-                                .map(n -> xpathPanelController.runXPathQuery(n, getLanguageVersion(), query))
-                                .orElseGet(Collections::emptyList);
-    }
-
 
 
     private void onFileMenuShowing() {
@@ -224,7 +184,6 @@ public class MainDesignerController extends AbstractController<AbstractControlle
                 LanguageVersion guess = DesignerUtil.getLanguageVersionFromExtension(file.getName());
                 if (guess != null) { // guess the language from the extension
                     sourceEditorController.setLanguageVersion(guess);
-                    refreshAST();
                 }
 
                 recentFiles.push(file);
@@ -269,21 +228,6 @@ public class MainDesignerController extends AbstractController<AbstractControlle
         items.add(clearItem);
 
         openRecentMenu.getItems().setAll(items);
-    }
-
-
-    public LanguageVersion getLanguageVersion() {
-        return sourceEditorController.getLanguageVersion();
-    }
-
-
-    public void setLanguageVersion(LanguageVersion version) {
-        sourceEditorController.setLanguageVersion(version);
-    }
-
-
-    public Val<LanguageVersion> languageVersionProperty() {
-        return sourceEditorController.languageVersionProperty();
     }
 
 

@@ -191,7 +191,7 @@ public class NodeInfoPanelController extends AbstractController<MainDesignerCont
 
 
     private ObservableList<MetricResult> evaluateAllMetrics(Node n) {
-        LanguageMetricsProvider<?, ?> provider = parent.getLanguageVersion().getLanguageVersionHandler().getLanguageMetricsProvider();
+        LanguageMetricsProvider<?, ?> provider = getGlobalLanguageVersion().getLanguageVersionHandler().getLanguageMetricsProvider();
         if (provider == null) {
             return FXCollections.emptyObservableList();
         }

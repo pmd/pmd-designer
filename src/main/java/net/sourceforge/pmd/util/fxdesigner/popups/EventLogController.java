@@ -24,6 +24,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.EventLogger;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
+import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluator;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 import javafx.beans.property.SimpleObjectProperty;
@@ -202,7 +203,9 @@ public final class EventLogController extends AbstractController<MainDesignerCon
         entry.setExamined(true);
 
         if (entry.getCategory().isUserException()) {
-            DesignerUtil.stackTraceToXPath(entry.getDetails()).map(parent::runXPathQuery).ifPresent(selectedErrorNodes::setValue);
+            DesignerUtil.stackTraceToXPath(entry.getDetails())
+                        .map(xpath -> XPathEvaluator.simpleEvaluate(getDesignerRoot(), xpath))
+                        .ifPresent(selectedErrorNodes::setValue);
         }
     }
 
