@@ -48,5 +48,9 @@ public interface DesignerRoot {
     Val<Node> currentCompilationUnitProperty();
 
 
+    /**
+     * Returns true if the ctrl key is being pressed.
+     * Vetoed by any other key press.
+     */
     Val<Boolean> isCtrlDownProperty();
 }
