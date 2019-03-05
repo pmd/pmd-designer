@@ -4,6 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.codearea;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -16,9 +17,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fxmisc.richtext.model.StyleSpans;
+import org.reactfx.EventSource;
+import org.reactfx.EventStream;
 
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea.LayerId;
+import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightUpdate.CompositeHighlightUpdate;
 
 import javafx.beans.NamedArg;
 import javafx.scene.control.IndexRange;
@@ -30,15 +34,16 @@ import javafx.scene.control.IndexRange;
  * which are listed in an enum.
  *
  * @param <K> Enum type listing the layer ids to use
+ *
  * @author Clément Fournier
  * @since 6.5.0
  */
 public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxHighlightingCodeArea {
 
-
     /** Contains the highlighting layers. */
     private final Map<K, StyleLayer> layersById;
-
+    private EventSource<CompositeHighlightUpdate> highlightUpdateBus = new EventSource<>();
+    private EventStream<?> highlightUpdateTicks = new EventSource<>();
 
     /**
      * Builds a new code area with the given enum type as layer id provider.
@@ -53,6 +58,12 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
         this.layersById = EnumSet.allOf(idEnum)
                                  .stream()
                                  .collect(Collectors.toConcurrentMap(id -> id, id -> new StyleLayer()));
+
+        highlightUpdateBus.reduceSuccessions(CompositeHighlightUpdate::merge, Duration.ofMillis(200))
+                          .subscribe(update -> {
+                              if (!isBeingUpdated())
+                              updateStyling(() -> update.apply(layersById));
+                          });
     }
 
 
@@ -82,7 +93,8 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
 
         UniformStyleCollection collection = new UniformStyleCollection(Collections.singleton(layerId.getStyleClass()), wrappedNodes);
 
-        updateStyling(() -> layersById.get(layerId).styleNodes(resetLayer, collection));
+        highlightUpdateBus.push(new CompositeHighlightUpdate(layerId, resetLayer, collection));
+//        updateStyling(() -> layersById.get(layerId).styleNodes(resetLayer, collection));
     }
 
 
@@ -104,7 +116,7 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
             // commonly thrown when the text is being edited while
             // the layering algorithm runs, and it doesn't matter
             if ("StyleSpan's length cannot be negative".equals(e.getMessage())
-                    || e.getMessage().contains("is not a valid range within")) {
+                || e.getMessage().contains("is not a valid range within")) {
                 return;
             }
             throw new RuntimeException("Unhandled error while recomputing the styling", e);
@@ -203,6 +215,7 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
 
     /** Identifier for a highlighting layer. */
     public interface LayerId {
+
         /**
          * Returns the style class associated with that layer.
          * Nodes styled in that layer will have this style class.

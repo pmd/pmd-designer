@@ -6,9 +6,10 @@ package net.sourceforge.pmd.util.fxdesigner.util.codearea;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 
@@ -18,7 +19,6 @@ import java.util.Set;
  * independently.
  */
 class StyleLayer {
-
 
     private final Map<Set<String>, UniformStyleCollection> styleToCollection = new HashMap<>();
 
@@ -34,23 +34,24 @@ class StyleLayer {
     }
 
 
-    public void styleNodes(UniformStyleCollection updates) {
-        styleNodes(false, updates);
-    }
-
-
-    public void styleNodes(boolean reset, UniformStyleCollection updates) {
-        if (reset) {
+    public void accept(HighlightUpdate update) {
+        if (update.resetLayer) {
             clearStyles();
         }
 
-        UniformStyleCollection newValue = Optional.ofNullable(styleToCollection.get(updates.getStyle()))
-                                                  .map(updates::merge)
-                                                  .orElse(updates);
+        for (Entry<Set<String>, UniformStyleCollection> styleEntry : new HashSet<>(styleToCollection.entrySet())) {
 
-        styleToCollection.put(updates.getStyle(), newValue);
+            UniformStyleCollection updated = update.styleToCollection.get(styleEntry.getKey());
+
+            if (updated != null) {
+                styleToCollection.put(styleEntry.getKey(), styleEntry.getValue().merge(updated));
+            }
+
+            update.styleToCollection.remove(styleEntry.getKey());
+        }
+
+        styleToCollection.putAll(update.styleToCollection);
     }
-
 
     @Override
     public boolean equals(Object o) {
