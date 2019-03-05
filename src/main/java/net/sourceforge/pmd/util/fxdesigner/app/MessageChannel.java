@@ -57,12 +57,9 @@ public class MessageChannel<T> {
      */
     public EventStream<T> messageStream(boolean alwaysHandle,
                                         ApplicationComponent component) {
-        return channel.hook(message -> component.logMessageTrace(message,
-                                                                 () -> component.getDebugName()
-                                                                     + " is handling message "
-                                                                     + message))
-                      .filter(message -> alwaysHandle || !component.equals(message.getOrigin()))
-                      .map(Message::getContent);
+        return channel.hook(message -> component.logMessageTrace(message, () -> component.getDebugName() + " is handling message " + message))
+                       .filter(message -> alwaysHandle || !component.equals(message.getOrigin()))
+                       .map(Message::getContent);
     }
 
 

@@ -36,6 +36,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
 import javafx.fxml.FXML;
@@ -75,6 +76,10 @@ public class SourceEditorController extends AbstractController {
     private AstTreeView astTreeView;
     @FXML
     private NodeEditionCodeArea nodeEditionCodeArea;
+    @FXML
+    private NodeParentageCrumbBar focusNodeParentageCrumbBar;
+
+
     private Var<LanguageVersion> languageVersionUIProperty;
 
 
