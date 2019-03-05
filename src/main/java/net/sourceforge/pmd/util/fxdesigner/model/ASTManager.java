@@ -65,9 +65,8 @@ public class ASTManager implements ApplicationComponent {
             Objects::isNull,
             Objects::nonNull,
             (a, b) -> b,
-            Duration.ofMillis(0)
-        );
-                           compilationUnit.values().subscribe(smoothCompilationUnit::setValue);
+            Duration.ofMillis(500)
+        ).subscribe(smoothCompilationUnit::setValue);
 
 
     }

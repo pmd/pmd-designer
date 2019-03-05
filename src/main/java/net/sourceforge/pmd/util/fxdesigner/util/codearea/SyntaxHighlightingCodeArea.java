@@ -121,16 +121,15 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
     private Subscription subscribeSyntaxHighlighting(EventStream<?> ticks, SyntaxHighlighter highlighter) {
         // captured in the closure, shutdown when unsubscribing
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
-        return Subscription.EMPTY;
-//        ticks.successionEnds(TEXT_CHANGE_DELAY)
-//                    .supplyTask(() -> computeHighlightingAsync(executorService, highlighter, this.getText()))
-//                    .awaitLatest(ticks)
-//                    .filterMap(t -> {
-//                        t.ifFailure(Throwable::printStackTrace);
-//                        return t.toOptional();
-//                    })
-//                    .subscribe(this::setCurrentSyntaxHighlight)
-//                    .and(executorService::shutdownNow);
+        return ticks.successionEnds(TEXT_CHANGE_DELAY)
+                    .supplyTask(() -> computeHighlightingAsync(executorService, highlighter, this.getText()))
+                    .awaitLatest(ticks)
+                    .filterMap(t -> {
+                        t.ifFailure(Throwable::printStackTrace);
+                        return t.toOptional();
+                    })
+                    .subscribe(this::setCurrentSyntaxHighlight)
+                    .and(executorService::shutdownNow);
     }
 
 
