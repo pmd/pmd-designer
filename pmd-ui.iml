@@ -68,12 +68,22 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-java:6.12.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-javascript:6.12.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.mozilla:rhino:1.7.7.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: junit:junit:4.12" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-jsp:6.12.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-plsql:6.12.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-visualforce:6.12.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-vm:6.12.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-xml:6.12.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.12" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.testfx:testfx-core:4.0.15-alpha" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.assertj:assertj-core:3.11.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.4.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apiguardian:apiguardian-api:1.0.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-engine:1.4.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.testfx:testfx-junit5:4.0.15-alpha" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.testfx:openjfx-monocle:8u76-b04" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.4.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.opentest4j:opentest4j:1.1.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-commons:1.4.0" level="project" />
   </component>
 </module>

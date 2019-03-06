@@ -37,6 +37,7 @@ public class Designer extends Application {
 
     private boolean isDeveloperMode;
     private long initStartTimeMillis;
+    private DesignerRoot owner;
 
     public Designer() {
         initStartTimeMillis = System.currentTimeMillis();
@@ -53,7 +54,9 @@ public class Designer extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        parseParameters(getParameters());
+        if (getParameters() != null) {
+            parseParameters(getParameters());
+        }
 
         // TODO should display the 4 segment version number
         stage.setTitle("PMD Rule Designer (v " + PMDVersion.VERSION + ')');
@@ -63,7 +66,7 @@ public class Designer extends Application {
 
         FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("designer.fxml"));
 
-        DesignerRoot owner = new DesignerRootImpl(stage, isDeveloperMode);
+        owner = new DesignerRootImpl(stage, isDeveloperMode);
         MainDesignerController mainController = new MainDesignerController(owner);
 
         NodeInfoPanelController nodeInfoPanelController = new NodeInfoPanelController(mainController);
@@ -130,6 +133,9 @@ public class Designer extends Application {
         }
     }
 
+    public DesignerRoot getDesignerRoot() {
+        return owner;
+    }
 
     private void setIcons(Stage primaryStage) {
         ObservableList<Image> icons = primaryStage.getIcons();
