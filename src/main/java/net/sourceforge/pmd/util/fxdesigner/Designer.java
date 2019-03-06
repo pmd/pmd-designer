@@ -33,7 +33,7 @@ import javafx.stage.Stage;
  * @author Clément Fournier
  * @since 6.0.0
  */
-class Designer extends Application {
+public class Designer extends Application {
 
     private long initStartTimeMillis;
     private DesignerRoot owner;

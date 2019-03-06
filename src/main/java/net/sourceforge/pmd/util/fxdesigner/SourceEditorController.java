@@ -28,7 +28,7 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.ClasspathClassLoader;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
+import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalStateHolderImpl;
 import net.sourceforge.pmd.util.fxdesigner.model.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
@@ -188,7 +188,7 @@ public class SourceEditorController extends AbstractController {
                       .ifPresent(this::setUpToDateCompilationUnit);
         } catch (ParseAbortedException e) {
             editorTitledPane.errorMessageProperty().setValue(sanitizeExceptionMessage(e));
-            ((DesignerRootImpl) getDesignerRoot()).globalCompilationUnitProperty().setValue(null);
+            ((GlobalStateHolderImpl) getGlobalState()).globalCompilationUnitProperty().setValue(null);
         }
     }
 

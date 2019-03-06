@@ -20,7 +20,7 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
+import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalStateHolderImpl;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStream;
 
@@ -56,7 +56,7 @@ public class ASTManager implements ApplicationComponent {
 
     public ASTManager(DesignerRoot owner) {
         this.designerRoot = owner;
-        Var<Node> smoothCompilationUnit = ((DesignerRootImpl) owner).globalCompilationUnitProperty();
+        Var<Node> smoothCompilationUnit = ((GlobalStateHolderImpl) getGlobalState()).globalCompilationUnitProperty();
 
         // veto null events to ignore null compilation units if they're
         // followed by a valid one quickly
@@ -88,7 +88,7 @@ public class ASTManager implements ApplicationComponent {
 
 
     public Optional<Node> getCompilationUnit() {
-        return getDesignerRoot().globalCompilationUnitProperty().getOpt();
+        return getGlobalState().globalCompilationUnitProperty().getOpt();
     }
 
 

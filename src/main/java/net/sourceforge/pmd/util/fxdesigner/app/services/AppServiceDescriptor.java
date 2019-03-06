@@ -16,13 +16,13 @@ package net.sourceforge.pmd.util.fxdesigner.app.services;
  */
 public final class AppServiceDescriptor<T> {
 
-    private final Class<T> type;
+    private final Class<? super T> type;
 
-    public AppServiceDescriptor(Class<T> type) {
+    public AppServiceDescriptor(Class<? super T> type) {
         this.type = type;
     }
 
-    public Class<T> getType() {
+    public Class<? super T> getType() {
         return type;
     }
 

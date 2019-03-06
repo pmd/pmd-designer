@@ -10,8 +10,8 @@ import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
 import net.sourceforge.pmd.util.fxdesigner.MainDesignerController;
-import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
+import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 
 
 /**

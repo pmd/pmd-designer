@@ -8,10 +8,12 @@ import java.util.function.Supplier;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
+import net.sourceforge.pmd.util.fxdesigner.app.MessageChannel.Message;
+import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
+import net.sourceforge.pmd.util.fxdesigner.app.services.EventLogger;
+import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalStateHolder;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
-import net.sourceforge.pmd.util.fxdesigner.app.MessageChannel.Message;
-import net.sourceforge.pmd.util.fxdesigner.app.services.EventLogger;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 
@@ -37,12 +39,18 @@ public interface ApplicationComponent {
     DesignerRoot getDesignerRoot();
 
 
-    /**
-     * A debug name for this component, used in developer mode to e.g. trace events
-     * handling paths.
-     */
-    default String getDebugName() {
-        return getClass().getSimpleName();
+    default <T> T getService(AppServiceDescriptor<T> descriptor) {
+        return getDesignerRoot().getService(descriptor);
+    }
+
+
+    default GlobalStateHolder getGlobalState() {
+        return getService(DesignerRoot.APP_STATE_HOLDER);
+    }
+
+
+    default LanguageVersion getGlobalLanguageVersion() {
+        return getGlobalState().getGlobalLanguageVersion();
     }
 
 
@@ -53,7 +61,16 @@ public interface ApplicationComponent {
      * @return The logger
      */
     default EventLogger getLogger() {
-        return getDesignerRoot().getLogger();
+        return getService(DesignerRoot.LOGGER);
+    }
+
+
+    /**
+     * A debug name for this component, used in developer mode to e.g. trace events
+     * handling paths.
+     */
+    default String getDebugName() {
+        return getClass().getSimpleName();
     }
 
 
@@ -129,9 +146,5 @@ public interface ApplicationComponent {
         }
     }
 
-
-    default LanguageVersion getGlobalLanguageVersion() {
-        return getDesignerRoot().getGlobalLanguageVersion();
-    }
 
 }

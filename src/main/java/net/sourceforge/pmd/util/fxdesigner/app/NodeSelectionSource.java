@@ -49,7 +49,7 @@ public interface NodeSelectionSource extends ApplicationComponent {
     default void initNodeSelectionHandling(DesignerRoot root,
                                            EventStream<? extends NodeSelectionEvent> mySelectionEvents,
                                            boolean alwaysHandleSelection) {
-        MessageChannel<NodeSelectionEvent> channel = root.getNodeSelectionChannel();
+        MessageChannel<NodeSelectionEvent> channel = root.getService(DesignerRoot.NODE_SELECTION_CHANNEL);
         mySelectionEvents.subscribe(n -> channel.pushEvent(this, n));
         channel.messageStream(alwaysHandleSelection, this).subscribe(evt -> setFocusNode(evt.selected, evt.options));
     }
