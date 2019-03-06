@@ -10,4 +10,5 @@ node to which it corresponds:
 
 * Added a crumb bar that displays the ancestors of the currently selected node.
 
-![Crumb bar demo](https://user-images.githubusercontent.com/24524930/53699460-bdf27000-3de8-11e9-8fcd-92b8b310cf60.gif)
+* When you have selected a node and start editing the code again, your selection
+should be preserved in most cases (on a best-effort basis) instead of reset.

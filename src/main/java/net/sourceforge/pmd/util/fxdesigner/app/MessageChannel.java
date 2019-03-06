@@ -9,9 +9,9 @@ import java.util.Objects;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
-import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.MainDesignerController;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
+import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
 
 
 /**
@@ -27,11 +27,8 @@ import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
  * <p>This abstraction is not sufficient to remove the mediator. The missing pieces are the
  * following:
  * <ul>
- * <li>Global state of the app: in particular the current language version of the editor, and
- * the current compilation unit, should be exposed globally.</li>
- * <li>Transformation requests: e.g. {@link MainDesignerController#wrapNode(Node)} allows to
- * associate a node with its rich-text representation by delegating to the code area. This would
- * be a "two-way" channel.</li>
+ * <li>Global state of the app: that's exposed through Vals on the {@link DesignerRoot}</li>
+ * <li>Transformation requests: that's exposed through an {@link AppServiceDescriptor}</li>
  * </ul>
  *
  * @param <T> Type of the messages of this channel

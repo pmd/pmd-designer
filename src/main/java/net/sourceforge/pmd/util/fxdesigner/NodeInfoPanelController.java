@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.reactfx.EventStream;
@@ -23,6 +24,7 @@ import net.sourceforge.pmd.lang.ast.xpath.Attribute;
 import net.sourceforge.pmd.lang.metrics.LanguageMetricsProvider;
 import net.sourceforge.pmd.lang.symboltable.NameDeclaration;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.model.MetricResult;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil;
@@ -51,7 +53,7 @@ import javafx.scene.control.TreeView;
  * @since 6.0.0
  */
 @SuppressWarnings("PMD.UnusedPrivateField")
-public class NodeInfoPanelController extends AbstractController<MainDesignerController> implements NodeSelectionSource {
+public class NodeInfoPanelController extends AbstractController implements NodeSelectionSource {
 
 
     /** List of attribute names that are ignored if {@link #isHideCommonAttributes()} is true. */
@@ -80,8 +82,8 @@ public class NodeInfoPanelController extends AbstractController<MainDesignerCont
     private SuspendableEventStream<TreeItem<Object>> myScopeItemSelectionEvents;
 
 
-    public NodeInfoPanelController(MainDesignerController mainController) {
-        super(mainController);
+    public NodeInfoPanelController(DesignerRoot designerRoot) {
+        super(designerRoot);
     }
 
 
@@ -101,10 +103,11 @@ public class NodeInfoPanelController extends AbstractController<MainDesignerCont
         // suppress as early as possible in the pipeline
         myScopeItemSelectionEvents = EventStreams.valuesOf(scopeHierarchyTreeView.getSelectionModel().selectedItemProperty()).suppressible();
 
-        EventStream<Node> selectionEvents = myScopeItemSelectionEvents.filter(Objects::nonNull)
-                                                                      .map(TreeItem::getValue)
-                                                                      .filterMap(o -> o instanceof NameDeclaration, o -> (NameDeclaration) o)
-                                                                      .map(NameDeclaration::getNode);
+        EventStream<NodeSelectionEvent> selectionEvents = myScopeItemSelectionEvents.filter(Objects::nonNull)
+                                                                                    .map(TreeItem::getValue)
+                                                                                    .filterMap(o -> o instanceof NameDeclaration, o -> (NameDeclaration) o)
+                                                                                    .map(NameDeclaration::getNode)
+                                                                                    .map(NodeSelectionEvent::of);
 
         // TODO split this into independent NodeSelectionSources
         initNodeSelectionHandling(getDesignerRoot(), selectionEvents, true);
@@ -116,9 +119,10 @@ public class NodeInfoPanelController extends AbstractController<MainDesignerCont
      * Displays info about a node. If null, the panels are reset.
      *
      * @param node Node to inspect
+     * @param options
      */
     @Override
-    public void setFocusNode(Node node) {
+    public void setFocusNode(Node node, Set<SelectionOption> options) {
         if (node == null) {
             invalidateInfo();
             return;
@@ -188,7 +192,7 @@ public class NodeInfoPanelController extends AbstractController<MainDesignerCont
 
 
     private ObservableList<MetricResult> evaluateAllMetrics(Node n) {
-        LanguageMetricsProvider<?, ?> provider = parent.getLanguageVersion().getLanguageVersionHandler().getLanguageMetricsProvider();
+        LanguageMetricsProvider<?, ?> provider = getGlobalLanguageVersion().getLanguageVersionHandler().getLanguageMetricsProvider();
         if (provider == null) {
             return FXCollections.emptyObservableList();
         }

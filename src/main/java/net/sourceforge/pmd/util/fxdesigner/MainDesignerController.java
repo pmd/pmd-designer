@@ -14,27 +14,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.reactfx.Subscription;
-import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluationException;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
 import net.sourceforge.pmd.util.fxdesigner.popups.EventLogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LimitedSizeStack;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
-import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 
+import javafx.beans.NamedArg;
 import javafx.fxml.FXML;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
@@ -59,7 +56,7 @@ import javafx.stage.FileChooser;
  * @since 6.0.0
  */
 @SuppressWarnings("PMD.UnusedPrivateField")
-public class MainDesignerController extends AbstractController<AbstractController<?>> {
+public class MainDesignerController extends AbstractController {
 
 
     /* Menu bar */
@@ -98,9 +95,9 @@ public class MainDesignerController extends AbstractController<AbstractControlle
     private final Stack<File> recentFiles = new LimitedSizeStack<>(5);
 
 
-    public MainDesignerController(DesignerRoot owner) {
-        super(owner, null);
-        eventLogController = new SoftReferenceCache<>(() -> new EventLogController(this));
+    public MainDesignerController(@NamedArg("designerRoot") DesignerRoot designerRoot) {
+        super(designerRoot);
+        eventLogController = new SoftReferenceCache<>(() -> new EventLogController(designerRoot));
     }
 
 
@@ -138,9 +135,11 @@ public class MainDesignerController extends AbstractController<AbstractControlle
     @Override
     protected void afterChildrenInit() {
         updateRecentFilesMenu();
-        refreshAST(); // initial refreshing
 
         sourceEditorController.currentRuleResultsProperty().bind(xpathPanelController.currentResultsProperty());
+
+        ((DesignerRootImpl) getDesignerRoot()).globalLanguageVersionProperty().bind(sourceEditorController.languageVersionProperty());
+
     }
 
 
@@ -153,54 +152,6 @@ public class MainDesignerController extends AbstractController<AbstractControlle
             ioe.printStackTrace();
         }
     }
-
-
-    /**
-     * Attempts to refresh the AST with the up-to-date source,
-     * also updating XPath results.
-     */
-    public void refreshAST() {
-        Optional<Node> root = sourceEditorController.refreshAST();
-
-        if (root.isPresent()) {
-            xpathPanelController.evaluateXPath(root.get(), getLanguageVersion());
-        } else {
-            xpathPanelController.invalidateResultsExternal(true);
-        }
-    }
-
-    /**
-     * Refreshes the XPath results if the compilation unit is valid.
-     * Otherwise does nothing.
-     */
-    public void refreshXPathResults() {
-        sourceEditorController.getCompilationUnit().ifPresent(root -> xpathPanelController.evaluateXPath(root, getLanguageVersion()));
-    }
-
-
-    /**
-     * Returns a wrapper around the given node that gives access
-     * to its textual representation in the editor area.
-     */
-    public TextAwareNodeWrapper wrapNode(Node node) {
-        return sourceEditorController.wrapNode(node);
-    }
-
-
-    /**
-     * Runs an XPath (2.0) query on the current AST.
-     * Performs no side effects.
-     *
-     * @param query the query
-     * @return the matched nodes
-     * @throws XPathEvaluationException if the query fails
-     */
-    public List<Node> runXPathQuery(String query) throws XPathEvaluationException {
-        return sourceEditorController.getCompilationUnit()
-                                     .map(n -> xpathPanelController.runXPathQuery(n, getLanguageVersion(), query))
-                                     .orElseGet(Collections::emptyList);
-    }
-
 
 
     private void onFileMenuShowing() {
@@ -223,7 +174,6 @@ public class MainDesignerController extends AbstractController<AbstractControlle
                 LanguageVersion guess = DesignerUtil.getLanguageVersionFromExtension(file.getName());
                 if (guess != null) { // guess the language from the extension
                     sourceEditorController.setLanguageVersion(guess);
-                    refreshAST();
                 }
 
                 recentFiles.push(file);
@@ -271,31 +221,6 @@ public class MainDesignerController extends AbstractController<AbstractControlle
     }
 
 
-    /**
-     * Called when the AST is updated to update all parts of the UI.
-     */
-    public void invalidateAst() {
-        nodeInfoPanelController.setFocusNode(null);
-        xpathPanelController.invalidateResultsExternal(false);
-        getDesignerRoot().getNodeSelectionChannel().pushEvent(this, null);
-    }
-
-
-    public LanguageVersion getLanguageVersion() {
-        return sourceEditorController.getLanguageVersion();
-    }
-
-
-    public void setLanguageVersion(LanguageVersion version) {
-        sourceEditorController.setLanguageVersion(version);
-    }
-
-
-    public Val<LanguageVersion> languageVersionProperty() {
-        return sourceEditorController.languageVersionProperty();
-    }
-
-
     @PersistentProperty
     public String getRecentFiles() {
         return recentFiles.stream().map(File::getAbsolutePath).collect(Collectors.joining(File.pathSeparator));
@@ -333,7 +258,7 @@ public class MainDesignerController extends AbstractController<AbstractControlle
 
 
     @Override
-    public List<AbstractController<MainDesignerController>> getChildren() {
+    public List<AbstractController> getChildren() {
         return Arrays.asList(xpathPanelController, sourceEditorController, nodeInfoPanelController);
     }
 

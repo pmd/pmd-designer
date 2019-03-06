@@ -9,6 +9,7 @@ import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.asRe
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.count;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.parentIterator;
 
+import java.util.Set;
 import java.util.function.Function;
 
 import org.controlsfx.control.BreadCrumbBar;
@@ -19,7 +20,6 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 
-import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
@@ -89,7 +89,7 @@ public class NodeParentageCrumbBar extends BreadCrumbBar<Node> implements NodeSe
 
         initNodeSelectionHandling(
             designerRoot,
-            selectionEvents,
+            selectionEvents.map(NodeSelectionEvent::of),
             true
         );
 
@@ -104,7 +104,7 @@ public class NodeParentageCrumbBar extends BreadCrumbBar<Node> implements NodeSe
      * the node to be the deepest one of the crumb bar. Noop if node is null.
      */
     @Override
-    public void setFocusNode(Node node) {
+    public void setFocusNode(Node node, Set<SelectionOption> options) {
         if (node == null) {
             return;
         }
@@ -123,13 +123,16 @@ public class NodeParentageCrumbBar extends BreadCrumbBar<Node> implements NodeSe
         // (difference between width of a BreadCrumbButton and that of its graphic)
         double constantPadding = Double.NaN;
 
+
         for (javafx.scene.Node button : asReversed(getChildren())) {
             Node n = (Node) ((TreeItem<?>) button.getUserData()).getValue();
-
-            // set the focus on the one being selected, remove on the others
-            // calling requestFocus would switch the focus from eg the treeview to the crumb bar (unusable)
-            button.pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), node.equals(n));
-
+            // when recovering from a selection it's impossible that the node be found,
+            // updating the style would cause visible twitching
+            if (!options.contains(SelectionOption.SELECTION_RECOVERY)) {
+                // set the focus on the one being selected, remove on the others
+                // calling requestFocus would switch the focus from eg the treeview to the crumb bar (unusable)
+                button.pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), node.equals(n));
+            }
             // update counters
             totalNumChar += ((Labeled) button).getText().length();
             double childWidth = ((Region) button).getWidth();
@@ -147,16 +150,15 @@ public class NodeParentageCrumbBar extends BreadCrumbBar<Node> implements NodeSe
             }
         }
 
+
         if (!found) {
             // Then we reset the deepest node.
 
             setDeepestNode(node, getWidthEstimator(totalNumChar, totalChildrenWidth, totalNumCrumbs, constantPadding));
             // set the deepest as focused
-            Platform.runLater(() ->
-                                  getChildren()
-                                      .get(getChildren().size() - 1)
-                                      .pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), true)
-            );
+            getChildren().get(getChildren().size() - 1)
+                         .pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), true);
+
         }
     }
 

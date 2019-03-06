@@ -67,10 +67,9 @@ public class Designer extends Application {
 
         DesignerRoot owner = new DesignerRootImpl(stage, isDeveloperMode);
         MainDesignerController mainController = new MainDesignerController(owner);
-
-        NodeInfoPanelController nodeInfoPanelController = new NodeInfoPanelController(mainController);
-        XPathPanelController xpathPanelController = new XPathPanelController(mainController);
-        SourceEditorController sourceEditorController = new SourceEditorController(mainController);
+        NodeInfoPanelController nodeInfoPanelController = new NodeInfoPanelController(owner);
+        XPathPanelController xpathPanelController = new XPathPanelController(owner);
+        SourceEditorController sourceEditorController = new SourceEditorController(owner);
 
         loader.setBuilderFactory(type -> {
 
