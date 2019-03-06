@@ -1,3 +1,7 @@
+/**
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
 package net.sourceforge.pmd.util.fxdesigner;
 
 import java.io.IOException;
@@ -39,24 +43,24 @@ public class LaunchTest {
      * @param robot - Will be injected by the test runner.
      */
     @Test
-    public void should_contain_button_with_text(FxRobot robot) {
+    public void todo(FxRobot robot) {
         FxAssert.verifyThat("#main-horizontal-split-pane", NodeMatchers.isNotNull());
     }
-//
-//    /**
-//     * @param robot - Will be injected by the test runner.
-//     */
-//    @Test
-//    void when_button_is_clicked_text_changes(FxRobot robot) {
-//        // when:
-//        robot.clickOn(".button");
-//
-//        // then:
-//        FxAssert.verifyThat(button, LabeledMatchers.hasText("clicked!"));
-//        // or (lookup by css id):
-//        FxAssert.verifyThat("#myButton", LabeledMatchers.hasText("clicked!"));
-//        // or (lookup by css class):
-//        FxAssert.verifyThat(".button", LabeledMatchers.hasText("clicked!"));
-//    }
+    //
+    //    /**
+    //     * @param robot - Will be injected by the test runner.
+    //     */
+    //    @Test
+    //    void when_button_is_clicked_text_changes(FxRobot robot) {
+    //        // when:
+    //        robot.clickOn(".button");
+    //
+    //        // then:
+    //        FxAssert.verifyThat(button, LabeledMatchers.hasText("clicked!"));
+    //        // or (lookup by css id):
+    //        FxAssert.verifyThat("#myButton", LabeledMatchers.hasText("clicked!"));
+    //        // or (lookup by css class):
+    //        FxAssert.verifyThat(".button", LabeledMatchers.hasText("clicked!"));
+    //    }
 
 }
