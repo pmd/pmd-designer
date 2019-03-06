@@ -16,6 +16,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import net.sourceforge.pmd.PMDVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 import com.sun.javafx.fxml.builder.ProxyBuilder;
@@ -64,7 +65,7 @@ public class Designer extends Application {
 
         FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("designer.fxml"));
 
-        DesignerRoot owner = new DesignerRoot(stage, isDeveloperMode);
+        DesignerRoot owner = new DesignerRootImpl(stage, isDeveloperMode);
         MainDesignerController mainController = new MainDesignerController(owner);
 
         NodeInfoPanelController nodeInfoPanelController = new NodeInfoPanelController(mainController);

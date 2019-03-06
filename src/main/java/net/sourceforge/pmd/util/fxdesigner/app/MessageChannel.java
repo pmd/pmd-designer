@@ -42,7 +42,6 @@ import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
 public class MessageChannel<T> {
 
     private final EventSource<Message<T>> channel = new EventSource<>();
-    private final EventStream<Message<T>> distinct = channel.distinct();
     private final Category logCategory;
 
 
@@ -60,7 +59,7 @@ public class MessageChannel<T> {
      */
     public EventStream<T> messageStream(boolean alwaysHandle,
                                         ApplicationComponent component) {
-        return distinct.hook(message -> component.logMessageTrace(message, () -> component.getDebugName() + " is handling message " + message))
+        return channel.hook(message -> component.logMessageTrace(message, () -> component.getDebugName() + " is handling message " + message))
                        .filter(message -> alwaysHandle || !component.equals(message.getOrigin()))
                        .map(Message::getContent);
     }
