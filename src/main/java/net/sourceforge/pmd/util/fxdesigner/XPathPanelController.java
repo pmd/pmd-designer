@@ -393,8 +393,10 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
             .map(
                 name ->
                     HelpfulPlaceholder.withMessage("Undeclared property in XPath expression: $" + name)
-                                      .withSuggestedAction("Add property",
-                                                           () -> propertyTableView.onAddPropertyClicked(name))
+                                      .withSuggestedAction(
+                                          "Add property",
+                                          () -> propertyTableView.onAddPropertyClicked(name)
+                                      )
             )
             .orElseGet(() -> HelpfulPlaceholder.withMessage(message))
             .withLeftColumn(new FontIcon("fas-exclamation-triangle"))
