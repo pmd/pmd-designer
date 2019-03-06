@@ -18,13 +18,14 @@ public class GlobalStateHolderImpl implements GlobalStateHolder {
     private final Var<Node> globalCompilationUnit = Var.newSimpleVar(null);
     private final Var<LanguageVersion> globalLanguageVersion = Var.newSimpleVar(DesignerUtil.defaultLanguageVersion());
 
+
     @Override
-    public Var<Node> globalCompilationUnitProperty() {
+    public Var<Node> writableGlobalCompilationUnitProperty() {
         return globalCompilationUnit;
     }
 
     @Override
-    public Var<LanguageVersion> globalLanguageVersionProperty() {
+    public Var<LanguageVersion> writeableGlobalLanguageVersionProperty() {
         return globalLanguageVersion;
     }
 }

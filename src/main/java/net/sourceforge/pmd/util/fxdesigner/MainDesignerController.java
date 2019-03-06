@@ -131,7 +131,7 @@ public class MainDesignerController extends AbstractController {
 
         sourceEditorController.currentRuleResultsProperty().bind(xpathPanelController.currentResultsProperty());
 
-        ((GlobalStateHolderImpl) getGlobalState()).globalLanguageVersionProperty().bind(sourceEditorController.languageVersionProperty());
+        getGlobalState().writeableGlobalLanguageVersionProperty().bind(sourceEditorController.languageVersionProperty());
 
     }
 

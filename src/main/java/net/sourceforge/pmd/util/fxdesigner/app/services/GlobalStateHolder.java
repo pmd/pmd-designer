@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner.app.services;
 
 import org.reactfx.value.Val;
+import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
@@ -17,17 +18,28 @@ import net.sourceforge.pmd.lang.ast.Node;
  */
 public interface GlobalStateHolder {
 
+    // Those are here to search for write-access usages more easily
+    Var<Node> writableGlobalCompilationUnitProperty();
+
+
+    Var<LanguageVersion> writeableGlobalLanguageVersionProperty();
+
+
     /**
      * Returns the compilation unit of the main editor. Empty if the source
      * is unparsable.
      */
-    Val<Node> globalCompilationUnitProperty();
+    default Val<Node> globalCompilationUnitProperty() {
+        return writableGlobalCompilationUnitProperty();
+    }
 
 
     /**
      * Returns the language version selected on the app. Never empty.
      */
-    Val<LanguageVersion> globalLanguageVersionProperty();
+    default Val<LanguageVersion> globalLanguageVersionProperty() {
+        return writeableGlobalLanguageVersionProperty();
+    }
 
 
     default LanguageVersion getGlobalLanguageVersion() {

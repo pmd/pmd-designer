@@ -188,7 +188,7 @@ public class SourceEditorController extends AbstractController {
                       .ifPresent(this::setUpToDateCompilationUnit);
         } catch (ParseAbortedException e) {
             editorTitledPane.errorMessageProperty().setValue(sanitizeExceptionMessage(e));
-            ((GlobalStateHolderImpl) getGlobalState()).globalCompilationUnitProperty().setValue(null);
+            getGlobalState().writableGlobalCompilationUnitProperty().setValue(null);
         }
     }
 
