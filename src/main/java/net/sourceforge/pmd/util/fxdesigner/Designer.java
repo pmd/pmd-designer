@@ -5,10 +5,8 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -48,6 +46,11 @@ class Designer extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         DesignerParams params = getParameters() == null ? new DesignerParams() : new DesignerParams(getParameters());
+        start(stage, new DesignerRootImpl(stage, params));
+    }
+
+    public void start(Stage stage, DesignerRoot owner) throws IOException {
+        this.owner = owner;
 
         // TODO should display the 4 segment version number
         stage.setTitle("PMD Rule Designer (v " + PMDVersion.VERSION + ')');
@@ -57,7 +60,6 @@ class Designer extends Application {
 
         FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("designer.fxml"));
 
-        owner = new DesignerRootImpl(stage, params.isDeveloperMode());
         MainDesignerController mainController = new MainDesignerController(owner);
         NodeInfoPanelController nodeInfoPanelController = new NodeInfoPanelController(owner);
         XPathPanelController xpathPanelController = new XPathPanelController(owner);
@@ -71,7 +73,6 @@ class Designer extends Application {
                 // Controls that need the DesignerRoot can declare a constructor
                 // with a parameter w/ signature @NamedArg("designerRoot") DesignerRoot
                 // to be injected with the relevant instance of the app.
-                // TODO Not everything has been refactored to use this mechanism for now
                 ProxyBuilder<Object> builder = new ProxyBuilder<>(type);
                 builder.put("designerRoot", owner);
                 return builder;

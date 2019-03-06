@@ -12,9 +12,12 @@ import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.util.fxdesigner.DesignerParams;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NodeSelectionEvent;
 import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
+import net.sourceforge.pmd.util.fxdesigner.app.services.OnDiskPersistenceManager;
+import net.sourceforge.pmd.util.fxdesigner.app.services.PersistenceManager;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 import javafx.scene.input.KeyCode;
@@ -43,14 +46,20 @@ public final class DesignerRootImpl implements DesignerRoot {
     private final Map<AppServiceDescriptor<?>, Object> services = new HashMap<>();
 
 
-    public DesignerRootImpl(Stage mainStage, boolean developerMode) {
+    public DesignerRootImpl(Stage mainStage, DesignerParams params) {
         this.mainStage = mainStage;
-        this.developerMode = developerMode;
+        this.developerMode = params.isDeveloperMode();
         this.logger = new EventLogger(this);
 
         // vetoed by any other key press, so that eg CTRL+V repeatedly vetoes it
         mainStage.addEventHandler(KeyEvent.KEY_PRESSED, e -> isCtrlDown.setValue(e.isControlDown() && e.getCode() == KeyCode.CONTROL));
         mainStage.addEventHandler(KeyEvent.KEY_RELEASED, e -> isCtrlDown.setValue(e.isControlDown() && e.getCode() == KeyCode.CONTROL));
+
+        PersistenceManager manager = new OnDiskPersistenceManager(this,
+                                                                  params.getPersistedInputFile(),
+                                                                  params.getPersistedOutputFile());
+
+        registerService(PERSISTENCE_MANAGER, manager);
     }
 
 
@@ -97,9 +106,7 @@ public final class DesignerRootImpl implements DesignerRoot {
 
     @Override
     public <T> void registerService(AppServiceDescriptor<T> descriptor, T component) {
-        if (services.containsKey(descriptor)) {
-            throw new IllegalStateException("Duplicate app service for descriptor " + descriptor);
-        }
+        logger.logEvent(LogEntry.serviceRegistered(descriptor, component));
         services.put(descriptor, component);
     }
 

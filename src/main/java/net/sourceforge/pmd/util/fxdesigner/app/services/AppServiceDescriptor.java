@@ -10,6 +10,8 @@ package net.sourceforge.pmd.util.fxdesigner.app.services;
  * a collection of services: the logger, the message channels, the global
  * state, etc.
  *
+ * TODO add shutdown hooks
+ *
  * @author Clément Fournier
  */
 public final class AppServiceDescriptor<T> {

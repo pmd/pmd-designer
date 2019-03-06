@@ -19,7 +19,7 @@ import javafx.application.Application.Parameters;
  * @author Clément Fournier
  * @since 6.0.0
  */
-final class DesignerParams {
+public final class DesignerParams {
 
     private static final Path PMD_SETTINGS_DIR = Paths.get(System.getProperty("user.home"), ".pmd");
     private static final File DEFAULT_SETTINGS_FILE = PMD_SETTINGS_DIR.resolve("designer.xml").toFile();
