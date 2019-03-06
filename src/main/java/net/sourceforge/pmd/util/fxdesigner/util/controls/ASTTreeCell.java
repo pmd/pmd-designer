@@ -10,6 +10,7 @@ import java.lang.reflect.Modifier;
 import java.util.function.Consumer;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reactfx.value.Val;
 
@@ -201,7 +202,7 @@ public class ASTTreeCell extends TreeCell<Node> {
             setGraphic(null);
             return;
         } else {
-            setText(item.toString() + (item.getImage() == null ? "" : " \"" + item.getImage() + "\""));
+            setText(nodePresentableText(item));
             setContextMenu(buildContextMenu(item));
         }
 
@@ -214,6 +215,11 @@ public class ASTTreeCell extends TreeCell<Node> {
             }
         });
 
+    }
+
+    private static String nodePresentableText(Node node) {
+        String image = node.getImage() == null ? "" : " \"" + StringEscapeUtils.escapeJava(node.getImage()) + "\"";
+        return node.getXPathNodeName() + image;
     }
 
 
