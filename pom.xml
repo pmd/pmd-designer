@@ -101,12 +101,12 @@
 
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.0</version>
+                <version>2.22.1</version>
             </plugin>
 
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.22.0</version>
+                <version>2.22.1</version>
             </plugin>
 
             <plugin>
@@ -505,13 +505,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.testfx</groupId>
-            <artifactId>openjfx-monocle</artifactId>
-            <version>8u76-b04</version> <!-- jdk-9+181 for Java 9, jdk-11+26 for Java 11 -->
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.4.0</version>
@@ -520,12 +513,112 @@
 
     </dependencies>
 
-    <!-- Those profiles are activated when importing project in eclipse or IntelliJ-->
-    <!-- They're only there to shift the "provided" scope to "runtime", to avoid recording -->
-    <!-- accidental compile dependencies. -->
-    <!-- They're duplicated, because Maven doesn't support doing a logical OR in activation... -->
-    <!-- See https://issues.apache.org/jira/browse/MNG-3328 -->
     <profiles>
+
+        <profile>
+            <id>headless</id>
+            <activation>
+                <!-- This runs tests headless by default -->
+                <!-- Run headed tests with -Dheaded or -P !headless -->
+                <property>
+                    <name>!headed</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.22.1</version>
+                        <configuration>
+                            <argLine>
+                                -Djava.awt.headless=true
+                                -Dtestfx.robot=glass
+                                -Dtestfx.headless=true
+                                -Dprism.order=sw
+                                -Dprism.text=t2k
+                                -Dtestfx.setup.timeout=2500
+                            </argLine>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>onJdk8</id>
+            <activation>
+                <jdk>[1.8, 9)</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.testfx</groupId>
+                    <artifactId>openjfx-monocle</artifactId>
+                    <version>8u76-b04</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+
+        <profile>
+            <id>onJdk11</id>
+            <activation>
+                <jdk>11</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.testfx</groupId>
+                    <artifactId>openjfx-monocle</artifactId>
+                    <version>jdk-11+26</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>onJdk9</id>
+            <activation>
+                <jdk>[9, 11)</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.testfx</groupId>
+                    <artifactId>openjfx-monocle</artifactId>
+                    <version>jdk-9+181</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Those profiles are activated when importing project in eclipse or IntelliJ-->
+        <!-- They're only there to shift the "provided" scope to "runtime", to avoid recording -->
+        <!-- accidental compile dependencies. -->
+        <!-- They're duplicated, because Maven doesn't support doing a logical OR in activation... -->
+        <!-- See https://issues.apache.org/jira/browse/MNG-3328 -->
         <profile>
             <id>m2e</id>
             <!-- This profile is only activated when building in Eclipse with m2e -->
@@ -671,27 +764,6 @@
                     <scope>runtime</scope>
                 </dependency>
             </dependencies>
-        </profile>
-        <profile>
-            <id>release</id>
-            <build>
-              <plugins>
-                <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-gpg-plugin</artifactId>
-                  <version>1.6</version>
-                  <executions>
-                    <execution>
-                      <id>sign-artifacts</id>
-                      <phase>verify</phase>
-                      <goals>
-                        <goal>sign</goal>
-                      </goals>
-                    </execution>
-                  </executions>
-                </plugin>
-              </plugins>
-            </build>
         </profile>
     </profiles>
 

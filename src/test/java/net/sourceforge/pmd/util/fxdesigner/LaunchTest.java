@@ -12,7 +12,6 @@ import org.testfx.matcher.base.NodeMatchers;
 
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 
-import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
