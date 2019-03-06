@@ -274,6 +274,10 @@ public final class ExportXPathWizardController implements Initializable {
         return dialog;
     }
 
+    private static String escapeMessageFormatter(String raw) {
+        return raw.replace("\"", "''''");
+    }
+
 
     /** Gets the template used to initialise the code area. */
     private static LiveTemplateBuilder<ObservableXPathRuleBuilder> liveTemplateBuilder() {
@@ -284,8 +288,9 @@ public final class ExportXPathWizardController implements Initializable {
             .appendIndent(1).append("language=\"").bind(ObservableRuleBuilder::languageProperty, Language::getTerseName).appendLine("\"")
             .bind(ObservableRuleBuilder::minimumVersionProperty, indented(2, surrounded("minimumLanguageVersion=\"", "\"\n", asString(LanguageVersion::getTerseName))))
             .bind(ObservableRuleBuilder::maximumVersionProperty, indented(2, surrounded("maximumLanguageVersion=\"", "\"\n", asString(LanguageVersion::getTerseName))))
-            // TODO should use MessageFormat escaping
-            .appendIndent(1).append("message=\"").bind(ObservableRuleBuilder::messageProperty).appendLine("\"")
+            .withDefaultEscape(s -> s) // special escape for message
+            .appendIndent(1).append("message=\"").bind(b -> b.messageProperty().map(ExportXPathWizardController::escapeMessageFormatter)).appendLine("\"")
+            .withDefaultEscape(StringEscapeUtils::escapeXml10) // restore escaper
             .appendIndent(1).append("class=\"").bind(ObservableRuleBuilder::clazzProperty, Class::getCanonicalName).appendLine("\">")
             .withDefaultIndent("   ")
             .appendIndent(1).appendLine("<description>")
