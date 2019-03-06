@@ -24,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.reactfx.Change;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 import org.reactfx.SuspendableEventStream;
@@ -32,7 +31,6 @@ import org.reactfx.collection.LiveArrayList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
@@ -159,7 +157,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
     @Override
     protected void afterParentInit() {
-        bindToParent();
+        bindBuilderToPanel();
 
         // init autocompletion only after binding to parent and settings restore
         // otherwise the popup is shown on startup
@@ -169,7 +167,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
 
     // Binds the underlying rule parameters to the parent UI, disconnecting it from the wizard if need be
-    private void bindToParent() {
+    private void bindBuilderToPanel() {
         DesignerUtil.rewire(getRuleBuilder().languageProperty(), Val.map(getDesignerRoot().globalLanguageVersionProperty(),
                                                                          LanguageVersion::getLanguage));
 
@@ -316,7 +314,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
     public Subscription bindToExportWizard(ExportXPathWizardController exportWizard) {
 
         return exportWizard.bindToRuleBuilder(getRuleBuilder())
-                           .and(this::bindToParent);
+                           .and(this::bindBuilderToPanel);
 
     }
 
