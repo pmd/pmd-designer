@@ -5,8 +5,10 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -33,9 +35,8 @@ import javafx.stage.Stage;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class Designer extends Application {
+class Designer extends Application {
 
-    private boolean isDeveloperMode;
     private long initStartTimeMillis;
     private DesignerRoot owner;
 
@@ -43,20 +44,10 @@ public class Designer extends Application {
         initStartTimeMillis = System.currentTimeMillis();
     }
 
-    private void parseParameters(Parameters params) {
-        List<String> raw = params.getRaw();
-        // error output is disabled by default
-        if (raw.contains("-v") || raw.contains("--verbose")) {
-            isDeveloperMode = true;
-        }
-    }
-
 
     @Override
     public void start(Stage stage) throws IOException {
-        if (getParameters() != null) {
-            parseParameters(getParameters());
-        }
+        DesignerParams params = getParameters() == null ? new DesignerParams() : new DesignerParams(getParameters());
 
         // TODO should display the 4 segment version number
         stage.setTitle("PMD Rule Designer (v " + PMDVersion.VERSION + ')');
@@ -66,7 +57,7 @@ public class Designer extends Application {
 
         FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("designer.fxml"));
 
-        owner = new DesignerRootImpl(stage, isDeveloperMode);
+        owner = new DesignerRootImpl(stage, params.isDeveloperMode());
         MainDesignerController mainController = new MainDesignerController(owner);
 
         NodeInfoPanelController nodeInfoPanelController = new NodeInfoPanelController(mainController);
