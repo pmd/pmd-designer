@@ -6,10 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.codearea;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.StyledDocument;
 
 import net.sourceforge.pmd.lang.ast.Node;
@@ -26,7 +23,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
  */
 class NodeStyleSpan {
 
-    private static final Pattern TAB_INDENT = Pattern.compile("^(\t*).*$");
     private static final Comparator<NodeStyleSpan> COMPARATOR = Comparator.comparing(NodeStyleSpan::getNode, Comparator.comparingInt(Node::getBeginLine).thenComparing(Node::getBeginColumn));
     private final Node node;
     private final SyntaxHighlightingCodeArea codeArea;
@@ -60,20 +56,9 @@ class NodeStyleSpan {
     }
 
     private int getAbsolutePosition(int line, int column) {
-        return codeArea.getAbsolutePosition(line - 1, column) - indentationOffset(line - 1);
+        return PmdCoordinatesSystem.getOffsetFromPmdPosition(codeArea, line, column);
     }
 
-
-    // CodeArea counts a tab as 1 column width but displays it as 8 columns width.
-    // PMD counts it correctly as 8 columns, so we must offset the position
-    private int indentationOffset(int paragraph) {
-        Paragraph<Collection<String>, String, Collection<String>> p = codeArea.getParagraph(paragraph);
-        Matcher m = TAB_INDENT.matcher(p.getText());
-        if (m.matches()) {
-            return m.group(1).length() * 7;
-        }
-        return 0;
-    }
 
 
     @Override

@@ -25,6 +25,8 @@ import javafx.scene.control.TreeView;
 
 
 /**
+ * Treeview that displays an AST.
+ *
  * @author Clément Fournier
  * @since 6.12.0
  */
@@ -111,7 +113,7 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
     private void highlightFocusNodeParents(ASTTreeItem oldSelection, ASTTreeItem newSelection) {
         if (oldSelection != null) {
             // remove highlighting on the cells of the item
-            sideEffectParents(oldSelection, (item, depth) -> item.setStyleClasses());
+            sideEffectParents(oldSelection, (item, depth) -> item.setStyleClasses(/* empty */));
         }
 
         if (newSelection != null) {

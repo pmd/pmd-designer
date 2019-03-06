@@ -14,7 +14,7 @@ import java.util.Set;
 
 /**
  * Represents a layer of styling in the text. Several layers are
- * aggregated into a {@link StyleContext}, and can evolve
+ * aggregated into a {@link HighlightLayerCodeArea}, and can evolve
  * independently.
  */
 class StyleLayer {
