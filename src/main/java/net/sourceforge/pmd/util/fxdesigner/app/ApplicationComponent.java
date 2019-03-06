@@ -6,6 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.app;
 
 import java.util.function.Supplier;
 
+import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.MessageChannel.Message;
@@ -124,6 +125,11 @@ public interface ApplicationComponent {
         if (isDeveloperMode()) {
             getLogger().logEvent(LogEntry.createDataEntry(event, event.getCategory(), details.get()));
         }
+    }
+
+
+    default LanguageVersion getGlobalLanguageVersion() {
+        return getDesignerRoot().getGlobalLanguageVersion();
     }
 
 }

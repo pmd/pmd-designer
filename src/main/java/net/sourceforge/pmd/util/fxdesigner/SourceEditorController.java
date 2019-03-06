@@ -17,7 +17,6 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,19 +27,18 @@ import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.ClasspathClassLoader;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
 import net.sourceforge.pmd.util.fxdesigner.model.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
-import net.sourceforge.pmd.util.fxdesigner.util.controls.ASTTreeItem;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.RadioMenuItem;
@@ -55,7 +53,7 @@ import javafx.scene.control.ToggleGroup;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class SourceEditorController extends AbstractController<MainDesignerController> {
+public class SourceEditorController extends AbstractController {
 
     private static final Duration AST_REFRESH_DELAY = Duration.ofMillis(100);
     private final ASTManager astManager;
@@ -85,9 +83,9 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
     private Var<LanguageVersion> languageVersionUIProperty;
 
 
-    public SourceEditorController(MainDesignerController mainController) {
-        super(mainController);
-        astManager = new ASTManager(mainController.getDesignerRoot());
+    public SourceEditorController(DesignerRoot designerRoot) {
+        super(designerRoot);
+        astManager = new ASTManager(designerRoot);
     }
 
 
@@ -115,8 +113,29 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
                            .subscribe(tick -> {
                                // Discard the AST if the language version has changed
                                tick.ifRight(c -> astTreeView.setRoot(null));
-                               Platform.runLater(parent::refreshAST);
+                               refreshAST();
                            });
+
+        // default text, will be overwritten by settings restore
+        // TODO this doesn't handle the case where java is not on the classpath
+        setText("class Foo {\n"
+                    + "\n"
+                    + "    /*\n"
+                    + "        Welcome to the PMD Rule designer :)\n"
+                    + "\n"
+                    + "        Type some code in this area\n"
+                    + "        \n"
+                    + "        On the right, the Abstract Syntax Tree is displayed\n"
+                    + "        On the left, you can examine the XPath attributes of\n"
+                    + "        the nodes you select\n"
+                    + "        \n"
+                    + "        You can set the language you'd like to work in with\n"
+                    + "        the cog icon above this code area\n"
+                    + "     */\n"
+                    + "\n"
+                    + "    int i = 0;\n"
+                    + "}");
+
     }
 
 
@@ -124,6 +143,8 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
     protected void afterParentInit() {
         rewire(astManager.languageVersionProperty(), languageVersionUIProperty);
         nodeEditionCodeArea.moveCaret(0, 0);
+
+        getDesignerRoot().registerService(DesignerRoot.RICH_TEXT_MAPPER, nodeEditionCodeArea);
     }
 
 
@@ -152,25 +173,23 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
     /**
      * Refreshes the AST and returns the new compilation unit if the parse didn't fail.
      */
-    public Optional<Node> refreshAST() {
+    public void refreshAST() {
         String source = getText();
 
         if (StringUtils.isBlank(source)) {
-            astTreeView.setRoot(null);
-            return Optional.empty();
+            astTreeView.setAstRoot(null);
+            return;
         }
 
-        Optional<Node> current;
 
         try {
-            current = astManager.updateIfChanged(source, auxclasspathClassLoader.getValue());
+            // this will push the new compilation unit on the global Val
+            astManager.updateIfChanged(source, auxclasspathClassLoader.getValue())
+                      .ifPresent(this::setUpToDateCompilationUnit);
         } catch (ParseAbortedException e) {
             editorTitledPane.errorMessageProperty().setValue(sanitizeExceptionMessage(e));
-            return Optional.empty();
+            ((DesignerRootImpl) getDesignerRoot()).globalCompilationUnitProperty().setValue(null);
         }
-
-        current.ifPresent(this::setUpToDateCompilationUnit);
-        return current;
     }
 
 
@@ -180,10 +199,8 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
 
 
     private void setUpToDateCompilationUnit(Node node) {
-        parent.invalidateAst();
         editorTitledPane.errorMessageProperty().setValue("");
-        ASTTreeItem root = ASTTreeItem.getRoot(node);
-        astTreeView.setRoot(root);
+        astTreeView.setAstRoot(node);
     }
 
     public Var<List<Node>> currentRuleResultsProperty() {
@@ -193,11 +210,6 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
 
     public Var<List<Node>> currentErrorNodesProperty() {
         return nodeEditionCodeArea.currentErrorNodesProperty();
-    }
-
-
-    public TextAwareNodeWrapper wrapNode(Node node) {
-        return nodeEditionCodeArea.wrapNode(node);
     }
 
 
@@ -214,14 +226,6 @@ public class SourceEditorController extends AbstractController<MainDesignerContr
 
     public Var<LanguageVersion> languageVersionProperty() {
         return languageVersionUIProperty;
-    }
-
-
-    /**
-     * Returns the most up-to-date compilation unit, or empty if it can't be parsed.
-     */
-    public Optional<Node> getCompilationUnit() {
-        return astManager.getCompilationUnit();
     }
 
 
