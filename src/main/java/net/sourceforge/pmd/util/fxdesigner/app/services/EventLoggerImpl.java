@@ -2,14 +2,13 @@
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
-package net.sourceforge.pmd.util.fxdesigner.app;
+package net.sourceforge.pmd.util.fxdesigner.app.services;
 
-import static net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category.PARSE_EXCEPTION;
-import static net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category.PARSE_OK;
-import static net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category.SELECTION_EVENT_TRACING;
-import static net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category.XPATH_EVALUATION_EXCEPTION;
-import static net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category.XPATH_OK;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.countNotMatching;
+import static net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category.PARSE_EXCEPTION;
+import static net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category.PARSE_OK;
+import static net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category.SELECTION_EVENT_TRACING;
+import static net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category.XPATH_EVALUATION_EXCEPTION;
+import static net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category.XPATH_OK;
 
 import java.time.Duration;
 import java.util.EnumSet;
@@ -20,10 +19,11 @@ import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
 import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
-import org.reactfx.value.Val;
 
-import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
-import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.LogEntryWithData;
+import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
+import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.LogEntryWithData;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 
@@ -33,7 +33,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class EventLogger implements ApplicationComponent {
+public class EventLoggerImpl implements ApplicationComponent, EventLogger {
 
     /**
      * Exceptions from XPath evaluation or parsing are never emitted
@@ -46,7 +46,7 @@ public class EventLogger implements ApplicationComponent {
     private final DesignerRoot designerRoot;
 
 
-    public EventLogger(DesignerRoot designerRoot) {
+    public EventLoggerImpl(DesignerRoot designerRoot) {
         this.designerRoot = designerRoot; // we have to be careful with initialization order here
 
         EventStream<LogEntry> onlyParseException = deleteOnSignal(latestEvent, PARSE_EXCEPTION, PARSE_OK);
@@ -74,12 +74,6 @@ public class EventLogger implements ApplicationComponent {
     }
 
 
-    /** Number of log entries that were not yet examined by the user. */
-    public Val<Integer> numNewLogEntriesProperty() {
-        return countNotMatching(fullLog.map(LogEntry::wasExaminedProperty));
-    }
-
-
     @Override
     public DesignerRoot getDesignerRoot() {
         return designerRoot;
@@ -104,21 +98,14 @@ public class EventLogger implements ApplicationComponent {
     }
 
 
-    /** Total number of log entries. */
-    public Val<Integer> numLogEntriesProperty() {
-        return fullLog.sizeProperty();
-    }
-
-
+    @Override
     public void logEvent(LogEntry event) {
         if (event != null) {
             latestEvent.push(event);
         }
     }
 
-    /**
-     * Returns the full log.
-     */
+    @Override
     public LiveList<LogEntry> getLog() {
         return fullLog;
     }

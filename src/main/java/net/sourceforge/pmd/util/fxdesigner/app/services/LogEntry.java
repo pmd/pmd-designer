@@ -2,7 +2,7 @@
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
-package net.sourceforge.pmd.util.fxdesigner.app;
+package net.sourceforge.pmd.util.fxdesigner.app.services;
 
 import java.util.Date;
 import java.util.Objects;
@@ -10,11 +10,9 @@ import java.util.Objects;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
-
 
 /**
- * Log entry of an {@link EventLogger}.
+ * Log entry of an {@link EventLoggerImpl}.
  *
  * @author Clément Fournier
  * @since 6.0.0
