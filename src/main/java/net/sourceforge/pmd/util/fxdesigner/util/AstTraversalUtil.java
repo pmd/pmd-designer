@@ -1,3 +1,7 @@
+/**
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
 package net.sourceforge.pmd.util.fxdesigner.util;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.parentIterator;
@@ -12,8 +16,11 @@ import net.sourceforge.pmd.lang.ast.Node;
 /**
  * @author Clément Fournier
  */
-public class AstTraversalUtil {
+public final class AstTraversalUtil {
 
+    private AstTraversalUtil() {
+
+    }
 
     /**
      * TODO move to some util.
