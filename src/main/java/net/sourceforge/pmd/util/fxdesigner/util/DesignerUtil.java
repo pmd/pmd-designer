@@ -91,7 +91,8 @@ public final class DesignerUtil {
 
 
     public static LanguageVersion defaultLanguageVersion() {
-        return LanguageRegistry.getDefaultLanguage().getDefaultVersion();
+        Language defaultLanguage = LanguageRegistry.getDefaultLanguage();
+        return defaultLanguage == null ? null : defaultLanguage.getDefaultVersion();
     }
 
 

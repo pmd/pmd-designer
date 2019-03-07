@@ -6,12 +6,15 @@ package net.sourceforge.pmd.util.fxdesigner;
 
 import javax.swing.JOptionPane;
 
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+
 /**
  * Main class of the app, checking for prerequisites to launching {@link Designer}.
  */
 public final class DesignerStarter {
 
     private static final String MISSING_JAVAFX = "You seem to be missing the JavaFX runtime. Please install JavaFX on your system and try again.";
+    private static final String MISSING_LANGUAGE_MODULES = "No PMD language modules can be found. Please add some to your classpath and restart the app.";
 
     private DesignerStarter() {
     }
@@ -25,10 +28,22 @@ public final class DesignerStarter {
         }
     }
 
+    private static boolean areLanguageModulesAvailable() {
+        return DesignerUtil.defaultLanguageVersion() != null;
+    }
+
     public static void main(String[] args) {
+
+        String message = null;
         if (!isJavaFxAvailable()) {
-            System.err.println(MISSING_JAVAFX);
-            JOptionPane.showMessageDialog(null, MISSING_JAVAFX);
+            message = MISSING_JAVAFX;
+        } else if (!areLanguageModulesAvailable()) {
+            message = MISSING_LANGUAGE_MODULES;
+        }
+
+        if (message != null) {
+            System.err.println(message);
+            JOptionPane.showMessageDialog(null, message);
             System.exit(1);
         }
 
