@@ -12,11 +12,12 @@ import org.testfx.api.FxAssert;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
-import org.testfx.matcher.base.NodeMatchers;
+import org.testfx.matcher.control.LabeledMatchers;
 
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
 @ExtendWith(ApplicationExtension.class)
@@ -43,9 +44,15 @@ public class LaunchTest {
      * @param robot - Will be injected by the test runner.
      */
     @Test
-    public void todo(FxRobot robot) {
-        FxAssert.verifyThat("#main-horizontal-split-pane", NodeMatchers.isNotNull());
+    public void testMnemonicParsingInMenuIsEnabled(FxRobot robot) {
+
+        robot.clickOn("#xpathResultListView");
+        robot.press(KeyCode.ALT);
+        robot.type(KeyCode.F);
+
+        FxAssert.verifyThat(".menu-item", LabeledMatchers.hasText("File"));
     }
+
     //
     //    /**
     //     * @param robot - Will be injected by the test runner.

@@ -28,7 +28,6 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.ClasspathClassLoader;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalStateHolderImpl;
 import net.sourceforge.pmd.util.fxdesigner.model.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;

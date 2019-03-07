@@ -537,7 +537,7 @@
                                 -Dtestfx.headless=true
                                 -Dprism.order=sw
                                 -Dprism.text=t2k
-                                -Dtestfx.setup.timeout=2500
+                                -Dtestfx.setup.timeout=10000
                             </argLine>
                         </configuration>
                     </plugin>

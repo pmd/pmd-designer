@@ -124,6 +124,9 @@ public class Designer extends Application {
         }
     }
 
+    /**
+     * Only set after {@link #start(Stage)} is called.
+     */
     public DesignerRoot getDesignerRoot() {
         return owner;
     }

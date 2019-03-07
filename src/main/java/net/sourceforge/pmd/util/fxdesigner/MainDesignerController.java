@@ -23,7 +23,6 @@ import org.reactfx.Subscription;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalStateHolderImpl;
 import net.sourceforge.pmd.util.fxdesigner.popups.EventLogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LimitedSizeStack;
