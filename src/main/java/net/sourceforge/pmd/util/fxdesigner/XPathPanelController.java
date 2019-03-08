@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,6 +35,7 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.rule.XPathRule;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
@@ -83,13 +85,11 @@ import javafx.stage.StageStyle;
  * @see ExportXPathWizardController
  * @since 6.0.0
  */
-public class XPathPanelController extends AbstractController<MainDesignerController> implements NodeSelectionSource {
+public class XPathPanelController extends AbstractController implements NodeSelectionSource {
 
     private static final String NO_MATCH_MESSAGE = "No match in text";
     private static final Duration XPATH_REFRESH_DELAY = Duration.ofMillis(100);
-    private final XPathEvaluator xpathEvaluator = new XPathEvaluator();
     private final ObservableXPathRuleBuilder ruleBuilder = new ObservableXPathRuleBuilder();
-
 
     @FXML
     public ToolbarTitledPane expressionTitledPane;
@@ -113,8 +113,8 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
 
     private SuspendableEventStream<TextAwareNodeWrapper> selectionEvents;
 
-    public XPathPanelController(MainDesignerController mainController) {
-        super(mainController);
+    public XPathPanelController(DesignerRoot designerRoot) {
+        super(designerRoot);
         getRuleBuilder().setClazz(XPathRule.class);
     }
 
@@ -133,13 +133,15 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
         exportXpathToRuleButton.setOnAction(e -> showExportXPathToRuleWizard());
 
         getRuleBuilder().modificationsTicks()
+                        .or(getDesignerRoot().globalCompilationUnitProperty().values())
                         .successionEnds(XPATH_REFRESH_DELAY)
-                        .subscribe(tick -> parent.refreshXPathResults());
+                        .subscribe(tick -> refreshResults());
 
         selectionEvents = EventStreams.valuesOf(xpathResultListView.getSelectionModel().selectedItemProperty()).suppressible();
 
         initNodeSelectionHandling(getDesignerRoot(),
-                                  selectionEvents.filter(Objects::nonNull).map(TextAwareNodeWrapper::getNode), false);
+                                  selectionEvents.filter(Objects::nonNull).map(TextAwareNodeWrapper::getNode).map(NodeSelectionEvent::of),
+                                  false);
 
         violationsTitledPane.titleProperty().bind(currentResults.map(List::size).map(n -> "Matched nodes (" + n + ")"));
     }
@@ -152,14 +154,15 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
 
         // init autocompletion only after binding to parent and settings restore
         // otherwise the popup is shown on startup
-        Supplier<CompletionResultSource> suggestionMaker = () -> XPathCompletionSource.forLanguage(parent.getLanguageVersion().getLanguage());
+        Supplier<CompletionResultSource> suggestionMaker = () -> XPathCompletionSource.forLanguage(getGlobalLanguageVersion().getLanguage());
         new XPathAutocompleteProvider(xpathExpressionArea, suggestionMaker).initialiseAutoCompletion();
     }
 
 
     // Binds the underlying rule parameters to the parent UI, disconnecting it from the wizard if need be
     private void bindToParent() {
-        DesignerUtil.rewire(getRuleBuilder().languageProperty(), Val.map(parent.languageVersionProperty(), LanguageVersion::getLanguage));
+        DesignerUtil.rewire(getRuleBuilder().languageProperty(), Val.map(getDesignerRoot().globalLanguageVersionProperty(),
+                                                                         LanguageVersion::getLanguage));
 
         DesignerUtil.rewireInit(getRuleBuilder().xpathVersionProperty(), xpathVersionProperty());
         DesignerUtil.rewireInit(getRuleBuilder().xpathExpressionProperty(), xpathExpressionProperty());
@@ -232,7 +235,7 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
     }
 
     @Override
-    public void setFocusNode(Node node) {
+    public void setFocusNode(Node node, Set<SelectionOption> options) {
         Optional<TextAwareNodeWrapper> firstResult = xpathResultListView.getItems().stream()
                            .filter(wrapper -> wrapper.getNode().equals(node))
                            .findFirst();
@@ -248,14 +251,11 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
 
     /**
      * Evaluate the contents of the XPath expression area
-     * on the given compilation unit. This updates the xpath
+     * on the global compilation unit. This updates the xpath
      * result panel, and can log XPath exceptions to the
      * event log panel.
-     *
-     * @param compilationUnit The AST root
-     * @param version         The language version
      */
-    public void evaluateXPath(Node compilationUnit, LanguageVersion version) {
+    private void refreshResults() {
 
         try {
             String xpath = getXpathExpression();
@@ -264,8 +264,17 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
                 return;
             }
 
+            Node compilationUnit = getDesignerRoot().globalCompilationUnitProperty().getValue();
+            if (compilationUnit == null) {
+                updateResults(false, true, Collections.emptyList(), "Compilation unit is invalid");
+                return;
+            }
+
+
+            LanguageVersion version = getDesignerRoot().globalLanguageVersionProperty().getValue();
+
             ObservableList<Node> results
-                = FXCollections.observableArrayList(xpathEvaluator.evaluateQuery(compilationUnit,
+                = FXCollections.observableArrayList(XPathEvaluator.evaluateQuery(compilationUnit,
                                                                                  version,
                                                                                  getXpathVersion(),
                                                                                  xpath,
@@ -279,20 +288,6 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
             logUserException(e, Category.XPATH_EVALUATION_EXCEPTION);
         }
 
-    }
-
-
-    public List<Node> runXPathQuery(Node compilationUnit, LanguageVersion version, String query) throws XPathEvaluationException {
-        return xpathEvaluator.evaluateQuery(compilationUnit, version, XPathRuleQuery.XPATH_2_0, query, ruleBuilder.getRuleProperties());
-    }
-
-
-    /**
-     * Called by the rest of the app.
-     */
-    public void invalidateResultsExternal(boolean error) {
-        String placeholder = error ? "Compilation unit is invalid" : NO_MATCH_MESSAGE;
-        updateResults(false, true, Collections.emptyList(), placeholder);
     }
 
 
@@ -380,7 +375,7 @@ public class XPathPanelController extends AbstractController<MainDesignerControl
 
         xpathResultListView.setPlaceholder(emptyLabel);
 
-        xpathResultListView.setItems(results.stream().map(parent::wrapNode).collect(Collectors.toCollection(LiveArrayList::new)));
+        xpathResultListView.setItems(results.stream().map(getDesignerRoot().getService(DesignerRoot.RICH_TEXT_MAPPER)::wrapNode).collect(Collectors.toCollection(LiveArrayList::new)));
         this.currentResults.setValue(results);
         // only show the error label here when it's an xpath error
         expressionTitledPane.errorMessageProperty().setValue(xpathError ? emptyResultsPlaceholder : "");

@@ -5,6 +5,8 @@
 package net.sourceforge.pmd.util.fxdesigner.model;
 
 import java.io.StringReader;
+import java.time.Duration;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +22,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
 import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStream;
 
 
 /**
@@ -43,7 +46,8 @@ public class ASTManager implements ApplicationComponent {
     /**
      * Most up-to-date compilation unit. Is null if the current source cannot be parsed.
      */
-    private final Var<Node> compilationUnit;
+    private final Var<Node> compilationUnit = Var.newSimpleVar(null);
+
     /**
      * Selected language version.
      */
@@ -52,7 +56,19 @@ public class ASTManager implements ApplicationComponent {
 
     public ASTManager(DesignerRoot owner) {
         this.designerRoot = owner;
-        compilationUnit = ((DesignerRootImpl) owner).currentCompilationUnitProperty();
+        Var<Node> smoothCompilationUnit = ((DesignerRootImpl) owner).globalCompilationUnitProperty();
+
+        // veto null events to ignore null compilation units if they're
+        // followed by a valid one quickly
+        VetoableEventStream.vetoableFrom(
+            compilationUnit.values(),
+            Objects::isNull,
+            Objects::nonNull,
+            (a, b) -> b,
+            Duration.ofMillis(500)
+        ).subscribe(smoothCompilationUnit::setValue);
+
+
     }
 
 
@@ -72,7 +88,7 @@ public class ASTManager implements ApplicationComponent {
 
 
     public Optional<Node> getCompilationUnit() {
-        return compilationUnit.getOpt();
+        return getDesignerRoot().globalCompilationUnitProperty().getOpt();
     }
 
 

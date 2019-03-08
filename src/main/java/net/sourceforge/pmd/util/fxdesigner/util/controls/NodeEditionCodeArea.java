@@ -16,13 +16,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.event.MouseOverTextEvent;
 import org.reactfx.EventSource;
-import org.reactfx.EventStreams;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -33,6 +33,7 @@ import net.sourceforge.pmd.lang.symboltable.ScopedNode;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
+import net.sourceforge.pmd.util.fxdesigner.app.services.RichTextMapper;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighlighters;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea;
@@ -54,7 +55,7 @@ import javafx.css.PseudoClass;
  * @since 6.12.0
  * @author Clément Fournier
  */
-public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> implements NodeSelectionSource {
+public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> implements NodeSelectionSource, RichTextMapper {
 
     /**
      * Minimum duration during which the CTRL key must be continually pressed before the code area
@@ -72,7 +73,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     private final Var<List<Node>> currentErrorNodes = Var.newSimpleVar(Collections.emptyList());
     private final Var<List<NameOccurrence>> currentNameOccurrences = Var.newSimpleVar(Collections.emptyList());
     private final DesignerRoot designerRoot;
-    private final EventSource<Node> selectionEvts = new EventSource<>();
+    private final EventSource<NodeSelectionEvent> selectionEvts = new EventSource<>();
 
 
 
@@ -86,9 +87,6 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         super(StyleLayerIds.class);
 
         this.designerRoot = root;
-
-        // never emits selection events itself for now, but handles events from other sources
-        initNodeSelectionHandling(root, EventStreams.never(), false);
 
         setParagraphGraphicFactory(lineNumberFactory());
 
@@ -116,14 +114,14 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
                 if (!isNodeSelectionMode.getValue()) {
                     return;
                 }
-                Node currentRoot = getDesignerRoot().currentCompilationUnitProperty().getValue();
+                Node currentRoot = getDesignerRoot().globalCompilationUnitProperty().getValue();
                 if (currentRoot == null) {
                     return;
                 }
 
                 TextPos2D target = getPmdLineAndColumnFromOffset(this, ev.getCharacterIndex());
 
-                findNodeAt(currentRoot, target).ifPresent(selectionEvts::push);
+                findNodeAt(currentRoot, target).map(NodeSelectionEvent::of).ifPresent(selectionEvts::push);
             }
         );
 
@@ -231,10 +229,13 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
 
     @Override
-    public void setFocusNode(Node node) {
-        // editor is always scrolled when re-selecting a node
-        if (node != null) {
-            Platform.runLater(() -> scrollToNode(node));
+    public void setFocusNode(Node node, Set<SelectionOption> options) {
+
+
+        // editor must not be scrolled when finding a new selection in a
+        // tree that is being edited
+        if (node != null && !options.contains(SelectionOption.SELECTION_RECOVERY)) {
+            scrollToNode(node);
         }
 
         if (Objects.equals(node, currentFocusNode.getValue())) {

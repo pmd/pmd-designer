@@ -107,11 +107,11 @@ public final class ASTTreeItem extends TreeItem<Node> {
 
 
     /** Builds an ASTTreeItem recursively from a node. */
-    public static ASTTreeItem getRoot(Node n) {
+    static ASTTreeItem buildRoot(Node n) {
         ASTTreeItem item = new ASTTreeItem(n);
         if (n.jjtGetNumChildren() > 0) {
             for (int i = 0; i < n.jjtGetNumChildren(); i++) {
-                item.getChildren().add(getRoot(n.jjtGetChild(i)));
+                item.getChildren().add(buildRoot(n.jjtGetChild(i)));
             }
         }
         return item;

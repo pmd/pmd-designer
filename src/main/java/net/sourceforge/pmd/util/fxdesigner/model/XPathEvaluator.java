@@ -8,6 +8,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +20,8 @@ import net.sourceforge.pmd.RuleSets;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.rule.XPathRule;
+import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 
 
 /**
@@ -27,8 +30,36 @@ import net.sourceforge.pmd.lang.rule.XPathRule;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class XPathEvaluator {
+public final class XPathEvaluator {
 
+
+    private XPathEvaluator() {
+
+    }
+
+    /**
+     * Evaluates the query with default parameters on the global compilation
+     * unit and with the global language version. This method hides errors.
+     *
+     * @return The results, or an empty list if there was an error
+     */
+    public static List<Node> simpleEvaluate(DesignerRoot root, String query) {
+        return root.globalCompilationUnitProperty()
+                   .getOpt()
+                   .map(n -> {
+                       try {
+                           return evaluateQuery(n,
+                                                root.getGlobalLanguageVersion(),
+                                                XPathRuleQuery.XPATH_2_0,
+                                                query,
+                                                emptyList());
+                       } catch (XPathEvaluationException e) {
+                           e.printStackTrace();
+                           return Collections.<Node>emptyList();
+                       }
+                   })
+                   .orElse(Collections.emptyList());
+    }
 
     /**
      * Evaluates an XPath query on the compilation unit. Performs
@@ -42,11 +73,11 @@ public class XPathEvaluator {
      *
      * @throws XPathEvaluationException if there was an error during the evaluation. The cause is preserved
      */
-    public List<Node> evaluateQuery(Node compilationUnit,
-                                    LanguageVersion languageVersion,
-                                    String xpathVersion,
-                                    String xpathQuery,
-                                    List<PropertyDescriptorSpec> properties) throws XPathEvaluationException {
+    public static List<Node> evaluateQuery(Node compilationUnit,
+                                           LanguageVersion languageVersion,
+                                           String xpathVersion,
+                                           String xpathQuery,
+                                           List<PropertyDescriptorSpec> properties) throws XPathEvaluationException {
 
         if (StringUtils.isBlank(xpathQuery)) {
             return emptyList();
