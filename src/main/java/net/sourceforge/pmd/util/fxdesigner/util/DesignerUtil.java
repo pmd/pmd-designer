@@ -4,11 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,8 +69,6 @@ public final class DesignerUtil {
 
     private static final Pattern EXCEPTION_PREFIX_PATTERN = Pattern.compile("(?:(?:\\w+\\.)*\\w+:\\s*)*\\s*(.*)$", Pattern.DOTALL);
 
-    private static final Path PMD_SETTINGS_DIR = Paths.get(System.getProperty("user.home"), ".pmd");
-    private static final File DESIGNER_SETTINGS_FILE = PMD_SETTINGS_DIR.resolve("designer.xml").toFile();
     private static final Pattern JJT_ACCEPT_PATTERN = Pattern.compile("net.sourceforge.pmd.lang.\\w++.ast.AST(\\w+).jjtAccept");
 
     private static List<LanguageVersion> supportedLanguageVersions;
@@ -104,16 +99,6 @@ public final class DesignerUtil {
      */
     public static URL getFxml(String simpleName) {
         return DesignerUtil.class.getResource("/net/sourceforge/pmd/util/fxdesigner/fxml/" + simpleName);
-    }
-
-
-    /**
-     * Name of the designer's settings file.
-     *
-     * @return The name
-     */
-    public static File getSettingsFile() {
-        return DESIGNER_SETTINGS_FILE;
     }
 
 
