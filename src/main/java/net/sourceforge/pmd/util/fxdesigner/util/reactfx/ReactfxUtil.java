@@ -5,11 +5,23 @@
 package net.sourceforge.pmd.util.fxdesigner.util.reactfx;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiPredicate;
+import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
+import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 import org.reactfx.value.ValBase;
+import org.reactfx.value.Var;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.Property;
+import javafx.beans.value.ObservableValue;
 
 /**
  * Extensions to ReactFX Val and EventStreams. Some can be deemed as too
@@ -54,5 +66,71 @@ public final class ReactfxUtil {
      */
     public static Val<Boolean> vetoableYes(Val<Boolean> base, Duration vetoPeriod) {
         return latestValue(VetoableEventStream.vetoableYes(base.values(), vetoPeriod)).orElseConst(false);
+    }
+
+    /** Like the other overload, using the setter of the ui property. */
+    public static <T> Subscription rewireInit(Property<T> underlying, Property<T> ui) {
+        return rewireInit(underlying, ui, ui::setValue);
+    }
+
+    /**
+     * Binds the underlying property to a source of values (UI property). The UI
+     * property is also initialised using a setter.
+     *
+     * @param underlying The underlying property
+     * @param ui         The property exposed to the user (the one in this wizard)
+     * @param setter     Setter to initialise the UI value
+     * @param <T>        Type of values
+     */
+    public static <T> Subscription rewireInit(Property<T> underlying, ObservableValue<? extends T> ui,
+                                              Consumer<? super T> setter) {
+        setter.accept(underlying.getValue());
+        return rewire(underlying, ui);
+    }
+
+    /** Like rewireInit, with no initialisation. */
+    public static <T> Subscription rewire(Property<T> underlying, ObservableValue<? extends T> source) {
+        underlying.unbind();
+        underlying.bind(source); // Bindings are garbage collected after the popup dies
+        return underlying::unbind;
+    }
+
+    public static Var<Boolean> booleanVar(BooleanProperty p) {
+        return Var.mapBidirectional(p, Boolean::booleanValue, Function.identity());
+    }
+
+    /**
+     * Like reduce if possible, but can be used if the events to reduce are emitted in extremely close
+     * succession, so close that some unrelated events may be mixed up. This reduces each new event
+     * with a related event in the pending notification chain instead of just considering the last one
+     * as a possible reduction target.
+     */
+    public static <T> EventStream<T> reduceEntangledIfPossible(EventStream<T> input, BiPredicate<T, T> canReduce, BinaryOperator<T> reduction, Duration duration) {
+        EventSource<T> source = new EventSource<>();
+
+
+        input.reduceSuccessions(
+            () -> new ArrayList<>(),
+            (List<T> pending, T t) -> {
+
+                for (int i = 0; i < pending.size(); i++) {
+                    if (canReduce.test(pending.get(i), t)) {
+                        pending.set(i, reduction.apply(pending.get(i), t));
+                        return pending;
+                    }
+                }
+                pending.add(t);
+
+                return pending;
+            },
+            duration
+        )
+             .subscribe(pending -> {
+                 for (T t : pending) {
+                     source.push(t);
+                 }
+             });
+
+        return source;
     }
 }

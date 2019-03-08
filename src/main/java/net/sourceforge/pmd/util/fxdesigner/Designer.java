@@ -37,25 +37,22 @@ import javafx.stage.Stage;
  */
 public class Designer extends Application {
 
-    private boolean isDeveloperMode;
     private long initStartTimeMillis;
+    private DesignerRoot owner;
 
     public Designer() {
         initStartTimeMillis = System.currentTimeMillis();
     }
 
-    private void parseParameters(Parameters params) {
-        List<String> raw = params.getRaw();
-        // error output is disabled by default
-        if (raw.contains("-v") || raw.contains("--verbose")) {
-            isDeveloperMode = true;
-        }
-    }
-
 
     @Override
     public void start(Stage stage) throws IOException {
-        parseParameters(getParameters());
+        DesignerParams params = getParameters() == null ? new DesignerParams() : new DesignerParams(getParameters());
+        start(stage, new DesignerRootImpl(stage, params));
+    }
+
+    public void start(Stage stage, DesignerRoot owner) throws IOException {
+        this.owner = owner;
 
         // TODO should display the 4 segment version number
         stage.setTitle("PMD Rule Designer (v " + PMDVersion.VERSION + ')');
@@ -65,7 +62,6 @@ public class Designer extends Application {
 
         FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("designer.fxml"));
 
-        DesignerRoot owner = new DesignerRootImpl(stage, isDeveloperMode);
         MainDesignerController mainController = new MainDesignerController(owner);
         NodeInfoPanelController nodeInfoPanelController = new NodeInfoPanelController(owner);
         XPathPanelController xpathPanelController = new XPathPanelController(owner);
@@ -79,7 +75,6 @@ public class Designer extends Application {
                 // Controls that need the DesignerRoot can declare a constructor
                 // with a parameter w/ signature @NamedArg("designerRoot") DesignerRoot
                 // to be injected with the relevant instance of the app.
-                // TODO Not everything has been refactored to use this mechanism for now
                 ProxyBuilder<Object> builder = new ProxyBuilder<>(type);
                 builder.put("designerRoot", owner);
                 return builder;
@@ -116,6 +111,12 @@ public class Designer extends Application {
         }
     }
 
+    /**
+     * Only set after {@link #start(Stage)} is called.
+     */
+    public DesignerRoot getDesignerRoot() {
+        return owner;
+    }
 
     private void setIcons(Stage primaryStage) {
         ObservableList<Image> icons = primaryStage.getIcons();

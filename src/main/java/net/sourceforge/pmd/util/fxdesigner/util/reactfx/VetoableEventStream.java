@@ -6,6 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.reactfx;
 
 import java.time.Duration;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -31,7 +32,7 @@ public final class VetoableEventStream<I> extends EventStreamBase<I> implements 
     private final EventStream<I> input;
     private final BiFunction<I, I, I> vetoableReduction;
     private final Predicate<I> isVetoable;
-    private final Predicate<I> isVetoSignal;
+    private final BiPredicate<I, I> isVetoSignal;
 
     private final Timer timer;
 
@@ -42,7 +43,7 @@ public final class VetoableEventStream<I> extends EventStreamBase<I> implements 
         EventStream<I> input,
         BiFunction<I, I, I> vetoableReduction,
         Predicate<I> isVetoable,
-        Predicate<I> isVeto,
+        BiPredicate<I, I> isVeto,
         Function<Runnable, Timer> timerFactory) {
 
         this.input = input;
@@ -77,7 +78,7 @@ public final class VetoableEventStream<I> extends EventStreamBase<I> implements 
 
     private void handleEvent(I i) {
         if (vetoable != null) {
-            if (isVetoSignal.test(i)) {
+            if (isVetoSignal.test(vetoable, i)) {
                 timer.stop();
                 vetoable = null;
                 invalidatePending();
@@ -121,7 +122,9 @@ public final class VetoableEventStream<I> extends EventStreamBase<I> implements 
      * @param input             Input event stream
      * @param isVetoable        Predicate that accepts events that should wait for the veto period
      *                          before it's emitted.
-     * @param isVeto            Predicate that accepts events that cancel a pending vetoable event
+     * @param isVeto            Predicate that accepts events that cancel a pending vetoable event.
+     *                          The pending vetoable is passed as first param, the event that may be
+     *                          a veto is the second param.
      * @param vetoableReduction Reduces two vetoable events, if a new vetoable event is recorded
      *                          while another one was already pending. The pending event is passed
      *                          as the first parameter. If the result of the reduction is vetoable,
@@ -131,7 +134,7 @@ public final class VetoableEventStream<I> extends EventStreamBase<I> implements 
      */
     public static <I> AwaitingEventStream<I> vetoableFrom(EventStream<I> input,
                                                           Predicate<I> isVetoable,
-                                                          Predicate<I> isVeto,
+                                                          BiPredicate<I, I> isVeto,
                                                           BiFunction<I, I, I> vetoableReduction,
                                                           Function<Runnable, Timer> timerFactory) {
         return new VetoableEventStream<>(input, vetoableReduction, isVetoable, isVeto, timerFactory);
@@ -140,7 +143,7 @@ public final class VetoableEventStream<I> extends EventStreamBase<I> implements 
 
     public static <I> AwaitingEventStream<I> vetoableFrom(EventStream<I> input,
                                                           Predicate<I> isVetoable,
-                                                          Predicate<I> isVeto,
+                                                          BiPredicate<I, I> isVeto,
                                                           BiFunction<I, I, I> vetoableReduction,
                                                           Duration vetoPeriod) {
 
@@ -152,6 +155,6 @@ public final class VetoableEventStream<I> extends EventStreamBase<I> implements 
      * @see ReactfxUtil#vetoableYes(Val, Duration)
      */
     public static AwaitingEventStream<Boolean> vetoableYes(EventStream<Boolean> input, Duration vetoPeriod) {
-        return vetoableFrom(input, b -> b, b -> !b, (a, b) -> b, vetoPeriod);
+        return vetoableFrom(input, b -> b, (a, b) -> !b, (a, b) -> b, vetoPeriod);
     }
 }

@@ -4,42 +4,24 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiPredicate;
-import java.util.function.BinaryOperator;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.reactfx.EventSource;
-import org.reactfx.EventStream;
-import org.reactfx.Subscription;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.lang.LanguageRegistry;
-import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.lang.Parser;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
 import net.sourceforge.pmd.lang.symboltable.NameDeclaration;
@@ -47,9 +29,6 @@ import net.sourceforge.pmd.lang.symboltable.NameOccurrence;
 import net.sourceforge.pmd.lang.symboltable.Scope;
 import net.sourceforge.pmd.lang.symboltable.ScopedNode;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Toggle;
@@ -67,12 +46,7 @@ public final class DesignerUtil {
 
     private static final Pattern EXCEPTION_PREFIX_PATTERN = Pattern.compile("(?:(?:\\w+\\.)*\\w+:\\s*)*\\s*(.*)$", Pattern.DOTALL);
 
-    private static final Path PMD_SETTINGS_DIR = Paths.get(System.getProperty("user.home"), ".pmd");
-    private static final File DESIGNER_SETTINGS_FILE = PMD_SETTINGS_DIR.resolve("designer.xml").toFile();
     private static final Pattern JJT_ACCEPT_PATTERN = Pattern.compile("net.sourceforge.pmd.lang.\\w++.ast.AST(\\w+).jjtAccept");
-
-    private static List<LanguageVersion> supportedLanguageVersions;
-    private static Map<String, LanguageVersion> extensionsToLanguage;
 
 
     private DesignerUtil() {
@@ -85,11 +59,6 @@ public final class DesignerUtil {
     }
 
 
-    public static LanguageVersion defaultLanguageVersion() {
-        return LanguageRegistry.getDefaultLanguage().getDefaultVersion();
-    }
-
-
     /**
      * Gets the URL to an fxml file from its simple name.
      *
@@ -99,16 +68,6 @@ public final class DesignerUtil {
      */
     public static URL getFxml(String simpleName) {
         return DesignerUtil.class.getResource("/net/sourceforge/pmd/util/fxdesigner/fxml/" + simpleName);
-    }
-
-
-    /**
-     * Name of the designer's settings file.
-     *
-     * @return The name
-     */
-    public static File getSettingsFile() {
-        return DESIGNER_SETTINGS_FILE;
     }
 
 
@@ -186,83 +145,6 @@ public final class DesignerUtil {
     }
 
 
-    public static StringConverter<LanguageVersion> languageVersionStringConverter() {
-        return DesignerUtil.stringConverter(
-            LanguageVersion::getShortName,
-            s -> LanguageRegistry.findLanguageVersionByTerseName(s.toLowerCase(Locale.ROOT))
-        );
-    }
-
-
-    private static Map<String, LanguageVersion> getExtensionsToLanguageMap() {
-        Map<String, LanguageVersion> result = new HashMap<>();
-        getSupportedLanguageVersions().stream()
-                                      .map(LanguageVersion::getLanguage)
-                                      .distinct()
-                                      .collect(Collectors.toMap(Language::getExtensions,
-                                                                Language::getDefaultVersion))
-                                      .forEach((key, value) -> key.forEach(ext -> result.put(ext, value)));
-        return result;
-    }
-
-
-    public static synchronized LanguageVersion getLanguageVersionFromExtension(String filename) {
-        if (extensionsToLanguage == null) {
-            extensionsToLanguage = getExtensionsToLanguageMap();
-        }
-
-        if (filename.indexOf('.') > 0) {
-            String[] tokens = filename.split("\\.");
-            return extensionsToLanguage.get(tokens[tokens.length - 1]);
-        }
-        return null;
-    }
-
-
-    public static synchronized List<LanguageVersion> getSupportedLanguageVersions() {
-        if (supportedLanguageVersions == null) {
-            List<LanguageVersion> languageVersions = new ArrayList<>();
-            for (LanguageVersion languageVersion : LanguageRegistry.findAllVersions()) {
-                Optional.ofNullable(languageVersion.getLanguageVersionHandler())
-                        .map(handler -> handler.getParser(handler.getDefaultParserOptions()))
-                        .filter(Parser::canParse)
-                        .ifPresent(p -> languageVersions.add(languageVersion));
-            }
-            supportedLanguageVersions = languageVersions;
-        }
-        return supportedLanguageVersions;
-    }
-
-
-    /** Like the other overload, using the setter of the ui property. */
-    public static <T> Subscription rewireInit(Property<T> underlying, Property<T> ui) {
-        return rewireInit(underlying, ui, ui::setValue);
-    }
-
-
-    /**
-     * Binds the underlying property to a source of values (UI property). The UI
-     * property is also initialised using a setter.
-     *
-     * @param underlying The underlying property
-     * @param ui         The property exposed to the user (the one in this wizard)
-     * @param setter     Setter to initialise the UI value
-     * @param <T>        Type of values
-     */
-    public static <T> Subscription rewireInit(Property<T> underlying, ObservableValue<? extends T> ui, Consumer<? super T> setter) {
-        setter.accept(underlying.getValue());
-        return rewire(underlying, ui);
-    }
-
-
-    /** Like rewireInit, with no initialisation. */
-    public static <T> Subscription rewire(Property<T> underlying, ObservableValue<? extends T> source) {
-        underlying.unbind();
-        underlying.bind(source); // Bindings are garbage collected after the popup dies
-        return underlying::unbind;
-    }
-
-
     /**
      * Works out an xpath query that matches the node
      * which was being visited during the failure.
@@ -308,111 +190,6 @@ public final class DesignerUtil {
     }
 
 
-    public static Var<Boolean> booleanVar(BooleanProperty p) {
-        return Var.mapBidirectional(p, Boolean::booleanValue, Function.identity());
-    }
-
-
-    public static Language findLanguageByShortName(String shortName) {
-        return LanguageRegistry.getLanguages().stream()
-                               .filter(it -> it.getShortName().equals(shortName))
-                               .findFirst()
-                               .orElse(LanguageRegistry.getDefaultLanguage());
-    }
-
-    /**
-     * Reduces the given stream on the given duration. If reduction of two values is not possible
-     * (canReduce returns false), then the last value is emitted and the new one will be tested for
-     * reduction with the next ones. If no new event is pushed during the duration, the last
-     * reduction result is emitted.
-     */
-    public static <T> EventStream<T> reduceIfPossible(EventStream<T> input, BiPredicate<T, T> canReduce, BinaryOperator<T> reduction, Duration duration) {
-        EventSource<T> source = new EventSource<>();
-
-        input.reduceSuccessions(
-            (last, t) -> {
-                if (canReduce.test(last, t)) {
-                    return reduction.apply(last, t);
-                } else {
-                    source.push(last);
-                    return t;
-                }
-            }, duration)
-             .subscribe(source::push);
-
-        return source;
-    }
-
-
-    /**
-     * Like reduce if possible, but can be used if the events to reduce are emitted in extremely
-     * close succession, so close that some unrelated events may be mixed up. This reduces each new
-     * event with a related event in the pending notification chain instead of just considering the
-     * last one as a possible reduction target.
-     */
-    public static <T> EventStream<T> reduceEntangledIfPossible(EventStream<T> input, BiPredicate<T, T> canReduce, BinaryOperator<T> reduction, Duration duration) {
-        EventSource<T> source = new EventSource<>();
-
-        input.reduceSuccessions(
-            () -> new ArrayList<>(),
-            (List<T> pending, T t) -> {
-
-                for (int i = 0; i < pending.size(); i++) {
-                    if (canReduce.test(pending.get(i), t)) {
-                        pending.set(i, reduction.apply(pending.get(i), t));
-                        return pending;
-                    }
-                }
-                pending.add(t);
-
-                return pending;
-            },
-            duration
-        )
-             .subscribe(pending -> {
-                 for (T t : pending) {
-                     source.push(t);
-                 }
-             });
-
-        return source;
-    }
-
-    public static Callback<Class<?>, Object> controllerFactoryKnowing(Object... controllers) {
-        return type -> {
-
-            for (Object o : controllers) {
-                if (o.getClass().equals(type)) {
-                    return o;
-                }
-            }
-
-            // default behavior for controllerFactory:
-            try {
-                return type.newInstance();
-            } catch (Exception exc) {
-                exc.printStackTrace();
-                throw new RuntimeException(exc); // fatal, just bail...
-            }
-        };
-    }
-
-
-    /**
-     * Returns an event stream that reduces successions of the input stream, and deletes the latest
-     * event if a new event that matches the isCancelSignal predicate is recorded during a reduction
-     * period. Cancel events are also emitted.
-     */
-    public static <T> EventStream<T> deleteOnSignal(EventStream<T> input, Predicate<T> isCancelSignal, Duration duration) {
-        return reduceIfPossible(input, (last, t) -> isCancelSignal.test(t), (last, t) -> t, duration);
-    }
-
-
-    public static <T, R> EventStream<T> mapFilter(EventStream<T> input, Function<? super T, ? extends R> mapper, Predicate<R> filter) {
-        return input.filter(t -> filter.test(mapper.apply(t)));
-    }
-
-
     public static List<NameOccurrence> getNameOccurrences(ScopedNode node) {
 
         // For MethodNameDeclaration the scope is the method scope, which is not the scope it is declared
@@ -447,6 +224,25 @@ public final class DesignerUtil {
                          .orElse(Collections.emptyList());
     }
 
+
+    public static Callback<Class<?>, Object> controllerFactoryKnowing(Object... controllers) {
+        return type -> {
+
+            for (Object o : controllers) {
+                if (o.getClass().equals(type)) {
+                    return o;
+                }
+            }
+
+            // default behavior for controllerFactory:
+            try {
+                return type.newInstance();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                throw new RuntimeException(exc); // fatal, just bail...
+            }
+        };
+    }
 
     /**
      * Attempts to retrieve the type of a java TypeNode reflectively.

@@ -5,22 +5,24 @@
 package net.sourceforge.pmd.util.fxdesigner.app.services;
 
 /**
- * Describes a service available to application components. This doesn't
- * support duplicate services. Probably, DesignerRoot can be split into
- * a collection of services: the logger, the message channels, the global
- * state, etc.
+ * Describes a service available to application components. If several
+ * services are registered for the same descriptor, the last one is kept
+ * (service registering events are logged).
+ *
+ * Some services are registered directly by DesignerImpl, others are
+ * implemented in controls and registered while FXML is loading.
  *
  * @author Clément Fournier
  */
 public final class AppServiceDescriptor<T> {
 
-    private final Class<T> type;
+    private final Class<? super T> type;
 
-    public AppServiceDescriptor(Class<T> type) {
+    public AppServiceDescriptor(Class<? super T> type) {
         this.type = type;
     }
 
-    public Class<T> getType() {
+    public Class<? super T> getType() {
         return type;
     }
 

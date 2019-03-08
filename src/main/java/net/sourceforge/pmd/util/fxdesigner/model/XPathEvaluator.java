@@ -44,12 +44,13 @@ public final class XPathEvaluator {
      * @return The results, or an empty list if there was an error
      */
     public static List<Node> simpleEvaluate(DesignerRoot root, String query) {
-        return root.globalCompilationUnitProperty()
+        return root.getService(DesignerRoot.APP_STATE_HOLDER)
+                   .globalCompilationUnitProperty()
                    .getOpt()
                    .map(n -> {
                        try {
                            return evaluateQuery(n,
-                                                root.getGlobalLanguageVersion(),
+                                                root.getService(DesignerRoot.APP_STATE_HOLDER).getGlobalLanguageVersion(),
                                                 XPathRuleQuery.XPATH_2_0,
                                                 query,
                                                 emptyList());
