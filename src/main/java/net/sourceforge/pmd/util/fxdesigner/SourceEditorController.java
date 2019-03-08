@@ -5,11 +5,11 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import static java.util.Collections.emptyList;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.defaultLanguageVersion;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.getSupportedLanguageVersions;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.mapToggleGroupToUserData;
-import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExceptionMessage;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguageVersion;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguageVersions;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
@@ -164,7 +164,7 @@ public class SourceEditorController extends AbstractController {
                         languageSelectionMenuButton.getItems().add(item);
                     });
 
-        languageVersionUIProperty = mapToggleGroupToUserData(languageToggleGroup, DesignerUtil::defaultLanguageVersion);
+        languageVersionUIProperty = mapToggleGroupToUserData(languageToggleGroup, LanguageRegistryUtil::defaultLanguageVersion);
         // this will be overwritten by property restore if needed
         languageVersionUIProperty.setValue(defaultLanguageVersion());
     }

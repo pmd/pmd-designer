@@ -8,7 +8,7 @@ import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 
 /**
  * @author Clément Fournier
@@ -16,7 +16,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 public class GlobalStateHolderImpl implements GlobalStateHolder {
 
     private final Var<Node> globalCompilationUnit = Var.newSimpleVar(null);
-    private final Var<LanguageVersion> globalLanguageVersion = Var.newSimpleVar(DesignerUtil.defaultLanguageVersion());
+    private final Var<LanguageVersion> globalLanguageVersion = Var.newSimpleVar(LanguageRegistryUtil.defaultLanguageVersion());
 
 
     @Override

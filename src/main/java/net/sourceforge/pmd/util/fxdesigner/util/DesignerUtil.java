@@ -6,13 +6,10 @@ package net.sourceforge.pmd.util.fxdesigner.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -25,10 +22,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.lang.LanguageRegistry;
-import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.lang.Parser;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
 import net.sourceforge.pmd.lang.symboltable.NameDeclaration;
@@ -55,9 +48,6 @@ public final class DesignerUtil {
 
     private static final Pattern JJT_ACCEPT_PATTERN = Pattern.compile("net.sourceforge.pmd.lang.\\w++.ast.AST(\\w+).jjtAccept");
 
-    private static List<LanguageVersion> supportedLanguageVersions;
-    private static Map<String, LanguageVersion> extensionsToLanguage;
-
 
     private DesignerUtil() {
 
@@ -66,11 +56,6 @@ public final class DesignerUtil {
 
     public static String defaultXPathVersion() {
         return XPathRuleQuery.XPATH_2_0;
-    }
-
-
-    public static LanguageVersion defaultLanguageVersion() {
-        return LanguageRegistry.getDefaultLanguage().getDefaultVersion();
     }
 
 
@@ -157,52 +142,6 @@ public final class DesignerUtil {
                           .stream()
                           .filter(toggle -> toggle.getUserData().equals(data))
                           .findFirst();
-    }
-
-
-    public static StringConverter<LanguageVersion> languageVersionStringConverter() {
-        return DesignerUtil.stringConverter(LanguageVersion::getShortName,
-            s -> LanguageRegistry.findLanguageVersionByTerseName(s.toLowerCase(Locale.ROOT)));
-    }
-
-
-    private static Map<String, LanguageVersion> getExtensionsToLanguageMap() {
-        Map<String, LanguageVersion> result = new HashMap<>();
-        getSupportedLanguageVersions().stream()
-                                      .map(LanguageVersion::getLanguage)
-                                      .distinct()
-                                      .collect(Collectors.toMap(Language::getExtensions,
-                                                                Language::getDefaultVersion))
-                                      .forEach((key, value) -> key.forEach(ext -> result.put(ext, value)));
-        return result;
-    }
-
-
-    public static synchronized LanguageVersion getLanguageVersionFromExtension(String filename) {
-        if (extensionsToLanguage == null) {
-            extensionsToLanguage = getExtensionsToLanguageMap();
-        }
-
-        if (filename.indexOf('.') > 0) {
-            String[] tokens = filename.split("\\.");
-            return extensionsToLanguage.get(tokens[tokens.length - 1]);
-        }
-        return null;
-    }
-
-
-    public static synchronized List<LanguageVersion> getSupportedLanguageVersions() {
-        if (supportedLanguageVersions == null) {
-            List<LanguageVersion> languageVersions = new ArrayList<>();
-            for (LanguageVersion languageVersion : LanguageRegistry.findAllVersions()) {
-                Optional.ofNullable(languageVersion.getLanguageVersionHandler())
-                        .map(handler -> handler.getParser(handler.getDefaultParserOptions()))
-                        .filter(Parser::canParse)
-                        .ifPresent(p -> languageVersions.add(languageVersion));
-            }
-            supportedLanguageVersions = languageVersions;
-        }
-        return supportedLanguageVersions;
     }
 
 

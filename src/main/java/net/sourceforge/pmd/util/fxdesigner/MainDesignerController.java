@@ -24,7 +24,7 @@ import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.popups.EventLogController;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LimitedSizeStack;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
@@ -158,7 +158,7 @@ public class MainDesignerController extends AbstractController {
             try {
                 String source = IOUtils.toString(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8);
                 sourceEditorController.setText(source);
-                LanguageVersion guess = DesignerUtil.getLanguageVersionFromExtension(file.getName());
+                LanguageVersion guess = LanguageRegistryUtil.getLanguageVersionFromExtension(file.getName());
                 if (guess != null) { // guess the language from the extension
                     sourceEditorController.setLanguageVersion(guess);
                 }

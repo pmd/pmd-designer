@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlSyntaxHighlighter;
 
@@ -57,11 +57,11 @@ public class ExportXPathWizardController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        languageChoiceBox.getItems().addAll(DesignerUtil.getSupportedLanguageVersions()
-                                                        .stream()
-                                                        .map(LanguageVersion::getLanguage)
-                                                        .distinct()
-                                                        .collect(Collectors.toList()));
+        languageChoiceBox.getItems().addAll(LanguageRegistryUtil.getSupportedLanguageVersions()
+                                                                .stream()
+                                                                .map(LanguageVersion::getLanguage)
+                                                                .distinct()
+                                                                .collect(Collectors.toList()));
 
         languageChoiceBox.setConverter(new StringConverter<Language>() {
             @Override
