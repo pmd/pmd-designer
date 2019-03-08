@@ -25,6 +25,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.LogEntryWithData;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStream;
 
 
 /**
@@ -81,10 +82,11 @@ public class EventLoggerImpl implements ApplicationComponent, EventLogger {
 
 
     private static EventStream<LogEntry> deleteOnSignal(EventStream<LogEntry> input, Category normal, Category deleteSignal) {
-        // TODO replace with vetoable event stream
-        return DesignerUtil.deleteOnSignal(
+        return VetoableEventStream.vetoableFrom(
             filterOnCategory(input, false, normal, deleteSignal),
-            x -> x.getCategory() == deleteSignal,
+            (maybeVetoable) -> maybeVetoable.getCategory() == normal,
+            (pending, maybeVeto) -> maybeVeto.getCategory() == deleteSignal,
+            (a, b) -> b,
             PARSE_EXCEPTION_REDUCTION_DELAY
         );
     }

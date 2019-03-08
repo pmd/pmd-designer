@@ -62,7 +62,7 @@ public class ASTManager implements ApplicationComponent {
         VetoableEventStream.vetoableFrom(
             compilationUnit.values(),
             Objects::isNull,
-            Objects::nonNull,
+            (a, b) -> b != null,
             (a, b) -> b,
             Duration.ofMillis(500)
         ).subscribe(smoothCompilationUnit::setValue);
