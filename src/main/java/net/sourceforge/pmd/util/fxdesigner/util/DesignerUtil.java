@@ -337,30 +337,6 @@ public final class DesignerUtil {
 
 
     /**
-     * Reduces the given stream on the given duration. If reduction of two values is not possible
-     * (canReduce returns false), then the last value is emitted and the new one will
-     * be tested for reduction with the next ones. If no new event is pushed during the duration, the last reduction
-     * result is emitted.
-     */
-    public static <T> EventStream<T> reduceIfPossible(EventStream<T> input, BiPredicate<T, T> canReduce, BinaryOperator<T> reduction, Duration duration) {
-        EventSource<T> source = new EventSource<>();
-
-        input.reduceSuccessions(
-            (last, t) -> {
-                if (canReduce.test(last, t)) {
-                    return reduction.apply(last, t);
-                } else {
-                    source.push(last);
-                    return t;
-                }
-            }, duration)
-             .subscribe(source::push);
-
-        return source;
-    }
-
-
-    /**
      * Like reduce if possible, but can be used if the events to reduce are emitted in extremely close
      * succession, so close that some unrelated events may be mixed up. This reduces each new event
      * with a related event in the pending notification chain instead of just considering the last one
@@ -392,21 +368,6 @@ public final class DesignerUtil {
              });
 
         return source;
-    }
-
-
-    /**
-     * Returns an event stream that reduces successions of the input stream, and deletes the latest
-     * event if a new event that matches the isCancelSignal predicate is recorded during a reduction
-     * period. Cancel events are also emitted.
-     */
-    public static <T> EventStream<T> deleteOnSignal(EventStream<T> input, Predicate<T> isCancelSignal, Duration duration) {
-        return reduceIfPossible(input, (last, t) -> isCancelSignal.test(t), (last, t) -> t, duration);
-    }
-
-
-    public static <T, R> EventStream<T> mapFilter(EventStream<T> input, Function<? super T, ? extends R> mapper, Predicate<R> filter) {
-        return input.filter(t -> filter.test(mapper.apply(t)));
     }
 
 
