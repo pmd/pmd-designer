@@ -4,7 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app.services;
 
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.countNotMatching;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.countNotMatching;
 
 import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;

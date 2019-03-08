@@ -8,7 +8,7 @@ import static java.util.Collections.emptyList;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.defaultLanguageVersion;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.getSupportedLanguageVersions;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.mapToggleGroupToUserData;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.rewire;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExceptionMessage;
 
 import java.io.File;

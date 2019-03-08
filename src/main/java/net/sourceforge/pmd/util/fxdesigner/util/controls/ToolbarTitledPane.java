@@ -11,7 +11,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -75,13 +75,13 @@ public final class ToolbarTitledPane extends TitledPane {
                 // this is the only way to access it outside of css
                 StackPane titleRegion = (StackPane) parent;
 
-                DesignerUtil.rewire(toolBar.maxHeightProperty(), titleRegion.heightProperty());
-                DesignerUtil.rewire(toolBar.minHeightProperty(), titleRegion.heightProperty());
-                DesignerUtil.rewire(toolBar.prefHeightProperty(), titleRegion.heightProperty());
+                ReactfxUtil.rewire(toolBar.maxHeightProperty(), titleRegion.heightProperty());
+                ReactfxUtil.rewire(toolBar.minHeightProperty(), titleRegion.heightProperty());
+                ReactfxUtil.rewire(toolBar.prefHeightProperty(), titleRegion.heightProperty());
 
                 // fill available width, for the spacer to be useful
-                DesignerUtil.rewire(toolBar.minWidthProperty(),
-                                    Val.wrap(titleRegion.widthProperty())
+                ReactfxUtil.rewire(toolBar.minWidthProperty(),
+                                   Val.wrap(titleRegion.widthProperty())
                                        // This "10" is the padding, I couldn't find a reliable way to
                                        // bind cleanly without hardcoding it
                                        .map(it -> it.doubleValue() - errorLabel.getPrefWidth() - 10)

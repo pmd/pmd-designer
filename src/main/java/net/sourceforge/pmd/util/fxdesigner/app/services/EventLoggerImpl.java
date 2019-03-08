@@ -24,7 +24,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.LogEntryWithData;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStream;
 
 
@@ -60,7 +60,7 @@ public class EventLoggerImpl implements ApplicationComponent, EventLogger {
         // none of this is done if developer mode isn't enabled because then those events aren't even pushed in the first place
         @SuppressWarnings("unchecked")
         EventStream<LogEntryWithData<Object>> traces = latestEvent.filter(e -> e.getCategory().isTrace()).map(t -> (LogEntryWithData<Object>) t);
-        EventStream<LogEntryWithData<Object>> reducedTraces = DesignerUtil.reduceEntangledIfPossible(
+        EventStream<LogEntryWithData<Object>> reducedTraces = ReactfxUtil.reduceEntangledIfPossible(
             traces,
             // the user data for those is the event
             // if they're the same event we reduce them together
