@@ -6,6 +6,8 @@ package net.sourceforge.pmd.util.fxdesigner;
 
 
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExceptionMessage;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewireInit;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -56,7 +58,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.HelpfulPlaceholder;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.XpathViolationListCell;
-import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -160,6 +161,9 @@ public class XPathPanelController extends AbstractController implements NodeSele
     protected void afterParentInit() {
         bindBuilderToPanel();
 
+        rewireInit(getRuleBuilder().xpathVersionProperty(), xpathVersionProperty());
+        rewireInit(getRuleBuilder().xpathExpressionProperty(), xpathExpressionProperty());
+
         // init autocompletion only after binding to parent and settings restore
         // otherwise the popup is shown on startup
         Supplier<CompletionResultSource> suggestionMaker = () -> XPathCompletionSource.forLanguage(getGlobalLanguageVersion().getLanguage());
@@ -169,16 +173,12 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
     // Binds the underlying rule parameters to the parent UI, disconnecting it from the wizard if need be
     private void bindBuilderToPanel() {
-        ReactfxUtil.rewire(getRuleBuilder().languageProperty(), Val.map(getGlobalState().globalLanguageVersionProperty(),
-                                                                        LanguageVersion::getLanguage));
+        rewire(getRuleBuilder().languageProperty(), Val.map(getGlobalState().globalLanguageVersionProperty(),
+                                                            LanguageVersion::getLanguage));
 
-
-        ReactfxUtil.rewireInit(getRuleBuilder().xpathVersionProperty(), xpathVersionProperty());
-        ReactfxUtil.rewireInit(getRuleBuilder().xpathExpressionProperty(), xpathExpressionProperty());
-
-        ReactfxUtil.rewireInit(getRuleBuilder().rulePropertiesProperty(),
-                               propertyTableView.rulePropertiesProperty(),
-                               propertyTableView::setRuleProperties);
+        rewireInit(getRuleBuilder().rulePropertiesProperty(),
+                   propertyTableView.rulePropertiesProperty(),
+                   propertyTableView::setRuleProperties);
     }
 
 
@@ -313,7 +313,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
      *
      * @param exportWizard The caller
      */
-    public Subscription bindToExportWizard(ExportXPathWizardController exportWizard) {
+    private Subscription bindToExportWizard(ExportXPathWizardController exportWizard) {
 
         return exportWizard.bindToRuleBuilder(getRuleBuilder())
                            .and(this::bindBuilderToPanel);

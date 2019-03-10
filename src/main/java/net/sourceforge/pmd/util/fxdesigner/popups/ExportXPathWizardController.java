@@ -159,6 +159,9 @@ public final class ExportXPathWizardController implements Initializable {
 
 
     public Subscription bindToRuleBuilder(ObservableXPathRuleBuilder ruleBuilder) {
+        this.xpathExpressionProperty().setValue(ruleBuilder.xpathExpressionProperty().getValue());
+        this.xpathVersionProperty().setValue(ruleBuilder.xpathVersionProperty().getValue());
+
         return Subscription.multi(
             // Rewire the rulebuilder to be updated by the ui, initialise the values of the ui
             rewireInit(ruleBuilder.nameProperty(), this.nameProperty()),
@@ -167,8 +170,6 @@ public final class ExportXPathWizardController implements Initializable {
             rewireInit(ruleBuilder.messageProperty(), this.messageProperty()),
             rewireInit(ruleBuilder.priorityProperty(), this.priorityProperty()),
             rewireInit(ruleBuilder.rulePropertiesProperty(), this.rulePropertiesProperty()),
-            rewireInit(ruleBuilder.xpathVersionProperty(), this.xpathVersionProperty()),
-            rewireInit(ruleBuilder.xpathExpressionProperty(), this.xpathExpressionProperty()),
             rewireInit(ruleBuilder.minimumVersionProperty(), this.languageVersionRangeSlider.minVersionProperty()),
             rewireInit(ruleBuilder.maximumVersionProperty(), this.languageVersionRangeSlider.maxVersionProperty()),
             // Initialise the live template
