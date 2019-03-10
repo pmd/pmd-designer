@@ -29,8 +29,8 @@ public class XmlSyntaxHighlighter extends SimpleRegexSyntaxHighlighter {
         .or(XML_CDATA_CONTENT.css, "(?<=<!\\[CDATA\\[).*?(?=]]>)")
         .or(XML_PROLOG.css, "<\\?xml.*?\\?>")
         .or(XML_LT_GT.css, "</?|/?>")
-        .or(XML_TAG_NAME.css, "\\b(?<=(</?))\\w[-\\w:]*")
-        .or(XML_ATTRIBUTE_NAME.css, "\\w[-\\w]*(?=\\s*=\\s*[\"'])")
+        .or(XML_TAG_NAME.css, "\\b(?<=(</?))\\w[-.\\w:]*")
+        .or(XML_ATTRIBUTE_NAME.css, "\\w[-.\\w]*(?=\\s*=\\s*[\"'])")
         .or(HighlightClasses.STRING.css, "('([^'<>\\\\]|\\\\.)*')|(\"([^\"<>\\\\]|\\\\.)*\")")
         .create(Pattern.DOTALL);
 
