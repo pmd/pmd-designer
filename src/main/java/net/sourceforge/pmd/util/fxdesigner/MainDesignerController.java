@@ -23,12 +23,10 @@ import org.reactfx.Subscription;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
 import net.sourceforge.pmd.util.fxdesigner.popups.EventLogController;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LimitedSizeStack;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
-import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 
 import javafx.beans.NamedArg;
@@ -104,13 +102,7 @@ public class MainDesignerController extends AbstractController {
 
     @Override
     protected void beforeParentInit() {
-        try {
-            SettingsPersistenceUtil.restoreProperties(this, DesignerUtil.getSettingsFile());
-        } catch (Exception e) {
-            // shouldn't prevent the app from opening
-            // in case the file is corrupted, it will be overwritten on shutdown
-            logInternalException(e);
-        }
+        getDesignerRoot().getService(DesignerRoot.PERSISTENCE_MANAGER).restoreSettings(this);
 
         licenseMenuItem.setOnAction(e -> showLicensePopup());
         openFileMenuItem.setOnAction(e -> onOpenFileClicked());
@@ -138,19 +130,14 @@ public class MainDesignerController extends AbstractController {
 
         sourceEditorController.currentRuleResultsProperty().bind(xpathPanelController.currentResultsProperty());
 
-        ((DesignerRootImpl) getDesignerRoot()).globalLanguageVersionProperty().bind(sourceEditorController.languageVersionProperty());
+        getGlobalState().writeableGlobalLanguageVersionProperty().bind(sourceEditorController.languageVersionProperty());
 
     }
 
 
 
     public void shutdown() {
-        try {
-            SettingsPersistenceUtil.persistProperties(this, DesignerUtil.getSettingsFile());
-        } catch (IOException ioe) {
-            // nevermind
-            ioe.printStackTrace();
-        }
+        getDesignerRoot().getService(DesignerRoot.PERSISTENCE_MANAGER).persistSettings(this);
     }
 
 
@@ -171,7 +158,7 @@ public class MainDesignerController extends AbstractController {
             try {
                 String source = IOUtils.toString(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8);
                 sourceEditorController.setText(source);
-                LanguageVersion guess = DesignerUtil.getLanguageVersionFromExtension(file.getName());
+                LanguageVersion guess = LanguageRegistryUtil.getLanguageVersionFromExtension(file.getName());
                 if (guess != null) { // guess the language from the extension
                     sourceEditorController.setLanguageVersion(guess);
                 }

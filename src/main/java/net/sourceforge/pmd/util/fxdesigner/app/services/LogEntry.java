@@ -2,7 +2,7 @@
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
-package net.sourceforge.pmd.util.fxdesigner.app;
+package net.sourceforge.pmd.util.fxdesigner.app.services;
 
 import java.util.Date;
 import java.util.Objects;
@@ -12,7 +12,7 @@ import org.reactfx.value.Var;
 
 
 /**
- * Log entry of an {@link EventLogger}.
+ * Log entry of an {@link EventLoggerImpl}.
  *
  * @author Clément Fournier
  * @since 6.0.0
@@ -103,6 +103,9 @@ public class LogEntry implements Comparable<LogEntry> {
         return new LogEntryWithData<>(details, Objects.toString(data), category, data);
     }
 
+    public static <T> LogEntry serviceRegistered(AppServiceDescriptor<T> descriptor, T service) {
+        return new LogEntry(service.toString(), descriptor.toString(), Category.SERVICE_REGISTERING);
+    }
 
     public enum Category {
         // all of those are "user" categories, which are relevant to a regular user of the app
@@ -122,6 +125,7 @@ public class LogEntry implements Comparable<LogEntry> {
         // These are used for events that occurred internally to the app and are
         // only relevant to a developer of the app.
         INTERNAL("Internal event", CategoryType.INTERNAL),
+        SERVICE_REGISTERING("Service registered", CategoryType.INTERNAL),
         SELECTION_EVENT_TRACING("Selection event tracing", CategoryType.TRACE);
 
         public final String name;

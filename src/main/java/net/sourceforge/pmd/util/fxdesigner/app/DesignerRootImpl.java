@@ -10,12 +10,14 @@ import java.util.Map;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
-import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NodeSelectionEvent;
+import net.sourceforge.pmd.util.fxdesigner.DesignerParams;
 import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.app.services.EventLoggerImpl;
+import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalStateHolderImpl;
+import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry;
+import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
+import net.sourceforge.pmd.util.fxdesigner.app.services.OnDiskPersistenceManager;
+import net.sourceforge.pmd.util.fxdesigner.app.services.PersistenceManager;
 
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -32,31 +34,32 @@ public final class DesignerRootImpl implements DesignerRoot {
 
 
     private final Stage mainStage;
-    private final EventLogger logger;
     private final boolean developerMode;
-    private final Var<Node> globalCompilationUnit = Var.newSimpleVar(null);
-    private final Var<LanguageVersion> globalLanguageVersion = Var.newSimpleVar(DesignerUtil.defaultLanguageVersion());
     private final Var<Boolean> isCtrlDown = Var.newSimpleVar(false);
 
-    private final MessageChannel<NodeSelectionEvent> nodeSelectionChannel = new MessageChannel<>(Category.SELECTION_EVENT_TRACING);
 
     private final Map<AppServiceDescriptor<?>, Object> services = new HashMap<>();
 
 
-    public DesignerRootImpl(Stage mainStage, boolean developerMode) {
+    public DesignerRootImpl(Stage mainStage, DesignerParams params) {
         this.mainStage = mainStage;
-        this.developerMode = developerMode;
-        this.logger = new EventLogger(this);
+        this.developerMode = params.isDeveloperMode();
+
+        registerService(LOGGER, new EventLoggerImpl(this));
 
         // vetoed by any other key press, so that eg CTRL+V repeatedly vetoes it
-        mainStage.addEventHandler(KeyEvent.KEY_PRESSED, e -> isCtrlDown.setValue(e.isControlDown() && e.getCode() == KeyCode.CONTROL));
-        mainStage.addEventHandler(KeyEvent.KEY_RELEASED, e -> isCtrlDown.setValue(e.isControlDown() && e.getCode() == KeyCode.CONTROL));
-    }
+        mainStage.addEventHandler(KeyEvent.KEY_PRESSED, e -> isCtrlDown.setValue(
+            e.isControlDown() && e.getCode() == KeyCode.CONTROL));
+        mainStage.addEventHandler(KeyEvent.KEY_RELEASED, e -> isCtrlDown.setValue(
+            e.isControlDown() && e.getCode() == KeyCode.CONTROL));
 
+        PersistenceManager manager = new OnDiskPersistenceManager(this,
+                                                                  params.getPersistedInputFile(),
+                                                                  params.getPersistedOutputFile());
 
-    @Override
-    public EventLogger getLogger() {
-        return logger;
+        registerService(PERSISTENCE_MANAGER, manager);
+        registerService(NODE_SELECTION_CHANNEL, new MessageChannel<>(Category.SELECTION_EVENT_TRACING));
+        registerService(APP_STATE_HOLDER, new GlobalStateHolderImpl());
     }
 
 
@@ -73,23 +76,6 @@ public final class DesignerRootImpl implements DesignerRoot {
 
 
     @Override
-    public MessageChannel<NodeSelectionEvent> getNodeSelectionChannel() {
-        return nodeSelectionChannel;
-    }
-
-
-    @Override
-    public Var<Node> globalCompilationUnitProperty() {
-        return globalCompilationUnit;
-    }
-
-    @Override
-    public Var<LanguageVersion> globalLanguageVersionProperty() {
-        return globalLanguageVersion;
-    }
-
-
-    @Override
     @SuppressWarnings("unchecked")
     public <T> T getService(AppServiceDescriptor<T> descriptor) {
         return (T) services.get(descriptor);
@@ -97,8 +83,9 @@ public final class DesignerRootImpl implements DesignerRoot {
 
     @Override
     public <T> void registerService(AppServiceDescriptor<T> descriptor, T component) {
-        if (services.containsKey(descriptor)) {
-            throw new IllegalStateException("Duplicate app service for descriptor " + descriptor);
+        if (getService(LOGGER) != null) {
+            // event the logger needs to be registered hehe
+            getService(LOGGER).logEvent(LogEntry.serviceRegistered(descriptor, component));
         }
         services.put(descriptor, component);
     }

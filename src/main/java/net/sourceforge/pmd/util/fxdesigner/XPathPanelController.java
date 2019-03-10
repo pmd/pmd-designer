@@ -36,8 +36,8 @@ import net.sourceforge.pmd.lang.rule.XPathRule;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.app.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
+import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluationException;
 import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluator;
@@ -54,6 +54,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.HelpfulPlaceholder;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.XpathViolationListCell;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -133,7 +134,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
         exportXpathToRuleButton.setOnAction(e -> showExportXPathToRuleWizard());
 
         getRuleBuilder().modificationsTicks()
-                        .or(getDesignerRoot().globalCompilationUnitProperty().values())
+                        .or(getGlobalState().globalCompilationUnitProperty().values())
                         .successionEnds(XPATH_REFRESH_DELAY)
                         .subscribe(tick -> refreshResults());
 
@@ -161,14 +162,14 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
     // Binds the underlying rule parameters to the parent UI, disconnecting it from the wizard if need be
     private void bindToParent() {
-        DesignerUtil.rewire(getRuleBuilder().languageProperty(), Val.map(getDesignerRoot().globalLanguageVersionProperty(),
-                                                                         LanguageVersion::getLanguage));
+        ReactfxUtil.rewire(getRuleBuilder().languageProperty(), Val.map(getGlobalState().globalLanguageVersionProperty(),
+                                                                        LanguageVersion::getLanguage));
 
-        DesignerUtil.rewireInit(getRuleBuilder().xpathVersionProperty(), xpathVersionProperty());
-        DesignerUtil.rewireInit(getRuleBuilder().xpathExpressionProperty(), xpathExpressionProperty());
+        ReactfxUtil.rewireInit(getRuleBuilder().xpathVersionProperty(), xpathVersionProperty());
+        ReactfxUtil.rewireInit(getRuleBuilder().xpathExpressionProperty(), xpathExpressionProperty());
 
-        DesignerUtil.rewireInit(getRuleBuilder().rulePropertiesProperty(),
-                                propertyTableView.rulePropertiesProperty(), propertyTableView::setRuleProperties);
+        ReactfxUtil.rewireInit(getRuleBuilder().rulePropertiesProperty(),
+                               propertyTableView.rulePropertiesProperty(), propertyTableView::setRuleProperties);
     }
 
     private void initialiseVersionSelection() {
@@ -264,14 +265,14 @@ public class XPathPanelController extends AbstractController implements NodeSele
                 return;
             }
 
-            Node compilationUnit = getDesignerRoot().globalCompilationUnitProperty().getValue();
+            Node compilationUnit = getGlobalState().globalCompilationUnitProperty().getValue();
             if (compilationUnit == null) {
                 updateResults(false, true, Collections.emptyList(), "Compilation unit is invalid");
                 return;
             }
 
 
-            LanguageVersion version = getDesignerRoot().globalLanguageVersionProperty().getValue();
+            LanguageVersion version = getGlobalState().globalLanguageVersionProperty().getValue();
 
             ObservableList<Node> results
                 = FXCollections.observableArrayList(XPathEvaluator.evaluateQuery(compilationUnit,
