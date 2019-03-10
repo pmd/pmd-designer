@@ -23,6 +23,7 @@ import com.sun.javafx.fxml.builder.ProxyBuilder;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -44,7 +45,6 @@ public class Designer extends Application {
     public Designer() {
         initStartTimeMillis = System.currentTimeMillis();
     }
-
 
     @Override
     public void start(Stage stage) throws IOException {

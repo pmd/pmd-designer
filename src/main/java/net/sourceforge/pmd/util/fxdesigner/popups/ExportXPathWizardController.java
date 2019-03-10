@@ -8,12 +8,10 @@ import static com.github.oowekyala.rxstring.ItemRenderer.asString;
 import static com.github.oowekyala.rxstring.ItemRenderer.indented;
 import static com.github.oowekyala.rxstring.ItemRenderer.surrounded;
 import static com.github.oowekyala.rxstring.ItemRenderer.wrapped;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.controllerFactoryKnowing;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.stringConverter;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguageVersions;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewireInit;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -35,6 +33,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.StageBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlSyntaxHighlighter;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider;
@@ -46,11 +45,8 @@ import com.github.oowekyala.rxstring.LiveTemplateBuilder;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -157,7 +153,6 @@ public final class ExportXPathWizardController implements Initializable {
         Platform.runLater(() -> exportResultArea.moveTo(0));
     }
 
-
     public Subscription bindToRuleBuilder(ObservableXPathRuleBuilder ruleBuilder) {
         this.xpathExpressionProperty().setValue(ruleBuilder.xpathExpressionProperty().getValue());
         this.xpathVersionProperty().setValue(ruleBuilder.xpathVersionProperty().getValue());
@@ -254,26 +249,12 @@ public final class ExportXPathWizardController implements Initializable {
 
     /** Builds the new stage, done in the constructor. */
     private Stage createStage(Stage mainStage) {
-        FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("xpath-export-wizard.fxml"));
-        loader.setControllerFactory(controllerFactoryKnowing(this));
-
-        final Stage dialog = new Stage();
-
-        dialog.initOwner(mainStage);
-        dialog.initModality(Modality.WINDOW_MODAL);
-        dialog.initStyle(StageStyle.DECORATED);
-
-        Parent root;
-        try {
-            root = loader.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        Scene scene = new Scene(root);
-        dialog.setTitle("Export XPath expression to rule");
-        dialog.setScene(scene);
-        dialog.setUserData(this);
-        return dialog;
+        return new StageBuilder().withOwner(mainStage)
+                                 .withModality(Modality.WINDOW_MODAL)
+                                 .withStyle(StageStyle.DECORATED)
+                                 .withFxml(DesignerUtil.getFxml("xpath-export-wizard.fxml"), this)
+                                 .withTitle("Export XPath expression to XML rule")
+                                 .newStage();
     }
 
     private static String escapeMessageFormatter(String raw) {

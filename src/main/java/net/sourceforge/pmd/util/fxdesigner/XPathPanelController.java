@@ -123,8 +123,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
     public XPathPanelController(DesignerRoot designerRoot) {
         super(designerRoot);
-        exportWizard =
-            new SoftReferenceCache<>(() -> new ExportXPathWizardController(designerRoot));
+        exportWizard = new SoftReferenceCache<>(() -> new ExportXPathWizardController(designerRoot));
     }
 
 
