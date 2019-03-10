@@ -135,12 +135,6 @@ public class MainDesignerController extends AbstractController {
     }
 
 
-
-    public void shutdown() {
-        getDesignerRoot().getService(DesignerRoot.PERSISTENCE_MANAGER).persistSettings(this);
-    }
-
-
     private void onFileMenuShowing() {
         openRecentMenu.setDisable(recentFiles.isEmpty());
     }
