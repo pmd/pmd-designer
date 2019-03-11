@@ -7,14 +7,10 @@ import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.tools.ValueExtractor;
-import org.controlsfx.validation.Severity;
-import org.controlsfx.validation.ValidationResult;
-import org.controlsfx.validation.ValidationSupport;
-import org.controlsfx.validation.Validator;
-import org.controlsfx.validation.decoration.StyleClassValidationDecoration;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.Subscription;
 import org.reactfx.value.Val;
+import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -22,19 +18,20 @@ import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.popups.EditPropertyDialogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
-import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 
 /**
  * @author Clément Fournier
@@ -89,6 +86,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
 
     private class PropertyDescriptorCell extends ListCell<PropertyDescriptorSpec> {
 
+        private Var<PopOver> myEditPopover = Var.newSimpleVar(null);
 
         @Override
         protected void updateItem(PropertyDescriptorSpec item, boolean empty) {
@@ -98,80 +96,10 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
                 setText(null);
                 setGraphic(null);
             } else {
-                setText(item.getName());
-                setGraphic(new FontIcon("fas-ellipsis-h"));
-
-
-                MenuItem editItem = new MenuItem("Edit...");
-                editItem.setOnAction(e -> {
-                    PopOver popOver = detailsPopOver(item);
-                    PopOverUtil.showAt(popOver, getMainStage(), this);
-                    Platform.runLater(() -> {
-                        if (editItem.getParentMenu() != null) {
-                            editItem.getParentMenu().hide();
-                        }
-                    });
-                });
-
-                MenuItem removeItem = new MenuItem("Remove");
-                removeItem.setOnAction(e -> getItems().remove(item));
-
-                MenuItem addItem = new MenuItem("Add property...");
-                addItem.setOnAction(e -> onAddPropertyClicked("name"));
-
-                ContextMenu fullMenu = new ContextMenu();
-                fullMenu.getItems().addAll(editItem, removeItem, new SeparatorMenuItem(), addItem);
-
-                // Reduced context menu, for when there are no properties or none is selected
-                MenuItem addItem2 = new MenuItem("Add property...");
-                addItem2.setOnAction(e -> onAddPropertyClicked("name"));
-
-                ContextMenu smallMenu = new ContextMenu();
-                smallMenu.getItems().add(addItem2);
-
-
-                this.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
-                    if (t.getButton() == MouseButton.SECONDARY
-                        || t.getButton() == MouseButton.PRIMARY && t.getClickCount() > 1) {
-                        if (getSelectionModel().getSelectedItem() != null) {
-                            fullMenu.show(this, t.getScreenX(), t.getScreenY());
-                        } else {
-                            smallMenu.show(this, t.getScreenX(), t.getScreenY());
-                        }
-                        t.consume();
-                    }
-                });
-
-
-                ValidationSupport validation = new ValidationSupport();
-                validation.setValidationDecorator(new StyleClassValidationDecoration());
-                validation.registerValidator(this, validator());
-                Val.wrap(validation.validationResultProperty())
-                   .values().subscribe(System.out::println);
+                setGraphic(buildGraphic(item));
             }
         }
 
-        private Validator<PropertyDescriptorSpec> validator() {
-
-            return (lv, spec) -> {
-                Validator<String> noWhitespaceName
-                    = Validator.createRegexValidator("Name cannot contain whitespace", "\\S*+", Severity.ERROR);
-                Validator<String> emptyName = Validator.createEmptyValidator("Name required");
-                Validator<String> uniqueName = (c, val) -> {
-                    long sameNameDescriptors = getItems().stream()
-                                                         .map(PropertyDescriptorSpec::getName)
-                                                         .filter(val::equals)
-                                                         .count();
-
-                    return new ValidationResult().addErrorIf(c, "The name must be unique", sameNameDescriptors > 1);
-                };
-
-                Validator<String> nameValidator = Validator.combine(noWhitespaceName, emptyName, uniqueName);
-
-                return new ValidationResult().addErrorIf(lv, "The name must not be empty", StringUtils.isBlank(spec.getName()));
-            };
-
-        }
 
         private PopOver detailsPopOver(PropertyDescriptorSpec spec) {
             EditPropertyDialogController wizard = new EditPropertyDialogController();
@@ -189,10 +117,49 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
 
             PopOver popOver = new PopOver(root);
             popOver.setHeaderAlwaysVisible(true);
-            popOver.titleProperty().bind(spec.nameProperty().map(it -> "Property '" + it + "'"));
+            popOver.titleProperty().bind(spec.nameProperty()
+                                             .filter(StringUtils::isNotBlank)
+                                             .orElseConst("(no name)")
+                                             .map(it -> "Property '" + it + "'"));
             Subscription closeSub = wizard.bindToDescriptor(spec, getItems());
             popOver.setOnHiding(e -> closeSub.unsubscribe());
             return popOver;
         }
+
+
+        private Node buildGraphic(PropertyDescriptorSpec spec) {
+
+            HBox hBox = new HBox();
+            Label label = new Label();
+            label.textProperty().bind(spec.nameProperty()
+                                          .filter(StringUtils::isNotBlank)
+                                          .orElseConst("(no name)"));
+
+            Pane spacer = new Pane();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+
+
+            Button edit = new Button();
+            edit.setGraphic(new FontIcon("fas-ellipsis-h"));
+            edit.getStyleClass().addAll("icon-button");
+            edit.setOnAction(e -> {
+                if (myEditPopover.isPresent()) {
+                    myEditPopover.getValue().requestFocus();
+                } else {
+                    PopOver popOver = detailsPopOver(spec);
+                    myEditPopover.setValue(popOver);
+                    PopOverUtil.showAt(popOver, getMainStage(), this);
+                    PopOverUtil.fixStyleSheets(popOver);
+                }
+            });
+
+
+            hBox.getChildren().setAll(label, spacer, edit);
+
+            hBox.setAlignment(Pos.CENTER_LEFT);
+
+            return hBox;
+        }
+
     }
 }

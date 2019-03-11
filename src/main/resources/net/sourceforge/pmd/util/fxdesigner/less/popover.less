@@ -6,21 +6,11 @@
 
 .popover {
 
-  &:focused {
-    .title {
-      -fx-background-color: @selection-focus-color;
-    }
-  }
-
   .title {
     -fx-background-color: @darker-accent;
 
-    -fx-padding: 2 6 4 6;
-
     .text {
-      -fx-padding: 0 0 0 5; // pad title left
-      -fx-font-size: 12;
-      -fx-fill: @fx-text-fill;
+      -fx-fill: black;
       -fx-font-weight: normal;
     }
   }
@@ -29,7 +19,5 @@
     .list-cell:empty {
       -fx-opacity: 0;
     }
-
-    -fx-pref-width: 250;
   }
 }

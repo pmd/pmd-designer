@@ -4,8 +4,11 @@ import static java.util.Objects.requireNonNull;
 
 import org.controlsfx.control.PopOver;
 
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.stage.Window;
 
 /**
@@ -62,6 +65,16 @@ public final class PopOverUtil {
         default:
             break;
         }
+    }
+
+
+    /**
+     * Must be called after "show".
+     *
+     * @param popOver
+     */
+    public static void fixStyleSheets(PopOver popOver) {
+        ((Parent) popOver.getSkin().getNode()).getStylesheets().add(DesignerUtil.getCss("popover.css").toExternalForm());
     }
 
 }
