@@ -13,13 +13,6 @@ WIP: the designer is being moved from [pmd/pmd/pmd-ui](https://github.com/pmd/pm
 * Move [open issues](https://github.com/pmd/pmd/labels/in%3Aui)
   * Close the designer project on pmd/pmd
 
-* Delete the pmd-ui directory from the main repo (PR pending)
-
-* Update release_procedure/do_release.sh
-  * Before releasing PMD, we need to check and update the pmd-ui/designer
-    dependency to the latest release, so that the latest version is included
-    in the binary distribution.
-
 ---------------
 ---------------
 
