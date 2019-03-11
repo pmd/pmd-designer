@@ -17,32 +17,6 @@
 
 }
 
-@removal-color-stack: fade(red, 15), fade(yellow, 15), fade(yellow, 5),;
-
-
-.removal-level-mixin(@selection-color) {
-  .tree-cell {
-    &.removal-level {
-      @foreach-i: {
-        @color: extract(@removal-color-stack, @i + 1);
-        -fx-background-color: @color; &:focused {
-          -fx-background-color: linear-gradient(to right, @color 0%, @selection-color 50%);
-        }
-      };
-
-      .make-depth-classes(length(@removal-color-stack) - 1, @foreach-i);
-    }
-  }
-}
-
-.ast-tree-view {
-  .removal-level-mixin(@darker-accent-border);
-
-  &:focused {
-    .removal-level-mixin(@selection-focus-color);
-  }
-}
-
 .tree-cell.ast-parent {
 
   @foreach-i: { -fx-background-color: linear-gradient(to right, fade(@selection-focus-color, percentage(1- (@i / 5))) 0%, darken(white, 5%) 10%); };
@@ -143,25 +117,8 @@
     }
   }
 
-  .text.autocomplete-match {
+  .autocomplete-match {
     -fx-fill: orange;
-  }
-}
-
-.tree-cell {
-  .text {
-    -fx-fill: @fx-text-fill;
-  }
-
-  .text.autocomplete-match {
-    -fx-fill: darken(orange, 5%);
-    -fx-font-weight: bold;
-    -fx-underline: true;
-  }
-
-  &.depth-0 .text.autocomplete-match {
-    -fx-fill: white;
-
   }
 }
 
@@ -177,6 +134,7 @@
 
 // Supports the ToolbarTitledPane
 .titled-pane.tool-bar-title {
+
   & > .title {
 
     -fx-padding: 0 6 0 6;
@@ -192,29 +150,44 @@
         -fx-border-insets: 0;
         -fx-border-image-insets: 0;
 
+        & > .label {
+          -fx-background-color: transparent;
+          -fx-font-size: @smaller-font-size;
+
+          // This is the title label of the pane
+          &.title-label {
+            -fx-padding: 0 0 0 6;
+            -fx-font-size: 10pt;
+          }
+
+          &.error-label {
+            .ikonli-font-icon {
+              -fx-fill: #d70000;
+            }
+          }
+        }
+
+        .separator {
+          //-fx-background-color: transparent;
+
+          -fx-padding: 4 2 4 2;
+
+          .line {
+            -fx-border-style: none solid none none;
+            -fx-border-width: 0.5px;
+            -fx-border-color: @fx-text-fill;
+          }
+        }
+
+        .menu-bar {
+          -fx-background-color: transparent;
+        }
       }
     }
   }
 }
 
-#testCaseToolsTitledPane {
-  & > .title {
-    -fx-background-color: @app-base-color;
-  }
-}
-
-.accordion {
-  .titled-pane {
-    & > .title {
-      -fx-background-color: @app-darker-slate-color;
-      -fx-border-style: solid none none none;
-      -fx-border-color: @darker-accent-border;
-    }
-  }
-}
-
-.menu-button.no-arrow .arrow-button,
-.choice-box.no-arrow .open-button {
+.menu-button.menu-button-no-arrow .arrow-button {
 
   &, * {
     -fx-padding: 0;
@@ -223,6 +196,58 @@
   }
 }
 
+// This is used for buttons that have just an icon and no text
+.icon-button {
+
+  -fx-background-color: transparent;
+
+  -fx-content-display: CENTER;
+  -fx-border-width: 0;
+  -fx-background-insets: 0;
+  -fx-border-insets: 0;
+  .force-square(24);
+
+  &, * {
+    -fx-graphic-text-gap: 0;
+  }
+
+  &.menu-button .ikonli-font-icon {
+    // Fixes a bug where the cog icon is misplaced to the right
+    // Probably needs to be synced with icon size
+    -fx-translate-x: -4;
+  }
+
+  .ikonli-font-icon, .svg-icon {
+    -fx-fill: @fx-text-fill;
+  }
+
+  &.toggle-button:selected {
+
+    &, &:focused {
+
+      @grad: linear-gradient(to bottom,
+      derive(-fx-color, -22%) 0%,
+      derive(-fx-color, -13%) 20%,
+      derive(-fx-color, -11%) 50%);
+
+      -fx-background-color: -fx-shadow-highlight-color, linear-gradient(to bottom, derive(-fx-outer-border, -20%), -fx-outer-border), @grad;
+
+      -fx-background-insets: 0 0 -1 0, 0, 1;
+    }
+
+    &:hover {
+      -fx-hover-base: @selection-focus-color;
+    }
+  }
+
+  &.menu-button:showing, &:hover {
+    -fx-background-color: @selection-focus-color;
+  }
+
+  .label {
+    -fx-background-color: transparent;
+  }
+}
 
 #main-horizontal-split-pane > .split-pane-divider {
   -fx-background-color: @darker-accent-focus;
@@ -233,31 +258,107 @@
   -fx-background-color: @app-darker-slate-color;
 }
 
-.text-field:empty-input {
-  -fx-prompt-text-fill: @fx-grayed-text-fill;
+
+/* This is the special button to reduce the lower split pane. */
+.toggle-button.expand-toggle {
+  -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+  -fx-background-insets: 1 0 -1 0, 0;
+  -fx-padding: 0.25em 0.3125em 0.25em 0.3125em; /* 3 3.75 3 3.75 */
+  -fx-shape: "M 0 0 h 7 l -3.5 -4 z";
+
+  .fix-height(5);
+  .fix-width(10);
+
+  &:selected {
+    // This changes the shape to point upward
+    -fx-shape: "M 0 0 h 7 l -3.5 4 z";
+  }
 }
 
-.label:default-message {
-  -fx-text-fill: @fx-grayed-text-fill;
-}
+.tab {
+  -fx-background-insets: 0.0;
+  -fx-background-radius: 0.0;
+  -fx-padding: 0 20 0 20;
+  -fx-border-color: transparent;
+  -fx-background-color: transparent;
 
+  &:selected {
+    -fx-background-color: @darker-accent-focus;
 
-.search-popup {
+    .focus-indicator {
+      -fx-focus-color: transparent;
+      -fx-border-color: transparent;
+    }
+  }
 
-  .hint-label {
-    -fx-translate-y: 8;
-    -fx-translate-x: -5;
-    -fx-text-fill: @fx-grayed-text-fill;
-    -fx-background-color: white;
-    -fx-background-insets: 3 0 2 0;
-    -fx-font-size: 10pt;
-    -fx-padding: 0 1 0 1;
+  &:focused, &:disabled {
+    -fx-focus-color: transparent;
+  }
+
+  .tab-label {
+    -fx-background-color: transparent;
+    -fx-alignment: CENTER;
+    -fx-padding: 0 10 0 10;
   }
 
 }
 
+.tab-pane {
+  -fx-tab-min-height: 20px;
+  -fx-tab-max-height: 20px;
 
-@import "tabs";
-@import "scrolling";
-@import "popover";
-//@import "flat";
+  .tab-header-area {
+    -fx-padding: 0;
+
+    .tab-header-background {
+      -fx-border-style: none none solid none;
+      -fx-border-insets: 0 0 1pt 0;
+      -fx-border-width: 0 0 1pt 0;
+      -fx-border-color: transparent;
+      -fx-background-color: @app-base-color;
+    }
+
+  }
+
+  &:top .tab-header-area {
+    -fx-background-insets: 0 0 1 0;
+  }
+
+  &:left .tab-header-area {
+    -fx-background-insets: 0 1 0 0;
+  }
+}
+
+// Useful link: http://www.guigarage.com/2015/11/styling-a-javafx-scrollbar/
+.scroll-bar {
+
+  -fx-padding: 0;
+
+  * {
+    -fx-background-color: white;
+  }
+
+  .thumb {
+    -fx-background-color: derive(black, 90%);
+    -fx-background-radius: 2em;
+  }
+
+  .increment-arrow, .decrement-arrow {
+    -fx-shape: " ";
+  }
+}
+
+// this is the corner when there is a horizontal and vertical scrollbar
+.corner {
+  -fx-background-color: white;
+}
+
+
+.popover {
+
+  .list-view {
+    .list-cell:empty {
+      -fx-opacity: 0;
+    }
+  }
+}

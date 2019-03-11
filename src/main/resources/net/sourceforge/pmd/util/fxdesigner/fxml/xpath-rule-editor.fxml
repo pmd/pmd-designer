@@ -22,36 +22,12 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="net.sourceforge.pmd.util.fxdesigner.XPathRuleEditorController">
     <children>
-        <SplitPane dividerPositions="0.2, 0.8"
+        <SplitPane dividerPositions="0.8"
                    AnchorPane.bottomAnchor="0.0"
                    AnchorPane.leftAnchor="0.0"
                    AnchorPane.rightAnchor="0.0"
                    AnchorPane.topAnchor="0.0">
             <items>
-                <AnchorPane>
-                    <children>
-                        <ToolbarTitledPane animated="false"
-                                    collapsible="false"
-                                    title="Properties"
-                                    AnchorPane.bottomAnchor="0.0"
-                                    AnchorPane.leftAnchor="0.0"
-                                    AnchorPane.rightAnchor="0.0"
-                                    AnchorPane.topAnchor="0.0">
-                            <content>
-                                <AnchorPane>
-                                    <PropertyTableView fx:id="propertyTableView"
-                                                       AnchorPane.bottomAnchor="0.0"
-                                                       AnchorPane.leftAnchor="0.0"
-                                                       AnchorPane.rightAnchor="0.0"
-                                                       AnchorPane.topAnchor="0.0" />
-                                    <padding>
-                                        <Insets bottom="-0.5" left="-0.5" right="-0.5" top="-0.5" />
-                                    </padding>
-                                </AnchorPane>
-                            </content>
-                        </ToolbarTitledPane>
-                    </children>
-                </AnchorPane>
                 <AnchorPane>
                     <children>
                         <ToolbarTitledPane fx:id="expressionTitledPane"
@@ -97,6 +73,8 @@
                                         </Tooltip>
                                     </tooltip>
                                 </Button>
+
+                                <Button fx:id="showPropertiesButton" mnemonicParsing="false" text="Properties"/>
                             </toolbarItems>
                             <content>
                                 <SyntaxHighlightingCodeArea stylesheets="@../css/editor-theme.css" fx:id="xpathExpressionArea" />

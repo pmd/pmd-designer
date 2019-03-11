@@ -6,6 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.popups;
 
 import static net.sourceforge.pmd.properties.MultiValuePropertyDescriptor.DEFAULT_DELIMITER;
 import static net.sourceforge.pmd.properties.MultiValuePropertyDescriptor.DEFAULT_NUMERIC_DELIMITER;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewireInit;
 
 import java.net.URL;
 import java.util.Objects;
@@ -15,6 +16,7 @@ import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
+import org.reactfx.Subscription;
 import org.reactfx.util.Try;
 import org.reactfx.value.Var;
 
@@ -24,7 +26,6 @@ import net.sourceforge.pmd.properties.ValueParserConstants;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView;
-import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.application.Platform;
 import javafx.beans.property.Property;
@@ -32,10 +33,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
 
 /**
@@ -63,9 +62,6 @@ public class EditPropertyDialogController implements Initializable {
     private ChoiceBox<PropertyTypeId> typeChoiceBox;
     @FXML
     private TextField valueField;
-    @FXML
-    private Button commitButton;
-
 
     public EditPropertyDialogController() {
         // default constructor
@@ -79,14 +75,6 @@ public class EditPropertyDialogController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        commitButton.setOnAction(e -> {
-            commitHandler.ifPresent(Runnable::run);
-            getStage().close();
-            this.free();
-        });
-
-        commitButton.disableProperty().bind(validationSupport.invalidProperty());
 
         Platform.runLater(() -> {
             typeId.bind(typeChoiceBox.getSelectionModel().selectedItemProperty());
@@ -105,39 +93,27 @@ public class EditPropertyDialogController implements Initializable {
     }
 
 
-    private Stage getStage() {
-        return (Stage) commitButton.getScene().getWindow();
-    }
-
-
-    /** Unbinds this dialog from its backing properties. */
-    public void free() {
-        backingDescriptor.ifPresent(PropertyDescriptorSpec::unbind);
-        backingDescriptor.setValue(null);
-        backingDescriptorList.setValue(null);
-        this.nameProperty().setValue(""); // necessary to get the validator to reevaluate each time
-    }
-
-
     /**
      * Wires this dialog to the descriptor, so that the controls edit the descriptor.
      *
      * @param spec The descriptor
      */
-    public void bindToDescriptor(PropertyDescriptorSpec spec, ObservableList<PropertyDescriptorSpec> allDescriptors) {
+    public Subscription bindToDescriptor(PropertyDescriptorSpec spec, ObservableList<PropertyDescriptorSpec> allDescriptors) {
         backingDescriptor.setValue(spec);
         backingDescriptorList.setValue(allDescriptors);
-        ReactfxUtil.rewireInit(spec.nameProperty(), this.nameProperty(), this::setName);
-        ReactfxUtil.rewireInit(spec.typeIdProperty(), this.typeIdProperty(), this::setTypeId);
-        ReactfxUtil.rewireInit(spec.valueProperty(), this.valueProperty(), this::setValue);
-        ReactfxUtil.rewireInit(spec.descriptionProperty(), this.descriptionProperty(), this::setDescription);
+        return Subscription.multi(
+            rewireInit(spec.nameProperty(), this.nameProperty(), this::setName),
+            rewireInit(spec.typeIdProperty(), this.typeIdProperty(), this::setTypeId),
+            rewireInit(spec.valueProperty(), this.valueProperty(), this::setValue),
+            rewireInit(spec.descriptionProperty(), this.descriptionProperty(), this::setDescription)
+        );
     }
 
 
     // Validators for attributes common to all properties
     private void registerBasicValidators() {
         Validator<String> noWhitespaceName
-                = Validator.createRegexValidator("Name cannot contain whitespace", "\\S*+", Severity.ERROR);
+            = Validator.createRegexValidator("Name cannot contain whitespace", "\\S*+", Severity.ERROR);
         Validator<String> emptyName = Validator.createEmptyValidator("Name required");
         Validator<String> uniqueName = (c, val) -> {
             long sameNameDescriptors = backingDescriptorList.getOrElse(FXCollections.emptyObservableList())
