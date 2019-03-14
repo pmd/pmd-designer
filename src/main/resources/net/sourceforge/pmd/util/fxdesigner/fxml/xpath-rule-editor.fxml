@@ -13,6 +13,7 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.control.Separator?>
 <AnchorPane minHeight="0.0"
             minWidth="0.0"
             prefHeight="180.0"
@@ -73,6 +74,8 @@
                                         </Tooltip>
                                     </tooltip>
                                 </Button>
+
+                                <Separator orientation="VERTICAL" />
 
                                 <Button fx:id="showPropertiesButton" mnemonicParsing="false" text="Properties"/>
                             </toolbarItems>

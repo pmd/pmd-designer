@@ -150,6 +150,19 @@
         -fx-border-insets: 0;
         -fx-border-image-insets: 0;
 
+        & > .button {
+          -fx-background-color: transparent;
+
+          -fx-content-display: CENTER;
+          -fx-border-width: 0;
+          -fx-background-insets: 0;
+          -fx-border-insets: 0;
+
+          &:hover {
+            -fx-background-color: @selection-focus-color;
+          }
+        }
+
         & > .label {
           -fx-background-color: transparent;
           -fx-font-size: @smaller-font-size;
@@ -175,6 +188,7 @@
           .line {
             -fx-border-style: none solid none none;
             -fx-border-width: 0.5px;
+            -fx-fill:@fx-text-fill;
             -fx-border-color: @fx-text-fill;
           }
         }
