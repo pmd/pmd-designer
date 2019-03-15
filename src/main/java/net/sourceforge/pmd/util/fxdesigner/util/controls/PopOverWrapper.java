@@ -7,8 +7,8 @@ import java.util.function.Supplier;
 import org.controlsfx.control.PopOver;
 import org.reactfx.value.Var;
 
-import javafx.scene.Node;
-import javafx.stage.Window;
+import javafx.collections.SetChangeListener;
+import javafx.css.PseudoClass;
 
 /**
  * Wrapper around a popover, that remembers whether it's already shown
@@ -40,6 +40,11 @@ public final class PopOverWrapper<T> {
             }
             myPopover.setValue(popOver);
             showMethod.accept(popOver);
+            SetChangeListener<PseudoClass> listener = ch -> {
+                System.out.println(ch.getSet());
+            };
+            PopOverUtil.getStyleableNode(popOver).getPseudoClassStates().addListener(listener);
+
             PopOverUtil.fixStyleSheets(popOver);
         }
     }

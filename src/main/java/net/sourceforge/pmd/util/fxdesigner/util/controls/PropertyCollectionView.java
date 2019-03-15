@@ -80,7 +80,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
     public static PopOver makePopOver(ObservableList<PropertyDescriptorSpec> items, DesignerRoot designerRoot) {
         PropertyCollectionView view = new PropertyCollectionView(designerRoot);
         view.setItems(items);
-        PopOver popOver = new PopOver(view);
+        PopOver popOver = new SmartPopover(view);
         popOver.setTitle("Rule properties");
         popOver.setHeaderAlwaysVisible(true);
         return popOver;
@@ -119,7 +119,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
             }
 
 
-            PopOver popOver = new PopOver(root);
+            PopOver popOver = new SmartPopover(root);
             popOver.setHeaderAlwaysVisible(true);
             popOver.titleProperty().bind(spec.nameProperty()
                                              .filter(StringUtils::isNotBlank)
