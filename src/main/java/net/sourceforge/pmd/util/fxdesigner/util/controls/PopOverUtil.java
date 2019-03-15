@@ -1,10 +1,9 @@
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import static java.util.Objects.requireNonNull;
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.addCustomStyleSheets;
 
 import org.controlsfx.control.PopOver;
-
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
@@ -74,7 +73,7 @@ public final class PopOverUtil {
      * @param popOver
      */
     public static void fixStyleSheets(PopOver popOver) {
-        ((Parent) popOver.getSkin().getNode()).getStylesheets().add(DesignerUtil.getCss("popover").toExternalForm());
+        addCustomStyleSheets(((Parent) popOver.getSkin().getNode()), "popover");
     }
 
 }

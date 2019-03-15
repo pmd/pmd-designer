@@ -4,6 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.addCustomStyleSheets;
+
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +47,7 @@ public final class ToolbarTitledPane extends TitledPane implements TitleOwner {
 
     public ToolbarTitledPane() {
 
-        getStylesheets().addAll(DesignerUtil.getCss("flat").toExternalForm());
+        addCustomStyleSheets(toolBar, "flat");
         getStyleClass().add("tool-bar-title");
         toolBar.getStylesheets().add(ResourceUtil.resolveResource("css/flat.css"));
 

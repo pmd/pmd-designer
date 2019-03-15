@@ -109,6 +109,13 @@ public final class DesignerUtil {
         return DesignerUtil.class.getResource("/net/sourceforge/pmd/util/fxdesigner/css/" + simpleName + ".css");
     }
 
+    public static void addCustomStyleSheets(Parent target, String... styleSheetSimpleName) {
+        Arrays.stream(styleSheetSimpleName)
+              .map(DesignerUtil::getCss)
+              .map(URL::toExternalForm)
+              .forEach(target.getStylesheets()::add);
+    }
+
 
     public static <T> Callback<ListView<T>, ListCell<T>> simpleListCellFactory(Function<T, String> converter, Function<T, String> toolTipMaker) {
         return collection -> new ListCell<T>() {
