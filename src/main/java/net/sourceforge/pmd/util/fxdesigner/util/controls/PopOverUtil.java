@@ -74,7 +74,7 @@ public final class PopOverUtil {
      * @param popOver
      */
     public static void fixStyleSheets(PopOver popOver) {
-        ((Parent) popOver.getSkin().getNode()).getStylesheets().add(DesignerUtil.getCss("popover.css").toExternalForm());
+        ((Parent) popOver.getSkin().getNode()).getStylesheets().add(DesignerUtil.getCss("popover").toExternalForm());
     }
 
 }
