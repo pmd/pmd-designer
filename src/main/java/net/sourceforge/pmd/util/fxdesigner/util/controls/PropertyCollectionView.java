@@ -10,7 +10,6 @@ import org.controlsfx.tools.ValueExtractor;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.Subscription;
 import org.reactfx.value.Val;
-import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -18,6 +17,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.popups.EditPropertyDialogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
+import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -58,9 +58,6 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
     }
 
 
-    // TODO PopOver context menu
-
-
     @Override
     public DesignerRoot getDesignerRoot() {
         return root;
@@ -73,6 +70,11 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
         PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
         spec.setName(name);
         this.getItems().add(spec);
+
+        Platform.runLater(
+            () ->
+                ((Button) getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() - 1)
+                                                   .lookup("." + PropertyDescriptorCell.DETAILS_BUTTON_CLASS)).fire());
     }
 
     public static PopOver makePopOver(ObservableList<PropertyDescriptorSpec> items, DesignerRoot designerRoot) {
@@ -86,7 +88,8 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
 
     private class PropertyDescriptorCell extends ListCell<PropertyDescriptorSpec> {
 
-        private Var<PopOver> myEditPopover = Var.newSimpleVar(null);
+        private static final String DETAILS_BUTTON_CLASS = "my-details-button";
+        private final PopOverWrapper<PropertyDescriptorSpec> myEditPopover = new PopOverWrapper<>(null, () -> null);
 
         @Override
         protected void updateItem(PropertyDescriptorSpec item, boolean empty) {
@@ -96,6 +99,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
                 setText(null);
                 setGraphic(null);
             } else {
+                myEditPopover.rebindIfDifferent(item, () -> detailsPopOver(item));
                 setGraphic(buildGraphic(item));
             }
         }
@@ -141,18 +145,8 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
 
             Button edit = new Button();
             edit.setGraphic(new FontIcon("fas-ellipsis-h"));
-            edit.getStyleClass().addAll("icon-button");
-            edit.setOnAction(e -> {
-                if (myEditPopover.isPresent()) {
-                    myEditPopover.getValue().requestFocus();
-                } else {
-                    PopOver popOver = detailsPopOver(spec);
-                    myEditPopover.setValue(popOver);
-                    PopOverUtil.showAt(popOver, getMainStage(), this);
-                    PopOverUtil.fixStyleSheets(popOver);
-                }
-            });
-
+            edit.getStyleClass().addAll(DETAILS_BUTTON_CLASS, "icon-button");
+            edit.setOnAction(e -> myEditPopover.showOrFocus(p -> PopOverUtil.showAt(p, getMainStage(), this)));
 
             hBox.getChildren().setAll(label, spacer, edit);
 

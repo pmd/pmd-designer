@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.controlsfx.control.PopOver;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -52,7 +51,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XPathSyntaxHighlighter;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.HelpfulPlaceholder;
-import net.sourceforge.pmd.util.fxdesigner.util.controls.PopOverUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.PopOverWrapper;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyCollectionView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.XpathViolationListCell;
@@ -93,6 +92,8 @@ public class XPathPanelController extends AbstractController implements NodeSele
     private static final String NO_MATCH_MESSAGE = "No match in text";
     private static final Duration XPATH_REFRESH_DELAY = Duration.ofMillis(100);
     private final ObservableXPathRuleBuilder ruleBuilder = new ObservableXPathRuleBuilder();
+    private final PopOverWrapper<ObservableXPathRuleBuilder> propertiesPopover
+        = new PopOverWrapper<>(null, () -> null);
 
     @FXML
     private ToolbarTitledPane expressionTitledPane;
@@ -148,11 +149,12 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
         violationsTitledPane.titleProperty().bind(currentResults.map(List::size).map(n -> "Matched nodes (" + n + ")"));
 
-        showPropertiesButton.setOnAction(e -> {
-            PopOver popOver = PropertyCollectionView.makePopOver(getRuleBuilder().getRuleProperties(), getDesignerRoot());
-            popOver.show(showPropertiesButton);
-            PopOverUtil.fixStyleSheets(popOver);
-        });
+        propertiesPopover.rebindIfDifferent(
+            getRuleBuilder(),
+            () -> PropertyCollectionView.makePopOver(getRuleBuilder().getRuleProperties(), getDesignerRoot())
+        );
+
+        showPropertiesButton.setOnAction(e -> propertiesPopover.showOrFocus(p -> p.show(showPropertiesButton)));
     }
 
     @Override
