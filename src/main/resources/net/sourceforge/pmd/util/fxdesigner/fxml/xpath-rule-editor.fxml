@@ -3,17 +3,15 @@
 <?import java.lang.String?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea?>
-<?import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.SVGPath?>
-<?import javafx.scene.control.Separator?>
 <AnchorPane minHeight="0.0"
             minWidth="0.0"
             prefHeight="180.0"
@@ -75,9 +73,9 @@
                                     </tooltip>
                                 </Button>
 
-                                <Separator orientation="VERTICAL" />
+                                <Separator orientation="VERTICAL"/>
 
-                                <Button fx:id="showPropertiesButton" mnemonicParsing="false" text="Properties"/>
+                                <Button fx:id="showPropertiesButton" mnemonicParsing="false" text="Properties..."/>
                             </toolbarItems>
                             <content>
                                 <SyntaxHighlightingCodeArea stylesheets="@../css/editor-theme.css" fx:id="xpathExpressionArea" />

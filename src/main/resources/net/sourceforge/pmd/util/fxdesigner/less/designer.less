@@ -150,16 +150,24 @@
         -fx-border-insets: 0;
         -fx-border-image-insets: 0;
 
-        & > .button {
+        & > .button,
+        & > .choice-box {
           -fx-background-color: transparent;
 
           -fx-content-display: CENTER;
-          -fx-border-width: 0;
+          -fx-border-width: 1;
+          -fx-border-color: @darker-accent-border;
           -fx-background-insets: 0;
           -fx-border-insets: 0;
+          -fx-border-radius: 3;
 
           &:hover {
             -fx-background-color: @selection-focus-color;
+          }
+
+          &.icon-button {
+            -fx-border-width: 0;
+            -fx-border-color: transparent;
           }
         }
 
@@ -201,7 +209,8 @@
   }
 }
 
-.menu-button.menu-button-no-arrow .arrow-button {
+.menu-button.no-arrow .arrow-button,
+.choice-box.no-arrow .open-button {
 
   &, * {
     -fx-padding: 0;
