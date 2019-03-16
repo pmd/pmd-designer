@@ -82,4 +82,8 @@ ignored resource directory so that the integrated SceneBuilder picks up on them.
 
 ##### Eclipse
 
-TODO
+1.  Clone the repository
+2.  Open eclipse, Choose "File, Import, Existing Maven Projects"
+3.  Right click on the project, select "Run as, Maven build...", enter `process-resources` as goal. Run it.
+    This generates the CSS resources.
+4.  Open class `net.sourceforge.pmd.util.fxdesigner.DesignerStarter`. Choose "Run as Java Application".
