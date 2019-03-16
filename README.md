@@ -8,8 +8,6 @@ WIP: the designer is being moved from [pmd/pmd/pmd-ui](https://github.com/pmd/pm
 
 ## TODOs
 
-* Review release procedure: short howto (locally mvn release:prepare, travis will deploy the tag)
-
 * Move [open issues](https://github.com/pmd/pmd/labels/in%3Aui)
   * Close the designer project on pmd/pmd
 
