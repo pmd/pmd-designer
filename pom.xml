@@ -833,6 +833,9 @@
             </dependencies>
         </profile>
         <profile>
+            <!-- Profile to build a fat runnable jar. -->
+            <!-- It's kind of shitty that we can't select dependencies to include manually, -->
+            <!-- a gradle script may help. -->
             <id>fat-java-jar</id>
             <activation>
                 <property>

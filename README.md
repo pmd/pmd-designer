@@ -39,3 +39,21 @@ PMD distribution.
 ## Building from source/ contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions to build the project from source and setup your IDE.
+
+
+##### Building a runnable JAR
+
+You can package a runnable jar containing the PMD dependencies with maven. For
+now the only option is to build a jar that contains pmd-core and pmd-java:
+
+```
+mvn clean package -Dfat-java -Dpmd.core.version=7.0.0-SNAPSHOT
+```
+The `pmd.core.version` property selects the version of pmd-core *and pmd-java*
+that will be included. The built jar can then be found in your `target` directory.
+**Such a jar cannot be used in a PMD distribution** and must be used in a
+standalone fashion, otherwise classpath conflicts may arise.
+
+You should never run the `install` goal with the `-Dfat-java` property! This
+would install the fat jar in your local repo and may cause dependency conflicts.
+
