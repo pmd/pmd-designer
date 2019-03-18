@@ -4,17 +4,6 @@
 [![Maven Central](https://img.shields.io/maven-central/v/net.sourceforge.pmd/pmd-ui.svg)](https://maven-badges.herokuapp.com/maven-central/net.sourceforge.pmd/pmd-ui)
 [![Join the chat at https://gitter.im/pmd/pmd-designer](https://badges.gitter.im/pmd/pmd-designer.svg)](https://gitter.im/pmd/pmd-designer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-WIP: the designer is being moved from [pmd/pmd/pmd-ui](https://github.com/pmd/pmd/tree/master/pmd-ui) to this repository. 
-
-## TODOs
-
-* Move [open issues](https://github.com/pmd/pmd/labels/in%3Aui)
-  * Close the designer project on pmd/pmd
-
----------------
----------------
-
-# PMD Rule Designer
 
 
 The Rule Designer is a graphical tool that helps PMD users develop their custom
