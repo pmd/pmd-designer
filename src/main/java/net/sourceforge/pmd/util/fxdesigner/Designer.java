@@ -79,7 +79,9 @@ public class Designer extends Application {
         });
 
         loader.setControllerFactory(DesignerUtil.controllerFactoryKnowing(
-            new NodeInfoPanelController(owner),
+            mainController,
+            new MetricPaneController(owner),
+            new ScopesPanelController(owner),
             new NodeDetailPaneController(owner),
             new XPathPanelController(owner),
             new SourceEditorController(owner)

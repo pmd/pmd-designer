@@ -61,7 +61,22 @@
                     <items>
                         <BorderPane prefHeight="200.0" prefWidth="200.0">
                             <left>
-                                <fx:include fx:id="nodeInfoPanel" source="node-info.fxml" />
+                                <TabPane id="nodeInfoTabPane"
+                                         prefWidth="300.0" side="LEFT"
+                                         tabClosingPolicy="UNAVAILABLE">
+
+                                    <tabs>
+                                        <Tab text="Attributes">
+                                            <fx:include source="node-details.fxml" fx:id="nodeDetailsTab"/>
+                                        </Tab>
+                                        <Tab fx:id="metricResultsTab" text="Metrics">
+                                            <fx:include source="metrics-panel.fxml" fx:id="metricPane"/>
+                                        </Tab>
+                                        <Tab text="Scopes">
+                                            <fx:include source="scopes-panel.fxml" fx:id="scopesPanel"/>
+                                        </Tab>
+                                    </tabs>
+                                </TabPane>
                             </left>
                             <center>
                                 <fx:include fx:id="sourceEditor" source="editor.fxml" prefHeight="200.0" prefWidth="200.0" />

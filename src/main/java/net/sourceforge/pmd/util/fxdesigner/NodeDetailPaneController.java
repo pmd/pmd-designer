@@ -44,12 +44,11 @@ public class NodeDetailPaneController extends AbstractController implements Node
 
     protected NodeDetailPaneController(DesignerRoot root) {
         super(root);
-
-        xpathAttributesListView.setPlaceholder(new Label("No available attributes"));
     }
 
     @Override
     protected void beforeParentInit() {
+        xpathAttributesListView.setPlaceholder(new Label("No available attributes"));
 
         Val<Node> currentSelection = initNodeSelectionHandling(getDesignerRoot(), EventStreams.never(), false);
 

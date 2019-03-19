@@ -14,6 +14,7 @@ import org.reactfx.value.Val;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.XPathPanelController;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 
 /**
@@ -52,9 +53,9 @@ public interface NodeSelectionSource extends ApplicationComponent {
                                                 boolean alwaysHandleSelection) {
         MessageChannel<NodeSelectionEvent> channel = root.getService(DesignerRoot.NODE_SELECTION_CHANNEL);
         mySelectionEvents.subscribe(n -> channel.pushEvent(this, n));
-        Val<NodeSelectionEvent> selection = channel.latestMessage(alwaysHandleSelection, this);
-        selection.values().subscribe(evt -> setFocusNode(evt.selected, evt.options));
-        return selection.map(it -> it.selected);
+        EventStream<NodeSelectionEvent> selection = channel.messageStream(alwaysHandleSelection, this);
+        selection.subscribe(evt -> setFocusNode(evt.selected, evt.options));
+        return ReactfxUtil.latestValue(selection.map(it -> it.selected));
     }
 
 
