@@ -8,10 +8,13 @@ import java.util.Objects;
 
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
+import org.reactfx.value.Val;
+import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.MainDesignerController;
 import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 
 /**
@@ -38,7 +41,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
  */
 public class MessageChannel<T> {
 
-    private final EventSource<Message<T>> channel = new EventSource<>();
+    private final Var<Message<T>> channel = Var.newSimpleVar(null);
     private final Category logCategory;
 
 
@@ -54,13 +57,14 @@ public class MessageChannel<T> {
      *
      * @return A stream of messages
      */
-    public EventStream<T> messageStream(boolean alwaysHandle,
-                                        ApplicationComponent component) {
-        return channel.hook(message -> component.logMessageTrace(message, () -> component.getDebugName() + " is handling message " + message))
-                       .filter(message -> alwaysHandle || !component.equals(message.getOrigin()))
-                       .map(Message::getContent);
+    public Val<T> latestMessage(boolean alwaysHandle,
+                                ApplicationComponent component) {
+        EventStream<T> stream = channel.values()
+                                       .hook(message -> component.logMessageTrace(message, () -> component.getDebugName() + " is handling message " + message))
+                                       .filter(message -> alwaysHandle || !component.equals(message.getOrigin()))
+                                       .map(Message::getContent);
+        return ReactfxUtil.latestValue(stream);
     }
-
 
     /**
      * Notifies the listeners of this channel with the given payload.
@@ -71,7 +75,7 @@ public class MessageChannel<T> {
      * @param content Message to transmit
      */
     public void pushEvent(ApplicationComponent origin, T content) {
-        channel.push(new Message<>(origin, logCategory, content));
+        channel.setValue(new Message<>(origin, logCategory, content));
     }
 
 

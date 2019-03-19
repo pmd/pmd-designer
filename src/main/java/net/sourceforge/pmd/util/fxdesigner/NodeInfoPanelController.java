@@ -56,26 +56,22 @@ import javafx.scene.control.TreeView;
 public class NodeInfoPanelController extends AbstractController implements NodeSelectionSource {
 
 
-    /** List of attribute names that are ignored if {@link #isHideCommonAttributes()} is true. */
-    private static final List<String> IGNORABLE_ATTRIBUTES =
-        Arrays.asList("BeginLine", "EndLine", "BeginColumn", "EndColumn", "FindBoundary", "SingleLine");
 
-    @FXML
-    private ToggleButton hideCommonAttributesToggle;
     @FXML
     private ToolbarTitledPane metricsTitledPane;
     @FXML
     private TabPane nodeInfoTabPane;
-    @FXML
-    private Tab xpathAttributesTab;
-    @FXML
-    private ListView<String> xpathAttributesListView;
     @FXML
     private Tab metricResultsTab;
     @FXML
     private ListView<MetricResult> metricResultsListView;
     @FXML
     private TreeView<Object> scopeHierarchyTreeView;
+
+
+    @FXML
+    private NodeDetailPaneController nodeDetailsTabController;
+
 
     private Node selectedNode;
 
@@ -91,14 +87,9 @@ public class NodeInfoPanelController extends AbstractController implements NodeS
     @Override
     protected void beforeParentInit() {
 
-        xpathAttributesListView.setPlaceholder(new Label("No available attributes"));
 
         scopeHierarchyTreeView.setCellFactory(view -> new ScopeHierarchyTreeCell());
 
-        hideCommonAttributesProperty()
-            .values()
-            .distinct()
-            .subscribe(show -> displayAttributes(selectedNode));
 
         // suppress as early as possible in the pipeline
         myScopeItemSelectionEvents = EventStreams.valuesOf(scopeHierarchyTreeView.getSelectionModel().selectedItemProperty()).suppressible();
@@ -140,7 +131,6 @@ public class NodeInfoPanelController extends AbstractController implements NodeS
 
 
     private void displayAttributes(Node node) {
-        xpathAttributesListView.setItems(getAttributes(node));
     }
 
 
@@ -179,7 +169,6 @@ public class NodeInfoPanelController extends AbstractController implements NodeS
      */
     private void invalidateInfo() {
         metricResultsListView.setItems(FXCollections.emptyObservableList());
-        xpathAttributesListView.setItems(FXCollections.emptyObservableList());
         scopeHierarchyTreeView.setRoot(null);
     }
 
@@ -203,49 +192,6 @@ public class NodeInfoPanelController extends AbstractController implements NodeS
                     .map(e -> new MetricResult(e.getKey(), e.getValue()))
                     .collect(Collectors.toList());
         return FXCollections.observableArrayList(resultList);
-    }
-
-
-    @PersistentProperty
-    public boolean isHideCommonAttributes() {
-        return hideCommonAttributesToggle.isSelected();
-    }
-
-
-    public void setHideCommonAttributes(boolean bool) {
-        hideCommonAttributesToggle.setSelected(bool);
-    }
-
-
-    public Var<Boolean> hideCommonAttributesProperty() {
-        return Var.fromVal(hideCommonAttributesToggle.selectedProperty(), hideCommonAttributesToggle::setSelected);
-    }
-
-
-    /**
-     * Gets the XPath attributes of the node for display within a listview.
-     */
-    private ObservableList<String> getAttributes(Node node) {
-        if (node == null) {
-            return FXCollections.emptyObservableList();
-        }
-
-        ObservableList<String> result = FXCollections.observableArrayList();
-        Iterator<Attribute> attributeAxisIterator = node.getXPathAttributesIterator();
-        while (attributeAxisIterator.hasNext()) {
-            Attribute attribute = attributeAxisIterator.next();
-
-            if (!(isHideCommonAttributes() && IGNORABLE_ATTRIBUTES.contains(attribute.getName()))) {
-                // TODO the display should be handled in a ListCell
-                result.add(attribute.getName() + " = "
-                               + ((attribute.getValue() != null) ? attribute.getStringValue() : "null"));
-            }
-        }
-
-        DesignerUtil.getResolvedType(node).map(t -> "typeIs() = " + t).ifPresent(result::add);
-
-        Collections.sort(result);
-        return result;
     }
 
 

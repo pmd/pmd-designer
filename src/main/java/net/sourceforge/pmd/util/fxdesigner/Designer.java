@@ -61,9 +61,6 @@ public class Designer extends Application {
         FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("designer.fxml"));
 
         MainDesignerController mainController = new MainDesignerController(owner);
-        NodeInfoPanelController nodeInfoPanelController = new NodeInfoPanelController(owner);
-        XPathPanelController xpathPanelController = new XPathPanelController(owner);
-        SourceEditorController sourceEditorController = new SourceEditorController(owner);
 
         loader.setBuilderFactory(type -> {
 
@@ -81,25 +78,12 @@ public class Designer extends Application {
             }
         });
 
-        loader.setControllerFactory(type -> {
-            if (type == MainDesignerController.class) {
-                return mainController;
-            } else if (type == NodeInfoPanelController.class) {
-                return nodeInfoPanelController;
-            } else if (type == XPathPanelController.class) {
-                return xpathPanelController;
-            } else if (type == SourceEditorController.class) {
-                return sourceEditorController;
-            } else {
-                // default behavior for controllerFactory:
-                try {
-                    return type.newInstance();
-                } catch (Exception exc) {
-                    exc.printStackTrace();
-                    throw new RuntimeException(exc); // fatal, just bail...
-                }
-            }
-        });
+        loader.setControllerFactory(DesignerUtil.controllerFactoryKnowing(
+            new NodeInfoPanelController(owner),
+            new NodeDetailPaneController(owner),
+            new XPathPanelController(owner),
+            new SourceEditorController(owner)
+        ));
 
         stage.setOnCloseRequest(e -> mainController.shutdown());
 

@@ -20,32 +20,7 @@
     <tabs>
         <Tab text="Attributes">
             <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                    <children>
-                        <ToolbarTitledPane
-                                title="XPath Attributes"
-                                styleClass="full-size-title"
-                                collapsible="false"
-                                AnchorPane.bottomAnchor="0.0"
-                                AnchorPane.leftAnchor="0.0"
-                                AnchorPane.rightAnchor="0.0"
-                                AnchorPane.topAnchor="0.0">
-                            <toolbarItems>
-                                <ToggleButton fx:id="hideCommonAttributesToggle" selected="true" styleClass="icon-button" mnemonicParsing="false">
-                                    <tooltip>
-                                        <Tooltip text="Hide common attributes" />
-                                    </tooltip>
-                                    <graphic>
-                                        <FontIcon iconLiteral="fas-eye-slash" />
-                                    </graphic>
-                                </ToggleButton>
-                            </toolbarItems>
-
-                            <ListView BorderPane.alignment="CENTER" fx:id="xpathAttributesListView"  />
-
-                        </ToolbarTitledPane>
-                    </children>
-                </AnchorPane>
+                <fx:include source="node-details.fxml" fx:id="nodeDetailsTab" />
             </content>
         </Tab>
         <Tab fx:id="metricResultsTab" text="Metrics">
