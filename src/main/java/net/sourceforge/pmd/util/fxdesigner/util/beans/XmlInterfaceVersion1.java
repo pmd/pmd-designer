@@ -7,6 +7,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.beans;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.ClassUtils;
@@ -23,6 +24,7 @@ import org.w3c.dom.NodeList;
  */
 public class XmlInterfaceVersion1 extends XmlInterface {
 
+    private static final Logger LOGGER = Logger.getLogger(XmlInterface.class.getName());
 
     // names used in the Xml schema
     private static final String SCHEMA_NODE_ELEMENT = "node";
@@ -68,11 +70,12 @@ public class XmlInterfaceVersion1 extends XmlInterface {
 
         for (Element child : getChildrenByTagName(nodeElement, SCHEMA_NODE_ELEMENT)) {
             try {
-                if (node.getChildrenByType().get(Class.forName(child.getAttribute(SCHEMA_NODE_CLASS_ATTRIBUTE))) == null) { // FIXME
+                Class<?> childType = Class.forName(child.getAttribute(SCHEMA_NODE_CLASS_ATTRIBUTE));
+                if (node.getChildrenByType().get(childType) == null) { // FIXME
                     node.addChild(parseSettingsOwnerNode(child));
                 }
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                LOGGER.warning("Ignoring unknown settings node of type " + child.getAttribute(SCHEMA_NODE_CLASS_ATTRIBUTE));
             }
         }
 
