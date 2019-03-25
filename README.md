@@ -9,9 +9,7 @@
 The Rule Designer is a graphical tool that helps PMD users develop their custom
 rules.
 
-TODO Gifs
-
-
+![Rules!](https://media.giphy.com/media/ma4msCmcHpAoBLU6hl/giphy.gif)
 
 ## Installation
 
