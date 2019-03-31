@@ -56,7 +56,7 @@ public class SerializerRegistrarTest {
 
         class Foo {}
 
-        testRegistrar.registerMapped(Foo.class, String.class, s -> new Foo(), Object::toString);
+        testRegistrar.registerMapped(Foo.class, String.class, Object::toString, s -> new Foo());
 
         assertNotNull(testRegistrar.getSerializer(Foo.class));
 

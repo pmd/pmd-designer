@@ -46,10 +46,10 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.SerializerRegis
 public final class SettingsPersistenceUtil {
 
     static {
-        SerializerRegistrar.getInstance().registerMapped(RulePriority.class, Integer.class, RulePriority::valueOf, RulePriority::getPriority);
-        SerializerRegistrar.getInstance().registerMapped(PropertyTypeId.class, String.class, PropertyTypeId::lookupMnemonic, PropertyTypeId::getStringId);
-        SerializerRegistrar.getInstance().registerMapped(LanguageVersion.class, String.class, LanguageRegistry::findLanguageVersionByTerseName, LanguageVersion::getTerseName);
-        SerializerRegistrar.getInstance().registerMapped(Language.class, String.class, LanguageRegistry::findLanguageByTerseName, Language::getTerseName);
+        SerializerRegistrar.getInstance().registerMapped(RulePriority.class, Integer.class, RulePriority::getPriority, RulePriority::valueOf);
+        SerializerRegistrar.getInstance().registerMapped(PropertyTypeId.class, String.class, PropertyTypeId::getStringId, PropertyTypeId::lookupMnemonic);
+        SerializerRegistrar.getInstance().registerMapped(LanguageVersion.class, String.class, LanguageVersion::getTerseName, LanguageRegistry::findLanguageVersionByTerseName);
+        SerializerRegistrar.getInstance().registerMapped(Language.class, String.class, Language::getTerseName, LanguageRegistry::findLanguageByTerseName);
     }
 
 

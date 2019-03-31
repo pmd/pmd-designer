@@ -24,9 +24,18 @@ import org.w3c.dom.NodeList;
 public interface Serializer<T> {
 
 
+    /**
+     * Produce an XML element that represents the value [t]. The parameter
+     * [eltFactory] can be used to produce a new element to add children.
+     * The returned element must be understood by {@link #fromXml(Element)}.
+     */
     Element toXml(T t, Supplier<Element> eltFactory);
 
 
+    /**
+     * Parses the given XML element into a value of type {@code <T>}. This
+     * method must be kept in sync with {@link #toXml(Object, Supplier)}.
+     */
     T fromXml(Element s);
 
 
@@ -49,6 +58,14 @@ public interface Serializer<T> {
     }
 
 
+    /**
+     * Builds a new serializer that can serialize arrays of component type
+     * {@code <T>}.
+     *
+     * @param emptyArray Empty array supplier
+     *
+     * @return A new serializer
+     */
     default Serializer<T[]> toArray(T[] emptyArray) {
         return
             this.<List<T>>toSeq(ArrayList::new)
