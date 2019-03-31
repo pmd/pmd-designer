@@ -6,6 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.beans;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -48,6 +49,30 @@ public class SerializerRegistrarTest {
 
         assertEquals(2, element.getChildNodes().getLength());
 
+    }
+
+    @Test
+    public void testArraySerializer() throws ParserConfigurationException {
+
+        class Foo {}
+
+        testRegistrar.registerMapped(Foo.class, String.class, s -> new Foo(), Object::toString);
+
+        assertNotNull(testRegistrar.getSerializer(Foo.class));
+
+        Serializer<Foo[]> serializer = testRegistrar.getSerializer(Foo[].class);
+
+        assertNotNull(serializer);
+
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        Document document = documentBuilderFactory.newDocumentBuilder().newDocument();
+
+        Element element = serializer.toXml(
+            new Foo[] { new Foo() },
+            () -> document.createElement("val")
+        );
+
+        assertEquals(1, element.getChildNodes().getLength());
     }
 
     @Test

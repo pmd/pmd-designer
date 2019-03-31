@@ -7,6 +7,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.beans.converters;
 import static net.sourceforge.pmd.util.fxdesigner.util.beans.converters.Serializer.stringConversion;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
@@ -97,7 +98,23 @@ public class SerializerRegistrar {
     public final <T> Serializer<T> getSerializer(Class<T> type) {
         @SuppressWarnings("unchecked")
         Serializer<T> t = (Serializer<T>) converters.get(type);
+        if (t == null && type.isArray()) {
+            Class<?> component = type.getComponentType();
+            return arraySerializerCapture(component);
+        }
         return t;
+    }
+
+    private <T, V> Serializer<T> arraySerializerCapture(Class<V> component) {
+        Serializer<V> componentSerializer = getSerializer(component);
+        if (componentSerializer != null) {
+            @SuppressWarnings("unchecked")
+            V[] emptyArr = (V[]) Array.newInstance(component, 0);
+            @SuppressWarnings("unchecked")
+            Serializer<T> serializer = (Serializer<T>) componentSerializer.toArray(emptyArr);
+            return serializer;
+        }
+        return null;
     }
 
     public final <T> Serializer<T> getSerializer(Typed<T> typed) {
