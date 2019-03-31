@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.reactfx.Subscription;
@@ -209,13 +208,13 @@ public class MainDesignerController extends AbstractController {
 
 
     @PersistentProperty
-    public String getRecentFiles() {
-        return recentFiles.stream().map(File::getAbsolutePath).collect(Collectors.joining(File.pathSeparator));
+    public List<File> getRecentFiles() {
+        return recentFiles;
     }
 
 
-    public void setRecentFiles(String files) {
-        Arrays.stream(files.split(File.pathSeparator)).map(File::new).forEach(recentFiles::push);
+    public void setRecentFiles(List<File> files) {
+        files.forEach(recentFiles::push);
     }
 
 

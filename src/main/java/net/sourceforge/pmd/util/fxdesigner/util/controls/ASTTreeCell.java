@@ -9,12 +9,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.function.Consumer;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.PropertyUtils;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
@@ -91,7 +91,7 @@ public class ASTTreeCell extends TreeCell<Node> {
 
         String[] childrenProps = new String[node.jjtGetNumChildren()];
 
-        for (PropertyDescriptor prop : PropertyUtils.getPropertyDescriptors(node.getClass())) {
+        for (PropertyDescriptor prop : PropertyUtils.getPropertyDescriptors(node.getClass()).values()) {
             if (prop.getReadMethod() != null && Modifier.isPublic(prop.getReadMethod().getModifiers())
                     && prop.getReadMethod().getDeclaringClass() == node.getClass()) {
 

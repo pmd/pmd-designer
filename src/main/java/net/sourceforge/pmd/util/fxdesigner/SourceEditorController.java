@@ -245,14 +245,13 @@ public class SourceEditorController extends AbstractController {
 
 
     @PersistentProperty
-    public String getAuxclasspathFiles() {
-        return auxclasspathFiles.getValue().stream().map(File::getAbsolutePath).collect(Collectors.joining(File.pathSeparator));
+    public List<File> getAuxclasspathFiles() {
+        return auxclasspathFiles.getValue();
     }
 
 
-    public void setAuxclasspathFiles(String files) {
-        List<File> newVal = Arrays.stream(files.split(File.pathSeparator)).map(File::new).collect(Collectors.toList());
-        auxclasspathFiles.setValue(newVal);
+    public void setAuxclasspathFiles(List<File> files) {
+        auxclasspathFiles.setValue(files);
     }
 
 

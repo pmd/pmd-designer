@@ -4,6 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.beans;
 
+import static net.sourceforge.pmd.util.fxdesigner.util.beans.PropertyUtils.getPropertyDescriptors;
+
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
@@ -22,17 +24,15 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import net.sourceforge.pmd.RulePriority;
+import net.sourceforge.pmd.lang.Language;
+import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.properties.PropertyTypeId;
-import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.LanguageVersionConverter;
-import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.PropertyTypeIdConverter;
-import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.RulePriorityConverter;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.SerializerRegistrar;
 
 
 /**
@@ -46,10 +46,10 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.RulePriorityCon
 public final class SettingsPersistenceUtil {
 
     static {
-        // register converters for custom types
-        ConvertUtils.register(new RulePriorityConverter(), RulePriority.class);
-        ConvertUtils.register(new PropertyTypeIdConverter(), PropertyTypeId.class);
-        ConvertUtils.register(new LanguageVersionConverter(), LanguageVersion.class);
+        SerializerRegistrar.getInstance().registerMapped(RulePriority.class, Integer.class, RulePriority::valueOf, RulePriority::getPriority);
+        SerializerRegistrar.getInstance().registerMapped(PropertyTypeId.class, String.class, PropertyTypeId::lookupMnemonic, PropertyTypeId::getStringId);
+        SerializerRegistrar.getInstance().registerMapped(LanguageVersion.class, String.class, LanguageRegistry::findLanguageVersionByTerseName, LanguageVersion::getTerseName);
+        SerializerRegistrar.getInstance().registerMapped(Language.class, String.class, LanguageRegistry::findLanguageByTerseName, Language::getTerseName);
     }
 
 
@@ -104,7 +104,6 @@ public final class SettingsPersistenceUtil {
         return Optional.empty();
     }
 
-
     /**
      * Builds a settings model recursively for the given settings owner.
      * The properties which have a getter tagged with {@link PersistentProperty}
@@ -118,7 +117,7 @@ public final class SettingsPersistenceUtil {
     static SimpleBeanModelNode buildSettingsModel(SettingsOwner root) {
         SimpleBeanModelNode node = new SimpleBeanModelNode(root.getClass());
 
-        for (PropertyDescriptor d : PropertyUtils.getPropertyDescriptors(root)) {
+        for (PropertyDescriptor d : getPropertyDescriptors(root).values()) {
             if (d.getReadMethod() == null) {
                 continue;
             }
@@ -142,7 +141,7 @@ public final class SettingsPersistenceUtil {
 
                     node.addChild(seq);
                 } else if (d.getReadMethod().isAnnotationPresent(PersistentProperty.class)) {
-                    node.addProperty(d.getName(), d.getReadMethod().invoke(root), d.getPropertyType());
+                    node.addProperty(d.getName(), d.getReadMethod().invoke(root), d.getReadMethod().getGenericReturnType());
                 }
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
@@ -182,7 +181,7 @@ public final class SettingsPersistenceUtil {
 
     /** Enumerates different formats for compatibility. */
     private enum XmlFormatRevision implements Comparable<XmlFormatRevision> {
-        V1(new XmlInterfaceVersion1(1));
+        V2(new XmlInterfaceImpl(2));
 
         private final XmlInterface xmlInterface;
 
