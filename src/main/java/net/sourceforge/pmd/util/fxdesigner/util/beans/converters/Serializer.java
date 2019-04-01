@@ -44,17 +44,19 @@ public interface Serializer<T> {
      * provided {@code <T>} can be mapped to and from {@code <S>}.
      */
     default <S> Serializer<S> map(Function<T, S> toS, Function<S, T> fromS) {
+        Serializer<T> nullable = nullable();
+
         return new Serializer<S>() {
             @Override
             public Element toXml(S s, Supplier<Element> eltFactory) {
-                return Serializer.this.toXml(fromS.apply(s), eltFactory);
+                return nullable.toXml(fromS.apply(s), eltFactory);
             }
 
             @Override
             public S fromXml(Element s) {
-                return toS.apply(Serializer.this.fromXml(s));
+                return toS.apply(nullable.fromXml(s));
             }
-        };
+        }.nullable();
     }
 
 
@@ -69,7 +71,7 @@ public interface Serializer<T> {
     default Serializer<T[]> toArray(T[] emptyArray) {
         return
             this.<List<T>>toSeq(ArrayList::new)
-                .map(l -> l.toArray(emptyArray), Arrays::asList);
+                .map(l -> l.toArray(emptyArray), Arrays::asList).nullable();
     }
 
 
@@ -86,12 +88,14 @@ public interface Serializer<T> {
      */
     default <C extends Collection<T>> Serializer<C> toSeq(Supplier<C> emptyCollSupplier) {
 
-        class MySerializer implements Serializer<C> {
+        Serializer<T> nullable = nullable();
+
+        class MyDecorator implements Serializer<C> {
 
             @Override
             public Element toXml(C t, Supplier<Element> eltFactory) {
                 Element element = eltFactory.get();
-                t.stream().map(v -> Serializer.this.toXml(v, eltFactory)).forEach(element::appendChild);
+                t.stream().map(v -> nullable.toXml(v, eltFactory)).forEach(element::appendChild);
                 return element;
             }
 
@@ -104,7 +108,7 @@ public interface Serializer<T> {
                     Node item = children.item(i);
                     if (item.getNodeType() == Element.ELEMENT_NODE) {
                         Element child = (Element) item;
-                        result.add(Serializer.this.fromXml(child));
+                        result.add(nullable.fromXml(child));
                     }
                 }
 
@@ -112,7 +116,36 @@ public interface Serializer<T> {
             }
         }
 
-        return new MySerializer();
+        return new MyDecorator().nullable();
+    }
+
+
+    /**
+     * Returns a decorated serializer that can handle null values. Standard
+     * serializer combinators already all return a nullable serializer. This
+     * method returns this if it's already nullable.
+     */
+    default Serializer<T> nullable() {
+        class MyDecorator implements Serializer<T> {
+
+            @Override
+            public Element toXml(T t, Supplier<Element> eltFactory) {
+                if (t != null) {
+                    return Serializer.this.toXml(t, eltFactory);
+                } else {
+                    Element element = eltFactory.get();
+                    element.setAttribute("null", "true");
+                    return element;
+                }
+            }
+
+            @Override
+            public T fromXml(Element element) {
+                return element.hasAttribute("null") ? null : Serializer.this.fromXml(element);
+            }
+        }
+
+        return this.getClass().equals(MyDecorator.class) ? this : new MyDecorator();
     }
 
 
@@ -121,30 +154,22 @@ public interface Serializer<T> {
      */
     static <T> Serializer<T> stringConversion(Function<String, T> fromString, Function<T, String> toString) {
 
-        class MySerializer implements Serializer<T> {
+        class MyDecorator implements Serializer<T> {
 
             @Override
             public Element toXml(T t, Supplier<Element> eltFactory) {
                 Element element = eltFactory.get();
-                if (t != null) {
-                    // todo escape ?
-                    element.setAttribute("value", toString.apply(t));
-                } else {
-                    element.setAttribute("null", "true");
-                }
+                element.setAttribute("value", toString.apply(t));
                 return element;
             }
 
             @Override
             public T fromXml(Element element) {
-                if (element.hasAttribute("null")) {
-                    return null;
-                }
                 return fromString.apply(element.getAttribute("value"));
             }
         }
 
-        return new MySerializer();
+        return new MyDecorator().nullable();
     }
 
 

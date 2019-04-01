@@ -54,7 +54,14 @@ public class SerializerRegistrarTest {
         roundTrip(new TypeLiteral<List<? extends List<String>>>() {}, asList(emptyList(), asList("", "foo & <bar></bar>")));
         roundTrip(new TypeLiteral<List<? extends List<String>>>() {}, emptyList());
     }
-    
+
+    @Test
+    public void testNullValue() {
+        roundTrip(String.class, null);
+        roundTrip(new TypeLiteral<List<? extends List<String>>>() {}, null);
+        roundTrip(new TypeLiteral<List<? extends List<String>>>() {}, asList(null, asList(null, "")));
+    }
+
     @Test
     public void testMappedSerializer() {
 
