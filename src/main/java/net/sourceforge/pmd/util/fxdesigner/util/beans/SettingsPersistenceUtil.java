@@ -181,7 +181,7 @@ public final class SettingsPersistenceUtil {
 
     /** Enumerates different formats for compatibility. */
     private enum XmlFormatRevision implements Comparable<XmlFormatRevision> {
-        V2(new XmlInterfaceImpl(2));
+        V2(new XmlInterfaceImpl(4));
 
         private final XmlInterface xmlInterface;
 

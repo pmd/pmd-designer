@@ -14,6 +14,8 @@ import java.util.List;
  * a model of the settings to persist, under the form of a
  * {@link SimpleBeanModelNode}.
  *
+ * TODO get rid of that and use annotations
+ *
  * @author Clément Fournier
  * @since 6.1.0
  */

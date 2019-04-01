@@ -15,8 +15,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.PropertyValue;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.Serializer;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.SerializerRegistrar;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.TypedObject;
 
 
 /**
@@ -35,15 +37,15 @@ public class XmlInterfaceImpl extends XmlInterface {
     private static final String SCHEMA_NODESEQ_ELEMENT = "nodeseq";
     private static final String SCHEMA_NODE_CLASS_ATTRIBUTE = "class";
     private static final String SCHEMA_PROPERTY_ELEMENT = "property";
-    private static final String SCHEMA_PROPERTY_NAME = "name";
+    private static final String SCHEMA_PROPERTY_NAME = "property-name";
     private static final String SCHEMA_PROPERTY_VALUE = "value";
-    private static final String SCHEMA_PROPERTY_TYPE = "type";
-    private static final String SCHEMA_NULL_VALUE_FLAG = "nullValue";
 
 
     XmlInterfaceImpl(int revisionNumber) {
         super(revisionNumber);
     }
+
+    private final Serializer<TypedObject<?>> serializer = SerializerRegistrar.getInstance().compositeSerializer();
 
 
     private List<Element> getChildrenByTagName(Element element, String tagName) {
@@ -94,27 +96,12 @@ public class XmlInterfaceImpl extends XmlInterface {
 
 
     private void parseSingleProperty(Element propertyElement, SimpleBeanModelNode owner) {
-        String typeName = propertyElement.getAttribute(SCHEMA_PROPERTY_TYPE);
         String name = propertyElement.getAttribute(SCHEMA_PROPERTY_NAME);
-        Type type = PropertyUtils.parseType(typeName);
-        if (type == null) {
-            System.out.println("Unable to parse " + typeName);
-            return;
-        }
-
         try {
-
-
-            Serializer<Object> serializer = SerializerRegistrar.getInstance().getSerializer(type);
-            if (serializer == null) {
-                throw new IllegalStateException("Null serializer for type " + typeName);
-            }
-            Object value = serializer.fromXml(getChildrenByTagName(propertyElement, SCHEMA_PROPERTY_VALUE).get(0));
-
-            owner.addProperty(name, value, type);
+            TypedObject<?> value = serializer.fromXml(getChildrenByTagName(propertyElement, SCHEMA_PROPERTY_VALUE).get(0));
+            owner.addProperty(name, value.getObject(), value.getType());
         } catch (Exception e) {
-            String message = "Unable to parse property " + name + " for " + typeName;
-            new IllegalStateException(message, e).printStackTrace();
+            new RuntimeException(e).printStackTrace();
         }
     }
 
@@ -136,6 +123,7 @@ public class XmlInterfaceImpl extends XmlInterface {
 
     public static class DocumentMakerVisitor extends BeanNodeVisitor<Element> {
 
+        private final Serializer<TypedObject<?>> serializer = SerializerRegistrar.getInstance().compositeSerializer();
 
         @Override
         public void visit(SimpleBeanModelNode node, Element parent) {
@@ -146,29 +134,23 @@ public class XmlInterfaceImpl extends XmlInterface {
 
             for (Entry<String, Object> keyValue : node.getSettingsValues().entrySet()) {
 
-                Type propertyType = settingsTypes.get(keyValue.getKey());
-                @SuppressWarnings("unchecked")
-                Serializer<Object> serializer = (Serializer<Object>) SerializerRegistrar.getInstance().getSerializer(propertyType);
 
-                if (serializer == null) {
-                    throw new IllegalStateException("No serializer registered for type " + propertyType);
-                }
-
-                Element valueElt;
                 try {
-                    valueElt = serializer.toXml(keyValue.getValue(), () -> parent.getOwnerDocument().createElement(SCHEMA_PROPERTY_VALUE));
-                } catch (Exception e) {
-                    String message = "Unable to serialize property "
-                        + keyValue.getKey() + " for " + node.getNodeType().getName();
-                    new IllegalStateException(message, e).printStackTrace();
-                    continue;
-                }
 
-                Element setting = parent.getOwnerDocument().createElement(SCHEMA_PROPERTY_ELEMENT);
-                setting.setAttribute(SCHEMA_PROPERTY_NAME, keyValue.getKey());
-                setting.setAttribute(SCHEMA_PROPERTY_TYPE, propertyType.getTypeName());
-                setting.appendChild(valueElt);
-                nodeElement.appendChild(setting);
+                    TypedObject object = new PropertyValue(keyValue.getKey(),
+                                                           node.getNodeType().getName(),
+                                                           keyValue.getValue(),
+                                                           settingsTypes.get(keyValue.getKey()));
+
+                    Element valueElt = serializer.toXml(object, () -> parent.getOwnerDocument().createElement(SCHEMA_PROPERTY_VALUE));
+                    Element propertyElement = parent.getOwnerDocument().createElement(SCHEMA_PROPERTY_ELEMENT);
+                    propertyElement.setAttribute(SCHEMA_PROPERTY_NAME, keyValue.getKey());
+                    propertyElement.appendChild(valueElt);
+                    nodeElement.appendChild(propertyElement);
+                } catch (Exception e) {
+                    // print it, but don't throw it
+                    new RuntimeException(e).printStackTrace();
+                }
             }
 
             parent.appendChild(nodeElement);

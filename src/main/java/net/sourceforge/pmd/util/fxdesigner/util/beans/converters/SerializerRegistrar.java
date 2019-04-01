@@ -25,6 +25,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.reflect.Typed;
+import org.w3c.dom.Element;
+
+import net.sourceforge.pmd.util.fxdesigner.util.beans.PropertyUtils;
 
 /**
  * A collection of serializers. Once you register a serializer for a type T,
@@ -53,6 +56,7 @@ public class SerializerRegistrar {
 
     private static final SerializerRegistrar INSTANCE = new SerializerRegistrar();
 
+    // using a map of types obviously doesn't handle subtyping
     private final Map<Type, Serializer<?>> converters = new WeakHashMap<>();
 
     public SerializerRegistrar() {
@@ -102,7 +106,6 @@ public class SerializerRegistrar {
 
     }
 
-
     /**
      * Registers a serializer suitable for one or more types. It can then
      * be accessed on this registrar instance with {@link #getSerializer(Typed)}.
@@ -111,7 +114,7 @@ public class SerializerRegistrar {
     public final <T> void register(Serializer<T> serializer, Typed<T> firstType, Typed<T>... type) {
         converters.put(firstType.getType(), serializer);
         for (Typed<T> tClass : type) {
-            converters.put(tClass.getType(), serializer);
+            converters.put(tClass.getType(), serializer.nullable());
         }
     }
 
@@ -119,8 +122,57 @@ public class SerializerRegistrar {
     public final <T> void register(Serializer<T> serializer, Class<T> firstType, Class<T>... type) {
         converters.put(firstType, serializer);
         for (Class<T> it : type) {
-            converters.put(it, serializer);
+            converters.put(it, serializer.nullable());
         }
+    }
+
+    /**
+     * Returns a new serializer that uses all the serializers registered
+     * on this registrar instance to serialize any object. It throws IllegalStateExceptions
+     * if serializers are missing for a particular type.
+     */
+    public Serializer<TypedObject<?>> compositeSerializer() {
+        class Composite implements Serializer<TypedObject<?>> {
+
+            @Override
+            public Element toXml(TypedObject<?> typedObject, Supplier<Element> eltFactory) {
+                Serializer<Object> serializer = getSerializer(typedObject.getType());
+                if (serializer == null) {
+                    throw new IllegalStateException("No serializer registered for type " + typedObject.getType());
+                }
+
+                try {
+                    Element element = serializer.toXml(typedObject.getObject(), eltFactory);
+                    element.setAttribute("type", typedObject.getType().getTypeName());
+                    return element;
+                } catch (Exception e) {
+                    String message = "Unable to serialize " + typedObject;
+                    new IllegalStateException(message, e).printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            public TypedObject<?> fromXml(Element s) {
+
+                String typeStr = s.getAttribute("type");
+                Type type = PropertyUtils.parseType(typeStr);
+                if (type == null) {
+                    throw new IllegalStateException("Unable to parse " + typeStr);
+                }
+
+                Serializer<Object> serializer = getSerializer(type);
+                if (serializer == null) {
+                    throw new IllegalStateException("No serializer registered for type " + type);
+                }
+
+                // TODO it could be that a different serializer serialized the object...
+
+                return new TypedObject<>(serializer.fromXml(s), type);
+            }
+        }
+
+        return new Composite();
     }
 
     /**
