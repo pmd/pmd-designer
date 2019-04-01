@@ -7,9 +7,10 @@ package net.sourceforge.pmd.util.fxdesigner.util.beans.converters;
 import static net.sourceforge.pmd.util.fxdesigner.util.beans.converters.Serializer.stringConversion;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -23,7 +24,6 @@ import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.reflect.Typed;
 
 /**
@@ -167,6 +167,10 @@ public class SerializerRegistrar {
 
         if (genericType instanceof Class) {
             return getSerializer((Class) genericType);
+        } else if (genericType instanceof WildcardType) {
+            return getSerializer(((WildcardType) genericType).getUpperBounds()[0]);
+        } else if (genericType instanceof TypeVariable<?>) {
+            return getSerializer(((TypeVariable) genericType).getBounds()[0]);
         } else if (genericType instanceof ParameterizedType) {
             Class rawType = (Class) ((ParameterizedType) genericType).getRawType();
 

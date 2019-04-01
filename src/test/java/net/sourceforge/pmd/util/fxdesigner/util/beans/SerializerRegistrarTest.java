@@ -5,10 +5,10 @@
 package net.sourceforge.pmd.util.fxdesigner.util.beans;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -40,7 +40,7 @@ public class SerializerRegistrarTest {
     @Test
     public void testListSerializer() {
         roundTrip(new TypeLiteral<List<List<String>>>() {}, asList(asList("a", "b"), asList("c", "d")));
-        roundTrip(new TypeLiteral<List<List<String>>>() {}, Collections.emptyList());
+        roundTrip(new TypeLiteral<List<List<String>>>() {}, emptyList());
     }
 
     @Test
@@ -49,6 +49,12 @@ public class SerializerRegistrarTest {
         roundTrip(String.class, "foo\" haha\"");
     }
 
+    @Test
+    public void testWildcardSerializer() {
+        roundTrip(new TypeLiteral<List<? extends List<String>>>() {}, asList(emptyList(), asList("", "foo & <bar></bar>")));
+        roundTrip(new TypeLiteral<List<? extends List<String>>>() {}, emptyList());
+    }
+    
     @Test
     public void testMappedSerializer() {
 
