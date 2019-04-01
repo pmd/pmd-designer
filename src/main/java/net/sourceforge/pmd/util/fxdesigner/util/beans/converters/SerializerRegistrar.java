@@ -28,9 +28,12 @@ import org.apache.commons.lang3.reflect.Typed;
 
 /**
  * A collection of serializers. Once you register a serializer for a type T,
- * both array types and list/set types of any depth with that type T as element
- * type can be serialized without having to register anything else. You
- * can override their serialization routine explicitly if you want though.
+ * list/set types of any depth with that type T as element type can be serialized
+ * without having to register anything else. You can override their serialization
+ * routine explicitly if you want though.
+ *
+ * <p>Arrays are not supported out of the box. They'd require some boilerplate
+ * I don't want to write without a use case.
  *
  * <p>Serializers for common types are registered implicitly.
  *
@@ -132,25 +135,7 @@ public class SerializerRegistrar {
     public final <T> Serializer<T> getSerializer(Class<T> type) {
         @SuppressWarnings("unchecked")
         Serializer<T> t = (Serializer<T>) converters.get(type);
-        if (t == null && type.isArray()) {
-            Class<?> component = type.getComponentType();
-            Serializer<T> tSerializer = arraySerializerCapture(component);
-            converters.put(type, tSerializer);
-            return tSerializer;
-        }
         return t;
-    }
-
-    private <T, V> Serializer<T> arraySerializerCapture(Class<V> component) {
-        Serializer<V> componentSerializer = getSerializer(component);
-        if (componentSerializer != null) {
-            @SuppressWarnings("unchecked")
-            V[] emptyArr = (V[]) Array.newInstance(component, 0);
-            @SuppressWarnings("unchecked")
-            Serializer<T> serializer = (Serializer<T>) componentSerializer.toArray(emptyArr);
-            return serializer;
-        }
-        return null;
     }
 
     /**
