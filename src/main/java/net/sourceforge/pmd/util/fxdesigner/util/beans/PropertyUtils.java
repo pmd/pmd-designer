@@ -72,42 +72,4 @@ public final class PropertyUtils {
     }
 
 
-    private static final Pattern PARAM_TYPE_MATCHER = Pattern.compile("(\\w+(?:\\.\\w+)*)(<([^,]*)>)?((?:\\[])*)");
-
-    /**
-     * Parses a string into a type. Returns null if it doesn't succeed.
-     * Only supports parameterized types with at most one type argument.
-     * Doesn't support wildcard types.
-     */
-    public static Type parseType(String t) {
-        Matcher matcher = PARAM_TYPE_MATCHER.matcher(t.replaceAll("\\s+", ""));
-        if (matcher.matches()) {
-            String raw = matcher.group(1);
-            Type result;
-            try {
-                result = ClassUtils.getClass(raw);
-            } catch (ClassNotFoundException e) {
-                return null;
-            }
-
-            String param = matcher.group(3);
-            if (StringUtils.isNotBlank(param)) {
-                Type paramType = parseType(param);
-                if (paramType != null) {
-                    result = TypeUtils.parameterize((Class) result, paramType);
-                }
-            }
-
-            String arrayDims = matcher.group(4);
-            if (StringUtils.isNotBlank(arrayDims)) {
-                int dimensions = StringUtils.countMatches(arrayDims, '[');
-                while (dimensions-- > 0) {
-                    result = TypeUtils.genericArrayType(result);
-                }
-            }
-
-            return result;
-        }
-        return null;
-    }
 }

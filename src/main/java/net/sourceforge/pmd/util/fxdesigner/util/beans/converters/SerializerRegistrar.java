@@ -23,11 +23,14 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.commons.lang3.reflect.Typed;
 import org.w3c.dom.Element;
-
-import net.sourceforge.pmd.util.fxdesigner.util.beans.PropertyUtils;
 
 /**
  * A collection of serializers. Once you register a serializer for a type T,
@@ -55,6 +58,7 @@ public class SerializerRegistrar {
 
 
     private static final SerializerRegistrar INSTANCE = new SerializerRegistrar();
+    private static final Pattern PARAM_TYPE_MATCHER = Pattern.compile("(\\w+(?:\\.\\w+)*)(<([^,]*)>)?((?:\\[])*)");
 
     // using a map of types obviously doesn't handle subtyping
     private final Map<Type, Serializer<?>> converters = new WeakHashMap<>();
@@ -156,7 +160,7 @@ public class SerializerRegistrar {
             public TypedObject<?> fromXml(Element s) {
 
                 String typeStr = s.getAttribute("type");
-                Type type = PropertyUtils.parseType(typeStr);
+                Type type = parseType(typeStr);
                 if (type == null) {
                     throw new IllegalStateException("Unable to parse " + typeStr);
                 }
@@ -260,4 +264,42 @@ public class SerializerRegistrar {
         return INSTANCE;
     }
 
+    /**
+     * Parses a string into a type. Returns null if it doesn't succeed.
+     * Only supports parameterized types with at most one type argument.
+     * Doesn't support wildcard types.
+     *
+     * TODO make a real parser someday
+     */
+    private static Type parseType(String t) {
+        Matcher matcher = PARAM_TYPE_MATCHER.matcher(t.replaceAll("\\s+", ""));
+        if (matcher.matches()) {
+            String raw = matcher.group(1);
+            Type result;
+            try {
+                result = ClassUtils.getClass(raw);
+            } catch (ClassNotFoundException e) {
+                return null;
+            }
+
+            String param = matcher.group(3);
+            if (StringUtils.isNotBlank(param)) {
+                Type paramType = parseType(param);
+                if (paramType != null) {
+                    result = TypeUtils.parameterize((Class) result, paramType);
+                }
+            }
+
+            String arrayDims = matcher.group(4);
+            if (StringUtils.isNotBlank(arrayDims)) {
+                int dimensions = StringUtils.countMatches(arrayDims, '[');
+                while (dimensions-- > 0) {
+                    result = TypeUtils.genericArrayType(result);
+                }
+            }
+
+            return result;
+        }
+        return null;
+    }
 }
