@@ -14,10 +14,8 @@ import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewir
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.reactfx.value.Val;

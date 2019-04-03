@@ -39,8 +39,8 @@ public class SerializerRegistrarTest {
 
     @Test
     public void testListSerializer() {
-        roundTrip(new TypeLiteral<List<List<String>>>() {}, asList(asList("a", "b"), asList("c", "d")));
-        roundTrip(new TypeLiteral<List<List<String>>>() {}, emptyList());
+        roundTrip(new TypeLiteral<List<List<String>>>() { }, asList(asList("a", "b"), asList("c", "d")));
+        roundTrip(new TypeLiteral<List<List<String>>>() { }, emptyList());
     }
 
     @Test
@@ -51,15 +51,15 @@ public class SerializerRegistrarTest {
 
     @Test
     public void testWildcardSerializer() {
-        roundTrip(new TypeLiteral<List<? extends List<String>>>() {}, asList(emptyList(), asList("", "foo & <bar></bar>")));
-        roundTrip(new TypeLiteral<List<? extends List<String>>>() {}, emptyList());
+        roundTrip(new TypeLiteral<List<? extends List<String>>>() { }, asList(emptyList(), asList("", "foo & <bar></bar>")));
+        roundTrip(new TypeLiteral<List<? extends List<String>>>() { }, emptyList());
     }
 
     @Test
     public void testNullValue() {
         roundTrip(String.class, null);
-        roundTrip(new TypeLiteral<List<? extends List<String>>>() {}, null);
-        roundTrip(new TypeLiteral<List<? extends List<String>>>() {}, asList(null, asList(null, "")));
+        roundTrip(new TypeLiteral<List<? extends List<String>>>() { }, null);
+        roundTrip(new TypeLiteral<List<? extends List<String>>>() { }, asList(null, asList(null, "")));
     }
 
     @Test

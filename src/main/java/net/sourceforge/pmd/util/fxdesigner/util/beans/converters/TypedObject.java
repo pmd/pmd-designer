@@ -1,4 +1,4 @@
-/*
+/**
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
@@ -38,8 +38,8 @@ public class TypedObject<T> implements Typed<T> {
             return false;
         }
         TypedObject<?> that = (TypedObject<?>) o;
-        return Objects.equals(object, that.object) &&
-            Objects.equals(type, that.type);
+        return Objects.equals(object, that.object)
+            && Objects.equals(type, that.type);
     }
 
     @Override

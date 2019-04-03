@@ -145,7 +145,7 @@ public interface Serializer<T> {
             }
         }
 
-        return this.getClass().equals(MyDecorator.class) ? this : new MyDecorator();
+        return this.getClass().equals(MyDecorator.class) ? this : new MyDecorator(); // NOPMD
     }
 
 

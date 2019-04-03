@@ -1,4 +1,4 @@
-/*
+/**
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
@@ -51,9 +51,9 @@ public class SomeBean implements SettingsOwner {
             return false;
         }
         SomeBean someBean = (SomeBean) o;
-        return i == someBean.i &&
-            Objects.equals(str, someBean.str) &&
-            Objects.equals(k, someBean.k);
+        return i == someBean.i
+            && Objects.equals(str, someBean.str)
+            && Objects.equals(k, someBean.k);
     }
 
     @Override
@@ -63,10 +63,6 @@ public class SomeBean implements SettingsOwner {
 
     @Override
     public String toString() {
-        return "SomeBean{" +
-            "str='" + str + '\'' +
-            ", k=" + k +
-            ", i=" + i +
-            '}';
+        return "SomeBean{str='" + str + '\'' + ", k=" + k + ", i=" + i + '}';
     }
 }
