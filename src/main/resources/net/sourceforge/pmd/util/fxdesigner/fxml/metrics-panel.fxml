@@ -1,0 +1,23 @@
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.MetricResultListCell?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane stylesheets="@../css/designer.css"
+            xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="net.sourceforge.pmd.util.fxdesigner.MetricPaneController">
+    <ToolbarTitledPane
+            title="Metrics"
+            collapsible="false"
+            fx:id="metricsTitledPane"
+            AnchorPane.bottomAnchor="0.0"
+            AnchorPane.leftAnchor="0.0"
+            AnchorPane.rightAnchor="0.0"
+            AnchorPane.topAnchor="0.0">
+        <ListView fx:id="metricResultsListView">
+            <cellFactory>
+                <MetricResultListCell fx:factory="callback"/>
+            </cellFactory>
+        </ListView>
+    </ToolbarTitledPane>
+</AnchorPane>

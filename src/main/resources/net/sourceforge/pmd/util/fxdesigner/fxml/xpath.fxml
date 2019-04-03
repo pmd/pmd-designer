@@ -18,7 +18,7 @@
             prefHeight="180.0"
             prefWidth="1200.0"
             stylesheets="@../css/designer.css"
-            xmlns="http://javafx.com/javafx/8.0.172-ea"
+            xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="net.sourceforge.pmd.util.fxdesigner.XPathPanelController">
     <children>

@@ -6,7 +6,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
-<SplitPane dividerPositions="0.45274212368728123" prefHeight="300.0" prefWidth="859.0" stylesheets="@../css/designer.css" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+<SplitPane dividerPositions="0.45274212368728123" prefHeight="300.0" prefWidth="859.0" stylesheets="@../css/designer.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <items>
         <AnchorPane>
             <children>

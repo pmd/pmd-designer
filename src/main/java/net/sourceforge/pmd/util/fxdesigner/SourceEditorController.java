@@ -35,6 +35,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStream;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
@@ -138,6 +139,21 @@ public class SourceEditorController extends AbstractController {
 
     @Override
     protected void afterParentInit() {
+
+        // Bind global compilation unit to the main ast manager
+        Var<Node> globalCompilationUnit = getGlobalState().writableGlobalCompilationUnitProperty();
+
+        // veto null events to ignore null compilation units if they're
+        // followed by a valid one quickly
+        VetoableEventStream.vetoableFrom(
+            astManager.compilationUnitProperty().values(),
+            Objects::isNull,
+            (a, b) -> b != null,
+            (a, b) -> b,
+            Duration.ofMillis(500)
+        ).subscribe(globalCompilationUnit::setValue);
+
+
         rewire(astManager.languageVersionProperty(), languageVersionUIProperty);
         nodeEditionCodeArea.moveCaret(0, 0);
 
