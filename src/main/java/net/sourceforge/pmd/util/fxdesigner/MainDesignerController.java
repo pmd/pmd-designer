@@ -77,15 +77,24 @@ public class MainDesignerController extends AbstractController {
     private Tab xpathEditorTab;
     @FXML
     private SplitPane mainHorizontalSplitPane;
+    @FXML
+    private Tab metricResultsTab;
 
 
     /* Children */
     @FXML
-    private NodeInfoPanelController nodeInfoPanelController;
-    @FXML
     private XPathPanelController xpathPanelController;
     @FXML
     private SourceEditorController sourceEditorController;
+
+    @FXML
+    private NodeDetailPaneController nodeDetailsTabController;
+    @FXML
+    private MetricPaneController metricPaneController;
+    @FXML
+    private ScopesPanelController scopesPanelController;
+
+
     // we cache it but if it's not used the FXML is not created, etc
     private final SoftReferenceCache<EventLogController> eventLogController;
 
@@ -132,6 +141,10 @@ public class MainDesignerController extends AbstractController {
 
         getGlobalState().writeableGlobalLanguageVersionProperty().bind(sourceEditorController.languageVersionProperty());
 
+        metricPaneController.numAvailableMetrics().values().subscribe(n -> {
+            metricResultsTab.setText("Metrics\t(" + (n == 0 ? "none" : n) + ")");
+            metricResultsTab.setDisable(n == 0);
+        });
     }
 
 
@@ -246,7 +259,11 @@ public class MainDesignerController extends AbstractController {
 
     @Override
     public List<AbstractController> getChildren() {
-        return Arrays.asList(xpathPanelController, sourceEditorController, nodeInfoPanelController);
+        return Arrays.asList(xpathPanelController,
+                             sourceEditorController,
+                             nodeDetailsTabController,
+                             metricPaneController,
+                             scopesPanelController);
     }
 
 

@@ -225,6 +225,25 @@ public final class DesignerUtil {
     }
 
 
+    public static Callback<Class<?>, Object> controllerFactoryKnowing(Object... controllers) {
+        return type -> {
+
+            for (Object o : controllers) {
+                if (o.getClass().equals(type)) {
+                    return o;
+                }
+            }
+
+            // default behavior for controllerFactory:
+            try {
+                return type.newInstance();
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                throw new RuntimeException(exc); // fatal, just bail...
+            }
+        };
+    }
+
     /**
      * Attempts to retrieve the type of a java TypeNode reflectively.
      */

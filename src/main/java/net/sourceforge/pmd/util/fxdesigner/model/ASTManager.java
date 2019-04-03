@@ -5,11 +5,10 @@
 package net.sourceforge.pmd.util.fxdesigner.model;
 
 import java.io.StringReader;
-import java.time.Duration;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.LanguageRegistry;
@@ -21,7 +20,6 @@ import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
-import net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStream;
 
 
 /**
@@ -55,19 +53,6 @@ public class ASTManager implements ApplicationComponent {
 
     public ASTManager(DesignerRoot owner) {
         this.designerRoot = owner;
-        Var<Node> smoothCompilationUnit = getGlobalState().writableGlobalCompilationUnitProperty();
-
-        // veto null events to ignore null compilation units if they're
-        // followed by a valid one quickly
-        VetoableEventStream.vetoableFrom(
-            compilationUnit.values(),
-            Objects::isNull,
-            (a, b) -> b != null,
-            (a, b) -> b,
-            Duration.ofMillis(500)
-        ).subscribe(smoothCompilationUnit::setValue);
-
-
     }
 
 
@@ -96,6 +81,10 @@ public class ASTManager implements ApplicationComponent {
         return designerRoot;
     }
 
+
+    public Val<Node> compilationUnitProperty() {
+        return compilationUnit;
+    }
 
     /**
      * Refreshes the compilation unit given the current parameters of the model.

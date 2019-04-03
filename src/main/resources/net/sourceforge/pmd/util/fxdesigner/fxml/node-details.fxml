@@ -1,0 +1,33 @@
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane stylesheets="@../css/designer.css"
+            xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="net.sourceforge.pmd.util.fxdesigner.NodeDetailPaneController">
+    <ToolbarTitledPane
+            title="XPath Attributes"
+            collapsible="false"
+            AnchorPane.bottomAnchor="0.0"
+            AnchorPane.leftAnchor="0.0"
+            AnchorPane.rightAnchor="0.0"
+            AnchorPane.topAnchor="0.0">
+        <toolbarItems>
+            <ToggleButton fx:id="hideCommonAttributesToggle" selected="true" styleClass="icon-button"
+                          mnemonicParsing="false">
+                <tooltip>
+                    <Tooltip text="Hide common attributes"/>
+                </tooltip>
+                <graphic>
+                    <FontIcon iconLiteral="fas-eye-slash"/>
+                </graphic>
+            </ToggleButton>
+        </toolbarItems>
+
+        <ListView fx:id="xpathAttributesListView"/>
+
+    </ToolbarTitledPane>
+</AnchorPane>
