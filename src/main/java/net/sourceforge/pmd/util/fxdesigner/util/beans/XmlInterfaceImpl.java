@@ -4,25 +4,31 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.beans;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.lang3.ClassUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.PropertyValue;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.Serializer;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.SerializerRegistrar;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.TypedObject;
+
 
 /**
- * V0, really.
+ * Implementation of {@link XmlInterface}.
  *
  * @author Clément Fournier
  * @since 6.1.0
+ * @since 6.14.0 (V2, no beanutils)
  */
-public class XmlInterfaceVersion1 extends XmlInterface {
+public class XmlInterfaceImpl extends XmlInterface {
 
     private static final Logger LOGGER = Logger.getLogger(XmlInterface.class.getName());
 
@@ -31,13 +37,15 @@ public class XmlInterfaceVersion1 extends XmlInterface {
     private static final String SCHEMA_NODESEQ_ELEMENT = "nodeseq";
     private static final String SCHEMA_NODE_CLASS_ATTRIBUTE = "class";
     private static final String SCHEMA_PROPERTY_ELEMENT = "property";
-    private static final String SCHEMA_PROPERTY_NAME = "name";
-    private static final String SCHEMA_PROPERTY_TYPE = "type";
+    private static final String SCHEMA_PROPERTY_NAME = "property-name";
+    private static final String SCHEMA_PROPERTY_VALUE = "value";
 
 
-    public XmlInterfaceVersion1(int revisionNumber) {
+    XmlInterfaceImpl(int revisionNumber) {
         super(revisionNumber);
     }
+
+    private final Serializer<TypedObject<?>> serializer = SerializerRegistrar.getInstance().compositeSerializer();
 
 
     private List<Element> getChildrenByTagName(Element element, String tagName) {
@@ -88,20 +96,13 @@ public class XmlInterfaceVersion1 extends XmlInterface {
 
 
     private void parseSingleProperty(Element propertyElement, SimpleBeanModelNode owner) {
-        String typeName = propertyElement.getAttribute(SCHEMA_PROPERTY_TYPE);
         String name = propertyElement.getAttribute(SCHEMA_PROPERTY_NAME);
-        Class<?> type;
         try {
-            type = ClassUtils.getClass(typeName);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return;
+            TypedObject<?> value = serializer.fromXml(getChildrenByTagName(propertyElement, SCHEMA_PROPERTY_VALUE).get(0));
+            owner.addProperty(name, value.getObject(), value.getType());
+        } catch (Exception e) {
+            new RuntimeException(e).printStackTrace();
         }
-
-        ConvertUtils.convert(new Object());
-        Object value = ConvertUtils.convert(propertyElement.getTextContent(), type);
-
-        owner.addProperty(name, value, type);
     }
 
 
@@ -122,29 +123,34 @@ public class XmlInterfaceVersion1 extends XmlInterface {
 
     public static class DocumentMakerVisitor extends BeanNodeVisitor<Element> {
 
+        private final Serializer<TypedObject<?>> serializer = SerializerRegistrar.getInstance().compositeSerializer();
 
         @Override
         public void visit(SimpleBeanModelNode node, Element parent) {
             Element nodeElement = parent.getOwnerDocument().createElement(SCHEMA_NODE_ELEMENT);
             nodeElement.setAttribute(SCHEMA_NODE_CLASS_ATTRIBUTE, node.getNodeType().getCanonicalName());
 
-            for (Entry<String, Object> keyValue : node.getSettingsValues().entrySet()) {
-                // I don't think the API is intended to be used like that
-                // but ConvertUtils wouldn't use the convertToString methods
-                // defined in the converters otherwise.
-                // Even when a built-in converter is available, objects are
-                // still converted with Object::toString which fucks up the
-                // conversion...
-                String value = (String) ConvertUtils.lookup(keyValue.getValue().getClass()).convert(String.class, keyValue.getValue());
-                if (value == null) {
-                    continue;
-                }
+            Map<String, Type> settingsTypes = node.getSettingsTypes();
 
-                Element setting = parent.getOwnerDocument().createElement(SCHEMA_PROPERTY_ELEMENT);
-                setting.setAttribute(SCHEMA_PROPERTY_NAME, keyValue.getKey());
-                setting.setAttribute(SCHEMA_PROPERTY_TYPE, node.getSettingsTypes().get(keyValue.getKey()).getCanonicalName());
-                setting.appendChild(parent.getOwnerDocument().createCDATASection(value));
-                nodeElement.appendChild(setting);
+            for (Entry<String, Object> keyValue : node.getSettingsValues().entrySet()) {
+
+
+                try {
+
+                    TypedObject object = new PropertyValue(keyValue.getKey(),
+                                                           node.getNodeType().getName(),
+                                                           keyValue.getValue(),
+                                                           settingsTypes.get(keyValue.getKey()));
+
+                    Element valueElt = serializer.toXml(object, () -> parent.getOwnerDocument().createElement(SCHEMA_PROPERTY_VALUE));
+                    Element propertyElement = parent.getOwnerDocument().createElement(SCHEMA_PROPERTY_ELEMENT);
+                    propertyElement.setAttribute(SCHEMA_PROPERTY_NAME, keyValue.getKey());
+                    propertyElement.appendChild(valueElt);
+                    nodeElement.appendChild(propertyElement);
+                } catch (Exception e) {
+                    // print it, but don't throw it
+                    new RuntimeException(e).printStackTrace();
+                }
             }
 
             parent.appendChild(nodeElement);

@@ -22,7 +22,7 @@ import javafx.application.Application.Parameters;
 public final class DesignerParams {
 
     private static final Path PMD_SETTINGS_DIR = Paths.get(System.getProperty("user.home"), ".pmd");
-    private static final File DEFAULT_SETTINGS_FILE = PMD_SETTINGS_DIR.resolve("designer.xml").toFile();
+    private static final File DEFAULT_SETTINGS_FILE = PMD_SETTINGS_DIR.resolve("designer-6.14.0.xml").toFile();
 
 
     private static final String SETTINGS_INPUT = "load-from";

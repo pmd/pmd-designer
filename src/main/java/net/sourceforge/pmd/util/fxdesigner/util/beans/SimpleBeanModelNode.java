@@ -4,6 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.beans;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class SimpleBeanModelNode extends BeanModelNode {
     private final Class<?> nodeType;
 
     private final Map<String, Object> propertyValues = new HashMap<>();
-    private final Map<String, Class<?>> propertyTypes = new HashMap<>();
+    private final Map<String, Type> propertyTypes = new HashMap<>();
     private final Map<Class<?>, BeanModelNode> children = new HashMap<>();
     private final Set<BeanModelNodeSeq<?>> sequenceProperties = new HashSet<>();
 
@@ -51,7 +52,7 @@ public class SimpleBeanModelNode extends BeanModelNode {
      * @param value       Value
      * @param type        Type of the property
      */
-    public void addProperty(String propertyKey, Object value, Class<?> type) {
+    public void addProperty(String propertyKey, Object value, Type type) {
         propertyValues.put(propertyKey, value);
         propertyTypes.put(propertyKey, type);
     }
@@ -84,7 +85,7 @@ public class SimpleBeanModelNode extends BeanModelNode {
 
 
     /** Returns a map of property names to their type. */
-    public Map<String, Class<?>> getSettingsTypes() {
+    public Map<String, Type> getSettingsTypes() {
         return Collections.unmodifiableMap(propertyTypes);
     }
 

@@ -14,10 +14,8 @@ import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewir
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.reactfx.value.Val;
@@ -261,14 +259,13 @@ public class SourceEditorController extends AbstractController {
 
 
     @PersistentProperty
-    public String getAuxclasspathFiles() {
-        return auxclasspathFiles.getValue().stream().map(File::getAbsolutePath).collect(Collectors.joining(File.pathSeparator));
+    public List<File> getAuxclasspathFiles() {
+        return auxclasspathFiles.getValue();
     }
 
 
-    public void setAuxclasspathFiles(String files) {
-        List<File> newVal = Arrays.stream(files.split(File.pathSeparator)).map(File::new).collect(Collectors.toList());
-        auxclasspathFiles.setValue(newVal);
+    public void setAuxclasspathFiles(List<File> files) {
+        auxclasspathFiles.setValue(files);
     }
 
 
