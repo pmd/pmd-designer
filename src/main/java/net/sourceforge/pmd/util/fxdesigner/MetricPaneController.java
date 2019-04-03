@@ -24,7 +24,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Tab;
 
 
 /**
@@ -54,7 +53,7 @@ public class MetricPaneController extends AbstractController implements NodeSele
     protected void beforeParentInit() {
         initNodeSelectionHandling(getDesignerRoot(), EventStreams.never(), false);
 
-        metricsTitledPane.titleProperty().bind(numAvailableMetrics().map(i-> "Metrics\t(" + (i == 0 ? "none" : i) + " available)"));
+        metricsTitledPane.titleProperty().bind(numAvailableMetrics().map(i -> "Metrics\t(" + (i == 0 ? "none" : i) + " available)"));
 
     }
 
