@@ -9,10 +9,12 @@ import static java.util.Collections.emptySet;
 import java.util.Set;
 
 import org.reactfx.EventStream;
+import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.XPathPanelController;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 
 /**
@@ -46,12 +48,14 @@ public interface NodeSelectionSource extends ApplicationComponent {
      *                              For now some must, because they aggregate several selection sources (the {@link net.sourceforge.pmd.util.fxdesigner.NodeInfoPanelController}).
      *                              Splitting it into separate controls will remove the need for that.
      */
-    default void initNodeSelectionHandling(DesignerRoot root,
-                                           EventStream<? extends NodeSelectionEvent> mySelectionEvents,
-                                           boolean alwaysHandleSelection) {
+    default Val<Node> initNodeSelectionHandling(DesignerRoot root,
+                                                EventStream<? extends NodeSelectionEvent> mySelectionEvents,
+                                                boolean alwaysHandleSelection) {
         MessageChannel<NodeSelectionEvent> channel = root.getService(DesignerRoot.NODE_SELECTION_CHANNEL);
         mySelectionEvents.subscribe(n -> channel.pushEvent(this, n));
-        channel.messageStream(alwaysHandleSelection, this).subscribe(evt -> setFocusNode(evt.selected, evt.options));
+        EventStream<NodeSelectionEvent> selection = channel.messageStream(alwaysHandleSelection, this);
+        selection.subscribe(evt -> setFocusNode(evt.selected, evt.options));
+        return ReactfxUtil.latestValue(selection.map(it -> it.selected));
     }
 
 

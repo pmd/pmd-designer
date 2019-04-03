@@ -7,15 +7,12 @@ package net.sourceforge.pmd.util.fxdesigner.util.beans;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-
-import org.apache.commons.beanutils.PropertyUtils;
 
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 
@@ -45,15 +42,17 @@ public class RestorePropertyVisitor extends BeanNodeVisitor<SettingsOwner> {
                                                        + model.getNodeType() + ", actual " + target.getClass());
         }
 
-        Map<String, PropertyDescriptor> descriptors = Arrays.stream(PropertyUtils.getPropertyDescriptors(target))
-                                                            .filter(d -> d.getReadMethod() != null && d.getReadMethod().isAnnotationPresent(PersistentProperty.class))
-                                                            .collect(Collectors.toMap(PropertyDescriptor::getName, d -> d));
+        Map<String, PropertyDescriptor> descriptors = PropertyUtils.getPropertyDescriptors(target)
+                                                                   .values().stream()
+                                                                   .filter(d -> d.getReadMethod() != null
+                                                                       && d.getReadMethod().isAnnotationPresent(PersistentProperty.class))
+                                                                   .collect(Collectors.toMap(PropertyDescriptor::getName, d -> d));
 
         for (Entry<String, Object> saved : model.getSettingsValues().entrySet()) {
             if (descriptors.containsKey(saved.getKey())) {
                 try {
                     PropertyUtils.setProperty(target, saved.getKey(), saved.getValue());
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                } catch (IllegalAccessException | InvocationTargetException e) {
                     System.err.println("Error setting property " + saved.getKey() + " on a " + target.getClass().getSimpleName());
                     e.printStackTrace();
                 }
@@ -88,7 +87,7 @@ public class RestorePropertyVisitor extends BeanNodeVisitor<SettingsOwner> {
             @SuppressWarnings("unchecked")
             Collection<SettingsOwner> tmp = (Collection<SettingsOwner>) PropertyUtils.getProperty(target, model.getPropertyName());
             container = tmp;
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             return;
         }
@@ -122,10 +121,6 @@ public class RestorePropertyVisitor extends BeanNodeVisitor<SettingsOwner> {
 
         container.addAll(itemsToAdd);
 
-        try {
-            PropertyUtils.setProperty(target, model.getPropertyName(), container);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+        // we modified the collection in-place, no need to set the property
     }
 }

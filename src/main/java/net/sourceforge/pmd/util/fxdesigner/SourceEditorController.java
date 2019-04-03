@@ -14,10 +14,8 @@ import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewir
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.reactfx.value.Val;
@@ -37,6 +35,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStream;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
@@ -140,6 +139,21 @@ public class SourceEditorController extends AbstractController {
 
     @Override
     protected void afterParentInit() {
+
+        // Bind global compilation unit to the main ast manager
+        Var<Node> globalCompilationUnit = getGlobalState().writableGlobalCompilationUnitProperty();
+
+        // veto null events to ignore null compilation units if they're
+        // followed by a valid one quickly
+        VetoableEventStream.vetoableFrom(
+            astManager.compilationUnitProperty().values(),
+            Objects::isNull,
+            (a, b) -> b != null,
+            (a, b) -> b,
+            Duration.ofMillis(500)
+        ).subscribe(globalCompilationUnit::setValue);
+
+
         rewire(astManager.languageVersionProperty(), languageVersionUIProperty);
         nodeEditionCodeArea.moveCaret(0, 0);
 
@@ -245,14 +259,13 @@ public class SourceEditorController extends AbstractController {
 
 
     @PersistentProperty
-    public String getAuxclasspathFiles() {
-        return auxclasspathFiles.getValue().stream().map(File::getAbsolutePath).collect(Collectors.joining(File.pathSeparator));
+    public List<File> getAuxclasspathFiles() {
+        return auxclasspathFiles.getValue();
     }
 
 
-    public void setAuxclasspathFiles(String files) {
-        List<File> newVal = Arrays.stream(files.split(File.pathSeparator)).map(File::new).collect(Collectors.toList());
-        auxclasspathFiles.setValue(newVal);
+    public void setAuxclasspathFiles(List<File> files) {
+        auxclasspathFiles.setValue(files);
     }
 
 

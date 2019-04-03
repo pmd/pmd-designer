@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.reactfx.Subscription;
@@ -77,15 +76,24 @@ public class MainDesignerController extends AbstractController {
     private Tab xpathEditorTab;
     @FXML
     private SplitPane mainHorizontalSplitPane;
+    @FXML
+    private Tab metricResultsTab;
 
 
     /* Children */
     @FXML
-    private NodeInfoPanelController nodeInfoPanelController;
-    @FXML
     private XPathPanelController xpathPanelController;
     @FXML
     private SourceEditorController sourceEditorController;
+
+    @FXML
+    private NodeDetailPaneController nodeDetailsTabController;
+    @FXML
+    private MetricPaneController metricPaneController;
+    @FXML
+    private ScopesPanelController scopesPanelController;
+
+
     // we cache it but if it's not used the FXML is not created, etc
     private final SoftReferenceCache<EventLogController> eventLogController;
 
@@ -132,6 +140,10 @@ public class MainDesignerController extends AbstractController {
 
         getGlobalState().writeableGlobalLanguageVersionProperty().bind(sourceEditorController.languageVersionProperty());
 
+        metricPaneController.numAvailableMetrics().values().subscribe(n -> {
+            metricResultsTab.setText("Metrics\t(" + (n == 0 ? "none" : n) + ")");
+            metricResultsTab.setDisable(n == 0);
+        });
     }
 
 
@@ -203,13 +215,13 @@ public class MainDesignerController extends AbstractController {
 
 
     @PersistentProperty
-    public String getRecentFiles() {
-        return recentFiles.stream().map(File::getAbsolutePath).collect(Collectors.joining(File.pathSeparator));
+    public List<File> getRecentFiles() {
+        return recentFiles;
     }
 
 
-    public void setRecentFiles(String files) {
-        Arrays.stream(files.split(File.pathSeparator)).map(File::new).forEach(recentFiles::push);
+    public void setRecentFiles(List<File> files) {
+        files.forEach(recentFiles::push);
     }
 
 
@@ -240,7 +252,11 @@ public class MainDesignerController extends AbstractController {
 
     @Override
     public List<AbstractController> getChildren() {
-        return Arrays.asList(xpathPanelController, sourceEditorController, nodeInfoPanelController);
+        return Arrays.asList(xpathPanelController,
+                             sourceEditorController,
+                             nodeDetailsTabController,
+                             metricPaneController,
+                             scopesPanelController);
     }
 
 

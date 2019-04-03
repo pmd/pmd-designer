@@ -64,9 +64,6 @@ public class Designer extends Application {
         FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("designer.fxml"));
 
         MainDesignerController mainController = new MainDesignerController(owner);
-        NodeInfoPanelController nodeInfoPanelController = new NodeInfoPanelController(owner);
-        XPathPanelController xpathPanelController = new XPathPanelController(owner);
-        SourceEditorController sourceEditorController = new SourceEditorController(owner);
 
         loader.setBuilderFactory(type -> {
 
@@ -84,10 +81,14 @@ public class Designer extends Application {
             }
         });
 
-        loader.setControllerFactory(controllerFactoryKnowing(mainController,
-                                                             nodeInfoPanelController,
-                                                             xpathPanelController,
-                                                             sourceEditorController));
+        loader.setControllerFactory(DesignerUtil.controllerFactoryKnowing(
+            mainController,
+            new MetricPaneController(owner),
+            new ScopesPanelController(owner),
+            new NodeDetailPaneController(owner),
+            new XPathPanelController(owner),
+            new SourceEditorController(owner)
+        ));
 
         stage.setOnCloseRequest(e -> {
             owner.getService(DesignerRoot.PERSISTENCE_MANAGER).persistSettings(mainController);

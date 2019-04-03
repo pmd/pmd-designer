@@ -4,26 +4,6 @@
 [![Maven Central](https://img.shields.io/maven-central/v/net.sourceforge.pmd/pmd-ui.svg)](https://maven-badges.herokuapp.com/maven-central/net.sourceforge.pmd/pmd-ui)
 [![Join the chat at https://gitter.im/pmd/pmd-designer](https://badges.gitter.im/pmd/pmd-designer.svg)](https://gitter.im/pmd/pmd-designer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-WIP: the designer is being moved from [pmd/pmd/pmd-ui](https://github.com/pmd/pmd/tree/master/pmd-ui) to this repository. 
-
-## TODOs
-
-* Review release procedure: short howto (locally mvn release:prepare, travis will deploy the tag)
-
-* Move [open issues](https://github.com/pmd/pmd/labels/in%3Aui)
-  * Close the designer project on pmd/pmd
-
-* Delete the pmd-ui directory from the main repo (PR pending)
-
-* Update release_procedure/do_release.sh
-  * Before releasing PMD, we need to check and update the pmd-ui/designer
-    dependency to the latest release, so that the latest version is included
-    in the binary distribution.
-
----------------
----------------
-
-# PMD Rule Designer
 
 
 The Rule Designer is a graphical tool that helps PMD users develop their custom
@@ -89,4 +69,8 @@ ignored resource directory so that the integrated SceneBuilder picks up on them.
 
 ##### Eclipse
 
-TODO
+1.  Clone the repository
+2.  Open eclipse, Choose "File, Import, Existing Maven Projects"
+3.  Right click on the project, select "Run as, Maven build...", enter `process-resources` as goal. Run it.
+    This generates the CSS resources.
+4.  Open class `net.sourceforge.pmd.util.fxdesigner.DesignerStarter`. Choose "Run as Java Application".
