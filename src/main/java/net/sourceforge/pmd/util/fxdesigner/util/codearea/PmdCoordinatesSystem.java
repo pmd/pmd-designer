@@ -4,15 +4,14 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.codearea;
 
-import java.util.Collection;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.TwoDimensional.Bias;
 import org.fxmisc.richtext.model.TwoDimensional.Position;
 
@@ -27,7 +26,6 @@ import net.sourceforge.pmd.lang.ast.Node;
  * @author Clément Fournier
  */
 public final class PmdCoordinatesSystem {
-    private static final Pattern TAB_INDENT = Pattern.compile("^(\t*).*$");
 
 
     private PmdCoordinatesSystem() {
@@ -37,6 +35,7 @@ public final class PmdCoordinatesSystem {
     public static int getRtfxParIndexFromPmdLine(int line) {
         return line - 1;
     }
+
 
     public static int getPmdLineFromRtfxParIndex(int line) {
         return line + 1;
@@ -49,11 +48,10 @@ public final class PmdCoordinatesSystem {
      */
     public static TextPos2D getPmdLineAndColumnFromOffset(CodeArea codeArea, int absoluteOffset) {
 
-        Position pos = codeArea.offsetToPosition(absoluteOffset, Bias.Backward);
-        int indentationOffset = indentationOffset(codeArea, pos.getMajor());
+        Position pos = codeArea.offsetToPosition(absoluteOffset, Bias.Forward);
 
         return new TextPos2D(getPmdLineFromRtfxParIndex(pos.getMajor()),
-                             pos.getMinor() + indentationOffset + 1);
+                             getPmdColumnIndexFromRtfxColumn(codeArea, pos.getMajor(), pos.getMinor()));
     }
 
 
@@ -64,21 +62,43 @@ public final class PmdCoordinatesSystem {
      * CodeArea counts a tab as 1 column width but displays it as 8 columns width.
      * PMD counts it correctly as 8 columns, so the position must be offset.
      *
-     * Also, PMD lines start at 1 but paragraph nums start at 0 in the code area.
+     * Also, PMD lines start at 1 but paragraph nums start at 0 in the code area,
+     * same for columns.
      */
     public static int getOffsetFromPmdPosition(CodeArea codeArea, int line, int column) {
-        return codeArea.getAbsolutePosition(getRtfxParIndexFromPmdLine(line), column)
-            - indentationOffset(codeArea, line - 1);
+        int parIdx = getRtfxParIndexFromPmdLine(line);
+        int raw = codeArea.getAbsolutePosition(parIdx, getRtfxColumnIndexFromPmdColumn(codeArea, parIdx, column));
+        return clip(raw, 0, codeArea.getLength() - 1);
     }
 
 
-    private static int indentationOffset(CodeArea codeArea, int paragraph) {
-        Paragraph<Collection<String>, String, Collection<String>> p = codeArea.getParagraph(paragraph);
-        Matcher m = TAB_INDENT.matcher(p.getText());
-        if (m.matches()) {
-            return m.group(1).length() * 7;
+    private static int getRtfxColumnIndexFromPmdColumn(CodeArea codeArea, int parIdx, int column) {
+        String parTxt = codeArea.getParagraph(parIdx).getText();
+        int end = column - 1;
+        for (int i = 0; i < end && end > 0; i++) {
+            char c = parTxt.charAt(i);
+            if (c == '\t') {
+                end = max(end - 7, 0);
+            }
         }
-        return 0;
+        return end;
+    }
+
+    private static int getPmdColumnIndexFromRtfxColumn(CodeArea codeArea, int parIdx, int rtfxCol) {
+        String parTxt = codeArea.getParagraph(parIdx).getText();
+        int mapped = rtfxCol;
+        for (int i = 0; i < rtfxCol && i < parTxt.length(); i++) {
+            char c = parTxt.charAt(i);
+            if (c == '\t') {
+                mapped += 7;
+            }
+        }
+        return mapped + 1;
+    }
+
+
+    private static int clip(int val, int min, int max) {
+        return max(min, min(val, max));
     }
 
 
@@ -191,6 +211,10 @@ public final class PmdCoordinatesSystem {
                 && column == that.column;
         }
 
+        @Override
+        public String toString() {
+            return "(" + line + ", " + column + ')';
+        }
 
         @Override
         public int compareTo(TextPos2D o) {
