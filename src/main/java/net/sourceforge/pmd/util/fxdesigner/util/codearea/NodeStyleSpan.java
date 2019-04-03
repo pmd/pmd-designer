@@ -50,8 +50,8 @@ class NodeStyleSpan {
     // I originally wrote it like that because I didn't think enough about it,
     // and I don't have time to simplify it before 6.5.0
     public PositionSnapshot snapshot() {
-        int lastKnownStart = getAbsolutePosition(node.getBeginLine(), node.getBeginColumn() - 1);
-        int lastKnownEnd = getAbsolutePosition(node.getEndLine(), node.getEndColumn());
+        int lastKnownStart = getAbsolutePosition(node.getBeginLine(), node.getBeginColumn());
+        int lastKnownEnd = getAbsolutePosition(node.getEndLine(), node.getEndColumn()) + 1; // exclusive
         return new PositionSnapshot(lastKnownStart, lastKnownEnd);
     }
 
