@@ -12,3 +12,5 @@ node to which it corresponds:
 
 * When you have selected a node and start editing the code again, your selection
 should be preserved in most cases (on a best-effort basis) instead of reset.
+
+* Improved the XPath export wizard
