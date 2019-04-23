@@ -42,7 +42,8 @@ TODO put usage doc on the main website
 
 * Clone the repository
 * Run `./mvnw clean verify`
-* The artifact can then be found in the `target` directory
+* The artifact can then be found in the `target` directory (it won't include PMD
+ dependencies)
 
 #### IDE Setup
 

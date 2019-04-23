@@ -23,6 +23,7 @@ import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.popups.EventLogController;
+import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
 import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LimitedSizeStack;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
@@ -37,7 +38,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 
@@ -46,10 +46,6 @@ import javafx.stage.FileChooser;
  * Main controller of the app. Mediator for subdivisions of the UI.
  *
  * @author Clément Fournier
- * @see NodeInfoPanelController
- * @see SourceEditorController
- * @see EventLogController
- * @see XPathPanelController
  * @since 6.0.0
  */
 @SuppressWarnings("PMD.UnusedPrivateField")
@@ -58,11 +54,15 @@ public class MainDesignerController extends AbstractController {
 
     /* Menu bar */
     @FXML
+    private MenuItem aboutMenuItem;
+    @FXML
     private MenuItem setupAuxclasspathMenuItem;
     @FXML
     public MenuItem openEventLogMenuItem;
     @FXML
     private MenuItem openFileMenuItem;
+    @FXML
+    private MenuItem saveMenuItem;
     @FXML
     private MenuItem licenseMenuItem;
     @FXML
@@ -71,10 +71,6 @@ public class MainDesignerController extends AbstractController {
     private Menu fileMenu;
     /* Bottom panel */
     @FXML
-    private TabPane bottomTabPane;
-    @FXML
-    private Tab xpathEditorTab;
-    @FXML
     private SplitPane mainHorizontalSplitPane;
     @FXML
     private Tab metricResultsTab;
@@ -82,7 +78,7 @@ public class MainDesignerController extends AbstractController {
 
     /* Children */
     @FXML
-    private XPathPanelController xpathPanelController;
+    private RuleEditorsController ruleEditorsController;
     @FXML
     private SourceEditorController sourceEditorController;
 
@@ -116,7 +112,9 @@ public class MainDesignerController extends AbstractController {
         openFileMenuItem.setOnAction(e -> onOpenFileClicked());
         openRecentMenu.setOnAction(e -> updateRecentFilesMenu());
         openRecentMenu.setOnShowing(e -> updateRecentFilesMenu());
+        saveMenuItem.setOnAction(e -> getService(DesignerRoot.PERSISTENCE_MANAGER).persistSettings(this));
         fileMenu.setOnShowing(e -> onFileMenuShowing());
+        aboutMenuItem.setOnAction(e -> SimplePopups.showAboutPopup(getDesignerRoot()));
 
         setupAuxclasspathMenuItem.setOnAction(e -> sourceEditorController.showAuxclasspathSetupPopup());
 
@@ -136,9 +134,7 @@ public class MainDesignerController extends AbstractController {
     protected void afterChildrenInit() {
         updateRecentFilesMenu();
 
-        sourceEditorController.currentRuleResultsProperty().bind(xpathPanelController.currentResultsProperty());
-
-        getGlobalState().writeableGlobalLanguageVersionProperty().bind(sourceEditorController.languageVersionProperty());
+        sourceEditorController.currentRuleResultsProperty().bind(ruleEditorsController.currentRuleResults());
 
         metricPaneController.numAvailableMetrics().values().subscribe(n -> {
             metricResultsTab.setText("Metrics\t(" + (n == 0 ? "none" : n) + ")");
@@ -237,27 +233,15 @@ public class MainDesignerController extends AbstractController {
     }
 
 
-    @PersistentProperty
-    public int getBottomTabIndex() {
-        return bottomTabPane.getSelectionModel().getSelectedIndex();
-    }
-
-
-    public void setBottomTabIndex(int i) {
-        if (i >= 0 && i < bottomTabPane.getTabs().size()) {
-            bottomTabPane.getSelectionModel().select(i);
-        }
-    }
-
-
     @Override
     public List<AbstractController> getChildren() {
-        return Arrays.asList(xpathPanelController,
+        return Arrays.asList(ruleEditorsController,
                              sourceEditorController,
                              nodeDetailsTabController,
                              metricPaneController,
                              scopesPanelController);
     }
+
 
 
     @Override

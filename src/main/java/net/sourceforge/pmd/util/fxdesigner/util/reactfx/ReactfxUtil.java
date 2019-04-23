@@ -15,6 +15,8 @@ import java.util.function.Function;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
+import org.reactfx.util.FxTimer;
+import org.reactfx.util.Timer;
 import org.reactfx.value.Val;
 import org.reactfx.value.ValBase;
 import org.reactfx.value.Var;
@@ -34,6 +36,16 @@ public final class ReactfxUtil {
 
     private ReactfxUtil() {
 
+    }
+
+
+    static Function<Runnable, Timer> defaultTimerFactory(Duration duration) {
+        return action -> FxTimer.create(duration, action);
+    }
+
+
+    public static <I> EventStream<I> distinctBetween(EventStream<I> input, Duration duration) {
+        return DistinctBetweenStream.distinctBetween(input, ReactfxUtil.defaultTimerFactory(duration));
     }
 
     /**
@@ -66,6 +78,10 @@ public final class ReactfxUtil {
      */
     public static Val<Boolean> vetoableYes(Val<Boolean> base, Duration vetoPeriod) {
         return latestValue(VetoableEventStream.vetoableYes(base.values(), vetoPeriod)).orElseConst(false);
+    }
+
+    public static <T> Val<T> vetoableNull(Val<T> base, Duration duration) {
+        return latestValue(VetoableEventStream.vetoableNull(base.values(), duration));
     }
 
     /** Like the other overload, using the setter of the ui property. */
@@ -120,7 +136,7 @@ public final class ReactfxUtil {
                     }
                 }
                 pending.add(t);
-
+                source.push(t);
                 return pending;
             },
             duration
@@ -131,6 +147,6 @@ public final class ReactfxUtil {
                  }
              });
 
-        return source;
+        return source.distinct();
     }
 }

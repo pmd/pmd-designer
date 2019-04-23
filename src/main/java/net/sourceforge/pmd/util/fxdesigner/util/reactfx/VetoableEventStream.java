@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner.util.reactfx;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -14,7 +15,6 @@ import org.reactfx.AwaitingEventStream;
 import org.reactfx.EventStream;
 import org.reactfx.EventStreamBase;
 import org.reactfx.Subscription;
-import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
 import org.reactfx.value.Val;
 
@@ -146,9 +146,7 @@ public final class VetoableEventStream<I> extends EventStreamBase<I> implements 
                                                           BiPredicate<I, I> isVeto,
                                                           BiFunction<I, I, I> vetoableReduction,
                                                           Duration vetoPeriod) {
-
-        Function<Runnable, Timer> timerFactory = action -> FxTimer.create(vetoPeriod, action);
-        return vetoableFrom(input, isVetoable, isVeto, vetoableReduction, timerFactory);
+        return vetoableFrom(input, isVetoable, isVeto, vetoableReduction, ReactfxUtil.defaultTimerFactory(vetoPeriod));
     }
 
     /**
@@ -156,5 +154,9 @@ public final class VetoableEventStream<I> extends EventStreamBase<I> implements 
      */
     public static AwaitingEventStream<Boolean> vetoableYes(EventStream<Boolean> input, Duration vetoPeriod) {
         return vetoableFrom(input, b -> b, (a, b) -> !b, (a, b) -> b, vetoPeriod);
+    }
+
+    public static <T> AwaitingEventStream<T> vetoableNull(EventStream<T> input, Duration vetoPeriod) {
+        return vetoableFrom(input, Objects::isNull, (a, b) -> b != null, (a, b) -> null, vetoPeriod);
     }
 }

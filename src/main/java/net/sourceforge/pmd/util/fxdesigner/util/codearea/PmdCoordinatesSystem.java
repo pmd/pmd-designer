@@ -6,6 +6,8 @@ package net.sourceforge.pmd.util.fxdesigner.util.codearea;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static net.sourceforge.pmd.util.fxdesigner.util.AstTraversalUtil.parentIterator;
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.toIterable;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -152,6 +154,34 @@ public final class PmdCoordinatesSystem {
         return null;  // key not found
     }
 
+    /**
+     * Returns the innermost node that covers the entire given text range
+     * in the given tree.
+     *
+     * @param root  Root of the tree
+     * @param range Range to find
+     * @param exact If true, will return the *outermost* node whose range
+     *              is *exactly* the given text range, otherwise it may be larger.
+     */
+    public static Optional<Node> findNodeCovering(Node root, TextRange range, boolean exact) {
+        return findNodeAt(root, range.startPos).map(innermost -> {
+            for (Node parent : toIterable(parentIterator(innermost, true))) {
+                TextRange parentRange = rangeOf(parent);
+                if (!exact && parentRange.contains(range)) {
+                    return parent;
+                } else if (exact && parentRange.equals(range)) {
+                    // previously this used node streams to get the highest node
+                    // on a single child path
+                    return parent;
+                } else if (exact && parentRange.contains(range)) {
+                    // if it isn't the same, then we can't find better so better stop looking
+                    return null;
+                }
+            }
+            return null;
+        });
+    }
+
 
     /**
      * Returns true if the given node contains the position.
@@ -168,6 +198,54 @@ public final class PmdCoordinatesSystem {
 
     public static TextPos2D endPosition(Node node) {
         return new TextPos2D(node.getEndLine(), node.getEndColumn());
+    }
+
+    public static TextRange rangeOf(Node node) {
+        return new TextRange(startPosition(node), endPosition(node));
+    }
+
+
+    public static final class TextRange {
+
+        public final TextPos2D startPos;
+        public final TextPos2D endPos;
+
+
+        public TextRange(TextPos2D startPos, TextPos2D endPos) {
+            this.startPos = startPos;
+            this.endPos = endPos;
+        }
+
+        public boolean contains(TextRange range) {
+            return startPos.compareTo(range.startPos) <= 0 && endPos.compareTo(range.endPos) >= 0;
+        }
+
+        public boolean contains(TextPos2D pos) {
+            return startPos.compareTo(pos) <= 0 && endPos.compareTo(pos) >= 0;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            TextRange textRange = (TextRange) o;
+            return startPos.equals(textRange.startPos)
+                && endPos.equals(textRange.endPos);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(startPos, endPos);
+        }
+
+        @Override
+        public String toString() {
+            return "[" + startPos + ", " + endPos + ']';
+        }
     }
 
 

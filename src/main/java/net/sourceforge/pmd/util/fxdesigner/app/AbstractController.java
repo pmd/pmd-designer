@@ -86,7 +86,7 @@ public abstract class AbstractController implements Initializable, SettingsOwner
      * This also means, after persistent settings restoration. If this node has no
      * parent, then this is never executed.
      */
-    protected void afterParentInit() {
+    public void afterParentInit() {
         // by default do nothing
     }
 
@@ -98,6 +98,17 @@ public abstract class AbstractController implements Initializable, SettingsOwner
      */
     protected void afterChildrenInit() {
         // by default do nothing
+    }
+
+
+    /**
+     * Standard shutdown procedure. Override but call super.shutdown()
+     * to shutdown children recursively.
+     */
+    public void shutdown() {
+        for (AbstractController child : getChildren()) {
+            child.shutdown();
+        }
     }
 
 

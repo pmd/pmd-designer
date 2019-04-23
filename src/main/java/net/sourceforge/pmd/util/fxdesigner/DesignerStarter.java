@@ -6,6 +6,8 @@ package net.sourceforge.pmd.util.fxdesigner;
 
 import javax.swing.JOptionPane;
 
+import javafx.application.Application;
+
 /**
  * Main class of the app, checking for prerequisites to launching {@link Designer}.
  */
@@ -25,6 +27,7 @@ public final class DesignerStarter {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidCatchingThrowable")
     public static void main(String[] args) {
         if (!isJavaFxAvailable()) {
             System.err.println(MISSING_JAVAFX);
@@ -32,6 +35,13 @@ public final class DesignerStarter {
             System.exit(1);
         }
 
-        Designer.main(args);
+
+
+        try {
+            Application.launch(Designer.class, args);
+        } catch (Throwable unrecoverable) {
+            unrecoverable.printStackTrace();
+            System.exit(1);
+        }
     }
 }

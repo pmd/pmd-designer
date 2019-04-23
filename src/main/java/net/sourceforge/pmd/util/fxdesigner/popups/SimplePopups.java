@@ -6,8 +6,15 @@ package net.sourceforge.pmd.util.fxdesigner.popups;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+
+import net.sourceforge.pmd.PMDVersion;
+import net.sourceforge.pmd.lang.Language;
+import net.sourceforge.pmd.util.fxdesigner.Designer;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -39,6 +46,29 @@ public final class SimplePopups {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        licenseAlert.getDialogPane().setContent(scroll);
+        licenseAlert.showAndWait();
+    }
+
+    public static void showAboutPopup(DesignerRoot root) {
+        Alert licenseAlert = new Alert(AlertType.INFORMATION);
+        licenseAlert.setWidth(500);
+        licenseAlert.setHeaderText("About");
+
+        ScrollPane scroll = new ScrollPane();
+        TextArea textArea = new TextArea();
+
+        String sb = "PMD core version: " + PMDVersion.VERSION + "\n"
+            + "Available languages: "
+            + LanguageRegistryUtil.getSupportedLanguages().map(Language::getTerseName).collect(Collectors.toList())
+            + "\n"
+            + "Designer version: " + Designer.VERSION + "\n"
+            + "Designer settings dir: " + root.getService(DesignerRoot.DISK_MANAGER).getSettingsDirectory()
+            + "\n";
+
+        textArea.setText(sb);
+        scroll.setContent(textArea);
 
         licenseAlert.getDialogPane().setContent(scroll);
         licenseAlert.showAndWait();

@@ -28,6 +28,6 @@ public final class AppServiceDescriptor<T> {
 
     @Override
     public String toString() {
-        return type.toString();
+        return type.getSimpleName();
     }
 }

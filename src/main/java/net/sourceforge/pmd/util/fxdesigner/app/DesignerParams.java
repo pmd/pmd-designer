@@ -2,9 +2,8 @@
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
-package net.sourceforge.pmd.util.fxdesigner;
+package net.sourceforge.pmd.util.fxdesigner.app;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -22,16 +21,15 @@ import javafx.application.Application.Parameters;
 public final class DesignerParams {
 
     private static final Path PMD_SETTINGS_DIR = Paths.get(System.getProperty("user.home"), ".pmd");
-    private static final File DEFAULT_SETTINGS_FILE = PMD_SETTINGS_DIR.resolve("designer-6.14.0.xml").toFile();
-
+    private static final Path THIS_DESIGNER_SETTINGS_DIR = PMD_SETTINGS_DIR.resolve("rule-designer");
 
     private static final String SETTINGS_INPUT = "load-from";
     private static final String SETTINGS_OUTPUT = "persist-to";
 
 
     private boolean isDeveloperMode;
-    private File persistedInputFile;
-    private File persistedOutputFile;
+    private Path persistedInputFile;
+    private Path persistedOutputFile;
 
 
     public DesignerParams(String... args) {
@@ -52,10 +50,10 @@ public final class DesignerParams {
             (name, value) -> {
                 switch (name) {
                 case SETTINGS_INPUT:
-                    persistedInputFile = new File(value);
+                    persistedInputFile = Paths.get(value);
                     break;
                 case SETTINGS_OUTPUT:
-                    persistedOutputFile = new File(value);
+                    persistedOutputFile = Paths.get(value);
                     break;
                 default:
                     break;
@@ -63,14 +61,16 @@ public final class DesignerParams {
             }
         );
 
-        processDefaults();
     }
 
+    public Path getSettingsDirectory() {
+        return THIS_DESIGNER_SETTINGS_DIR;
+    }
 
-    private void processDefaults() {
+    void processDefaults(Path defaultAppStateFile) {
         if (persistedInputFile == null && persistedOutputFile == null) {
-            persistedInputFile = DEFAULT_SETTINGS_FILE;
-            persistedOutputFile = DEFAULT_SETTINGS_FILE;
+            persistedInputFile = defaultAppStateFile;
+            persistedOutputFile = defaultAppStateFile;
         }
     }
 
@@ -78,11 +78,11 @@ public final class DesignerParams {
         return isDeveloperMode;
     }
 
-    public File getPersistedInputFile() {
+    public Path getPersistedInputFile() {
         return persistedInputFile;
     }
 
-    public File getPersistedOutputFile() {
+    public Path getPersistedOutputFile() {
         return persistedOutputFile;
     }
 }

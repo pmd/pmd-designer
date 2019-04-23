@@ -4,8 +4,9 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app.services;
 
-import java.io.File;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
@@ -19,14 +20,15 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil;
 public class OnDiskPersistenceManager implements PersistenceManager {
 
     private final DesignerRoot root;
-    private final File input;
-    private final File output;
+    private final Path input;
+    private final Path output;
 
-    public OnDiskPersistenceManager(DesignerRoot root, File input, File output) {
+    public OnDiskPersistenceManager(DesignerRoot root, Path input, Path output) {
         this.root = root;
         this.input = input;
         this.output = output;
     }
+
 
     @Override
     public DesignerRoot getDesignerRoot() {
@@ -35,11 +37,18 @@ public class OnDiskPersistenceManager implements PersistenceManager {
 
     @Override
     public void restoreSettings(SettingsOwner settingsOwner) {
-        if (input == null || !input.isFile()) {
-            return;
+        CompletableFuture<Path> extraction = null;
+        if (input == null || !Files.isRegularFile(input) || !Files.exists(input)) {
+            // TODO this should be kept around
+            //            Path settingsDirectory = getService(DesignerRoot.DISK_MANAGER).getSettingsDirectory();
+            //            ResourceManager manager = new ResourceManager(getDesignerRoot(), settingsDirectory);
+            //            extraction = manager.extractResource("placeholders/appstate.xml", "appstate.xml");
         }
+
         try {
-            SettingsPersistenceUtil.restoreProperties(settingsOwner, input);
+            Path realInput = extraction != null ? extraction.get() : input;
+
+            SettingsPersistenceUtil.restoreProperties(settingsOwner, realInput.toFile());
         } catch (Exception e) {
             // shouldn't prevent the app from opening
             // in case the file is corrupted, it will be overwritten on shutdown
@@ -54,10 +63,10 @@ public class OnDiskPersistenceManager implements PersistenceManager {
         }
 
         try {
-            SettingsPersistenceUtil.persistProperties(settingsOwner, output);
-        } catch (IOException ioe) {
+            SettingsPersistenceUtil.persistProperties(settingsOwner, output.toFile());
+        } catch (Exception e) {
             // nevermind
-            ioe.printStackTrace();
+            e.printStackTrace();
         }
     }
 }

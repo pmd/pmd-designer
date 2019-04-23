@@ -4,12 +4,16 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util;
 
+import static net.sourceforge.pmd.lang.LanguageRegistry.findAllVersions;
+import static net.sourceforge.pmd.lang.LanguageRegistry.getDefaultLanguage;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageRegistry;
@@ -31,7 +35,7 @@ public final class LanguageRegistryUtil {
     }
 
     public static LanguageVersion defaultLanguageVersion() {
-        Language defaultLanguage = LanguageRegistry.getDefaultLanguage();
+        Language defaultLanguage = getDefaultLanguage();
         return defaultLanguage == null ? null : defaultLanguage.getDefaultVersion();
     }
 
@@ -61,7 +65,7 @@ public final class LanguageRegistryUtil {
     public static synchronized List<LanguageVersion> getSupportedLanguageVersions() {
         if (supportedLanguageVersions == null) {
             List<LanguageVersion> languageVersions = new ArrayList<>();
-            for (LanguageVersion languageVersion : LanguageRegistry.findAllVersions()) {
+            for (LanguageVersion languageVersion : findAllVersions()) {
                 Optional.ofNullable(languageVersion.getLanguageVersionHandler())
                         .map(handler -> handler.getParser(handler.getDefaultParserOptions()))
                         .filter(Parser::canParse)
@@ -72,12 +76,14 @@ public final class LanguageRegistryUtil {
         return supportedLanguageVersions;
     }
 
-    public static Language findLanguageByShortName(String shortName) {
-        return getSupportedLanguageVersions().stream()
-                                             .map(LanguageVersion::getLanguage)
-                                             .distinct()
-                                             .filter(it -> it.getShortName().equals(shortName))
-                                             .findFirst()
-                                             .get();
+    public static Stream<Language> getSupportedLanguages() {
+        return getSupportedLanguageVersions().stream().map(LanguageVersion::getLanguage).distinct();
     }
+
+    public static Language findLanguageByShortName(String shortName) {
+        return getSupportedLanguages().filter(it -> it.getShortName().equals(shortName))
+                                      .findFirst()
+                                      .get();
+    }
+
 }

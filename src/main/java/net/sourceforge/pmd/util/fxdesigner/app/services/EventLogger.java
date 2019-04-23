@@ -24,12 +24,6 @@ public interface EventLogger {
     }
 
 
-    /** Total number of log entries. */
-    default Val<Integer> numLogEntriesProperty() {
-        return getLog().sizeProperty();
-    }
-
-
     /**
      * Logs a new event.
      */

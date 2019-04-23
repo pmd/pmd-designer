@@ -98,8 +98,8 @@ class TreeViewWrapper<T> {
 
         return first.isPresent()
                 && last.isPresent()
-                && first.get().getIndex() <= index
-                && last.get().getIndex() >= index;
+                && first.get().getIndex() < index
+                && last.get().getIndex() > index;
     }
 
 

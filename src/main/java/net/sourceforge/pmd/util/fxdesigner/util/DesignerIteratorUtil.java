@@ -6,15 +6,17 @@ package net.sourceforge.pmd.util.fxdesigner.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import net.sourceforge.pmd.lang.ast.Node;
-
-import javafx.scene.control.TreeItem;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 
 /**
@@ -30,11 +32,39 @@ public final class DesignerIteratorUtil {
 
     }
 
-
-    public static boolean isParent(Node parent, Node child) {
-        return any(parentIterator(child, false), p -> parent == p);
+    public static <T> Stream<T> takeWhile(Stream<T> stream, Predicate<? super T> predicate) {
+        return StreamSupport.stream(takeWhile(stream.spliterator(), predicate), false);
     }
 
+
+    private static <T> Spliterator<T> takeWhile(Spliterator<T> splitr, Predicate<? super T> predicate) {
+        return new Spliterators.AbstractSpliterator<T>(splitr.estimateSize(), 0) {
+            boolean stillGoing = true;
+
+            @Override
+            public boolean tryAdvance(Consumer<? super T> consumer) {
+                if (stillGoing) {
+                    boolean hadNext = splitr.tryAdvance(elem -> {
+                        if (predicate.test(elem)) {
+                            consumer.accept(elem);
+                        } else {
+                            stillGoing = false;
+                        }
+                    });
+                    return hadNext && stillGoing;
+                }
+                return false;
+            }
+        };
+    }
+
+    public static <T> T last(Iterator<T> ts) {
+        T t = null;
+        while (ts.hasNext()) {
+            t = ts.next();
+        }
+        return t;
+    }
 
     public static <T> boolean any(Iterator<? extends T> it, Predicate<? super T> predicate) {
         for (T t : toIterable(it)) {
@@ -45,60 +75,8 @@ public final class DesignerIteratorUtil {
         return false;
     }
 
-
-    /**
-     * Returns an iterator over the parents of the given node, in innermost to outermost order.
-     */
-    public static Iterator<Node> parentIterator(Node deepest, boolean includeSelf) {
-        return iteratorFrom(deepest, n -> n.jjtGetParent() != null, Node::jjtGetParent, includeSelf);
-    }
-
-
-    /**
-     * Returns an iterator over the parents of the given node, in innermost to outermost order.
-     */
-    public static <T> Iterator<TreeItem<T>> parentIterator(TreeItem<T> deepest, boolean includeSelf) {
-        return iteratorFrom(deepest, n -> n.getParent() != null, TreeItem::getParent, includeSelf);
-    }
-
-
-    /**
-     * Gets an iterator with a successor fun.
-     *
-     * @param seed         Seed item
-     * @param hasSuccessor Tests whether the seed / the last item output has a successor
-     * @param successorFun Successor function
-     * @param includeSeed  Whether to include the seed as the first item of the iterator
-     * @param <T>          Type of values
-     *
-     * @return An iterator
-     */
-    private static <T> Iterator<T> iteratorFrom(T seed, Predicate<T> hasSuccessor, Function<T, T> successorFun, boolean includeSeed) {
-
-        return new Iterator<T>() {
-
-            private T current = seed;
-            private boolean myIncludeCurrent = includeSeed; // include the current item iff it's the first and includeFirst
-
-
-            @Override
-            public boolean hasNext() {
-                return myIncludeCurrent || hasSuccessor.test(current);
-            }
-
-
-            @Override
-            public T next() {
-
-                if (myIncludeCurrent) {
-                    myIncludeCurrent = false;
-                } else {
-                    current = successorFun.apply(current);
-                }
-
-                return current;
-            }
-        };
+    public static <T> Stream<T> toStream(Iterator<T> it) {
+        return StreamSupport.stream(toIterable(it).spliterator(), false);
     }
 
 
@@ -158,5 +136,64 @@ public final class DesignerIteratorUtil {
                 li.remove();
             }
         };
+    }
+
+    /**
+     * Gets an iterator with a successor fun.
+     *
+     * @param seed         Seed item
+     * @param hasSuccessor Tests whether the seed / the last item output has a successor
+     * @param successorFun Successor function
+     * @param includeSeed  Whether to include the seed as the first item of the iterator
+     * @param <T>          Type of values
+     *
+     * @return An iterator
+     */
+    public static <T> Iterator<T> iteratorFrom(T seed, Predicate<T> hasSuccessor, Function<T, T> successorFun,
+                                               boolean includeSeed) {
+
+        return new Iterator<T>() {
+
+            private T current = seed;
+            private boolean myIncludeCurrent = includeSeed; // include the current item iff it's the first and includeFirst
+
+
+            @Override
+            public boolean hasNext() {
+                return myIncludeCurrent || hasSuccessor.test(current);
+            }
+
+
+            @Override
+            public T next() {
+
+                if (myIncludeCurrent) {
+                    myIncludeCurrent = false;
+                } else {
+                    current = successorFun.apply(current);
+                }
+
+                return current;
+            }
+        };
+    }
+
+    // TODO move to IteratorUtil
+    static <T> Stream<T> enumerationAsStream(Enumeration<T> e) {
+        return StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(
+                new Iterator<T>() {
+                    @Override
+                    public T next() {
+                        return e.nextElement();
+                    }
+
+
+                    @Override
+                    public boolean hasNext() {
+                        return e.hasMoreElements();
+                    }
+                },
+                Spliterator.ORDERED), false);
     }
 }

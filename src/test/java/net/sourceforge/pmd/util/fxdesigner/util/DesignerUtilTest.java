@@ -18,7 +18,7 @@ public class DesignerUtilTest {
     @Test
     public void testGetFxml() {
         assertNotNull(DesignerUtil.getFxml("designer.fxml"));
-        assertNotNull(DesignerUtil.getFxml("xpath.fxml"));
+        assertNotNull(DesignerUtil.getFxml("xpath-rule-editor.fxml"));
     }
 
 

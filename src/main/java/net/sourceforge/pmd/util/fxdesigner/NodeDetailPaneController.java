@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.reactfx.EventStreams;
 import org.reactfx.value.Val;
@@ -19,6 +18,7 @@ import net.sourceforge.pmd.lang.ast.xpath.Attribute;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
+import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 
@@ -59,12 +59,12 @@ public class NodeDetailPaneController extends AbstractController implements Node
         hideCommonAttributesProperty()
             .values()
             .distinct()
-            .subscribe(show -> setFocusNode(currentSelection.getValue(), Collections.emptySet()));
+            .subscribe(show -> setFocusNode(currentSelection.getValue(), new DataHolder()));
 
     }
 
     @Override
-    public void setFocusNode(Node node, Set<SelectionOption> options) {
+    public void setFocusNode(final Node node, DataHolder options) {
         xpathAttributesListView.setItems(getAttributes(node));
     }
 
@@ -82,9 +82,15 @@ public class NodeDetailPaneController extends AbstractController implements Node
             Attribute attribute = attributeAxisIterator.next();
 
             if (!(isHideCommonAttributes() && IGNORABLE_ATTRIBUTES.contains(attribute.getName()))) {
-                // TODO the display should be handled in a ListCell
-                result.add(attribute.getName() + " = "
-                               + ((attribute.getValue() != null) ? attribute.getStringValue() : "null"));
+
+                try {
+                    // TODO the display should be handled in a ListCell
+                    result.add(attribute.getName() + " = "
+                                   + ((attribute.getValue() != null) ? attribute.getStringValue() : "null"));
+                } catch (Exception e) {
+                    // some attributes throw eg numberformat exceptions
+                }
+
             }
         }
 
