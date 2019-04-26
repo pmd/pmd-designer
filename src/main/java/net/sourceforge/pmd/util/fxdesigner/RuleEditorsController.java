@@ -36,7 +36,7 @@ public class RuleEditorsController extends AbstractController {
 
     private final ObservableSet<XPathRuleEditorController> currentlySelectedController = FXCollections.observableSet();
     @FXML
-    private MutableTabPane<XPathRuleEditorController> xpathEditorsTabPane;
+    private MutableTabPane<XPathRuleEditorController> mutableTabPane;
 
     private ObservableList<ObservableXPathRuleBuilder> xpathRuleBuilders = new LiveArrayList<>();
     private int restoredTabIndex = 0;
@@ -50,7 +50,7 @@ public class RuleEditorsController extends AbstractController {
     @Override
     protected void beforeParentInit() {
 
-        xpathEditorsTabPane.setControllerSupplier(() -> new XPathRuleEditorController(getDesignerRoot()));
+        mutableTabPane.setControllerSupplier(() -> new XPathRuleEditorController(getDesignerRoot()));
 
         selectedEditorProperty().changes()
                                 .subscribe(ch -> {
@@ -72,23 +72,23 @@ public class RuleEditorsController extends AbstractController {
 
             if (ruleSpecs.isEmpty()) {
                 // add at least one tab
-                xpathEditorsTabPane.addTabWithNewController();
+                mutableTabPane.addTabWithNewController();
             } else {
                 for (ObservableXPathRuleBuilder builder : ruleSpecs) {
-                    xpathEditorsTabPane.addTabWithController(new XPathRuleEditorController(getDesignerRoot(), builder));
+                    mutableTabPane.addTabWithController(new XPathRuleEditorController(getDesignerRoot(), builder));
                 }
             }
 
-            xpathEditorsTabPane.getSelectionModel().select(restoredTabIndex);
+            mutableTabPane.getSelectionModel().select(restoredTabIndex);
 
             // after restoration they're read-only and got for persistence on closing
-            xpathRuleBuilders = xpathEditorsTabPane.getControllers().map(XPathRuleEditorController::getRuleBuilder);
+            xpathRuleBuilders = mutableTabPane.getControllers().map(XPathRuleEditorController::getRuleBuilder);
         });
 
     }
 
     private Val<XPathRuleEditorController> selectedEditorProperty() {
-        return xpathEditorsTabPane.currentFocusedController();
+        return mutableTabPane.currentFocusedController();
     }
 
     public Val<List<Node>> currentRuleResults() {
@@ -102,7 +102,7 @@ public class RuleEditorsController extends AbstractController {
 
     @PersistentProperty
     public int getSelectedTabIndex() {
-        return xpathEditorsTabPane.getSelectionModel().getSelectedIndex();
+        return mutableTabPane.getSelectionModel().getSelectedIndex();
     }
 
 

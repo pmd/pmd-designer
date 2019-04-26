@@ -87,7 +87,7 @@ public class NodeDetailPaneController extends AbstractController implements Node
                     // TODO the display should be handled in a ListCell
                     result.add(attribute.getName() + " = "
                                    + ((attribute.getValue() != null) ? attribute.getStringValue() : "null"));
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                     // some attributes throw eg numberformat exceptions
                 }
 

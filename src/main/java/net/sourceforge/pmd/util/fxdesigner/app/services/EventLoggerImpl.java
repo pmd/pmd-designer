@@ -74,6 +74,7 @@ public class EventLoggerImpl implements ApplicationComponent, EventLogger {
 
 
     /** Number of log entries that were not yet examined by the user. */
+    @Override
     public Val<Integer> numNewLogEntriesProperty() {
         return LiveList.sizeOf(ReactfxExtensions.flattenVals(fullLog.map(LogEntry::wasExaminedProperty))
                                                 .filtered(read -> !read));

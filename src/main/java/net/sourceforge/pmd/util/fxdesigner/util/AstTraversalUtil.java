@@ -8,7 +8,6 @@ import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.any;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.iteratorFrom;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.reverse;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.toIterable;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.toStream;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.or;
 import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.endPosition;
 import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.findNodeAt;
@@ -17,7 +16,6 @@ import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSy
 
 import java.util.Iterator;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;

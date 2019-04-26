@@ -20,7 +20,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class LogEntry implements Comparable<LogEntry> {
+public final class LogEntry implements Comparable<LogEntry> {
 
 
     private final Category category;

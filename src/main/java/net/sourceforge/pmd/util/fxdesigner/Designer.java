@@ -51,8 +51,6 @@ public class Designer extends Application {
     private static final String PMD_CORE_MIN_VERSION;
     private static final String UNKNOWN_VERSION = "unknown";
 
-    private static final Logger LOG = Logger.getLogger(Designer.class.getName());
-
 
     /**
      * Determines the version from maven's generated pom.properties file.
@@ -78,7 +76,7 @@ public class Designer extends Application {
                 properties.load(stream);
                 return Optional.ofNullable(properties.getProperty(key));
             }
-        } catch (final IOException e) {
+        } catch (final IOException ignored) {
             // fallthrough
         }
         return Optional.empty();

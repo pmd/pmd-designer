@@ -57,11 +57,6 @@ public class ObservableRuleBuilder implements SettingsOwner {
     private final Var<Boolean> usesTypeResolution = Var.newSimpleVar(false);
 
 
-    public ObservableRuleBuilder() {
-
-    }
-
-
     @PersistentProperty // CUSTOM?
     public Language getLanguage() {
         return language.getValue();
