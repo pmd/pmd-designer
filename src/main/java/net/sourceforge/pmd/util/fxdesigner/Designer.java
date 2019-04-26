@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,6 +23,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerParams;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 
 import com.sun.javafx.fxml.builder.ProxyBuilder;
 import javafx.application.Application;
@@ -45,7 +47,8 @@ public class Designer extends Application {
     /**
      * Constant that contains always the current version of the designer.
      */
-    public static final String VERSION;
+    private static final String VERSION;
+    private static final String PMD_CORE_MIN_VERSION;
     private static final String UNKNOWN_VERSION = "unknown";
 
     private static final Logger LOG = Logger.getLogger(Designer.class.getName());
@@ -55,20 +58,31 @@ public class Designer extends Application {
      * Determines the version from maven's generated pom.properties file.
      */
     static {
-        String pmdVersion = UNKNOWN_VERSION;
-        try (InputStream stream = PMDVersion.class.getResourceAsStream("/META-INF/maven/net.sourceforge.pmd/pmd-ui/pom.properties")) {
+        VERSION = readProperty("/META-INF/maven/net.sourceforge.pmd/pmd-ui/pom.properties", "version").orElse(UNKNOWN_VERSION);
+        PMD_CORE_MIN_VERSION = readProperty(ResourceUtil.resolveResource("designer.properties"), "pmd.core.version").orElse(UNKNOWN_VERSION);
+    }
+
+
+    public static String getCurrentVersion() {
+        return VERSION;
+    }
+
+    public static String getPmdCoreMinVersion() {
+        return PMD_CORE_MIN_VERSION;
+    }
+
+    private static Optional<String> readProperty(String resourcePath, String key) {
+        try (InputStream stream = PMDVersion.class.getResourceAsStream(resourcePath)) {
             if (stream != null) {
                 final Properties properties = new Properties();
                 properties.load(stream);
-                pmdVersion = properties.getProperty("version");
+                return Optional.ofNullable(properties.getProperty(key));
             }
         } catch (final IOException e) {
-            LOG.log(Level.FINE, "Couldn't determine version of PMD", e);
+            // fallthrough
         }
-
-        VERSION = pmdVersion;
+        return Optional.empty();
     }
-
 
     private long initStartTimeMillis;
     private DesignerRoot designerRoot;

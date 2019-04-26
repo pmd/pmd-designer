@@ -59,13 +59,15 @@ public final class SimplePopups {
         ScrollPane scroll = new ScrollPane();
         TextArea textArea = new TextArea();
 
-        String sb = "PMD core version: " + PMDVersion.VERSION + "\n"
-            + "Available languages: "
-            + LanguageRegistryUtil.getSupportedLanguages().map(Language::getTerseName).collect(Collectors.toList())
-            + "\n"
-            + "Designer version: " + Designer.VERSION + "\n"
-            + "Designer settings dir: " + root.getService(DesignerRoot.DISK_MANAGER).getSettingsDirectory()
-            + "\n";
+        String sb =
+            "PMD core version:\t\t\t" + PMDVersion.VERSION + "\n"
+                + "Designer version:\t\t\t" + Designer.getCurrentVersion()
+                + " (supports PMD core " + Designer.getPmdCoreMinVersion() + ")\n"
+                + "Designer settings dir:\t\t"
+                + root.getService(DesignerRoot.DISK_MANAGER).getSettingsDirectory() + "\n"
+                + "Available languages:\t\t"
+                + LanguageRegistryUtil.getSupportedLanguages().map(Language::getTerseName).collect(Collectors.toList())
+                + "\n";
 
         textArea.setText(sb);
         scroll.setContent(textArea);

@@ -31,7 +31,7 @@ public class GlobalDiskManagerImpl implements GlobalDiskManager, ApplicationComp
         this.settingsDirectory = settingsDirectory;
 
 
-        Path curVersionStamp = settingsDirectory.resolve("version-" + Designer.VERSION);
+        Path curVersionStamp = settingsDirectory.resolve("version-" + Designer.getCurrentVersion());
 
 
         List<Path> diskVersionStamps = getDiskVersionStamps();
