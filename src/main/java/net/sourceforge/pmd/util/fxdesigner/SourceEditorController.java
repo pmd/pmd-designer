@@ -89,8 +89,7 @@ public class SourceEditorController extends AbstractController {
 
     public SourceEditorController(DesignerRoot designerRoot) {
         super(designerRoot);
-        ASTManagerImpl astManagerImpl = new ASTManagerImpl(designerRoot);
-        this.astManager = astManagerImpl;
+        this.astManager = new ASTManagerImpl(designerRoot);
 
         designerRoot.registerService(DesignerRoot.AST_MANAGER, astManager);
     }
