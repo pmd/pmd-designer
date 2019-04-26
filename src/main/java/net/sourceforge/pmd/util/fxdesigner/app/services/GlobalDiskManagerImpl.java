@@ -23,6 +23,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 public class GlobalDiskManagerImpl implements GlobalDiskManager, ApplicationComponent {
 
 
+    public static final String APPSTATE_NAME = "appstate.xml";
     private final DesignerRoot root;
     private final Path settingsDirectory;
 
@@ -71,7 +72,7 @@ public class GlobalDiskManagerImpl implements GlobalDiskManager, ApplicationComp
     }
 
     public Path defaultAppStateFile() {
-        return settingsDirectory.resolve("appstate.xml");
+        return settingsDirectory.resolve(APPSTATE_NAME);
     }
 
     @Override

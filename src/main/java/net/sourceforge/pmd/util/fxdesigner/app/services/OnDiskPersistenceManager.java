@@ -4,10 +4,12 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app.services;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
+import net.sourceforge.pmd.util.fxdesigner.Designer;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil;
@@ -64,9 +66,27 @@ public class OnDiskPersistenceManager implements PersistenceManager {
 
         try {
             SettingsPersistenceUtil.persistProperties(settingsOwner, output.toFile());
+            commitAppState();
         } catch (Exception e) {
             // nevermind
             e.printStackTrace();
         }
+    }
+
+
+    private void commitAppState() throws IOException, InterruptedException {
+
+        ProcessBuilder process = new ProcessBuilder();
+        process.directory(getService(DesignerRoot.DISK_MANAGER).getSettingsDirectory().toFile());
+
+        // if there's no git on the path then this probably fails
+        // doesn't matter though
+        process.command("git", "init");
+        process.start().waitFor();
+        process.command("git", "add", output.toString());
+        process.start().waitFor();
+        process.command("git", "commit", "-m", "\"On version " + Designer.getCurrentVersion() + "\"");
+        process.start().waitFor();
+
     }
 }
