@@ -1,4 +1,6 @@
-# Changelog since version 6.12.0
+# Changelog
+
+## 6.14.0
 
 * Added the possibility to select a node directly from the code area.
 To use this, hold the CTRL key pressed for a second. The code area should
