@@ -71,8 +71,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <pmd.build-tools.version>1.4.0</pmd.build-tools.version>
-        <pmd.check.version>6.12.0</pmd.check.version>
+        <pmd.build-tools.version>2</pmd.build-tools.version>
+        <pmd.check.version>6.13.0</pmd.check.version>
     </properties>
 
     <build>
