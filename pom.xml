@@ -6,6 +6,8 @@
     <name>PMD Designer</name>
     <version>6.15.0-SNAPSHOT</version>
 
+    <description>The Rule Designer is a graphical tool that helps PMD users develop their custom rules.</description>
+    <url>https://pmd.github.io</url>
     <inceptionYear>2017</inceptionYear>
     <licenses>
         <license>
@@ -20,6 +22,9 @@
         <url>https://github.com/pmd/pmd-designer</url>
         <tag>HEAD</tag>
     </scm>
+    <ciManagement>
+        <url>https://travis-ci.org/pmd/pmd-designer</url>
+    </ciManagement>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -30,6 +35,23 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+    <developers>
+        <developer>
+            <id>oowekyala</id>
+            <name>Clément Fournier</name>
+            <email>clement.fournier76@gmail.com</email>
+        </developer>
+        <developer>
+            <id>jsotuyod</id>
+            <name>Juan Martín Sotuyo Dodero</name>
+            <email>juansotuyo@gmail.com</email>
+        </developer>
+        <developer>
+            <id>adangel</id>
+            <name>Andreas Dangel</name>
+            <email>adangel@users.sourceforge.net</email>
+        </developer>
+    </developers>
 
     <properties>
         <pmd.core.version>6.12.0</pmd.core.version>
