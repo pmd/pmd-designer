@@ -33,3 +33,18 @@ env:
 # Used in .m2/settings.xml
 # GPG key used to sign the release jar before uploading to maven central
 #
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/0e6dd310db54b96c2653
+      - https://webhooks.gitter.im/e/65efc1ea65175ad23ab6
+      - https://webhooks.gitter.im/e/d93f85750d54f0a8623b
+    on_success: always  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: never     # options: [always|never|change] default: always
+  email:
+    recipients:
+    - andreas.dangel@adangel.org
+    on_success: change
+    on_failure: always
