@@ -1,8 +1,8 @@
 #!/bin/bash
 set -ev
 
-if [ "${TRAVIS_PULL_REQUEST}" != "false" ] || [ "${TRAVIS_SECURE_ENV_VARS}" != "true" ]; then
-    echo "Not setting up secrets (TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST} TRAVIS_SECURE_ENV_VARS=${TRAVIS_SECURE_ENV_VARS})."
+if [ "${TRAVIS_REPO_SLUG}" != "pmd/pmd-designer" ] || [ "${TRAVIS_PULL_REQUEST}" != "false" ] || [ "${TRAVIS_SECURE_ENV_VARS}" != "true" ]; then
+    echo "Not setting up secrets (TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG} TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST} TRAVIS_SECURE_ENV_VARS=${TRAVIS_SECURE_ENV_VARS})."
     exit 0
 fi
 

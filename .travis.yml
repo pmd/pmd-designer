@@ -6,8 +6,7 @@ before_install:
   - . .travis/install-openjdk.sh
 install: './mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V'
 script:
-  - 'if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then ./mvnw test -B -V; fi'
-  - 'if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_SECURE_ENV_VARS}" = "true" ]; then bash .travis/deploy.sh; fi'
+  - 'bash .travis/deploy.sh'
 
 cache:
   directories:
