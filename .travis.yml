@@ -3,12 +3,7 @@ before_install:
   - 'mkdir -p ${HOME}/.m2'
   - 'cp .travis/maven-settings.xml ${HOME}/.m2/settings.xml'
   - 'bash .travis/setup-secrets.sh'
-  - 'mkdir -p ${HOME}/.adoptopenjdk'
-  - 'mkdir -p ${HOME}/openjdk11'
-  - 'wget --quiet --directory-prefix ${HOME}/.adoptopenjdk --timestamping --continue https://github.com/AdoptOpenJDK/openjdk11-upstream-binaries/releases/download/jdk-11.0.3%2B7/OpenJDK11U-x64_linux_11.0.3_7.tar.gz'
-  - 'tar --extract --file ${HOME}/.adoptopenjdk/OpenJDK11U-x64_linux_11.0.3_7.tar.gz -C ${HOME}/openjdk11 --strip-components 1'
-  - 'export JAVA_HOME=${HOME}/openjdk11'
-  - 'export PATH=${JAVA_HOME}/bin:$PATH'
+  - . .travis/install-openjdk.sh
 install: './mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V'
 script:
   - 'if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then ./mvnw test -B -V; fi'
@@ -17,7 +12,7 @@ script:
 cache:
   directories:
   - "$HOME/.m2"
-  - "$HOME/.adoptopenjdk"
+  - "$HOME/.cache"
 
 env:
   global:
