@@ -4,10 +4,9 @@
 
 package net.sourceforge.pmd.util.fxdesigner;
 
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.parentIterator;
+import static net.sourceforge.pmd.util.fxdesigner.util.AstTraversalUtil.parentIterator;
 
 import java.util.Objects;
-import java.util.Set;
 
 import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
@@ -18,6 +17,7 @@ import net.sourceforge.pmd.lang.symboltable.NameDeclaration;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
+import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ScopeHierarchyTreeCell;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ScopeHierarchyTreeItem;
@@ -70,7 +70,7 @@ public class ScopesPanelController extends AbstractController implements NodeSel
 
 
     @Override
-    public void setFocusNode(Node node, Set<SelectionOption> options) {
+    public void setFocusNode(final Node node, DataHolder options) {
         if (node == null) {
             scopeHierarchyTreeView.setRoot(null);
             return;

@@ -61,7 +61,7 @@ public final class JavaSyntaxHighlighter extends SimpleRegexSyntaxHighlighter {
         .or(CHAR.css, "'(?:[^']|\\\\(?:'|u\\w{4}))'") // char
         .or(NULL.css, asWord("null"))
         .or(BOOLEAN.css, asWord("true|false"))
-        .or(ANNOTATION.css, "@[\\w]+")
+        .or(ANNOTATION.css, "@[\\w]+(\\.\\w+)*")
         .or(CLASS_IDENTIFIER.css, asWord("[A-Z][\\w_$]*"))
         .or(IDENTIFIER.css, asWord("[\\w_$]+"))
         .create(Pattern.DOTALL);

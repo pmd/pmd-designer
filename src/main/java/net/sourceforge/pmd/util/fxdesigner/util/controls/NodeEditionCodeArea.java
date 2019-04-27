@@ -4,6 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.findNodeAt;
@@ -16,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.app.services.RichTextMapper;
+import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighlighters;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea;
@@ -114,14 +116,16 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
                 if (!isNodeSelectionMode.getValue()) {
                     return;
                 }
-                Node currentRoot = getGlobalState().globalCompilationUnitProperty().getValue();
+                Node currentRoot = getService(DesignerRoot.AST_MANAGER).compilationUnitProperty().getValue();
                 if (currentRoot == null) {
                     return;
                 }
 
                 TextPos2D target = getPmdLineAndColumnFromOffset(this, ev.getCharacterIndex());
 
-                findNodeAt(currentRoot, target).map(NodeSelectionEvent::of).ifPresent(selectionEvts::push);
+                findNodeAt(currentRoot, target)
+                    .map(n -> NodeSelectionEvent.of(n, new DataHolder().withData(CARET_POSITION, target)))
+                    .ifPresent(selectionEvts::push);
             }
         );
 
@@ -133,9 +137,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     }
 
     /** Scroll the editor to a node and makes it visible. */
-    private void scrollToNode(Node node) {
-
-        moveTo(node.getBeginLine() - 1, 0);
+    private void scrollToNode(Node node, boolean scrollToTop) {
 
         if (getVisibleParagraphs().size() < 1) {
             return;
@@ -150,14 +152,14 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
             getRtfxParIndexFromPmdLine(node.getEndLine()) <= lastVisibleParToAllParIndex();
 
         if (fitsViewPort) {
-            if (!isStartVisible) {
-                showParagraphAtTop(Math.max(node.getBeginLine() - 2, 0));
+            if (!isStartVisible && scrollToTop) {
+                showParagraphAtTop(max(node.getBeginLine() - 2, 0));
             }
             if (!isEndVisible) {
-                showParagraphAtBottom(Math.min(node.getEndLine(), getParagraphs().size()));
+                showParagraphAtBottom(min(node.getEndLine(), getParagraphs().size()));
             }
-        } else if (!isStartVisible) {
-            showParagraphAtTop(Math.max(node.getBeginLine() - 2, 0));
+        } else if (!isStartVisible && scrollToTop) {
+            showParagraphAtTop(max(node.getBeginLine() - 2, 0));
         }
     }
 
@@ -216,7 +218,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     private void highlightErrorNodes(Collection<? extends Node> nodes) {
         styleNodes(nodes, StyleLayerIds.ERROR, true);
         if (!nodes.isEmpty()) {
-            scrollToNode(nodes.iterator().next());
+            scrollToNode(nodes.iterator().next(), true);
         }
     }
 
@@ -229,13 +231,15 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
 
     @Override
-    public void setFocusNode(Node node, Set<SelectionOption> options) {
+    public void setFocusNode(final Node node, DataHolder options) {
 
 
         // editor must not be scrolled when finding a new selection in a
         // tree that is being edited
-        if (node != null && !options.contains(SelectionOption.SELECTION_RECOVERY)) {
-            scrollToNode(node);
+        if (node != null && !options.hasData(SELECTION_RECOVERY)) {
+            // don't randomly jump to top of eg ClassOrInterfaceBody
+            // when selecting from a caret position
+            scrollToNode(node, !options.hasData(CARET_POSITION));
         }
 
         if (Objects.equals(node, currentFocusNode.getValue())) {

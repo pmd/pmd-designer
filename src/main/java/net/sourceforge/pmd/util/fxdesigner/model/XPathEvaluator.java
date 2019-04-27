@@ -21,6 +21,7 @@ import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.rule.XPathRule;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
+import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 
 
@@ -44,13 +45,14 @@ public final class XPathEvaluator {
      * @return The results, or an empty list if there was an error
      */
     public static List<Node> simpleEvaluate(DesignerRoot root, String query) {
-        return root.getService(DesignerRoot.APP_STATE_HOLDER)
-                   .globalCompilationUnitProperty()
+        ApplicationComponent component = () -> root;
+        return root.getService(DesignerRoot.AST_MANAGER)
+                   .compilationUnitProperty()
                    .getOpt()
                    .map(n -> {
                        try {
                            return evaluateQuery(n,
-                                                root.getService(DesignerRoot.APP_STATE_HOLDER).getGlobalLanguageVersion(),
+                                                component.getGlobalLanguageVersion(),
                                                 XPathRuleQuery.XPATH_2_0,
                                                 query,
                                                 emptyList());

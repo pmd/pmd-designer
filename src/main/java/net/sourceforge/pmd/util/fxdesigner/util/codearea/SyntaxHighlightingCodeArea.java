@@ -87,7 +87,6 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
      * If the argument is null, then this method disables syntax highlighting.
      */
     public void setSyntaxHighlighter(SyntaxHighlighter highlighter) {
-
         if (Objects.equals(highlighter, syntaxHighlighter.getValue())) {
             return;
         }

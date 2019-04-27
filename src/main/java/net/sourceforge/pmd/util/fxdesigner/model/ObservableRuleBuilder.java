@@ -33,7 +33,7 @@ import javafx.collections.ObservableList;
 public class ObservableRuleBuilder implements SettingsOwner {
 
     private final Var<Language> language = Var.newSimpleVar(LanguageRegistry.getDefaultLanguage());
-    private final Var<String> name = Var.newSimpleVar("");
+    private final Var<String> name = Var.newSimpleVar(null);
     private final Var<Class<?>> clazz = Var.newSimpleVar(null);
 
     // doesn't contain the "xpath" and "version" properties for XPath rules
@@ -42,6 +42,7 @@ public class ObservableRuleBuilder implements SettingsOwner {
 
     private final Var<LanguageVersion> minimumVersion = Var.newSimpleVar(null);
     private final Var<LanguageVersion> maximumVersion = Var.newSimpleVar(null);
+
 
     private final Var<String> since = Var.newSimpleVar("");
 
@@ -56,6 +57,7 @@ public class ObservableRuleBuilder implements SettingsOwner {
     private final Var<Boolean> usesTypeResolution = Var.newSimpleVar(false);
 
 
+    @PersistentProperty // CUSTOM?
     public Language getLanguage() {
         return language.getValue();
     }
@@ -93,7 +95,7 @@ public class ObservableRuleBuilder implements SettingsOwner {
     }
 
 
-    public void setClazz(Class<?> clazz) {
+    public final void setClazz(Class<?> clazz) {
         this.clazz.setValue(clazz);
     }
 

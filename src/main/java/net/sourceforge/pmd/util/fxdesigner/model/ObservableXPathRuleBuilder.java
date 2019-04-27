@@ -5,8 +5,10 @@
 package net.sourceforge.pmd.util.fxdesigner.model;
 
 import org.reactfx.EventStream;
+import org.reactfx.collection.LiveList;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.lang.rule.XPathRule;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 
@@ -23,6 +25,9 @@ public class ObservableXPathRuleBuilder extends ObservableRuleBuilder {
     private final Var<String> xpathVersion = Var.newSimpleVar(DesignerUtil.defaultXPathVersion());
     private final Var<String> xpathExpression = Var.newSimpleVar("");
 
+    public ObservableXPathRuleBuilder() {
+        setClazz(XPathRule.class);
+    }
 
     @PersistentProperty
     public String getXpathVersion() {
@@ -60,10 +65,10 @@ public class ObservableXPathRuleBuilder extends ObservableRuleBuilder {
      * Pushes an event every time the rule needs to be re-evaluated.
      */
     public EventStream<?> modificationsTicks() {
-        return nameProperty().values()
+        return languageProperty().values()
                              .or(xpathVersion.values())
                              .or(xpathExpression.values())
-                             .or(rulePropertiesProperty().changes());
+                             .or(rulePropertiesProperty().values().flatMap(LiveList::changesOf));
     }
 
     // TODO: Once the xpath expression changes, we'll need to rebuild the rule

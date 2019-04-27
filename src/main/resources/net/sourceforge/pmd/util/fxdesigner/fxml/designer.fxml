@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -22,6 +23,9 @@
                                     <items>
                                         <MenuItem fx:id="openFileMenuItem" text="_Open..." />
                                         <Menu fx:id="openRecentMenu" text="Open _Recent" />
+                                        <SeparatorMenuItem/>
+                                        <MenuItem fx:id="saveMenuItem" text="Save workbench"/>
+                                        <MenuItem fx:id="javadocImportMenuItem" text="Run javadoc import REMOVE ME" visible="false"/>
                                     </items>
                                 </Menu>
 
@@ -48,6 +52,7 @@
                                         <!-- TODO add link to doc pages -->
                                         <!--<MenuItem mnemonicParsing="false" text="About" />-->
                                         <MenuItem fx:id="licenseMenuItem" text="_License" />
+                                        <MenuItem fx:id="aboutMenuItem" text="_About"/>
                                     </items>
                                 </Menu>
 
@@ -82,31 +87,7 @@
                                 <fx:include fx:id="sourceEditor" source="editor.fxml" prefHeight="200.0" prefWidth="200.0" />
                             </center>
                         </BorderPane>
-                        <BorderPane prefHeight="200.0" prefWidth="200.0">
-                            <center>
-                                <AnchorPane BorderPane.alignment="CENTER">
-                                    <children>
-                                        <TabPane fx:id="bottomTabPane" minHeight="20.0" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="10000.0" tabMaxWidth="10000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <tabs>
-                                                <Tab text="XPath Editor" fx:id="xpathEditorTab">
-                                                    <content>
-                                                        <fx:include source="xpath.fxml" fx:id="xpathPanel" />
-                                                    </content>
-                                                </Tab>
-                                                <Tab disable="true">
-                                                    <content>
-                                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                                                    </content>
-                                                </Tab>
-                                            </tabs>
-                                        </TabPane>
-                                    </children>
-                                </AnchorPane>
-                            </center>
-                            <top>
-                                <AnchorPane prefWidth="200.0" BorderPane.alignment="CENTER" />
-                            </top>
-                        </BorderPane>
+                        <fx:include source="rule-editors.fxml" fx:id="ruleEditors" />
                     </items>
                 </SplitPane>
             </center>

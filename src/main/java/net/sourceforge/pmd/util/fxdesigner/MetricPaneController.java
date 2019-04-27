@@ -5,7 +5,6 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.reactfx.EventStreams;
@@ -18,6 +17,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.model.MetricResult;
+import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
 import javafx.collections.FXCollections;
@@ -65,7 +65,7 @@ public class MetricPaneController extends AbstractController implements NodeSele
      * @param options
      */
     @Override
-    public void setFocusNode(Node node, Set<SelectionOption> options) {
+    public void setFocusNode(final Node node, DataHolder options) {
 
         ObservableList<MetricResult> metrics = evaluateAllMetrics(node);
         metricResultsListView.setItems(metrics);

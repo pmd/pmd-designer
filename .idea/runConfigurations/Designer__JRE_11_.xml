@@ -12,7 +12,7 @@
     <option name="VM_PARAMETERS" value="--add-opens javafx.controls/javafx.scene.control.skin=ALL-UNNAMED --add-opens javafx.controls/com.sun.javafx.scene.control.inputmap=ALL-UNNAMED --illegal-access=warn" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="net.sourceforge.pmd.util.fxdesigner.*" />
+        <option name="PATTERN" value="net.sourceforge.pmd.util.fxdesigner.app.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

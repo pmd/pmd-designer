@@ -20,7 +20,7 @@
             stylesheets="@../css/designer.css"
             xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="net.sourceforge.pmd.util.fxdesigner.XPathPanelController">
+            fx:controller="net.sourceforge.pmd.util.fxdesigner.XPathRuleEditorController">
     <children>
         <SplitPane dividerPositions="0.2, 0.8"
                    AnchorPane.bottomAnchor="0.0"
@@ -65,7 +65,7 @@
                                 <!-- For some reason setting "text", even if it's not displayed, makes the padding of the icon work properly -->
                                 <MenuButton mnemonicParsing="false"
                                             text="spacer"
-                                            styleClass="menu-button-no-arrow,icon-button"
+                                            styleClass="no-arrow,icon-button"
                                             fx:id="xpathVersionMenuButton">
                                     <graphic>
                                         <FontIcon iconLiteral="fas-cog" />

@@ -4,13 +4,14 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.parentIterator;
+import static net.sourceforge.pmd.util.fxdesigner.util.AstTraversalUtil.parentIterator;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.reverse;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
+import java.util.function.Consumer;
 
 import org.reactfx.value.Var;
 
@@ -33,7 +34,7 @@ public final class ASTTreeItem extends TreeItem<Node> {
      * Latent style classes are style classes that logically belong to this tree item (i.e. the node it wraps).
      * The TreeItem must sync them to the TreeCell that currently displays it. The value is never null.
      */
-    private final Var<List<String>> latentStyleClasses = Var.newSimpleVar(Collections.emptyList());
+    private final Var<Collection<String>> latentStyleClasses = Var.newSimpleVar(Collections.emptyList());
 
     private ASTTreeItem(Node n) {
         super(n);
@@ -117,14 +118,29 @@ public final class ASTTreeItem extends TreeItem<Node> {
         return item;
     }
 
+    public void foreach(Consumer<ASTTreeItem> fun) {
+        foreach(this, item -> fun.accept((ASTTreeItem) item));
+    }
 
-    public void setStyleClasses(List<String> classes) {
+    public void setStyleClasses(Collection<String> classes) {
         latentStyleClasses.setValue(classes == null ? Collections.emptyList() : classes);
     }
 
-
     public void setStyleClasses(String... classes) {
         setStyleClasses(Arrays.asList(classes));
+    }
+
+    public static <T> void foreach(TreeItem<T> root, Consumer<? super TreeItem<T>> fun) {
+
+        if (root == null) {
+            return;
+        }
+
+        fun.accept(root);
+
+        for (TreeItem<T> child : root.getChildren()) {
+            foreach(child, fun);
+        }
     }
 
 

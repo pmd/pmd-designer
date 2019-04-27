@@ -186,8 +186,6 @@ public class PropertyDescriptorSpec implements SettingsOwner {
         valueProperty().unbind();
     }
 
-
-
     /**
      * Pushes an event every time the rule owning this property needs to be re-evaluated.
      */
