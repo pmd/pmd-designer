@@ -4,6 +4,7 @@ before_install:
   - 'cp .travis/maven-settings.xml ${HOME}/.m2/settings.xml'
   - 'bash .travis/setup-secrets.sh'
   - 'mkdir -p ${HOME}/.adoptopenjdk'
+  - 'mkdir -p ${HOME}/openjdk11'
   - 'wget --quiet --directory-prefix ${HOME}/.adoptopenjdk --timestamping --continue https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.3%2B7/OpenJDK11U-jdk_x64_linux_hotspot_11.0.3_7.tar.gz'
   - 'tar --extract --file ${HOME}/.adoptopenjdk/OpenJDK11U-jdk_x64_linux_hotspot_11.0.3_7.tar.gz -C ${HOME}/openjdk11 --strip-components 1'
   - 'export JAVA_HOME=${HOME}/openjdk11'
