@@ -16,3 +16,5 @@ node to which it corresponds:
 should be preserved in most cases (on a best-effort basis) instead of reset.
 
 * Improved the XPath export wizard
+
+* Allow multiple independent xpath editors
