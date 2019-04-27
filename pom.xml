@@ -4,7 +4,7 @@
     <groupId>net.sourceforge.pmd</groupId>
     <artifactId>pmd-ui</artifactId>
     <name>PMD Designer</name>
-    <version>6.14.0</version>
+    <version>6.15.0-SNAPSHOT</version>
 
     <inceptionYear>2017</inceptionYear>
     <licenses>
@@ -18,7 +18,7 @@
         <connection>scm:git:git://github.com/pmd/pmd-designer.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/pmd/pmd-designer.git</developerConnection>
         <url>https://github.com/pmd/pmd-designer</url>
-        <tag>6.14.0</tag>
+        <tag>HEAD</tag>
     </scm>
     <distributionManagement>
         <snapshotRepository>
