@@ -163,6 +163,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
 
         showPropertiesButton.setOnAction(e -> propertiesPopover.showOrFocus(p -> p.show(showPropertiesButton)));
+
         propertiesPopover.rebindIfDifferent(getRuleBuilder());
         Platform.runLater(() -> propertiesPopover.doFirstLoad(getMainStage()));
     }

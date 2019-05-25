@@ -150,7 +150,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
     }
 
     private PopOver detailsPopOver(PropertyDescriptorSpec spec) {
-        EditPropertyDialogController wizard = new EditPropertyDialogController();
+        EditPropertyDialogController wizard = new EditPropertyDialogController(root);
 
         FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("edit-property-dialog.fxml"));
         loader.setController(wizard);
@@ -165,6 +165,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
 
         PopOver popOver = new SmartPopover(root);
         popOver.setHeaderAlwaysVisible(true);
+        popOver.setDetachable(false); // Well we can't let it be detached, it grabs focus...........
         popOver.setUserData(wizard);
         return rebindPopover(spec, popOver);
     }
@@ -222,6 +223,8 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
             edit.setGraphic(new FontIcon("fas-ellipsis-h"));
             edit.getStyleClass().addAll(DETAILS_BUTTON_CLASS, "icon-button");
             Tooltip.install(edit, new Tooltip("Edit property..."));
+
+
             edit.setOnAction(e -> {
                 myEditPopover.rebindIfDifferent(spec);
                 myEditPopover.showOrFocus(p -> PopOverUtil.showAt(p, getMainStage(), this));

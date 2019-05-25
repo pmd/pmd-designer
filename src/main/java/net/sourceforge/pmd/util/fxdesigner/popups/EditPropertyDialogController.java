@@ -9,7 +9,6 @@ import static net.sourceforge.pmd.properties.MultiValuePropertyDescriptor.DEFAUL
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewireInit;
 
 import java.net.URL;
-import java.util.Date;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -19,12 +18,13 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.reactfx.Subscription;
 import org.reactfx.util.Try;
-import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.properties.PropertyTypeId;
 import net.sourceforge.pmd.properties.ValueParser;
 import net.sourceforge.pmd.properties.ValueParserConstants;
+import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView;
@@ -48,7 +48,7 @@ import javafx.scene.control.TextField;
  * @see PropertyDescriptorSpec
  * @since 6.0.0
  */
-public class EditPropertyDialogController implements Initializable {
+public class EditPropertyDialogController implements Initializable, ApplicationComponent {
 
     private final Var<PropertyTypeId> typeId = Var.newSimpleVar(PropertyTypeId.STRING);
     private final Var<Runnable> commitHandler = Var.newSimpleVar(null);
@@ -56,6 +56,7 @@ public class EditPropertyDialogController implements Initializable {
     private final Var<ObservableList<PropertyDescriptorSpec>> backingDescriptorList = Var.newSimpleVar(null);
 
     private final ValidationSupport validationSupport = new ValidationSupport();
+    private final DesignerRoot root;
     @FXML
     private TextField nameField;
     @FXML
@@ -67,11 +68,13 @@ public class EditPropertyDialogController implements Initializable {
 
     public EditPropertyDialogController() {
         // default constructor
+        this.root = null;
     }
 
 
-    public EditPropertyDialogController(Runnable commitHandler) {
-        this.commitHandler.setValue(commitHandler);
+    public EditPropertyDialogController(DesignerRoot root) {
+        this.root = root;
+        this.commitHandler.setValue(()->{});
     }
 
 
@@ -217,5 +220,8 @@ public class EditPropertyDialogController implements Initializable {
         return valueField.textProperty();
     }
 
-
+    @Override
+    public DesignerRoot getDesignerRoot() {
+        return root;
+    }
 }
