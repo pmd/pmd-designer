@@ -16,6 +16,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.popups.EditPropertyDialogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.FakeTailObservableList;
 
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
@@ -40,14 +41,32 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
 
     private static final int LIST_CELL_HEIGHT = 24;
     private final DesignerRoot root;
+    // unique item representing the "ADD property" button
+    private static final PropertyDescriptorSpec SPECIAL_ADD_SPEC = new PropertyDescriptorSpec() {
+        @Override
+        public boolean equals(Object obj) {
+            return this == obj;
+        }
+
+        @Override
+        public int hashCode() {
+            return super.hashCode();
+        }
+    };
+
+    private ObservableList<PropertyDescriptorSpec> realItems;
 
 
     static {
         ValueExtractor.addObservableValueExtractor(c -> c instanceof ListCell, c -> ((ListCell) c).itemProperty());
     }
 
-    public PropertyCollectionView(@NamedArg("designerRoot") DesignerRoot root) {
+
+    public PropertyCollectionView(@NamedArg("designerRoot") DesignerRoot root, ObservableList<PropertyDescriptorSpec> realItems) {
         this.root = root;
+        this.realItems = realItems;
+
+        setItems(new FakeTailObservableList<>(this.realItems, SPECIAL_ADD_SPEC));
 
         setFixedCellSize(LIST_CELL_HEIGHT);
         setCellFactory(lv -> new PropertyDescriptorCell());
@@ -72,14 +91,15 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
         this.getItems().add(spec);
 
         Platform.runLater(
-            () ->
-                ((Button) getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() - 1)
-                                                   .lookup("." + PropertyDescriptorCell.DETAILS_BUTTON_CLASS)).fire());
+            () -> {
+                Node node = getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() - 1);
+                System.out.println(node);
+                ((Button) node.lookup("." + PropertyDescriptorCell.DETAILS_BUTTON_CLASS)).fire();
+            });
     }
 
     public static PopOver makePopOver(ObservableList<PropertyDescriptorSpec> items, DesignerRoot designerRoot) {
-        PropertyCollectionView view = new PropertyCollectionView(designerRoot);
-        view.setItems(items);
+        PropertyCollectionView view = new PropertyCollectionView(designerRoot, items);
         PopOver popOver = new SmartPopover(view);
         popOver.setTitle("Rule properties");
         popOver.setHeaderAlwaysVisible(true);
@@ -98,10 +118,25 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
             if (empty || item == null) {
                 setText(null);
                 setGraphic(null);
+            } else if (item == SPECIAL_ADD_SPEC) {
+                setGraphic(addPropertyButton());
             } else {
                 myEditPopover.rebindIfDifferent(item, () -> detailsPopOver(item));
                 setGraphic(buildGraphic(item));
             }
+        }
+
+        private Node addPropertyButton() {
+            Button b = new Button("Add property");
+            b.setOnAction(e -> {
+                PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
+                spec.setName("TODO");
+                getItems().add(spec);
+//                PopOver popOver = detailsPopOver(spec);
+//                System.out.println(popOver);
+//                Platform.runLater(() -> popOver.show(b));
+            });
+            return b;
         }
 
 
@@ -125,7 +160,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
                                              .filter(StringUtils::isNotBlank)
                                              .orElseConst("(no name)")
                                              .map(it -> "Property '" + it + "'"));
-            Subscription closeSub = wizard.bindToDescriptor(spec, getItems());
+            Subscription closeSub = wizard.bindToDescriptor(spec, realItems);
             popOver.setOnHiding(e -> closeSub.unsubscribe());
             return popOver;
         }

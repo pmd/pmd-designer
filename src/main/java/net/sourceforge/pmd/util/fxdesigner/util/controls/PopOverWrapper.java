@@ -7,9 +7,6 @@ import java.util.function.Supplier;
 import org.controlsfx.control.PopOver;
 import org.reactfx.value.Var;
 
-import javafx.collections.SetChangeListener;
-import javafx.css.PseudoClass;
-
 /**
  * Wrapper around a popover, that remembers whether it's already shown
  * or not.
@@ -30,6 +27,9 @@ public final class PopOverWrapper<T> {
     public void showOrFocus(Consumer<PopOver> showMethod) {
         if (myPopover.isPresent() && myPopover.getValue().isShowing()) {
             myPopover.getValue().requestFocus();
+        } else if (myPopover.isPresent()) {
+            showMethod.accept(myPopover.getValue());
+            PopOverUtil.fixStyleSheets(myPopover.getValue());
         } else {
             if (supplier == null) {
                 throw new IllegalStateException("Unitialized");
@@ -39,13 +39,7 @@ public final class PopOverWrapper<T> {
                 throw new IllegalStateException("Improper supplier");
             }
             myPopover.setValue(popOver);
-            showMethod.accept(popOver);
-            //            DEBUG
-            //            SetChangeListener<PseudoClass> listener = ch -> {
-            //                System.out.println(ch.getSet());
-            //            };
-            //            PopOverUtil.getStyleableNode(popOver).getPseudoClassStates().addListener(listener);
-            PopOverUtil.fixStyleSheets(popOver);
+            showOrFocus(showMethod); // fall into the above branch
         }
     }
 
