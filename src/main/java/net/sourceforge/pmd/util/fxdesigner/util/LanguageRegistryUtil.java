@@ -5,7 +5,6 @@
 package net.sourceforge.pmd.util.fxdesigner.util;
 
 import static net.sourceforge.pmd.lang.LanguageRegistry.findAllVersions;
-import static net.sourceforge.pmd.lang.LanguageRegistry.getDefaultLanguage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ public final class LanguageRegistryUtil {
     }
 
     public static LanguageVersion defaultLanguageVersion() {
-        Language defaultLanguage = getDefaultLanguage();
+        Language defaultLanguage = LanguageRegistry.getDefaultLanguage();
         return defaultLanguage == null ? null : defaultLanguage.getDefaultVersion();
     }
 
