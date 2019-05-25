@@ -68,8 +68,7 @@ public class ObservableXPathRuleBuilder extends ObservableRuleBuilder {
         return languageProperty().values()
                                  .or(xpathVersion.values())
                                  .or(xpathExpression.values())
-                                 .or(rulePropertiesProperty().values().flatMap(lst -> new ObservableTickList<>(lst, PropertyDescriptorSpec::modificationTicks).quasiChanges()))
-            ;
+                                 .or(rulePropertiesProperty().values().flatMap(lst -> new ObservableTickList<>(lst, PropertyDescriptorSpec::modificationTicks).quasiChanges()));
     }
 
     // TODO: Once the xpath expression changes, we'll need to rebuild the rule

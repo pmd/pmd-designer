@@ -9,6 +9,7 @@ import static net.sourceforge.pmd.properties.MultiValuePropertyDescriptor.DEFAUL
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewireInit;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -18,6 +19,7 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.reactfx.Subscription;
 import org.reactfx.util.Try;
+import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.properties.PropertyTypeId;
@@ -99,6 +101,8 @@ public class EditPropertyDialogController implements Initializable {
      * @param spec The descriptor
      */
     public Subscription bindToDescriptor(PropertyDescriptorSpec spec, ObservableList<PropertyDescriptorSpec> allDescriptors) {
+
+//        Val.wrap(nameField.focusedProperty()).values().subscribe(v -> System.out.println(v + " " + new Date()));
         backingDescriptor.setValue(spec);
         backingDescriptorList.setValue(allDescriptors);
         return Subscription.multi(
