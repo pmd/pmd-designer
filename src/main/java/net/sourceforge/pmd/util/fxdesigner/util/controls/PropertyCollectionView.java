@@ -14,6 +14,7 @@ import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.popups.EditPropertyDialogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
@@ -66,6 +67,10 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
            .subscribe(e -> rewire(maxHeightProperty(), Bindings.size(e).multiply(LIST_CELL_HEIGHT).add(5)));
 
         myEditPopover = new PopOverWrapper<>(this::rebindPopover);
+
+        myEditPopover.rebindIfDifferent(new PropertyDescriptorSpec());
+        myEditPopover.doFirstLoad(root.getMainStage());
+
     }
 
 
@@ -107,9 +112,12 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
         }
     }
 
-    public static PopOver makePopOver(ObservableList<PropertyDescriptorSpec> items, DesignerRoot designerRoot) {
+    /**
+     * Makes the property popover for a rule.
+     */
+    public static PopOver makePopOver(ObservableXPathRuleBuilder rule, Val<String> titleProperty, DesignerRoot designerRoot) {
         VBox vbox = new VBox();
-        PropertyCollectionView view = new PropertyCollectionView(designerRoot, items);
+        PropertyCollectionView view = new PropertyCollectionView(designerRoot, rule.getRuleProperties());
 
         AnchorPane footer = new AnchorPane();
         footer.setPrefHeight(30);
@@ -135,8 +143,9 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
         vbox.getChildren().addAll(view, footer);
 
         PopOver popOver = new SmartPopover(vbox);
-        popOver.setTitle("Rule properties");
+        popOver.titleProperty().bind(titleProperty.map(it -> "Properties of " + it));
         popOver.setHeaderAlwaysVisible(true);
+        popOver.setPrefWidth(150);
         return popOver;
     }
 

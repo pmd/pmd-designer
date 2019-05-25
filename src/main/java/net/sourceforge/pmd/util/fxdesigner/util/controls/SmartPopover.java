@@ -25,7 +25,6 @@ public class SmartPopover extends PopOver {
     private static void registerPseudoClassListeners(SmartPopover popOver) {
 
         EventStreams.valuesOf(popOver.detachedProperty())
-                    .hook(System.out::println)
                     .subscribe(v -> popOver.pseudoClassStateChanged(PseudoClass.getPseudoClass("detached"), v));
         EventStreams.valuesOf(popOver.focusedProperty())
                     .subscribe(v -> popOver.pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), v));

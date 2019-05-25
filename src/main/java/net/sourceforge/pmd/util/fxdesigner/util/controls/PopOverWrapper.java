@@ -10,6 +10,10 @@ import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
+import javafx.application.Platform;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+
 /**
  * Wrapper around a popover, that remembers whether it's already shown
  * or not.
@@ -58,9 +62,24 @@ public final class PopOverWrapper<T> {
             return;
         }
         popOver.getRoot().getStylesheets().addAll(DesignerUtil.getCss("popover").toString());
+        popOver.getRoot().applyCss();
         myPopover.setValue(popOver);
     }
 
+    /**
+     * This is a weird hack to preload the FXML and CSS, so that the
+     * first opening of the popover doesn't look completely broken.
+     */
+    public void doFirstLoad(Stage stage) {
+        myPopover.ifPresent(pop -> {
+            pop.getRoot().setOpacity(0);
+            pop.show(stage);
+            Platform.runLater(() -> {
+                pop.hide();
+                pop.getRoot().setOpacity(1);
+            });
+        });
+    }
 
     public T getIdentity() {
         return identity;
@@ -81,5 +100,9 @@ public final class PopOverWrapper<T> {
     @Override
     public int hashCode() {
         return Objects.hash(identity);
+    }
+
+    public void hide() {
+        myPopover.getOpt().filter(Window::isShowing).ifPresent(PopOver::hide);
     }
 }

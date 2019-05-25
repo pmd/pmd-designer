@@ -57,6 +57,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.XpathViolationListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -131,7 +132,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
         this.ruleBuilder = ruleBuilder;
 
         this.exportWizard = new SoftReferenceCache<>(() -> new ExportXPathWizardController(getDesignerRoot()));
-        this.propertiesPopover = new PopOverWrapper<>((t, f) -> PropertyCollectionView.makePopOver(t.getRuleProperties(), root));
+        this.propertiesPopover = new PopOverWrapper<>((t, f) -> PropertyCollectionView.makePopOver(t, titleProperty(), root));
     }
 
     @Override
@@ -160,9 +161,10 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
         violationsTitledPane.titleProperty().bind(currentResults.map(List::size).map(n -> "Matched nodes (" + n + ")"));
 
-        propertiesPopover.rebindIfDifferent(getRuleBuilder());
 
         showPropertiesButton.setOnAction(e -> propertiesPopover.showOrFocus(p -> p.show(showPropertiesButton)));
+        propertiesPopover.rebindIfDifferent(getRuleBuilder());
+        Platform.runLater(() -> propertiesPopover.doFirstLoad(getMainStage()));
     }
 
     @Override
