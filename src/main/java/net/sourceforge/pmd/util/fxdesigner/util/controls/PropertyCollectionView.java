@@ -3,6 +3,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.PopOver;
@@ -44,6 +45,9 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
     private final DesignerRoot root;
 
 
+    private final PopOverWrapper<PropertyDescriptorSpec> myEditPopover;
+
+
     static {
         ValueExtractor.addObservableValueExtractor(c -> c instanceof ListCell, c -> ((ListCell) c).itemProperty());
     }
@@ -59,6 +63,8 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
         Val.wrap(itemsProperty())
            .values()
            .subscribe(e -> rewire(maxHeightProperty(), Bindings.size(e).multiply(LIST_CELL_HEIGHT).add(5)));
+
+        myEditPopover = new PopOverWrapper<>(this::rebindPopover);
     }
 
 
@@ -109,7 +115,44 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
         return popOver;
     }
 
-    private final PopOverWrapper<PropertyDescriptorSpec> myEditPopover = new PopOverWrapper<>();
+    private PopOver detailsPopOver(PropertyDescriptorSpec spec) {
+        EditPropertyDialogController wizard = new EditPropertyDialogController();
+
+        FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("edit-property-dialog.fxml"));
+        loader.setController(wizard);
+
+        Parent root;
+        try {
+            root = loader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        PopOver popOver = new SmartPopover(root);
+        popOver.setHeaderAlwaysVisible(true);
+        popOver.setUserData(wizard);
+        return rebindPopover(spec, popOver);
+    }
+
+    private PopOver rebindPopover(PropertyDescriptorSpec newSpec, PopOver pop) {
+        if (pop == null) {
+            // create it
+            return detailsPopOver(newSpec);
+        }
+        Optional.ofNullable(pop.getOnHiding()).ifPresent(it -> it.handle(null));
+
+        pop.titleProperty().bind(newSpec.nameProperty()
+                                        .filter(StringUtils::isNotBlank)
+                                        .orElseConst("(no name)")
+                                        .map(it -> "Property '" + it + "'"));
+
+        EditPropertyDialogController wizard = (EditPropertyDialogController) pop.getUserData();
+        Subscription sub = wizard.bindToDescriptor(newSpec, getItems()).and(pop.titleProperty()::unbind);
+        pop.setOnHiding(we -> sub.unsubscribe());
+        return pop;
+
+    }
 
     private class PropertyDescriptorCell extends ListCell<PropertyDescriptorSpec> {
 
@@ -129,33 +172,6 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
         }
 
 
-        private PopOver detailsPopOver(PropertyDescriptorSpec spec) {
-            EditPropertyDialogController wizard = new EditPropertyDialogController();
-
-            FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("edit-property-dialog.fxml"));
-            loader.setController(wizard);
-
-            Parent root;
-            try {
-                root = loader.load();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-
-            PopOver popOver = new SmartPopover(root);
-            popOver.setHeaderAlwaysVisible(true);
-            popOver.titleProperty().bind(spec.nameProperty()
-                                             .filter(StringUtils::isNotBlank)
-                                             .orElseConst("(no name)")
-                                             .map(it -> "Property '" + it + "'"));
-            Subscription closeSub = wizard.bindToDescriptor(spec, getItems());
-            popOver.setUserData(wizard);
-            popOver.setOnHiding(e -> closeSub.unsubscribe());
-            return popOver;
-        }
-
-
         private Node buildGraphic(PropertyDescriptorSpec spec) {
 
             HBox hBox = new HBox();
@@ -172,17 +188,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
             edit.setGraphic(new FontIcon("fas-ellipsis-h"));
             edit.getStyleClass().addAll(DETAILS_BUTTON_CLASS, "icon-button");
             edit.setOnAction(e -> {
-                myEditPopover.rebindIfDifferent(spec, (thisSpec, pop) -> {
-                    if (pop != null) {
-                        pop.getOnHiding().handle(null); // hack, unsubscribes the previous one
-                        EditPropertyDialogController wizard = (EditPropertyDialogController) pop.getUserData();
-                        Subscription sub = wizard.bindToDescriptor(thisSpec, getItems());
-                        pop.setOnHiding(we -> sub.unsubscribe());
-                        return pop;
-                    } else {
-                        return detailsPopOver(spec);
-                    }
-                });
+                myEditPopover.rebindIfDifferent(spec);
                 myEditPopover.showOrFocus(p -> PopOverUtil.showAt(p, getMainStage(), this));
             });
 

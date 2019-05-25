@@ -22,9 +22,9 @@ public final class PopOverWrapper<T> {
     private BiFunction<T, PopOver, PopOver> rebinder;
     private T identity;
 
-    public PopOverWrapper() {
+    public PopOverWrapper(BiFunction<T, PopOver, PopOver> rebinder) {
         this.identity = null;
-        this.rebinder = (t, f) -> null;
+        this.rebinder = rebinder;
     }
 
     public void showOrFocus(Consumer<PopOver> showMethod) {
@@ -42,10 +42,9 @@ public final class PopOverWrapper<T> {
         }
     }
 
-    public void rebindIfDifferent(T identity, BiFunction<T, PopOver, PopOver> rebinder) {
+    public void rebindIfDifferent(T identity) {
         if (!Objects.equals(this.identity, identity)) {
             this.identity = identity;
-            this.rebinder = rebinder;
             preload(() -> rebinder.apply(identity, myPopover.getValue()));
         }
     }

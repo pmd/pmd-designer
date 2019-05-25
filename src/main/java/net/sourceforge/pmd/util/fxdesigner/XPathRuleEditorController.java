@@ -32,7 +32,6 @@ import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.lang.rule.XPathRule;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -43,6 +42,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluationException;
 import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluator;
 import net.sourceforge.pmd.util.fxdesigner.popups.ExportXPathWizardController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.CompletionResultSource;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.XPathAutocompleteProvider;
@@ -91,9 +91,13 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
     private static final String NO_MATCH_MESSAGE = "No match in text";
     private static final Duration XPATH_REFRESH_DELAY = Duration.ofMillis(100);
-    private final ObservableXPathRuleBuilder ruleBuilder = new ObservableXPathRuleBuilder();
-    private final PopOverWrapper<ObservableXPathRuleBuilder> propertiesPopover
-        = new PopOverWrapper<>();
+    private static final Pattern JAXEN_MISSING_PROPERTY_EXTRACTOR = Pattern.compile("Variable (\\w+)");
+    private static final Pattern SAXON_MISSING_PROPERTY_EXTRACTOR = Pattern.compile("Undeclared variable in XPath expression: \\$(\\w+)");
+    private final SoftReferenceCache<ExportXPathWizardController> exportWizard;
+    private final ObservableXPathRuleBuilder ruleBuilder;
+    private final Var<ObservableList<Node>> myXpathResults = Var.newSimpleVar(null);
+    private final Var<List<Node>> currentResults = Var.newSimpleVar(Collections.emptyList());
+    private final PopOverWrapper<ObservableXPathRuleBuilder> propertiesPopover;
 
     @FXML
     private ToolbarTitledPane expressionTitledPane;
@@ -110,18 +114,25 @@ public class XPathPanelController extends AbstractController implements NodeSele
     @FXML
     private ListView<TextAwareNodeWrapper> xpathResultListView;
 
-    private final Var<List<Node>> currentResults = Var.newSimpleVar(Collections.emptyList());
-
     // ui property
     private Var<String> xpathVersionUIProperty = Var.newSimpleVar(XPathRuleQuery.XPATH_2_0);
 
     private SuspendableEventStream<TextAwareNodeWrapper> selectionEvents;
 
     public XPathPanelController(DesignerRoot designerRoot) {
-        super(designerRoot);
-        getRuleBuilder().setClazz(XPathRule.class);
+        this(designerRoot, new ObservableXPathRuleBuilder());
     }
 
+    /**
+     * Creates a controller with an existing rule builder.
+     */
+    public XPathRuleEditorController(DesignerRoot root, ObservableXPathRuleBuilder ruleBuilder) {
+        super(root);
+        this.ruleBuilder = ruleBuilder;
+
+        this.exportWizard = new SoftReferenceCache<>(() -> new ExportXPathWizardController(getDesignerRoot()));
+        this.propertiesPopover = new PopOverWrapper<>((t, f) -> PropertyCollectionView.makePopOver(t.getRuleProperties(), root));
+    }
 
     @Override
     protected void beforeParentInit() {
@@ -149,10 +160,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
         violationsTitledPane.titleProperty().bind(currentResults.map(List::size).map(n -> "Matched nodes (" + n + ")"));
 
-        propertiesPopover.rebindIfDifferent(
-            getRuleBuilder(),
-            (t, f) -> PropertyCollectionView.makePopOver(t.getRuleProperties(), getDesignerRoot())
-        );
+        propertiesPopover.rebindIfDifferent(getRuleBuilder());
 
         showPropertiesButton.setOnAction(e -> propertiesPopover.showOrFocus(p -> p.show(showPropertiesButton)));
     }
