@@ -7,7 +7,6 @@
 
     <rule ref="net/sourceforge/pmd/pmd-dogfood-config.xml" />
 
-
     <rule name="InternalApiUsage"
           language="java"
           since="6.5.0"
@@ -22,6 +21,27 @@
             <property name="xpath">
                 <value><![CDATA[
                 //ImportDeclaration/Name[starts-with(@Image, "net.sourceforge.pmd.") and contains(@Image, ".internal")]
+            ]]></value>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- FIXME this doesn't work because "fxml" is not part of the patterns for the XML language... -->
+    <rule name="FxmlApiVersion"
+          language="xml"
+          since="6.5.0"
+          message='FXML docs for this project should specify an API version of 8: xmlns="http://javafx.com/javafx/8"'
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+            FXML docs for this project should specify an API version of 8.
+        </description>
+        <priority>1</priority>
+        <properties>
+            <property name="apiVersion" type="String" value="8" description="JavaFX API version to enforce"/>
+            <property name="version" value="2.0"/>
+            <property name="xpath">
+                <value><![CDATA[
+                //*[starts-with(@xmlns,"http://javafx.com/javafx/") and xmlns != string-join(("http://javafx.com/javafx/", $apiVersion), "")]
             ]]></value>
             </property>
         </properties>

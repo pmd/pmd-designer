@@ -4,14 +4,19 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app;
 
+import java.time.Duration;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
+import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.util.fxdesigner.MainDesignerController;
 import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
+import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 
 /**
@@ -39,11 +44,13 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 public class MessageChannel<T> {
 
     private final EventSource<Message<T>> channel = new EventSource<>();
+    private final Val<Message<T>> latestMessage = ReactfxUtil.latestValue(channel);
     private final Category logCategory;
 
 
     MessageChannel(Category logCategory) {
         this.logCategory = logCategory;
+        latestMessage.pin();
     }
 
 
@@ -56,11 +63,21 @@ public class MessageChannel<T> {
      */
     public EventStream<T> messageStream(boolean alwaysHandle,
                                         ApplicationComponent component) {
-        return channel.hook(message -> component.logMessageTrace(message, () -> component.getDebugName() + " is handling message " + message))
-                       .filter(message -> alwaysHandle || !component.equals(message.getOrigin()))
-                       .map(Message::getContent);
+        // Eliminate duplicate messages in close succession.
+        // TreeView selection is particularly shitty in that regard because
+        // it emits many events for what corresponds to one click
+
+        // This relies on the equality of two messages, so equals and hashcode
+        // must be used correctly.
+        return ReactfxUtil.distinctBetween(channel, Duration.ofMillis(100))
+                          .hook(message -> logMessageTrace(component, message, () -> ""))
+                          .filter(message -> alwaysHandle || !component.equals(message.getOrigin()))
+                          .map(Message::getContent);
     }
 
+    public Val<T> latestMessage() {
+        return latestMessage.map(Message::getContent);
+    }
 
     /**
      * Notifies the listeners of this channel with the given payload.
@@ -72,6 +89,18 @@ public class MessageChannel<T> {
      */
     public void pushEvent(ApplicationComponent origin, T content) {
         channel.push(new Message<>(origin, logCategory, content));
+    }
+
+    /** Traces a message. */
+    private static <T> void logMessageTrace(ApplicationComponent component, Message<T> event, Supplier<String> details) {
+        if (component.isDeveloperMode()) {
+            LogEntry entry = LogEntry.createInternalDebugEntry(event.toString(),
+                                                               details.get(),
+                                                               component,
+                                                               event.getCategory(),
+                                                               true);
+            component.getLogger().logEvent(entry);
+        }
     }
 
 
@@ -133,7 +162,7 @@ public class MessageChannel<T> {
 
         @Override
         public String toString() {
-            return getContent() + "(" + Objects.hashCode(getContent()) + ") from " + getOrigin().getClass().getSimpleName();
+            return getContent() + "(" + hashCode() + ") from " + getOrigin().getDebugName();
         }
     }
 }

@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.reactfx.Subscription;
@@ -24,7 +23,8 @@ import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.popups.EventLogController;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
+import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LimitedSizeStack;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
@@ -38,7 +38,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 
@@ -47,10 +46,6 @@ import javafx.stage.FileChooser;
  * Main controller of the app. Mediator for subdivisions of the UI.
  *
  * @author Clément Fournier
- * @see NodeInfoPanelController
- * @see SourceEditorController
- * @see EventLogController
- * @see XPathPanelController
  * @since 6.0.0
  */
 @SuppressWarnings("PMD.UnusedPrivateField")
@@ -59,11 +54,15 @@ public class MainDesignerController extends AbstractController {
 
     /* Menu bar */
     @FXML
+    private MenuItem aboutMenuItem;
+    @FXML
     private MenuItem setupAuxclasspathMenuItem;
     @FXML
     public MenuItem openEventLogMenuItem;
     @FXML
     private MenuItem openFileMenuItem;
+    @FXML
+    private MenuItem saveMenuItem;
     @FXML
     private MenuItem licenseMenuItem;
     @FXML
@@ -72,20 +71,25 @@ public class MainDesignerController extends AbstractController {
     private Menu fileMenu;
     /* Bottom panel */
     @FXML
-    private TabPane bottomTabPane;
-    @FXML
-    private Tab xpathEditorTab;
-    @FXML
     private SplitPane mainHorizontalSplitPane;
+    @FXML
+    private Tab metricResultsTab;
 
 
     /* Children */
     @FXML
-    private NodeInfoPanelController nodeInfoPanelController;
-    @FXML
-    private XPathPanelController xpathPanelController;
+    private RuleEditorsController ruleEditorsController;
     @FXML
     private SourceEditorController sourceEditorController;
+
+    @FXML
+    private NodeDetailPaneController nodeDetailsTabController;
+    @FXML
+    private MetricPaneController metricPaneController;
+    @FXML
+    private ScopesPanelController scopesPanelController;
+
+
     // we cache it but if it's not used the FXML is not created, etc
     private final SoftReferenceCache<EventLogController> eventLogController;
 
@@ -108,12 +112,14 @@ public class MainDesignerController extends AbstractController {
         openFileMenuItem.setOnAction(e -> onOpenFileClicked());
         openRecentMenu.setOnAction(e -> updateRecentFilesMenu());
         openRecentMenu.setOnShowing(e -> updateRecentFilesMenu());
+        saveMenuItem.setOnAction(e -> getService(DesignerRoot.PERSISTENCE_MANAGER).persistSettings(this));
         fileMenu.setOnShowing(e -> onFileMenuShowing());
+        aboutMenuItem.setOnAction(e -> SimplePopups.showAboutPopup(getDesignerRoot()));
 
         setupAuxclasspathMenuItem.setOnAction(e -> sourceEditorController.showAuxclasspathSetupPopup());
 
         openEventLogMenuItem.setOnAction(e -> {
-            EventLogController wizard = eventLogController.getValue();
+            EventLogController wizard = eventLogController.get();
             Subscription parentToWizSubscription = wizard.errorNodesProperty().values().subscribe(sourceEditorController.currentErrorNodesProperty()::setValue);
             wizard.showPopup(parentToWizSubscription);
         });
@@ -128,16 +134,12 @@ public class MainDesignerController extends AbstractController {
     protected void afterChildrenInit() {
         updateRecentFilesMenu();
 
-        sourceEditorController.currentRuleResultsProperty().bind(xpathPanelController.currentResultsProperty());
+        sourceEditorController.currentRuleResultsProperty().bind(ruleEditorsController.currentRuleResults());
 
-        getGlobalState().writeableGlobalLanguageVersionProperty().bind(sourceEditorController.languageVersionProperty());
-
-    }
-
-
-
-    public void shutdown() {
-        getDesignerRoot().getService(DesignerRoot.PERSISTENCE_MANAGER).persistSettings(this);
+        metricPaneController.numAvailableMetrics().values().subscribe(n -> {
+            metricResultsTab.setText("Metrics\t(" + (n == 0 ? "none" : n) + ")");
+            metricResultsTab.setDisable(n == 0);
+        });
     }
 
 
@@ -158,7 +160,7 @@ public class MainDesignerController extends AbstractController {
             try {
                 String source = IOUtils.toString(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8);
                 sourceEditorController.setText(source);
-                LanguageVersion guess = DesignerUtil.getLanguageVersionFromExtension(file.getName());
+                LanguageVersion guess = LanguageRegistryUtil.getLanguageVersionFromExtension(file.getName());
                 if (guess != null) { // guess the language from the extension
                     sourceEditorController.setLanguageVersion(guess);
                 }
@@ -209,13 +211,13 @@ public class MainDesignerController extends AbstractController {
 
 
     @PersistentProperty
-    public String getRecentFiles() {
-        return recentFiles.stream().map(File::getAbsolutePath).collect(Collectors.joining(File.pathSeparator));
+    public List<File> getRecentFiles() {
+        return recentFiles;
     }
 
 
-    public void setRecentFiles(String files) {
-        Arrays.stream(files.split(File.pathSeparator)).map(File::new).forEach(recentFiles::push);
+    public void setRecentFiles(List<File> files) {
+        files.forEach(recentFiles::push);
     }
 
 
@@ -231,23 +233,15 @@ public class MainDesignerController extends AbstractController {
     }
 
 
-    @PersistentProperty
-    public int getBottomTabIndex() {
-        return bottomTabPane.getSelectionModel().getSelectedIndex();
-    }
-
-
-    public void setBottomTabIndex(int i) {
-        if (i >= 0 && i < bottomTabPane.getTabs().size()) {
-            bottomTabPane.getSelectionModel().select(i);
-        }
-    }
-
-
     @Override
     public List<AbstractController> getChildren() {
-        return Arrays.asList(xpathPanelController, sourceEditorController, nodeInfoPanelController);
+        return Arrays.asList(ruleEditorsController,
+                             sourceEditorController,
+                             nodeDetailsTabController,
+                             metricPaneController,
+                             scopesPanelController);
     }
+
 
 
     @Override

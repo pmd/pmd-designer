@@ -1,4 +1,6 @@
-# Changelog since version 6.12.0
+# Changelog
+
+## 6.14.0
 
 * Added the possibility to select a node directly from the code area.
 To use this, hold the CTRL key pressed for a second. The code area should
@@ -12,3 +14,7 @@ node to which it corresponds:
 
 * When you have selected a node and start editing the code again, your selection
 should be preserved in most cases (on a best-effort basis) instead of reset.
+
+* Improved the XPath export wizard
+
+* Allow multiple independent xpath editors

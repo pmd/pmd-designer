@@ -8,15 +8,14 @@ import java.util.function.Supplier;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
-import net.sourceforge.pmd.util.fxdesigner.app.MessageChannel.Message;
 import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
 import net.sourceforge.pmd.util.fxdesigner.app.services.EventLogger;
-import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalStateHolder;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 
+import javafx.application.Platform;
 import javafx.scene.control.Control;
 import javafx.stage.Stage;
 
@@ -33,6 +32,7 @@ import javafx.stage.Stage;
  *
  * @author Clément Fournier
  */
+@FunctionalInterface
 public interface ApplicationComponent {
 
 
@@ -44,13 +44,8 @@ public interface ApplicationComponent {
     }
 
 
-    default GlobalStateHolder getGlobalState() {
-        return getService(DesignerRoot.APP_STATE_HOLDER);
-    }
-
-
     default LanguageVersion getGlobalLanguageVersion() {
-        return getGlobalState().getGlobalLanguageVersion();
+        return getService(DesignerRoot.AST_MANAGER).languageVersionProperty().getValue();
     }
 
 
@@ -71,6 +66,14 @@ public interface ApplicationComponent {
      */
     default String getDebugName() {
         return getClass().getSimpleName();
+    }
+
+
+    /**
+     * A default category for exceptions coming from this component.
+     */
+    default Category getLogCategory() {
+        return Category.INTERNAL;
     }
 
 
@@ -108,7 +111,7 @@ public interface ApplicationComponent {
      * Only logged in developer mode.
      */
     default void raiseParsableXPathFlag() {
-        getLogger().logEvent(LogEntry.createUserFlagEntry(Category.XPATH_OK));
+        getLogger().logEvent(LogEntry.createUserFlagEntry("", Category.XPATH_OK));
     }
 
 
@@ -116,8 +119,9 @@ public interface ApplicationComponent {
      * Notify the logger that source code parsing succeeded and that the last recent failure may be thrown away.
      * Only logged in developer mode.
      */
-    default void raiseParsableSourceFlag() {
-        getLogger().logEvent(LogEntry.createUserFlagEntry(Category.PARSE_OK));
+    default void raiseParsableSourceFlag(Supplier<String> details) {
+        String realDetails = isDeveloperMode() ? details.get() : "";
+        getLogger().logEvent(LogEntry.createUserFlagEntry(realDetails, Category.PARSE_OK));
     }
 
     // Internal log handlers
@@ -126,23 +130,27 @@ public interface ApplicationComponent {
     /** Logs an exception that occurred somewhere in the app logic. */
     default void logInternalException(Throwable throwable) {
         if (isDeveloperMode()) {
-            getLogger().logEvent(LogEntry.createInternalExceptionEntry(throwable));
+            System.err.println("Exception in " + this.getDebugName() + ": " + throwable.getMessage());
+            System.err.println("  See the event log for more info");
+            getLogger().logEvent(LogEntry.createUserExceptionEntry(throwable, getLogCategory()));
         }
     }
 
 
     /** Logs an exception that occurred somewhere in the app logic. */
     default void logInternalDebugInfo(Supplier<String> shortMessage, Supplier<String> details) {
-        if (isDeveloperMode()) {
-            getLogger().logEvent(LogEntry.createInternalDebugEntry(shortMessage.get(), details.get()));
-        }
+        logInternalDebugInfo(shortMessage, details, false);
     }
 
 
-    /** Traces a message. */
-    default <T> void logMessageTrace(Message<T> event, Supplier<String> details) {
+    /** Logs an exception that occurred somewhere in the app logic. */
+    default void logInternalDebugInfo(Supplier<String> shortMessage, Supplier<String> details, boolean trace) {
         if (isDeveloperMode()) {
-            getLogger().logEvent(LogEntry.createDataEntry(event, event.getCategory(), details.get()));
+            Platform.runLater(() -> getLogger().logEvent(LogEntry.createInternalDebugEntry(shortMessage.get(),
+                                                                                           details.get(),
+                                                                                           this,
+                                                                                           getLogCategory(),
+                                                                                           trace)));
         }
     }
 

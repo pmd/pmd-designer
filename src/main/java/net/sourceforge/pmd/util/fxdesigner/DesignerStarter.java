@@ -6,7 +6,9 @@ package net.sourceforge.pmd.util.fxdesigner;
 
 import javax.swing.JOptionPane;
 
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
+
+import javafx.application.Application;
 
 /**
  * Main class of the app, checking for prerequisites to launching {@link Designer}.
@@ -29,9 +31,10 @@ public final class DesignerStarter {
     }
 
     private static boolean areLanguageModulesAvailable() {
-        return DesignerUtil.defaultLanguageVersion() != null;
+        return LanguageRegistryUtil.defaultLanguageVersion() != null;
     }
 
+    @SuppressWarnings("PMD.AvoidCatchingThrowable")
     public static void main(String[] args) {
 
         String message = null;
@@ -47,6 +50,13 @@ public final class DesignerStarter {
             System.exit(1);
         }
 
-        Designer.main(args);
+
+
+        try {
+            Application.launch(Designer.class, args);
+        } catch (Throwable unrecoverable) {
+            unrecoverable.printStackTrace();
+            System.exit(1);
+        }
     }
 }

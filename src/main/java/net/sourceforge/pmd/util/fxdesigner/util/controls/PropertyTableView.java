@@ -4,7 +4,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.function.Consumer;
 
@@ -15,14 +14,12 @@ import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.popups.EditPropertyDialogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
+import net.sourceforge.pmd.util.fxdesigner.util.StageBuilder;
 
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -44,8 +41,8 @@ import javafx.util.StringConverter;
  * Controls a table view used to inspect and edit the properties of
  * the rule being built. This component is made to be reused in several
  * views.
- * <p>
- * TODO: would be great to make it directly editable without compromising content validation
+ *
+ * <p>TODO: would be great to make it directly editable without compromising content validation
  *
  * @author Clément Fournier
  * @since 6.0.0
@@ -147,7 +144,7 @@ public class PropertyTableView extends TableView<PropertyDescriptorSpec> {
      * @param edited The edited property descriptor
      */
     private void popEditPropertyDialog(PropertyDescriptorSpec edited) {
-        Stage dialog = editPropertyDialogCache.getValue();
+        Stage dialog = editPropertyDialogCache.get();
         EditPropertyDialogController wizard = (EditPropertyDialogController) dialog.getUserData();
         Platform.runLater(() -> wizard.bindToDescriptor(edited, getRuleProperties()));
         dialog.setOnHiding(e -> {
@@ -160,27 +157,13 @@ public class PropertyTableView extends TableView<PropertyDescriptorSpec> {
 
     private Stage createEditPropertyDialog() {
         EditPropertyDialogController wizard = new EditPropertyDialogController();
-
-        FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("edit-property-dialog.fxml"));
-        loader.setController(wizard);
-
-        final Stage dialog = new Stage();
-        dialog.initOwner(this.getScene().getWindow());
-        dialog.initModality(Modality.WINDOW_MODAL);
-        dialog.initStyle(StageStyle.UNDECORATED);
-
-        Parent root;
-        try {
-            root = loader.load();
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-
-        Scene scene = new Scene(root);
-        dialog.setTitle("Edit property");
-        dialog.setScene(scene);
-        dialog.setUserData(wizard);
-        return dialog;
+        return new StageBuilder().withFxml(DesignerUtil.getFxml("edit-property-dialog.fxml"), wizard)
+            .withTitle("Edit property")
+            .withModality(Modality.WINDOW_MODAL)
+            .withStyle(StageStyle.UNDECORATED)
+            .withUserData(wizard)
+            .withOwner(this.getScene().getWindow())
+            .newStage();
     }
 
 

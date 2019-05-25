@@ -6,7 +6,9 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
-<SplitPane dividerPositions="0.45274212368728123" prefHeight="300.0" prefWidth="859.0" stylesheets="@../css/designer.css" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Label?>
+<SplitPane dividerPositions="0.45274212368728123" prefHeight="300.0" prefWidth="859.0" stylesheets="@../css/designer.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <items>
         <AnchorPane>
             <children>
@@ -25,6 +27,10 @@
         <AnchorPane prefWidth="300.0">
             <children>
                 <ToolbarTitledPane collapsible="false" prefWidth="300.0" title="Details" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <toolbarItems>
+                        <Separator/>
+                        <Label fx:id="timePrecisionsLabel"/>
+                    </toolbarItems>
                     <content>
                         <TextArea fx:id="logDetailsTextArea" editable="false" prefHeight="200.0" prefWidth="300.0" />
                     </content>

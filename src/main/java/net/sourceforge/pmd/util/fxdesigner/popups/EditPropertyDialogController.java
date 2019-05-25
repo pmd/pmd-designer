@@ -24,6 +24,7 @@ import net.sourceforge.pmd.properties.ValueParserConstants;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.application.Platform;
 import javafx.beans.property.Property;
@@ -126,10 +127,10 @@ public class EditPropertyDialogController implements Initializable {
     public void bindToDescriptor(PropertyDescriptorSpec spec, ObservableList<PropertyDescriptorSpec> allDescriptors) {
         backingDescriptor.setValue(spec);
         backingDescriptorList.setValue(allDescriptors);
-        DesignerUtil.rewireInit(spec.nameProperty(), this.nameProperty(), this::setName);
-        DesignerUtil.rewireInit(spec.typeIdProperty(), this.typeIdProperty(), this::setTypeId);
-        DesignerUtil.rewireInit(spec.valueProperty(), this.valueProperty(), this::setValue);
-        DesignerUtil.rewireInit(spec.descriptionProperty(), this.descriptionProperty(), this::setDescription);
+        ReactfxUtil.rewireInit(spec.nameProperty(), this.nameProperty(), this::setName);
+        ReactfxUtil.rewireInit(spec.typeIdProperty(), this.typeIdProperty(), this::setTypeId);
+        ReactfxUtil.rewireInit(spec.valueProperty(), this.valueProperty(), this::setValue);
+        ReactfxUtil.rewireInit(spec.descriptionProperty(), this.descriptionProperty(), this::setDescription);
     }
 
 

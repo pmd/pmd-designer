@@ -7,12 +7,13 @@
     <option name="PROGRAM_PARAMETERS" value="-v" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="net.sourceforge.pmd.util.fxdesigner.*" />
+        <option name="PATTERN" value="net.sourceforge.pmd.util.fxdesigner.app.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
     <method v="2">
       <option name="Make" enabled="true" />
+      <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$/pom.xml" goal="process-resources" />
     </method>
   </configuration>
 </component>

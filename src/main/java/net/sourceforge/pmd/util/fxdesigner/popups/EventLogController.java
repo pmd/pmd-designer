@@ -36,6 +36,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -59,6 +60,10 @@ public final class EventLogController extends AbstractController {
 
     private static final PseudoClass NEW_ENTRY = PseudoClass.getPseudoClass("new-entry");
 
+    private final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss+SS");
+
+    @FXML
+    private Label timePrecisionsLabel;
     @FXML
     private TableView<LogEntry> eventLogTableView;
     @FXML
@@ -203,7 +208,7 @@ public final class EventLogController extends AbstractController {
         entry.setExamined(true);
 
         if (entry.getCategory().isUserException()) {
-            DesignerUtil.stackTraceToXPath(entry.getDetails())
+            DesignerUtil.stackTraceToXPath(entry.detailsProperty().getValue())
                         .map(xpath -> XPathEvaluator.simpleEvaluate(getDesignerRoot(), xpath))
                         .ifPresent(selectedErrorNodes::setValue);
         }
@@ -217,9 +222,21 @@ public final class EventLogController extends AbstractController {
         myPopupStage.setOnCloseRequest(e -> popupBinding.unsubscribe());
     }
 
+    private String timePrecisions(LogEntry entry) {
+        String date = dateFormat.format(entry.getTimestamp());
+
+        int idx = eventLogTableView.getItems().indexOf(entry);
+        if (idx + 1 < eventLogTableView.getItems().size()) {
+            date += "  (+";
+            date += entry.getTimestamp().getTime() - eventLogTableView.getItems().get(idx + 1).getTimestamp().getTime();
+            date += "ms)";
+        }
+        return date;
+    }
 
     private void onExceptionSelectionChanges(LogEntry newVal) {
-        logDetailsTextArea.setText(newVal == null ? "" : newVal.getDetails());
+        timePrecisionsLabel.setText(newVal == null ? "" : timePrecisions(newVal));
+        logDetailsTextArea.setText(newVal == null ? "" : newVal.detailsProperty().getValue());
         handleSelectedEntry(newVal);
     }
 

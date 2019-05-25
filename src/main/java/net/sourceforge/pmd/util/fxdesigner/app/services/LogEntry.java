@@ -5,10 +5,13 @@
 package net.sourceforge.pmd.util.fxdesigner.app.services;
 
 import java.util.Date;
-import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.reactfx.value.Var;
+
+import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
+import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 
 
 /**
@@ -17,23 +20,22 @@ import org.reactfx.value.Var;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class LogEntry implements Comparable<LogEntry> {
+public final class LogEntry implements Comparable<LogEntry> {
 
 
-    private final String shortMessage;
     private final Category category;
-    private final String detailsText;
     private final Date timestamp;
+    private static final String INDENT = "    ";
+    private final Var<String> detailsText = Var.newSimpleVar("");
     private final Var<Boolean> wasExamined = Var.newSimpleVar(false);
+    private final Var<String> shortMessage = Var.newSimpleVar("");
+    private final boolean isTrace;
+    private DataHolder holder = new DataHolder();
 
 
-    private LogEntry(String detailsText, String shortMessage, Category cat) {
-        this.detailsText = detailsText;
-        this.shortMessage = shortMessage;
-        this.category = cat;
-        this.timestamp = new Date();
+    public DataHolder getUserMap() {
+        return holder;
     }
-
 
     public boolean isWasExamined() {
         return wasExamined.getValue();
@@ -49,8 +51,12 @@ public class LogEntry implements Comparable<LogEntry> {
     }
 
 
-    public String getMessage() {
-        return shortMessage;
+    private LogEntry(String detailsText, String shortMessage, Category cat, boolean isTrace) {
+        this.category = cat;
+        this.isTrace = isTrace;
+        this.detailsText.setValue(detailsText);
+        this.shortMessage.setValue(shortMessage);
+        this.timestamp = new Date();
     }
 
 
@@ -63,48 +69,65 @@ public class LogEntry implements Comparable<LogEntry> {
         return timestamp;
     }
 
+    public Var<String> messageProperty() {
+        return shortMessage;
+    }
 
     @Override
     public int compareTo(LogEntry o) {
         return getTimestamp().compareTo(o.getTimestamp());
     }
 
+    public boolean isTrace() {
+        return isTrace;
+    }
 
-    public String getDetails() {
+    public Var<String> detailsProperty() {
         return detailsText;
     }
 
-
-    public static LogEntry createUserExceptionEntry(Throwable thrown, Category cat) {
-        return new LogEntry(ExceptionUtils.getStackTrace(thrown), thrown.getMessage(), cat);
+    public LogEntry appendMessage(LogEntry newer) {
+        StringBuilder sb = new StringBuilder(detailsProperty().getValue());
+        sb.append('\n');
+        sb.append(formatDiff(timeDiff(this, newer))).append('\n');
+        String otherDetails = newer.detailsProperty().getValue();
+        sb.append(INDENT);
+        sb.append(otherDetails.replaceAll("\\n", "\n" + INDENT));
+        detailsProperty().setValue(sb.toString());
+        return this;
     }
 
+    public static LogEntry createUserExceptionEntry(Throwable thrown, Category cat) {
+        return new LogEntry(ExceptionUtils.getStackTrace(thrown), thrown.getMessage(), cat, false);
+    }
 
     /**
      * Just for the flag categories {@link Category#PARSE_OK} and {@link Category#XPATH_OK},
      * which are not rendered in the log.
      */
-    public static LogEntry createUserFlagEntry(Category flagCategory) {
-        return new LogEntry("", "", flagCategory);
-    }
-
-
-    public static LogEntry createInternalExceptionEntry(Throwable thrown) {
-        return createUserExceptionEntry(thrown, Category.INTERNAL);
-    }
-
-
-    public static LogEntry createInternalDebugEntry(String shortMessage, String details) {
-        return new LogEntry(details, shortMessage, Category.INTERNAL);
-    }
-
-
-    public static <T> LogEntryWithData<T> createDataEntry(T data, Category category, String details) {
-        return new LogEntryWithData<>(details, Objects.toString(data), category, data);
+    public static LogEntry createUserFlagEntry(String details, Category flagCategory) {
+        return new LogEntry(details, "", flagCategory, false);
     }
 
     public static <T> LogEntry serviceRegistered(AppServiceDescriptor<T> descriptor, T service) {
-        return new LogEntry(service.toString(), descriptor.toString(), Category.SERVICE_REGISTERING);
+        return new LogEntry(service.toString(), descriptor.toString(), Category.SERVICE_REGISTERING, false);
+    }
+
+    public static LogEntry createInternalDebugEntry(String shortMessage,
+                                                    String details,
+                                                    ApplicationComponent component,
+                                                    Category category,
+                                                    boolean trace) {
+        String richDetails = "In " + component.getDebugName() + (StringUtils.isBlank(details) ? "" : "\n\n" + details);
+        return new LogEntry(richDetails, shortMessage, category, trace);
+    }
+
+    private static int timeDiff(LogEntry a, LogEntry b) {
+        return (int) (b.getTimestamp().getTime() - a.getTimestamp().getTime());
+    }
+
+    private static String formatDiff(int diff) {
+        return (diff > 0 ? "+" + diff : diff) + " ms";
     }
 
     public enum Category {
@@ -126,7 +149,8 @@ public class LogEntry implements Comparable<LogEntry> {
         // only relevant to a developer of the app.
         INTERNAL("Internal event", CategoryType.INTERNAL),
         SERVICE_REGISTERING("Service registered", CategoryType.INTERNAL),
-        SELECTION_EVENT_TRACING("Selection event tracing", CategoryType.TRACE);
+        RESOURCE_MANAGEMENT("Resource manager", CategoryType.INTERNAL),
+        SELECTION_EVENT_TRACING("Selection event", CategoryType.INTERNAL);
 
         public final String name;
         private final CategoryType type;
@@ -160,36 +184,9 @@ public class LogEntry implements Comparable<LogEntry> {
         }
 
 
-        public boolean isTrace() {
-            return type == CategoryType.TRACE;
-        }
-
         enum CategoryType {
             USER_EXCEPTION,
-            INTERNAL,
-            /** Trace events are aggregated. */
-            TRACE
-        }
-    }
-
-    static class LogEntryWithData<T> extends LogEntry {
-
-        private final T userData;
-
-
-        private LogEntryWithData(String detailsText, String shortMessage, Category cat, T userData) {
-            super(detailsText, shortMessage, cat);
-            this.userData = userData;
-        }
-
-
-        public T getUserData() {
-            return userData;
-        }
-
-
-        static <T> LogEntryWithData<T> reduceEventTrace(LogEntryWithData<T> prev, LogEntryWithData<T> next) {
-            return createDataEntry(prev.getUserData(), prev.getCategory(), prev.getDetails() + "\n" + next.getDetails());
+            INTERNAL
         }
     }
 

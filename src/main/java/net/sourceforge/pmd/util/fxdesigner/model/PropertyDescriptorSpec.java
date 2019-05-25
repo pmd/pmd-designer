@@ -19,11 +19,6 @@ import net.sourceforge.pmd.properties.builders.PropertyDescriptorExternalBuilder
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 
-import javafx.beans.Observable;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.util.Callback;
-
 
 /**
  * Stores enough data to build a property descriptor, can be displayed within table views.
@@ -190,18 +185,6 @@ public class PropertyDescriptorSpec implements SettingsOwner {
         descriptionProperty().unbind();
         valueProperty().unbind();
     }
-
-
-    /** Extractor for observable lists. */
-    public static Callback<PropertyDescriptorSpec, Observable[]> extractor() {
-        return spec -> new Observable[]{spec.nameProperty(), spec.typeIdProperty(), spec.valueProperty()};
-    }
-
-
-    public static ObservableList<PropertyDescriptorSpec> observableList() {
-        return FXCollections.observableArrayList(extractor());
-    }
-
 
     /**
      * Pushes an event every time the rule owning this property needs to be re-evaluated.

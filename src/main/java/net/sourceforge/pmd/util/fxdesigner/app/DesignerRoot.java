@@ -7,9 +7,11 @@ package net.sourceforge.pmd.util.fxdesigner.app;
 import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NodeSelectionEvent;
+import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
+import net.sourceforge.pmd.util.fxdesigner.app.services.CloseableService;
 import net.sourceforge.pmd.util.fxdesigner.app.services.EventLogger;
-import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalStateHolder;
+import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalDiskManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.PersistenceManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.RichTextMapper;
 
@@ -32,8 +34,10 @@ public interface DesignerRoot {
     AppServiceDescriptor<EventLogger> LOGGER = new AppServiceDescriptor<>(EventLogger.class);
     /** Channel used to transmit node selection events to all interested components. */
     AppServiceDescriptor<MessageChannel<NodeSelectionEvent>> NODE_SELECTION_CHANNEL = new AppServiceDescriptor<>(MessageChannel.class);
-    /** Holds global state about the editor. */
-    AppServiceDescriptor<GlobalStateHolder> APP_STATE_HOLDER = new AppServiceDescriptor<>(GlobalStateHolder.class);
+
+    AppServiceDescriptor<ASTManager> AST_MANAGER = new AppServiceDescriptor<>(ASTManager.class);
+
+    AppServiceDescriptor<GlobalDiskManager> DISK_MANAGER = new AppServiceDescriptor<>(GlobalDiskManager.class);
 
 
     /**
@@ -74,5 +78,12 @@ public interface DesignerRoot {
      */
     Val<Boolean> isCtrlDownProperty(); // TODO this may also be extracted
 
+
+    /**
+     * Shutdown all registered service components that
+     * implement {@link CloseableService}. Called when
+     * the app exits.
+     */
+    void shutdownServices();
 
 }

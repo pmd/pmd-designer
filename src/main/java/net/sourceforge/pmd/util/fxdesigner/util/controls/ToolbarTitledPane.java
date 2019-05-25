@@ -11,7 +11,8 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -34,7 +35,7 @@ import javafx.scene.layout.StackPane;
  * @author Clément Fournier
  * @since 6.11.0
  */
-public final class ToolbarTitledPane extends TitledPane {
+public final class ToolbarTitledPane extends TitledPane implements TitleOwner {
 
 
     private final ToolBar toolBar = new ToolBar();
@@ -44,6 +45,7 @@ public final class ToolbarTitledPane extends TitledPane {
     public ToolbarTitledPane() {
 
         getStyleClass().add("tool-bar-title");
+        toolBar.getStylesheets().add(ResourceUtil.resolveResource("css/flat.css"));
 
         // change the default
         setCollapsible(false);
@@ -75,13 +77,13 @@ public final class ToolbarTitledPane extends TitledPane {
                 // this is the only way to access it outside of css
                 StackPane titleRegion = (StackPane) parent;
 
-                DesignerUtil.rewire(toolBar.maxHeightProperty(), titleRegion.heightProperty());
-                DesignerUtil.rewire(toolBar.minHeightProperty(), titleRegion.heightProperty());
-                DesignerUtil.rewire(toolBar.prefHeightProperty(), titleRegion.heightProperty());
+                ReactfxUtil.rewire(toolBar.maxHeightProperty(), titleRegion.heightProperty());
+                ReactfxUtil.rewire(toolBar.minHeightProperty(), titleRegion.heightProperty());
+                ReactfxUtil.rewire(toolBar.prefHeightProperty(), titleRegion.heightProperty());
 
                 // fill available width, for the spacer to be useful
-                DesignerUtil.rewire(toolBar.minWidthProperty(),
-                                    Val.wrap(titleRegion.widthProperty())
+                ReactfxUtil.rewire(toolBar.minWidthProperty(),
+                                   Val.wrap(titleRegion.widthProperty())
                                        // This "10" is the padding, I couldn't find a reliable way to
                                        // bind cleanly without hardcoding it
                                        .map(it -> it.doubleValue() - errorLabel.getPrefWidth() - 10)
@@ -147,6 +149,7 @@ public final class ToolbarTitledPane extends TitledPane {
     }
 
     /** Title of the pane, not equivalent to {@link #textProperty()}. */
+    @Override
     public Var<String> titleProperty() {
         return title;
     }

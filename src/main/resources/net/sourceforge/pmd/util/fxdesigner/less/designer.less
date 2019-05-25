@@ -17,6 +17,32 @@
 
 }
 
+@removal-color-stack: fade(red, 15), fade(yellow, 15), fade(yellow, 5),;
+
+
+.removal-level-mixin(@selection-color) {
+  .tree-cell {
+    &.removal-level {
+      @foreach-i: {
+        @color: extract(@removal-color-stack, @i + 1);
+        -fx-background-color: @color; &:focused {
+          -fx-background-color: linear-gradient(to right, @color 0%, @selection-color 50%);
+        }
+      };
+
+      .make-depth-classes(length(@removal-color-stack) - 1, @foreach-i);
+    }
+  }
+}
+
+.ast-tree-view {
+  .removal-level-mixin(@darker-accent-border);
+
+  &:focused {
+    .removal-level-mixin(@selection-focus-color);
+  }
+}
+
 .tree-cell.ast-parent {
 
   @foreach-i: { -fx-background-color: linear-gradient(to right, fade(@selection-focus-color, percentage(1- (@i / 5))) 0%, darken(white, 5%) 10%); };
@@ -150,44 +176,13 @@
         -fx-border-insets: 0;
         -fx-border-image-insets: 0;
 
-        & > .label {
-          -fx-background-color: transparent;
-          -fx-font-size: @smaller-font-size;
-
-          // This is the title label of the pane
-          &.title-label {
-            -fx-padding: 0 0 0 6;
-            -fx-font-size: 10pt;
-          }
-
-          &.error-label {
-            .ikonli-font-icon {
-              -fx-fill: #d70000;
-            }
-          }
-        }
-
-        .separator {
-          //-fx-background-color: transparent;
-
-          -fx-padding: 4 2 4 2;
-
-          .line {
-            -fx-border-style: none solid none none;
-            -fx-border-width: 0.5px;
-            -fx-border-color: @fx-text-fill;
-          }
-        }
-
-        .menu-bar {
-          -fx-background-color: transparent;
-        }
       }
     }
   }
 }
 
-.menu-button.menu-button-no-arrow .arrow-button {
+.menu-button.no-arrow .arrow-button,
+.choice-box.no-arrow .open-button {
 
   &, * {
     -fx-padding: 0;
@@ -196,58 +191,6 @@
   }
 }
 
-// This is used for buttons that have just an icon and no text
-.icon-button {
-
-  -fx-background-color: transparent;
-
-  -fx-content-display: CENTER;
-  -fx-border-width: 0;
-  -fx-background-insets: 0;
-  -fx-border-insets: 0;
-  .force-square(24);
-
-  &, * {
-    -fx-graphic-text-gap: 0;
-  }
-
-  &.menu-button .ikonli-font-icon {
-    // Fixes a bug where the cog icon is misplaced to the right
-    // Probably needs to be synced with icon size
-    -fx-translate-x: -4;
-  }
-
-  .ikonli-font-icon, .svg-icon {
-    -fx-fill: @fx-text-fill;
-  }
-
-  &.toggle-button:selected {
-
-    &, &:focused {
-
-      @grad: linear-gradient(to bottom,
-      derive(-fx-color, -22%) 0%,
-      derive(-fx-color, -13%) 20%,
-      derive(-fx-color, -11%) 50%);
-
-      -fx-background-color: -fx-shadow-highlight-color, linear-gradient(to bottom, derive(-fx-outer-border, -20%), -fx-outer-border), @grad;
-
-      -fx-background-insets: 0 0 -1 0, 0, 1;
-    }
-
-    &:hover {
-      -fx-hover-base: @selection-focus-color;
-    }
-  }
-
-  &.menu-button:showing, &:hover {
-    -fx-background-color: @selection-focus-color;
-  }
-
-  .label {
-    -fx-background-color: transparent;
-  }
-}
 
 #main-horizontal-split-pane > .split-pane-divider {
   -fx-background-color: @darker-accent-focus;
@@ -327,7 +270,37 @@
   &:left .tab-header-area {
     -fx-background-insets: 0 1 0 0;
   }
+
+  &.mutable-tab-pane {
+    -fx-open-tab-animation: NONE;
+    -fx-close-tab-animation: NONE;
+
+    .tab-header-area {
+      .tab {
+        -fx-padding: 0 5 0 5;
+        -fx-border-style: none solid none none;
+        -fx-border-color: @darker-accent-border;
+
+        .tab-close-button {
+          -fx-background-color: @fx-text-fill;
+        }
+      }
+    }
+
+    .button.add-tab-button {
+      -fx-padding: 0;
+      -fx-border-insets: 0;
+      -fx-background-insets: 0;
+      -fx-background-color: transparent;
+
+      .ikonli-font-icon {
+        -fx-fill: @fx-text-fill;
+        -fx-font-size: 10px;
+      }
+    }
+  }
 }
+
 
 // Useful link: http://www.guigarage.com/2015/11/styling-a-javafx-scrollbar/
 .scroll-bar {

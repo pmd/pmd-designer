@@ -6,28 +6,28 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar?>
-<BorderPane xmlns="http://javafx.com/javafx/8.0.172-ea"
+<?import javafx.scene.layout.Pane?>
+<BorderPane xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="net.sourceforge.pmd.util.fxdesigner.SourceEditorController">
     <center>
         <SplitPane dividerPositions="0.5"
                    prefHeight="400.0"
                    prefWidth="500.0"
-                   styleClass="accent-header"
                    stylesheets="@../css/designer.css">
             <items>
                 <AnchorPane>
                     <children>
                         <ToolbarTitledPane fx:id="editorTitledPane"
                                            collapsible="false"
-                                           styleClass="accent-header,full-size-title"
                                            title="Source Code"
                                            AnchorPane.bottomAnchor="0.0"
                                            AnchorPane.leftAnchor="0.0"
@@ -36,13 +36,13 @@
                             <toolbarItems>
                                 <MenuButton fx:id="languageSelectionMenuButton"
                                             mnemonicParsing="false"
-                                            styleClass="menu-button-no-arrow,icon-button">
+                                            styleClass="no-arrow,icon-button">
                                     <graphic>
-                                        <FontIcon iconLiteral="fas-cog" />
+                                        <FontIcon iconLiteral="fas-cog"/>
                                     </graphic>
                                     <items>
 
-                                </items>
+                                    </items>
                                 </MenuButton>
                             </toolbarItems>
                             <content>
@@ -50,7 +50,7 @@
                                                      stylesheets="@../css/editor-theme.css"
                                                      BorderPane.alignment="CENTER">
                                     <BorderPane.margin>
-                                        <Insets />
+                                        <Insets/>
                                     </BorderPane.margin>
                                 </NodeEditionCodeArea>
                             </content>
@@ -63,13 +63,18 @@
                                 collapsible="false"
                                 title="Abstract Syntax Tree"
                                 fx:id="astTitledPane"
-                                styleClass="full-size-title"
                                 AnchorPane.bottomAnchor="0.0"
                                 AnchorPane.leftAnchor="0.0"
                                 AnchorPane.rightAnchor="0.0"
                                 AnchorPane.topAnchor="0.0">
+                            <toolbarItems>
+                                <Pane prefWidth="10"/>
+                                <Label fx:id="numNewNodesLabel"/>
+                            </toolbarItems>
 
-                            <AstTreeView fx:id="astTreeView" />
+                            <AstTreeView fx:id="astTreeView">
+                                <highlightFocusParents>false</highlightFocusParents>
+                            </AstTreeView>
 
                         </ToolbarTitledPane>
                     </children>
@@ -80,6 +85,6 @@
     <bottom>
         <NodeParentageCrumbBar fx:id="focusNodeParentageCrumbBar"
                                stylesheets="@../css/crumbbar.css"
-                               prefHeight="30" id="main-toolbar" />
+                               prefHeight="30" id="main-toolbar"/>
     </bottom>
 </BorderPane>

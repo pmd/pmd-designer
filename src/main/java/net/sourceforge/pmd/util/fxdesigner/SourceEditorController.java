@@ -5,20 +5,21 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import static java.util.Collections.emptyList;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.defaultLanguageVersion;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.getSupportedLanguageVersions;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.mapToggleGroupToUserData;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.rewire;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExceptionMessage;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguageVersion;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguageVersions;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
@@ -28,10 +29,12 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.ClasspathClassLoader;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.model.ASTManager;
-import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
+import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
+import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManagerImpl;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
@@ -57,14 +60,15 @@ public class SourceEditorController extends AbstractController {
     private static final Duration AST_REFRESH_DELAY = Duration.ofMillis(100);
     private final ASTManager astManager;
     private final Var<List<File>> auxclasspathFiles = Var.newSimpleVar(emptyList());
-    private final Val<ClassLoader> auxclasspathClassLoader = auxclasspathFiles.map(fileList -> {
+    private final Val<ClassLoader> auxclasspathClassLoader = auxclasspathFiles.<ClassLoader>map(fileList -> {
         try {
             return new ClasspathClassLoader(fileList, SourceEditorController.class.getClassLoader());
         } catch (IOException e) {
             e.printStackTrace();
-            return SourceEditorController.class.getClassLoader();
+            return null;
         }
-    });
+    }).orElseConst(SourceEditorController.class.getClassLoader());
+
     @FXML
     private ToolbarTitledPane astTitledPane;
     @FXML
@@ -79,12 +83,15 @@ public class SourceEditorController extends AbstractController {
     private NodeParentageCrumbBar focusNodeParentageCrumbBar;
 
 
+
     private Var<LanguageVersion> languageVersionUIProperty;
 
 
     public SourceEditorController(DesignerRoot designerRoot) {
         super(designerRoot);
-        astManager = new ASTManager(designerRoot);
+        this.astManager = new ASTManagerImpl(designerRoot);
+
+        designerRoot.registerService(DesignerRoot.AST_MANAGER, astManager);
     }
 
 
@@ -103,48 +110,65 @@ public class SourceEditorController extends AbstractController {
                                  .map(lang -> "Source Code (" + lang + ")")
                                  .subscribe(editorTitledPane::setTitle);
 
-        nodeEditionCodeArea.plainTextChanges()
-                           .filter(t -> !t.isIdentity())
-                           .successionEnds(AST_REFRESH_DELAY)
-                           // Refresh the AST anytime the text, classloader, or language version changes
-                           .or(auxclasspathClassLoader.changes())
-                           .or(languageVersionProperty().changes())
-                           .subscribe(tick -> {
-                               // Discard the AST if the language version has changed
-                               tick.ifRight(c -> astTreeView.setRoot(null));
-                               refreshAST();
-                           });
+        astManager.languageVersionProperty()
+                  .changes()
+                  .subscribe(c -> astTreeView.setAstRoot(null));
+
+        ((ASTManagerImpl) astManager).classLoaderProperty().bind(auxclasspathClassLoader);
 
         // default text, will be overwritten by settings restore
-        // TODO this doesn't handle the case where java is not on the classpath
-        setText("class Foo {\n"
-                    + "\n"
-                    + "    /*\n"
-                    + "        Welcome to the PMD Rule designer :)\n"
-                    + "\n"
-                    + "        Type some code in this area\n"
-                    + "        \n"
-                    + "        On the right, the Abstract Syntax Tree is displayed\n"
-                    + "        On the left, you can examine the XPath attributes of\n"
-                    + "        the nodes you select\n"
-                    + "        \n"
-                    + "        You can set the language you'd like to work in with\n"
-                    + "        the cog icon above this code area\n"
-                    + "     */\n"
-                    + "\n"
-                    + "    int i = 0;\n"
-                    + "}");
-
+        setText(getDefaultText());
     }
 
-
     @Override
-    protected void afterParentInit() {
-        rewire(astManager.languageVersionProperty(), languageVersionUIProperty);
+    public void afterParentInit() {
+
+        rewire(((ASTManagerImpl) astManager).languageVersionProperty(), languageVersionUIProperty);
+
+        nodeEditionCodeArea.replaceText(astManager.getSourceCode());
+
+        nodeEditionCodeArea.plainTextChanges()
+                           .successionEnds(AST_REFRESH_DELAY)
+                           .map(it -> nodeEditionCodeArea.getText())
+                           .subscribe(((ASTManagerImpl) astManager)::setSourceCode);
+
+
         nodeEditionCodeArea.moveCaret(0, 0);
+
+        initTreeView(astManager, astTreeView, editorTitledPane.errorMessageProperty());
 
         getDesignerRoot().registerService(DesignerRoot.RICH_TEXT_MAPPER, nodeEditionCodeArea);
     }
+
+
+    private String getDefaultText() {
+        try {
+            // TODO this should take language into account
+            //  it doesn't handle the case where java is not on the classpath
+
+            return IOUtils.resourceToString(ResourceUtil.resolveResource("placeholders/editor.java"), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "class Foo {\n"
+                + "\n"
+                + "    /*\n"
+                + "        Welcome to the PMD Rule designer :)\n"
+                + "\n"
+                + "        Type some code in this area\n"
+                + "        \n"
+                + "        On the right, the Abstract Syntax Tree is displayed\n"
+                + "        On the left, you can examine the XPath attributes of\n"
+                + "        the nodes you select\n"
+                + "        \n"
+                + "        You can set the language you'd like to work in with\n"
+                + "        the cog icon above this code area\n"
+                + "     */\n"
+                + "\n"
+                + "    int i = 0;\n"
+                + "}";
+        }
+    }
+
 
 
     private void initializeLanguageSelector() {
@@ -164,43 +188,17 @@ public class SourceEditorController extends AbstractController {
                         languageSelectionMenuButton.getItems().add(item);
                     });
 
-        languageVersionUIProperty = mapToggleGroupToUserData(languageToggleGroup, DesignerUtil::defaultLanguageVersion);
+        languageVersionUIProperty = mapToggleGroupToUserData(languageToggleGroup, LanguageRegistryUtil::defaultLanguageVersion);
         // this will be overwritten by property restore if needed
         languageVersionUIProperty.setValue(defaultLanguageVersion());
     }
 
-    /**
-     * Refreshes the AST and returns the new compilation unit if the parse didn't fail.
-     */
-    public void refreshAST() {
-        String source = getText();
-
-        if (StringUtils.isBlank(source)) {
-            astTreeView.setAstRoot(null);
-            return;
-        }
-
-
-        try {
-            // this will push the new compilation unit on the global Val
-            astManager.updateIfChanged(source, auxclasspathClassLoader.getValue())
-                      .ifPresent(this::setUpToDateCompilationUnit);
-        } catch (ParseAbortedException e) {
-            editorTitledPane.errorMessageProperty().setValue(sanitizeExceptionMessage(e));
-            getGlobalState().writableGlobalCompilationUnitProperty().setValue(null);
-        }
-    }
 
 
     public void showAuxclasspathSetupPopup() {
         new AuxclasspathSetupController(getDesignerRoot()).show(getMainStage(), auxclasspathFiles.getValue(), auxclasspathFiles::setValue);
     }
 
-
-    private void setUpToDateCompilationUnit(Node node) {
-        editorTitledPane.errorMessageProperty().setValue("");
-        astTreeView.setAstRoot(node);
-    }
 
     public Var<List<Node>> currentRuleResultsProperty() {
         return nodeEditionCodeArea.currentRuleResultsProperty();
@@ -212,7 +210,6 @@ public class SourceEditorController extends AbstractController {
     }
 
 
-    @PersistentProperty
     public LanguageVersion getLanguageVersion() {
         return languageVersionUIProperty.getValue();
     }
@@ -228,7 +225,6 @@ public class SourceEditorController extends AbstractController {
     }
 
 
-    @PersistentProperty
     public String getText() {
         return nodeEditionCodeArea.getText();
     }
@@ -245,19 +241,55 @@ public class SourceEditorController extends AbstractController {
 
 
     @PersistentProperty
-    public String getAuxclasspathFiles() {
-        return auxclasspathFiles.getValue().stream().map(File::getAbsolutePath).collect(Collectors.joining(File.pathSeparator));
+    public List<File> getAuxclasspathFiles() {
+        return auxclasspathFiles.getValue();
     }
 
 
-    public void setAuxclasspathFiles(String files) {
-        List<File> newVal = Arrays.stream(files.split(File.pathSeparator)).map(File::new).collect(Collectors.toList());
-        auxclasspathFiles.setValue(newVal);
+    public void setAuxclasspathFiles(List<File> files) {
+        auxclasspathFiles.setValue(files);
     }
 
+
+    @Override
+    public List<? extends SettingsOwner> getChildrenSettingsNodes() {
+        return Collections.singletonList(astManager);
+    }
 
     @Override
     public String getDebugName() {
         return "editor";
     }
+
+    /**
+     * Refreshes the AST and returns the new compilation unit if the parse didn't fail.
+     */
+    private static void initTreeView(ASTManager manager,
+                                     AstTreeView treeView,
+                                     Var<String> errorMessageProperty) {
+
+        manager.sourceCodeProperty()
+               .values()
+               .filter(StringUtils::isBlank)
+               .subscribe(code -> treeView.setAstRoot(null));
+
+        manager.currentExceptionProperty()
+               .values()
+               .subscribe(e -> {
+                   if (e == null) {
+                       errorMessageProperty.setValue(null);
+                   } else {
+                       errorMessageProperty.setValue(sanitizeExceptionMessage(e));
+                   }
+               });
+
+        manager.compilationUnitProperty()
+               .values()
+               .filter(Objects::nonNull)
+               .subscribe(node -> {
+                   errorMessageProperty.setValue("");
+                   treeView.setAstRoot(node);
+               });
+    }
+
 }
