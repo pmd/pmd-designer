@@ -33,6 +33,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 /**
  * @author Clément Fournier
@@ -40,21 +41,8 @@ import javafx.scene.layout.Priority;
 public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> implements ApplicationComponent {
 
     private static final int LIST_CELL_HEIGHT = 24;
+    private int id = 0;
     private final DesignerRoot root;
-    // unique item representing the "ADD property" button
-    private static final PropertyDescriptorSpec SPECIAL_ADD_SPEC = new PropertyDescriptorSpec() {
-        @Override
-        public boolean equals(Object obj) {
-            return this == obj;
-        }
-
-        @Override
-        public int hashCode() {
-            return super.hashCode();
-        }
-    };
-
-    private ObservableList<PropertyDescriptorSpec> realItems;
 
 
     static {
@@ -64,9 +52,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
 
     public PropertyCollectionView(@NamedArg("designerRoot") DesignerRoot root, ObservableList<PropertyDescriptorSpec> realItems) {
         this.root = root;
-        this.realItems = realItems;
-
-        setItems(new FakeTailObservableList<>(this.realItems, SPECIAL_ADD_SPEC));
+        setItems(realItems);
 
         setFixedCellSize(LIST_CELL_HEIGHT);
         setCellFactory(lv -> new PropertyDescriptorCell());
@@ -98,9 +84,27 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
             });
     }
 
+    private String getUniqueNewName() {
+        return "New property (" + id++ + ")";
+    }
+
     public static PopOver makePopOver(ObservableList<PropertyDescriptorSpec> items, DesignerRoot designerRoot) {
+        VBox vbox = new VBox();
         PropertyCollectionView view = new PropertyCollectionView(designerRoot, items);
-        PopOver popOver = new SmartPopover(view);
+        Pane footer = new Pane();
+        footer.setPrefHeight(30);
+        footer.getStyleClass().addAll("popover-footer");
+        footer.getStylesheets().addAll(DesignerUtil.getCss("flat").toString());
+        Button addProperty = new Button("Add property");
+        addProperty.setOnAction(e -> {
+            PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
+            spec.setName(view.getUniqueNewName());
+            view.getItems().add(spec);
+        });
+        footer.getChildren().addAll(addProperty);
+        vbox.getChildren().addAll(view, footer);
+
+        PopOver popOver = new SmartPopover(vbox);
         popOver.setTitle("Rule properties");
         popOver.setHeaderAlwaysVisible(true);
         return popOver;
@@ -118,25 +122,10 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
             if (empty || item == null) {
                 setText(null);
                 setGraphic(null);
-            } else if (item == SPECIAL_ADD_SPEC) {
-                setGraphic(addPropertyButton());
             } else {
                 myEditPopover.rebindIfDifferent(item, () -> detailsPopOver(item));
                 setGraphic(buildGraphic(item));
             }
-        }
-
-        private Node addPropertyButton() {
-            Button b = new Button("Add property");
-            b.setOnAction(e -> {
-                PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
-                spec.setName("TODO");
-                getItems().add(spec);
-//                PopOver popOver = detailsPopOver(spec);
-//                System.out.println(popOver);
-//                Platform.runLater(() -> popOver.show(b));
-            });
-            return b;
         }
 
 
@@ -160,7 +149,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
                                              .filter(StringUtils::isNotBlank)
                                              .orElseConst("(no name)")
                                              .map(it -> "Property '" + it + "'"));
-            Subscription closeSub = wizard.bindToDescriptor(spec, realItems);
+            Subscription closeSub = wizard.bindToDescriptor(spec, getItems());
             popOver.setOnHiding(e -> closeSub.unsubscribe());
             return popOver;
         }

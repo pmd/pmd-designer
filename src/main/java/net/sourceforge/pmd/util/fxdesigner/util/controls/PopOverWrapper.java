@@ -7,6 +7,10 @@ import java.util.function.Supplier;
 import org.controlsfx.control.PopOver;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+
+import javafx.application.Platform;
+
 /**
  * Wrapper around a popover, that remembers whether it's already shown
  * or not.
@@ -29,7 +33,6 @@ public final class PopOverWrapper<T> {
             myPopover.getValue().requestFocus();
         } else if (myPopover.isPresent()) {
             showMethod.accept(myPopover.getValue());
-            PopOverUtil.fixStyleSheets(myPopover.getValue());
         } else {
             if (supplier == null) {
                 throw new IllegalStateException("Unitialized");
@@ -39,6 +42,7 @@ public final class PopOverWrapper<T> {
                 throw new IllegalStateException("Improper supplier");
             }
             myPopover.setValue(popOver);
+            popOver.getRoot().getStylesheets().addAll(DesignerUtil.getCss("popover").toString());
             showOrFocus(showMethod); // fall into the above branch
         }
     }
@@ -47,7 +51,20 @@ public final class PopOverWrapper<T> {
         if (!Objects.equals(this.identity, identity)) {
             this.identity = identity;
             this.supplier = supplier;
+            preload(supplier);
         }
+    }
+
+    private void preload(Supplier<PopOver> supplier) {
+        if (supplier == null) {
+            return;
+        }
+        PopOver popOver = supplier.get();
+        if (popOver == null) {
+            return;
+        }
+        popOver.getRoot().getStylesheets().addAll(DesignerUtil.getCss("popover").toString());
+        myPopover.setValue(popOver);
     }
 
 

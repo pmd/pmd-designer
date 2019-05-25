@@ -6,6 +6,8 @@ import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.addCustomSty
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.controlsfx.control.PopOver;
 
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+
 import javafx.css.Styleable;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
@@ -77,14 +79,5 @@ public final class PopOverUtil {
         }
     }
 
-
-    /**
-     * Must be called after "show".
-     *
-     * @param popOver
-     */
-    public static void fixStyleSheets(PopOver popOver) {
-        addCustomStyleSheets(((Parent) popOver.getSkin().getNode()), "popover");
-    }
 
 }
