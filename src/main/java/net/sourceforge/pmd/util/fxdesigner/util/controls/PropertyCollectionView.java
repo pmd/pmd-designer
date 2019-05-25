@@ -16,7 +16,6 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.popups.EditPropertyDialogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.reactfx.FakeTailObservableList;
 
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
@@ -110,10 +109,12 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
         return popOver;
     }
 
+    private final PopOverWrapper<PropertyDescriptorSpec> myEditPopover = new PopOverWrapper<>();
+
     private class PropertyDescriptorCell extends ListCell<PropertyDescriptorSpec> {
 
         private static final String DETAILS_BUTTON_CLASS = "my-details-button";
-        private final PopOverWrapper<PropertyDescriptorSpec> myEditPopover = new PopOverWrapper<>(null, () -> null);
+        private static final String DELETE_BUTTON_CLASS = "delete-property-button";
 
         @Override
         protected void updateItem(PropertyDescriptorSpec item, boolean empty) {
@@ -123,7 +124,6 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
                 setText(null);
                 setGraphic(null);
             } else {
-                myEditPopover.rebindIfDifferent(item, () -> detailsPopOver(item));
                 setGraphic(buildGraphic(item));
             }
         }
@@ -150,6 +150,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
                                              .orElseConst("(no name)")
                                              .map(it -> "Property '" + it + "'"));
             Subscription closeSub = wizard.bindToDescriptor(spec, getItems());
+            popOver.setUserData(wizard);
             popOver.setOnHiding(e -> closeSub.unsubscribe());
             return popOver;
         }
@@ -170,10 +171,27 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
             Button edit = new Button();
             edit.setGraphic(new FontIcon("fas-ellipsis-h"));
             edit.getStyleClass().addAll(DETAILS_BUTTON_CLASS, "icon-button");
-            edit.setOnAction(e -> myEditPopover.showOrFocus(p -> PopOverUtil.showAt(p, getMainStage(), this)));
+            edit.setOnAction(e -> {
+                myEditPopover.rebindIfDifferent(spec, (thisSpec, pop) -> {
+                    if (pop != null) {
+                        pop.getOnHiding().handle(null); // hack, unsubscribes the previous one
+                        EditPropertyDialogController wizard = (EditPropertyDialogController) pop.getUserData();
+                        Subscription sub = wizard.bindToDescriptor(thisSpec, getItems());
+                        pop.setOnHiding(we -> sub.unsubscribe());
+                        return pop;
+                    } else {
+                        return detailsPopOver(spec);
+                    }
+                });
+                myEditPopover.showOrFocus(p -> PopOverUtil.showAt(p, getMainStage(), this));
+            });
 
-            hBox.getChildren().setAll(label, spacer, edit);
+            Button delete = new Button();
+            delete.setGraphic(new FontIcon("fas-trash-alt"));
+            delete.getStyleClass().addAll(DETAILS_BUTTON_CLASS, "icon-button");
+            delete.setOnAction(e -> getItems().remove(spec));
 
+            hBox.getChildren().setAll(label, spacer, delete, edit);
             hBox.setAlignment(Pos.CENTER_LEFT);
 
             return hBox;

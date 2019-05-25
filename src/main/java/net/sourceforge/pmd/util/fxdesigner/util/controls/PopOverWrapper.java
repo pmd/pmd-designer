@@ -1,6 +1,7 @@
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -8,8 +9,6 @@ import org.controlsfx.control.PopOver;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-
-import javafx.application.Platform;
 
 /**
  * Wrapper around a popover, that remembers whether it's already shown
@@ -20,12 +19,12 @@ import javafx.application.Platform;
 public final class PopOverWrapper<T> {
 
     private final Var<PopOver> myPopover = Var.newSimpleVar(null);
-    private Supplier<PopOver> supplier;
+    private BiFunction<T, PopOver, PopOver> rebinder;
     private T identity;
 
-    public PopOverWrapper(T identity, Supplier<PopOver> supplier) {
-        this.identity = identity;
-        this.supplier = supplier;
+    public PopOverWrapper() {
+        this.identity = null;
+        this.rebinder = (t, f) -> null;
     }
 
     public void showOrFocus(Consumer<PopOver> showMethod) {
@@ -34,24 +33,20 @@ public final class PopOverWrapper<T> {
         } else if (myPopover.isPresent()) {
             showMethod.accept(myPopover.getValue());
         } else {
-            if (supplier == null) {
-                throw new IllegalStateException("Unitialized");
+            preload(() -> rebinder.apply(identity, null));
+            if (myPopover.isEmpty()) {
+                System.err.println("Wrong supplier, cannot rebind popover");
+            } else {
+                showMethod.accept(myPopover.getValue());
             }
-            PopOver popOver = supplier.get();
-            if (popOver == null) {
-                throw new IllegalStateException("Improper supplier");
-            }
-            myPopover.setValue(popOver);
-            popOver.getRoot().getStylesheets().addAll(DesignerUtil.getCss("popover").toString());
-            showOrFocus(showMethod); // fall into the above branch
         }
     }
 
-    public void rebindIfDifferent(T identity, Supplier<PopOver> supplier) {
+    public void rebindIfDifferent(T identity, BiFunction<T, PopOver, PopOver> rebinder) {
         if (!Objects.equals(this.identity, identity)) {
             this.identity = identity;
-            this.supplier = supplier;
-            preload(supplier);
+            this.rebinder = rebinder;
+            preload(() -> rebinder.apply(identity, myPopover.getValue()));
         }
     }
 

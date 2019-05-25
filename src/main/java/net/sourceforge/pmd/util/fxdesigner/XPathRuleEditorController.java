@@ -93,7 +93,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
     private static final Duration XPATH_REFRESH_DELAY = Duration.ofMillis(100);
     private final ObservableXPathRuleBuilder ruleBuilder = new ObservableXPathRuleBuilder();
     private final PopOverWrapper<ObservableXPathRuleBuilder> propertiesPopover
-        = new PopOverWrapper<>(null, () -> null);
+        = new PopOverWrapper<>();
 
     @FXML
     private ToolbarTitledPane expressionTitledPane;
@@ -151,7 +151,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
         propertiesPopover.rebindIfDifferent(
             getRuleBuilder(),
-            () -> PropertyCollectionView.makePopOver(getRuleBuilder().getRuleProperties(), getDesignerRoot())
+            (t, f) -> PropertyCollectionView.makePopOver(t.getRuleProperties(), getDesignerRoot())
         );
 
         showPropertiesButton.setOnAction(e -> propertiesPopover.showOrFocus(p -> p.show(showPropertiesButton)));
