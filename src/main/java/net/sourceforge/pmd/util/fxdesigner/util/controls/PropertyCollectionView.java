@@ -30,6 +30,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -96,11 +97,19 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
     public static PopOver makePopOver(ObservableList<PropertyDescriptorSpec> items, DesignerRoot designerRoot) {
         VBox vbox = new VBox();
         PropertyCollectionView view = new PropertyCollectionView(designerRoot, items);
-        Pane footer = new Pane();
+
+        AnchorPane footer = new AnchorPane();
         footer.setPrefHeight(30);
         footer.getStyleClass().addAll("popover-footer");
         footer.getStylesheets().addAll(DesignerUtil.getCss("flat").toString());
+
         Button addProperty = new Button("Add property");
+        AnchorPane.setLeftAnchor(addProperty, 0.);
+        AnchorPane.setRightAnchor(addProperty, 0.);
+        AnchorPane.setBottomAnchor(addProperty, 0.);
+        AnchorPane.setTopAnchor(addProperty, 0.);
+
+
         addProperty.setOnAction(e -> {
             PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
             spec.setName(view.getUniqueNewName());
