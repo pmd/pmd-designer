@@ -40,11 +40,11 @@ public final class PopOverWrapper<T> {
             }
             myPopover.setValue(popOver);
             showMethod.accept(popOver);
-            SetChangeListener<PseudoClass> listener = ch -> {
-                System.out.println(ch.getSet());
-            };
-            PopOverUtil.getStyleableNode(popOver).getPseudoClassStates().addListener(listener);
-
+            //            DEBUG
+            //            SetChangeListener<PseudoClass> listener = ch -> {
+            //                System.out.println(ch.getSet());
+            //            };
+            //            PopOverUtil.getStyleableNode(popOver).getPseudoClassStates().addListener(listener);
             PopOverUtil.fixStyleSheets(popOver);
         }
     }
