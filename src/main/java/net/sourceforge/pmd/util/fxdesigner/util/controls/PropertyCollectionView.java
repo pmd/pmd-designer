@@ -30,6 +30,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -42,7 +43,6 @@ import javafx.scene.layout.VBox;
 public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> implements ApplicationComponent {
 
     private static final int LIST_CELL_HEIGHT = 24;
-    private int id = 0;
     private final DesignerRoot root;
 
 
@@ -90,8 +90,21 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
             });
     }
 
+    /**
+     * Gets a unique new name for a property.
+     */
     private String getUniqueNewName() {
-        return "New property (" + id++ + ")";
+        return getUniqueNewName("New property");
+    }
+
+    private String getUniqueNewName(String attempt) {
+        // this suffixing scheme is obnoxious, but nobody should
+        // spam the button
+        if (getItems().stream().anyMatch(it -> attempt.equals(it.getName()))) {
+            return getUniqueNewName(attempt + " (1)");
+        } else {
+            return attempt;
+        }
     }
 
     public static PopOver makePopOver(ObservableList<PropertyDescriptorSpec> items, DesignerRoot designerRoot) {
@@ -103,7 +116,9 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
         footer.getStyleClass().addAll("popover-footer");
         footer.getStylesheets().addAll(DesignerUtil.getCss("flat").toString());
 
+
         Button addProperty = new Button("Add property");
+
         AnchorPane.setLeftAnchor(addProperty, 0.);
         AnchorPane.setRightAnchor(addProperty, 0.);
         AnchorPane.setBottomAnchor(addProperty, 0.);
@@ -114,6 +129,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
             PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
             spec.setName(view.getUniqueNewName());
             view.getItems().add(spec);
+            // TODO pop the edit view
         });
         footer.getChildren().addAll(addProperty);
         vbox.getChildren().addAll(view, footer);
@@ -196,6 +212,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
             Button edit = new Button();
             edit.setGraphic(new FontIcon("fas-ellipsis-h"));
             edit.getStyleClass().addAll(DETAILS_BUTTON_CLASS, "icon-button");
+            Tooltip.install(edit, new Tooltip("Edit property..."));
             edit.setOnAction(e -> {
                 myEditPopover.rebindIfDifferent(spec);
                 myEditPopover.showOrFocus(p -> PopOverUtil.showAt(p, getMainStage(), this));
@@ -203,7 +220,8 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
 
             Button delete = new Button();
             delete.setGraphic(new FontIcon("fas-trash-alt"));
-            delete.getStyleClass().addAll(DETAILS_BUTTON_CLASS, "icon-button");
+            delete.getStyleClass().addAll(DELETE_BUTTON_CLASS, "icon-button");
+            Tooltip.install(delete, new Tooltip("Remove property"));
             delete.setOnAction(e -> getItems().remove(spec));
 
             hBox.getChildren().setAll(label, spacer, delete, edit);
