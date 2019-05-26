@@ -75,7 +75,11 @@
 
                                 <Separator orientation="VERTICAL"/>
 
-                                <Button fx:id="showPropertiesButton" mnemonicParsing="false" text="Properties..."/>
+                                <Button fx:id="showPropertiesButton" mnemonicParsing="false" text="Properties...">
+                                    <tooltip>
+                                        <Tooltip text="Inspect rule properties" />
+                                    </tooltip>
+                                </Button>
                             </toolbarItems>
                             <content>
                                 <SyntaxHighlightingCodeArea stylesheets="@../css/editor-theme.css" fx:id="xpathExpressionArea" />
