@@ -56,6 +56,9 @@ public class NodeDetailPaneController extends AbstractController implements Node
 
         Val<Node> currentSelection = initNodeSelectionHandling(getDesignerRoot(), EventStreams.never(), false);
 
+        // pin to see updates
+        currentSelection.pin();
+
         hideCommonAttributesProperty()
             .values()
             .distinct()

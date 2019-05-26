@@ -62,6 +62,10 @@ public interface NodeSelectionSource extends ApplicationComponent {
      * @param mySelectionEvents     Stream of nodes that should push an event each time the user selects a node
      *                              from this control. The whole app will sync to this new selection.
      * @param alwaysHandleSelection Whether the component should handle selection events that originated from itself.
+     *
+     * @return A Val reflecting the current global selection for the app.
+     * Note that that Val is lazy and so if you don't subscribe to it or
+     * {@linkplain Val#pin() pin it} you won't see updates!
      */
     default Val<Node> initNodeSelectionHandling(DesignerRoot root,
                                                 EventStream<? extends NodeSelectionEvent> mySelectionEvents,
