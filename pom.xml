@@ -521,6 +521,12 @@
             <version>${pmd.core.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.sourceforge.pmd</groupId>
+            <artifactId>pmd-test</artifactId>
+            <version>${pmd.core.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
