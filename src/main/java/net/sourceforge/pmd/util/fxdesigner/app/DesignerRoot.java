@@ -25,19 +25,23 @@ import javafx.stage.Stage;
  */
 public interface DesignerRoot {
 
+    // Those are shared by all the app
 
-    /** Maps a node to its rich text representation. */
-    AppServiceDescriptor<RichTextMapper> RICH_TEXT_MAPPER = new AppServiceDescriptor<>(RichTextMapper.class);
     /** Manages settings persistence. */
     AppServiceDescriptor<PersistenceManager> PERSISTENCE_MANAGER = new AppServiceDescriptor<>(PersistenceManager.class);
     /** Logger of the app. */
     AppServiceDescriptor<EventLogger> LOGGER = new AppServiceDescriptor<>(EventLogger.class);
-    /** Channel used to transmit node selection events to all interested components. */
-    AppServiceDescriptor<MessageChannel<NodeSelectionEvent>> NODE_SELECTION_CHANNEL = new AppServiceDescriptor<>(MessageChannel.class);
-
-    AppServiceDescriptor<ASTManager> AST_MANAGER = new AppServiceDescriptor<>(ASTManager.class);
 
     AppServiceDescriptor<GlobalDiskManager> DISK_MANAGER = new AppServiceDescriptor<>(GlobalDiskManager.class);
+
+    // Those are local to one edit session
+
+    /** Maps a node to its rich text representation. */
+    AppServiceDescriptor<RichTextMapper> RICH_TEXT_MAPPER = new AppServiceDescriptor<>(RichTextMapper.class);
+    /** Channel used to transmit node selection events to all interested components. */
+    AppServiceDescriptor<MessageChannel<NodeSelectionEvent>> NODE_SELECTION_CHANNEL = new AppServiceDescriptor<>(MessageChannel.class);
+    /** AST manager of the current code. */
+    AppServiceDescriptor<ASTManager> AST_MANAGER = new AppServiceDescriptor<>(ASTManager.class);
 
 
     /**
