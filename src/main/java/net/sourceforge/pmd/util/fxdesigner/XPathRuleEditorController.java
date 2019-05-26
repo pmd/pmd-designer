@@ -101,6 +101,8 @@ public class XPathPanelController extends AbstractController implements NodeSele
     private final PopOverWrapper<ObservableXPathRuleBuilder> propertiesPopover;
 
     @FXML
+    public TestCollectionController testCollectionController;
+    @FXML
     private ToolbarTitledPane expressionTitledPane;
     @FXML
     private Button exportXpathToRuleButton;
@@ -129,6 +131,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
      */
     public XPathRuleEditorController(DesignerRoot root, ObservableXPathRuleBuilder ruleBuilder) {
         super(root);
+        this.testCollectionController = new TestCollectionController(root, ruleBuilder.getTestCollection());
         this.ruleBuilder = ruleBuilder;
 
         this.exportWizard = new SoftReferenceCache<>(() -> new ExportXPathWizardController(root));
@@ -401,6 +404,11 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
     private void addProperty(String name) {
         // TODO
+    }
+
+    @Override
+    public List<AbstractController> getChildren() {
+        return Collections.singletonList(testCollectionController);
     }
 
     private javafx.scene.Node getErrorPlaceholder(String message) {

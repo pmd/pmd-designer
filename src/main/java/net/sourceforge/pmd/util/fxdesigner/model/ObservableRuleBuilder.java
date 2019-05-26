@@ -4,6 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import org.reactfx.collection.LiveArrayList;
@@ -17,6 +18,7 @@ import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.rules.RuleBuilder;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCollection;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
@@ -56,6 +58,7 @@ public class ObservableRuleBuilder implements SettingsOwner {
     private final Var<Boolean> usesMultifile = Var.newSimpleVar(false);
     private final Var<Boolean> usesTypeResolution = Var.newSimpleVar(false);
 
+    private final TestCollection testCollection = new TestCollection(Collections.emptyList());
 
     @PersistentProperty // CUSTOM?
     public Language getLanguage() {
@@ -355,4 +358,7 @@ public class ObservableRuleBuilder implements SettingsOwner {
 
     }
 
+    public TestCollection getTestCollection() {
+        return testCollection;
+    }
 }

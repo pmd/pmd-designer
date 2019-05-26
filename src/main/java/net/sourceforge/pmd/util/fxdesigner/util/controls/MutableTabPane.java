@@ -8,6 +8,8 @@ import static net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil.resolveResou
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -251,7 +253,10 @@ public final class MutableTabPane<T extends AbstractController & TitleOwner> ext
             FXMLLoader loader = new FXMLLoader(url);
 
             if (controller != null) {
-                loader.setControllerFactory(DesignerUtil.controllerFactoryKnowing(controller));
+                List<AbstractController> lst = new ArrayList<>(controller.getChildren());
+                lst.add(0, controller);
+                // TODO this adds the children but not descendants
+                loader.setControllerFactory(DesignerUtil.controllerFactoryKnowing(lst.toArray()));
             }
 
             Parent root;

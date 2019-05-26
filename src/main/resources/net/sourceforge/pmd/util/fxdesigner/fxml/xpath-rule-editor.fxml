@@ -21,12 +21,13 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="net.sourceforge.pmd.util.fxdesigner.XPathRuleEditorController">
     <children>
-        <SplitPane dividerPositions="0.8"
+        <SplitPane dividerPositions="0.15,0.85"
                    AnchorPane.bottomAnchor="0.0"
                    AnchorPane.leftAnchor="0.0"
                    AnchorPane.rightAnchor="0.0"
                    AnchorPane.topAnchor="0.0">
             <items>
+                <fx:include source="test-collection.fxml" fx:id="testCollection" />
                 <AnchorPane>
                     <children>
                         <ToolbarTitledPane fx:id="expressionTitledPane"
