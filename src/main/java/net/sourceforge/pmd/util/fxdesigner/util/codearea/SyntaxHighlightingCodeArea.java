@@ -9,11 +9,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.reactfx.EventStream;
@@ -166,13 +167,17 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
      * Update the syntax highlighting to the specified value.
      * If null, syntax highlighting is stripped off.
      */
-    private void setCurrentSyntaxHighlight(final StyleSpans<Collection<String>> newSyntax) {
-        Optional<StyleSpans<Collection<String>>> oldSyntaxHighlight = currentSyntaxHighlight.getOpt();
+    private void setCurrentSyntaxHighlight(final @Nullable StyleSpans<Collection<String>> newSyntax) {
+        StyleSpans<Collection<String>> oldSyntaxHighlight = currentSyntaxHighlight.getValue();
         this.currentSyntaxHighlight.setValue(newSyntax);
 
         setStyleSpans(0, styleSyntaxHighlightChange(oldSyntaxHighlight, newSyntax));
     }
 
+    @Override
+    public void setStyleSpans(int from, @NonNull StyleSpans<? extends Collection<String>> styleSpans) {
+        super.setStyleSpans(from, styleSpans);
+    }
 
     /**
      * Given the old value of the highlighting spans, and a newly computed value,
@@ -181,9 +186,10 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
      * style layer in the game. Subclasses are free to override, to get a chance to
      * preserve additional style layers.
      */
-    protected StyleSpans<Collection<String>> styleSyntaxHighlightChange(final Optional<StyleSpans<Collection<String>>> oldSyntax,
-                                                                        final StyleSpans<Collection<String>> newSyntax) {
-        return newSyntax;
+    @NonNull
+    protected StyleSpans<Collection<String>> styleSyntaxHighlightChange(final @Nullable StyleSpans<Collection<String>> oldSyntax,
+                                                                        final @Nullable StyleSpans<Collection<String>> newSyntax) {
+        return newSyntax == null ? emptySpan() : newSyntax;
     }
 
 

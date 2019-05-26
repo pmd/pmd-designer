@@ -27,7 +27,6 @@ import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView;
 
 import javafx.application.Platform;
 import javafx.beans.property.Property;
@@ -41,7 +40,7 @@ import javafx.scene.control.TextField;
 
 /**
  * Property edition dialog. Use {@link #bindToDescriptor(PropertyDescriptorSpec, ObservableList)} )}
- * to use this dialog to edit a descriptor spec. Typically owned by a {@link PropertyTableView}.
+ * to use this dialog to edit a descriptor spec. Typically owned by a {@link PropertyCollectionView}.
  * The controller must be instantiated by hand.
  *
  * @author Clément Fournier
@@ -51,7 +50,6 @@ import javafx.scene.control.TextField;
 public class EditPropertyDialogController implements Initializable, ApplicationComponent {
 
     private final Var<PropertyTypeId> typeId = Var.newSimpleVar(PropertyTypeId.STRING);
-    private final Var<Runnable> commitHandler = Var.newSimpleVar(null);
     private final Var<PropertyDescriptorSpec> backingDescriptor = Var.newSimpleVar(null);
     private final Var<ObservableList<PropertyDescriptorSpec>> backingDescriptorList = Var.newSimpleVar(null);
 
@@ -74,7 +72,6 @@ public class EditPropertyDialogController implements Initializable, ApplicationC
 
     public EditPropertyDialogController(DesignerRoot root) {
         this.root = root;
-        this.commitHandler.setValue(()->{});
     }
 
 

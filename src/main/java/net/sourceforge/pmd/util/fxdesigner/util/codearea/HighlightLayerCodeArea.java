@@ -15,6 +15,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fxmisc.richtext.model.StyleSpans;
 
 import net.sourceforge.pmd.lang.ast.Node;
@@ -176,11 +178,12 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
      * parsing update.
      */
     @Override
-    protected final StyleSpans<Collection<String>> styleSyntaxHighlightChange(final Optional<StyleSpans<Collection<String>>> oldSyntax,
-                                                                              final StyleSpans<Collection<String>> newSyntax) {
+    @NonNull
+    protected final StyleSpans<Collection<String>> styleSyntaxHighlightChange(final @Nullable StyleSpans<Collection<String>> oldSyntax,
+                                                                              final @Nullable StyleSpans<Collection<String>> newSyntax) {
 
         StyleSpans<Collection<String>> currentSpans = getStyleSpans(new IndexRange(0, getLength()));
-        StyleSpans<Collection<String>> base = oldSyntax.map(s -> subtract(currentSpans, s)).orElse(currentSpans);
+        StyleSpans<Collection<String>> base = Optional.ofNullable(oldSyntax).map(s -> subtract(currentSpans, s)).orElse(currentSpans);
 
         return Optional.ofNullable(newSyntax)
                        .map(s -> base.overlay(s, SyntaxHighlightingCodeArea::additiveOverlay))

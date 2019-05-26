@@ -3,7 +3,7 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider?>
-<?import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyCollectionView?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.RulePrioritySlider?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
 <?import javafx.geometry.Insets?>
@@ -129,15 +129,15 @@
                                 </AnchorPane>
                             </content>
                         </TitledPane>
-                        <TitledPane animated="false" expanded="false" text="Properties">
+                        <TitledPane animated="false" expanded="false" text="Properties" stylesheets="@../css/flat.css">
                             <content>
                                 <AnchorPane>
                                     <children>
-                                        <PropertyTableView fx:id="propertyTableView"
-                                                           AnchorPane.bottomAnchor="0.0"
-                                                           AnchorPane.leftAnchor="0.0"
-                                                           AnchorPane.rightAnchor="0.0"
-                                                           AnchorPane.topAnchor="0.0" />
+                                        <PropertyCollectionView fx:id="propertyCollectionView"
+                                                                AnchorPane.bottomAnchor="0.0"
+                                                                AnchorPane.leftAnchor="0.0"
+                                                                AnchorPane.rightAnchor="0.0"
+                                                                AnchorPane.topAnchor="0.0" />
                                     </children>
                                     <padding>
                                         <Insets bottom="-0.5" left="-0.5" right="-0.5" top="-0.5" />

@@ -15,8 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import net.sourceforge.pmd.PMDVersion;
 import net.sourceforge.pmd.lang.ast.xpath.Attribute;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerParams;
@@ -25,7 +23,6 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 
-import com.sun.javafx.fxml.builder.ProxyBuilder;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -115,21 +112,7 @@ public class Designer extends Application {
 
         MainDesignerController mainController = new MainDesignerController(owner);
 
-        loader.setBuilderFactory(type -> {
-
-            boolean needsRoot = Arrays.stream(type.getConstructors()).anyMatch(it -> ArrayUtils.contains(it.getParameterTypes(), DesignerRoot.class));
-
-            if (needsRoot) {
-                // Controls that need the DesignerRoot can declare a constructor
-                // with a parameter w/ signature @NamedArg("designerRoot") DesignerRoot
-                // to be injected with the relevant instance of the app.
-                ProxyBuilder<Object> builder = new ProxyBuilder<>(type);
-                builder.put("designerRoot", owner);
-                return builder;
-            } else {
-                return null; //use default
-            }
-        });
+        loader.setBuilderFactory(DesignerUtil.customBuilderFactory(owner));
 
         loader.setControllerFactory(DesignerUtil.controllerFactoryKnowing(
             mainController,

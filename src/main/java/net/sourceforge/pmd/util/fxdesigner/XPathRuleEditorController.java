@@ -131,7 +131,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
         super(root);
         this.ruleBuilder = ruleBuilder;
 
-        this.exportWizard = new SoftReferenceCache<>(() -> new ExportXPathWizardController(getDesignerRoot()));
+        this.exportWizard = new SoftReferenceCache<>(() -> new ExportXPathWizardController(root));
         this.propertiesPopover = new PopOverWrapper<>((t, f) -> PropertyCollectionView.makePopOver(t, titleProperty(), root));
     }
 
@@ -164,7 +164,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
 
         showPropertiesButton.setOnAction(e -> propertiesPopover.showOrFocus(p -> p.show(showPropertiesButton)));
 
-        propertiesPopover.rebindIfDifferent(getRuleBuilder());
+        propertiesPopover.rebind(getRuleBuilder());
         Platform.runLater(() -> propertiesPopover.doFirstLoad(getMainStage()));
     }
 

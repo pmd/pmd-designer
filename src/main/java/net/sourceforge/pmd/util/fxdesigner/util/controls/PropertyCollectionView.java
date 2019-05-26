@@ -1,3 +1,7 @@
+/*
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
@@ -6,6 +10,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.tools.ValueExtractor;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -37,16 +42,19 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /**
  * @author Clément Fournier
  */
-public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> implements ApplicationComponent {
+public class PropertyCollectionView extends VBox implements ApplicationComponent {
 
     private static final int LIST_CELL_HEIGHT = 24;
+    @NonNull
     private final DesignerRoot root;
-
-
+    @NonNull
+    private final ListView<PropertyDescriptorSpec> view;
+    @NonNull
     private final PopOverWrapper<PropertyDescriptorSpec> myEditPopover;
 
 
@@ -55,24 +63,56 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
     }
 
 
-    public PropertyCollectionView(@NamedArg("designerRoot") DesignerRoot root, ObservableList<PropertyDescriptorSpec> realItems) {
+    // for scenebuilder
+    @SuppressWarnings("ConstantConditions") // suppress nullability issue
+    public PropertyCollectionView() {
+        this.root = null;
+        this.myEditPopover = null;
+        this.view = null;
+    }
+
+    public PropertyCollectionView(@NamedArg("designerRoot") DesignerRoot root) {
         this.root = root;
-        setItems(realItems);
 
-        setFixedCellSize(LIST_CELL_HEIGHT);
-        setCellFactory(lv -> new PropertyDescriptorCell());
+        this.getStyleClass().addAll("property-collection-view");
 
-        Val.wrap(itemsProperty())
-           .values()
-           .subscribe(e -> rewire(maxHeightProperty(), Bindings.size(e).multiply(LIST_CELL_HEIGHT).add(5)));
+        view = new ListView<>();
+        initListView(view);
+        setOwnerStageFactory(root.getMainStage()); // default
+
+        AnchorPane footer = new AnchorPane();
+        footer.setPrefHeight(30);
+        footer.getStyleClass().addAll("footer");
+        footer.getStylesheets().addAll(DesignerUtil.getCss("flat").toString());
+
+
+        Button addProperty = new Button("Add property");
+
+        AnchorPane.setLeftAnchor(addProperty, 0.);
+        AnchorPane.setRightAnchor(addProperty, 0.);
+        AnchorPane.setBottomAnchor(addProperty, 0.);
+        AnchorPane.setTopAnchor(addProperty, 0.);
+
+
+        addProperty.setOnAction(e -> {
+            PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
+            spec.setName(getUniqueNewName());
+            view.getItems().add(spec);
+            // TODO pop the edit view
+        });
+        footer.getChildren().addAll(addProperty);
+        this.getChildren().addAll(view, footer);
 
         myEditPopover = new PopOverWrapper<>(this::rebindPopover);
 
-        myEditPopover.rebindIfDifferent(new PropertyDescriptorSpec());
+        myEditPopover.rebind(new PropertyDescriptorSpec());
         myEditPopover.doFirstLoad(root.getMainStage());
 
     }
 
+    public void setOwnerStageFactory(Stage stage) {
+        view.setCellFactory(lv -> new PropertyDescriptorCell(stage));
+    }
 
     @Override
     public DesignerRoot getDesignerRoot() {
@@ -85,7 +125,7 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
     public void onAddPropertyClicked(String name) {
         PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
         spec.setName(name);
-        this.getItems().add(spec);
+        view.getItems().add(spec);
 
         Platform.runLater(
             () -> {
@@ -113,42 +153,8 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
     }
 
     /**
-     * Makes the property popover for a rule.
+     * Make the edit popover for a single spec.
      */
-    public static PopOver makePopOver(ObservableXPathRuleBuilder rule, Val<String> titleProperty, DesignerRoot designerRoot) {
-        VBox vbox = new VBox();
-        PropertyCollectionView view = new PropertyCollectionView(designerRoot, rule.getRuleProperties());
-
-        AnchorPane footer = new AnchorPane();
-        footer.setPrefHeight(30);
-        footer.getStyleClass().addAll("popover-footer");
-        footer.getStylesheets().addAll(DesignerUtil.getCss("flat").toString());
-
-
-        Button addProperty = new Button("Add property");
-
-        AnchorPane.setLeftAnchor(addProperty, 0.);
-        AnchorPane.setRightAnchor(addProperty, 0.);
-        AnchorPane.setBottomAnchor(addProperty, 0.);
-        AnchorPane.setTopAnchor(addProperty, 0.);
-
-
-        addProperty.setOnAction(e -> {
-            PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
-            spec.setName(view.getUniqueNewName());
-            view.getItems().add(spec);
-            // TODO pop the edit view
-        });
-        footer.getChildren().addAll(addProperty);
-        vbox.getChildren().addAll(view, footer);
-
-        PopOver popOver = new SmartPopover(vbox);
-        popOver.titleProperty().bind(titleProperty.map(it -> "Properties of " + it));
-        popOver.setHeaderAlwaysVisible(true);
-        popOver.setPrefWidth(150);
-        return popOver;
-    }
-
     private PopOver detailsPopOver(PropertyDescriptorSpec spec) {
         EditPropertyDialogController wizard = new EditPropertyDialogController(root);
 
@@ -183,16 +189,60 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
                                         .map(it -> "Property '" + it + "'"));
 
         EditPropertyDialogController wizard = (EditPropertyDialogController) pop.getUserData();
-        Subscription sub = wizard.bindToDescriptor(newSpec, getItems()).and(pop.titleProperty()::unbind);
+        Subscription sub = wizard.bindToDescriptor(newSpec, view.getItems()).and(pop.titleProperty()::unbind);
         pop.setOnHiding(we -> sub.unsubscribe());
         return pop;
 
+    }
+
+    public void setItems(ObservableList<PropertyDescriptorSpec> ruleProperties) {
+        view.setItems(ruleProperties);
+    }
+
+    public ObservableList<PropertyDescriptorSpec> getItems() {
+        return view.getItems();
+    }
+
+    public Val<ObservableList<PropertyDescriptorSpec>> itemsProperty() {
+        return Val.wrap(view.itemsProperty());
+    }
+
+    private static void initListView(ListView<PropertyDescriptorSpec> view) {
+        view.setFixedCellSize(LIST_CELL_HEIGHT);
+
+        Val.wrap(view.itemsProperty())
+           .values()
+           .subscribe(e -> rewire(view.maxHeightProperty(), Bindings.size(e).multiply(LIST_CELL_HEIGHT).add(5)));
+
+        Label placeholder = new Label("No properties yet");
+        placeholder.getStyleClass().addAll("placeholder");
+        view.setPlaceholder(placeholder);
+    }
+
+    /**
+     * Makes the property popover for a rule.
+     */
+    public static PopOver makePopOver(ObservableXPathRuleBuilder rule, Val<String> titleProperty, DesignerRoot designerRoot) {
+        PropertyCollectionView view = new PropertyCollectionView(designerRoot);
+
+        view.setItems(rule.getRuleProperties());
+
+        PopOver popOver = new SmartPopover(view);
+        popOver.titleProperty().bind(titleProperty.map(it -> "Properties of " + it));
+        popOver.setHeaderAlwaysVisible(true);
+        popOver.setPrefWidth(150);
+        return popOver;
     }
 
     private class PropertyDescriptorCell extends ListCell<PropertyDescriptorSpec> {
 
         private static final String DETAILS_BUTTON_CLASS = "my-details-button";
         private static final String DELETE_BUTTON_CLASS = "delete-property-button";
+        private final Stage owner;
+
+        public PropertyDescriptorCell(Stage owner) {
+            this.owner = owner;
+        }
 
         @Override
         protected void updateItem(PropertyDescriptorSpec item, boolean empty) {
@@ -226,8 +276,8 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
 
 
             edit.setOnAction(e -> {
-                myEditPopover.rebindIfDifferent(spec);
-                myEditPopover.showOrFocus(p -> PopOverUtil.showAt(p, getMainStage(), this));
+                myEditPopover.rebind(spec);
+                myEditPopover.showOrFocus(p -> PopOverUtil.showAt(p, owner, this));
             });
 
             Button delete = new Button();
@@ -243,4 +293,5 @@ public class PropertyCollectionView extends ListView<PropertyDescriptorSpec> imp
         }
 
     }
+
 }

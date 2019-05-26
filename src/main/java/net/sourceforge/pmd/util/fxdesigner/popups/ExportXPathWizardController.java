@@ -37,7 +37,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.StageBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlSyntaxHighlighter;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider;
-import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyCollectionView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.RulePrioritySlider;
 
 import com.github.oowekyala.rxstring.LiveTemplate;
@@ -80,6 +80,9 @@ public final class ExportXPathWizardController implements Initializable {
     private final Var<String> xpathExpression = Var.newSimpleVar("");
     private final Var<String> xpathVersion = Var.newSimpleVar(DesignerUtil.defaultXPathVersion());
     private final Stage myPopupStage;
+    private final DesignerRoot root;
+    @FXML
+    private PropertyCollectionView propertyCollectionView;
     @FXML
     private Button resetMetadataButton;
     @FXML
@@ -99,13 +102,14 @@ public final class ExportXPathWizardController implements Initializable {
     @FXML
     private Accordion infoAccordion;
     @FXML
-    private PropertyTableView propertyTableView;
-    @FXML
     private LanguageVersionRangeSlider languageVersionRangeSlider;
 
 
     public ExportXPathWizardController(DesignerRoot root) {
+        this.root = root;
         this.myPopupStage = createStage(root.getMainStage());
+        propertyCollectionView.setOwnerStageFactory(myPopupStage);
+
     }
 
 
@@ -235,7 +239,7 @@ public final class ExportXPathWizardController implements Initializable {
 
 
     private Var<ObservableList<PropertyDescriptorSpec>> rulePropertiesProperty() {
-        return Var.fromVal(propertyTableView.rulePropertiesProperty(), propertyTableView::setRuleProperties);
+        return Var.fromVal(propertyCollectionView.itemsProperty(), propertyCollectionView::setItems);
     }
 
 
@@ -252,7 +256,7 @@ public final class ExportXPathWizardController implements Initializable {
         return new StageBuilder().withOwner(mainStage)
                                  .withModality(Modality.WINDOW_MODAL)
                                  .withStyle(StageStyle.DECORATED)
-                                 .withFxml(DesignerUtil.getFxml("xpath-export-wizard.fxml"), this)
+                                 .withFxml(DesignerUtil.getFxml("xpath-export-wizard.fxml"), root, this)
                                  .withTitle("Export XPath expression to XML rule")
                                  .newStage();
     }

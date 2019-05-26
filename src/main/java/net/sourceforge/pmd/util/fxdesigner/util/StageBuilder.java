@@ -5,10 +5,15 @@
 package net.sourceforge.pmd.util.fxdesigner.util;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.controllerFactoryKnowing;
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.customBuilderFactory;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -60,8 +65,9 @@ public final class StageBuilder {
         return withScene(new Scene(parent));
     }
 
-    public StageBuilder withFxml(URL fxmlUrl, Object... controllers) {
+    public StageBuilder withFxml(URL fxmlUrl, @NonNull DesignerRoot root, Object... controllers) {
         FXMLLoader loader = new FXMLLoader(fxmlUrl);
+        loader.setBuilderFactory(customBuilderFactory(root));
         loader.setControllerFactory(controllerFactoryKnowing(controllers));
         Parent parent;
         try {

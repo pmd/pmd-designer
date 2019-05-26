@@ -18,6 +18,7 @@
     -fx-padding: 2 6 4 6;
 
     .text {
+      -fx-padding: 0 0 0 5; // pad title left
       -fx-font-size: 12;
       -fx-fill: @fx-text-fill;
       -fx-font-weight: normal;
@@ -28,11 +29,7 @@
     .list-cell:empty {
       -fx-opacity: 0;
     }
-  }
 
-
-  .popover-footer {
-    -fx-background-color: @darker-accent;
-    -fx-font-size: 13;
+    -fx-pref-width: 250;
   }
 }

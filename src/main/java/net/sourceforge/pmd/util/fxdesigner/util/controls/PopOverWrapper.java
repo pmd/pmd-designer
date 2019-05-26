@@ -46,11 +46,8 @@ public final class PopOverWrapper<T> {
         }
     }
 
-    public void rebindIfDifferent(T identity) {
-        if (!Objects.equals(this.identity, identity)) {
-            this.identity = identity;
-            preload(() -> rebinder.apply(identity, myPopover.getValue()));
-        }
+    public void rebind(T identity) {
+        preload(() -> rebinder.apply(identity, myPopover.getValue()));
     }
 
     private void preload(Supplier<PopOver> supplier) {
