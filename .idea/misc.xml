@@ -16,7 +16,7 @@
     </option>
   </component>
   <component name="NullableNotNullManager">
-    <option name="myDefaultNullable" value="org.jetbrains.annotations.Nullable" />
+    <option name="myDefaultNullable" value="org.checkerframework.checker.nullness.qual.Nullable" />
     <option name="myDefaultNotNull" value="org.checkerframework.checker.nullness.qual.NonNull" />
     <option name="myNullables">
       <value>

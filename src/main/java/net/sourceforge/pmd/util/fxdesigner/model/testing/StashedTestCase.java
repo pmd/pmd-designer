@@ -21,6 +21,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import net.sourceforge.pmd.Rule;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.testframework.TestDescriptor;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
@@ -41,7 +42,6 @@ public class StashedTestCase {
         this.languageVersion = languageVersion;
         this.properties = new HashMap<>(properties);
         this.expectedViolations = new ArrayList<>(expectedViolations);
-        expectedViolations.sort(Comparator.comparing(v -> v.getRange().startPos));
     }
 
     public TestDescriptor toDescriptor(Rule owner) {
@@ -65,19 +65,23 @@ public class StashedTestCase {
         return live;
     }
 
+    @PersistentProperty
     public String getSource() {
         return source;
     }
 
+    @PersistentProperty
     public String getDescription() {
         return description;
     }
 
     @Nullable
+    @PersistentProperty
     public LanguageVersion getLanguageVersion() {
         return languageVersion;
     }
 
+    //    @PersistentSequence // TODO
     public List<ViolationRecord> getExpectedViolations() {
         return expectedViolations;
     }
@@ -108,14 +112,17 @@ public class StashedTestCase {
         live.setSource(descriptor.getCode());
         live.setDescription(descriptor.getDescription());
 
-        List<String> lines = Arrays.asList(descriptor.getCode().split("\\Z"));
+        List<String> lines = Arrays.asList(descriptor.getCode().split("\\r?\\n"));
+        List<String> messages = descriptor.getExpectedMessages();
+        List<Integer> lineNumbers = descriptor.getExpectedLineNumbers();
 
         for (int i = 0; i < descriptor.getNumberOfProblemsExpected(); i++) {
-            String m = descriptor.getExpectedMessages().get(i);
-            int line = descriptor.getExpectedLineNumbers().get(i);
+            String m = messages.size() > i ? messages.get(i) : null;
+            int line = lineNumbers.size() > i ? lineNumbers.get(i) : -1;
 
-
-            TextRange tr = new TextRange(new TextPos2D(line, 0), new TextPos2D(line, lines.get(line - 1).length()));
+            TextRange tr = line >= 0
+                           ? TextRange.fullLine(line, lines.get(line).length())
+                           : null;
 
             live.getExpectedViolations().add(new ViolationRecord(tr, false, m).unfreeze());
         }

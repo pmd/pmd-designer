@@ -131,7 +131,7 @@ public class XPathPanelController extends AbstractController implements NodeSele
      */
     public XPathRuleEditorController(DesignerRoot root, ObservableXPathRuleBuilder ruleBuilder) {
         super(root);
-        this.testCollectionController = new TestCollectionController(root, ruleBuilder.getTestCollection());
+        this.testCollectionController = new TestCollectionController(root, ruleBuilder);
         this.ruleBuilder = ruleBuilder;
 
         this.exportWizard = new SoftReferenceCache<>(() -> new ExportXPathWizardController(root));

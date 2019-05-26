@@ -224,6 +224,10 @@ public final class PmdCoordinatesSystem {
             return startPos.compareTo(pos) <= 0 && endPos.compareTo(pos) >= 0;
         }
 
+        public static TextRange fullLine(int line, int lineLength) {
+            return new TextRange(new TextPos2D(line, 0), new TextPos2D(line, lineLength));
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) {

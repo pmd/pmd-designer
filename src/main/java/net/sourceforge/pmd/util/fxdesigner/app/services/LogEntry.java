@@ -139,6 +139,8 @@ public final class LogEntry implements Comparable<LogEntry> {
         SYMBOL_FACADE_EXCEPTION("Symbol façade exception"),
         XPATH_EVALUATION_EXCEPTION("XPath evaluation exception"),
 
+        TEST_LOADING_EXCEPTION("XML test loader exception"),
+
         // These are "flag" categories that signal that previous exceptions
         // thrown during code or XPath edition may be discarded as uninteresting
         // When in developer mode they're pushed to the event log too

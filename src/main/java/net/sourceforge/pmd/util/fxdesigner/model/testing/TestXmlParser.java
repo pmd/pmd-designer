@@ -28,8 +28,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sourceforge.pmd.Rule;
+import net.sourceforge.pmd.RuleContext;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.lang.rule.AbstractRule;
 import net.sourceforge.pmd.testframework.RuleTst;
 import net.sourceforge.pmd.testframework.TestDescriptor;
 
@@ -142,17 +144,14 @@ public class TestXmlParser {
         TestDescriptor descriptor;
 
         String languageVersionString = getNodeValue(testCode, "source-type", false);
-        if (languageVersionString == null) {
-            descriptor = new TestDescriptor(code, description, expectedProblems, rule);
-        } else {
-            LanguageVersion languageVersion = LanguageRegistry
-                .findLanguageVersionByTerseName(languageVersionString);
-            if (languageVersion != null) {
-                descriptor = new TestDescriptor(code, description, expectedProblems, rule, languageVersion);
-            } else {
+        LanguageVersion languageVersion = null;
+        if (languageVersionString != null) {
+            languageVersion = LanguageRegistry.findLanguageVersionByTerseName(languageVersionString);
+            if (languageVersion == null) {
                 throw new RuntimeException("Unknown LanguageVersion for test: " + languageVersionString);
             }
         }
+        descriptor = new TestDescriptor(code, description, expectedProblems, rule, languageVersion);
         descriptor.setReinitializeRule(reinitializeRule);
         descriptor.setRegressionTest(isRegressionTest);
         descriptor.setUseAuxClasspath(isUseAuxClasspath);
@@ -186,7 +185,7 @@ public class TestXmlParser {
         return buffer.toString().trim();
     }
 
-    public static TestCollection readXmlTestFile(Path path, Rule rule, Consumer<Exception> errorHandler) {
+    public static TestCollection readXmlTestFile(Path path, Consumer<Exception> errorHandler) {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         try {
@@ -196,6 +195,12 @@ public class TestXmlParser {
             DocumentBuilder builder = getDocumentBuilder(dbf);
 
             Document doc = builder.parse(path.toFile());
+            Rule rule = new AbstractRule() {
+                @Override
+                public void apply(List<? extends net.sourceforge.pmd.lang.ast.Node> list, RuleContext ruleContext) {
+                    // do nothing
+                }
+            };
             List<TestDescriptor> testDescriptors = new TestXmlParser().parseTests(rule, doc, errorHandler);
             List<StashedTestCase> tests = testDescriptors.stream().map(StashedTestCase::fromDescriptor).collect(Collectors.toList());
             return new TestCollection(tests);

@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner.app.services;
 
 import org.reactfx.value.Val;
+import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
@@ -23,7 +24,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 public interface ASTManager extends ApplicationComponent, SettingsOwner {
 
 
-    Val<String> sourceCodeProperty();
+    Var<String> sourceCodeProperty();
 
 
     String getSourceCode();

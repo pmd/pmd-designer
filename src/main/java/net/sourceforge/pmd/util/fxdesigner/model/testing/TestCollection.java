@@ -19,6 +19,14 @@ public class TestCollection {
         this.stash = new LiveArrayList<>(tests);
     }
 
+    public void rebase(TestCollection testCases) {
+        this.stash.setAll(testCases.stash);
+    }
+
+
+    public LiveList<StashedTestCase> getStash() {
+        return stash;
+    }
 
     /**
      * Opens a test case for write access.

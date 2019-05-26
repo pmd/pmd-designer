@@ -9,6 +9,7 @@ import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.mapToggleGro
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExceptionMessage;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguageVersion;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguageVersions;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.latestValue;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
 
 import java.io.File;
@@ -21,6 +22,7 @@ import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.reactfx.SuspendableEventStream;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -127,10 +129,18 @@ public class SourceEditorController extends AbstractController {
 
         nodeEditionCodeArea.replaceText(astManager.getSourceCode());
 
-        nodeEditionCodeArea.plainTextChanges()
-                           .successionEnds(AST_REFRESH_DELAY)
-                           .map(it -> nodeEditionCodeArea.getText())
-                           .subscribe(((ASTManagerImpl) astManager)::setSourceCode);
+        SuspendableEventStream<String> modelCode = astManager.sourceCodeProperty().values().suppressible();
+
+        Var<String> areaText = Var.fromVal(
+            latestValue(nodeEditionCodeArea.plainTextChanges()
+                                           .successionEnds(AST_REFRESH_DELAY)
+                                           .map(it -> nodeEditionCodeArea.getText())),
+            nodeEditionCodeArea::replaceText
+        );
+
+        areaText.bindBidirectional(astManager.sourceCodeProperty());
+
+//        astManager.sourceCodeProperty().values().subscribe(it -> modelCode.suspendWhile(() -> nodeEditionCodeArea.replaceText(it)));
 
 
         nodeEditionCodeArea.moveCaret(0, 0);

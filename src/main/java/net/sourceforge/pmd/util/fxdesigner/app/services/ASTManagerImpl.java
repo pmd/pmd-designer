@@ -108,8 +108,8 @@ public class ASTManagerImpl implements ASTManager {
 
 
     @Override
-    public Val<String> sourceCodeProperty() {
-        return sourceCode.orElseConst("");
+    public Var<String> sourceCodeProperty() {
+        return Var.fromVal(sourceCode.orElseConst(""), this::setSourceCode);
     }
 
     @PersistentProperty
