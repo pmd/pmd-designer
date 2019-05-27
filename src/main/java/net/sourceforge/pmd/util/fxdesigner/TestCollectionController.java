@@ -31,7 +31,7 @@ public class TestCollectionController extends AbstractController {
     @FXML
     private ToolbarTitledPane titledPane;
     @FXML
-    private ListView<LiveTestCase> testsListView;
+    public ListView<LiveTestCase> testsListView;
     @FXML
     private Button importTestsButton;
     @FXML

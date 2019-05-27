@@ -21,7 +21,7 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="net.sourceforge.pmd.util.fxdesigner.XPathRuleEditorController">
     <children>
-        <SplitPane dividerPositions="0.15,0.85"
+        <SplitPane dividerPositions="0.25,0.85"
                    AnchorPane.bottomAnchor="0.0"
                    AnchorPane.leftAnchor="0.0"
                    AnchorPane.rightAnchor="0.0"

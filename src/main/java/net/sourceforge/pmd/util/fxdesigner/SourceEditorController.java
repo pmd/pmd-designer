@@ -44,7 +44,9 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.Pe
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.PopOverWrapper;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.ViolationCollectionView;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.fxml.FXML;
@@ -93,6 +95,7 @@ public class SourceEditorController extends AbstractController implements TestLo
     @FXML
     private NodeParentageCrumbBar focusNodeParentageCrumbBar;
 
+    private final PopOverWrapper<LiveTestCase> violationsPopover;
 
     private Var<LanguageVersion> languageVersionUIProperty;
 
@@ -102,6 +105,8 @@ public class SourceEditorController extends AbstractController implements TestLo
         this.astManager = new ASTManagerImpl(designerRoot);
 
         designerRoot.registerService(DesignerRoot.AST_MANAGER, astManager);
+
+        violationsPopover = new PopOverWrapper<>((t, p) -> ViolationCollectionView.makePopOver(t, getDesignerRoot()));
     }
 
 
@@ -128,6 +133,8 @@ public class SourceEditorController extends AbstractController implements TestLo
 
         // default text, will be overwritten by settings restore
         setText(getDefaultText());
+
+        violationsButton.setOnAction(e -> violationsPopover.showOrFocus(p -> p.show(violationsButton)));
     }
 
     @Override
@@ -157,6 +164,17 @@ public class SourceEditorController extends AbstractController implements TestLo
 
         getDesignerRoot().registerService(DesignerRoot.RICH_TEXT_MAPPER, nodeEditionCodeArea);
         getDesignerRoot().registerService(DesignerRoot.TEST_LOADER, this);
+
+        currentlyOpenTestCase.values().subscribe(t -> {
+            if (t == null) {
+                violationsButton.setVisible(false);
+            } else {
+                violationsPopover.rebind(t);
+                violationsButton.setVisible(true);
+            }
+        });
+
+
     }
 
 

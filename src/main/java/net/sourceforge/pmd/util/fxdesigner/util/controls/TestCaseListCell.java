@@ -22,6 +22,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.testing.TestStatus;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -97,6 +98,21 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         //            delete.getStyleClass().addAll(DELETE_BUTTON_CLASS, "icon-button");
         //            Tooltip.install(delete, new Tooltip("Remove property"));
         //            delete.setOnAction(e -> getItems().remove(spec));
+
+        label.maxWidthProperty().bind(
+            Bindings.subtract(
+                collection.testsListView.widthProperty(),
+                Bindings.add(
+                    Bindings.add(
+                        load.widthProperty(),
+                        duplicate.widthProperty()
+                    ),
+                    50// spacing + sep
+                )
+
+            )
+        );
+
 
         hBox.getChildren().setAll(statusLabel, label, spacer, duplicate, new Separator(Orientation.VERTICAL), load);
         hBox.setAlignment(Pos.CENTER_LEFT);
