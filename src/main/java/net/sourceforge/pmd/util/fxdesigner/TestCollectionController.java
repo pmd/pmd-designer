@@ -61,7 +61,7 @@ public class TestCollectionController extends AbstractController {
             chooser.setTitle("Load source from file");
             File file = chooser.showOpenDialog(getMainStage());
 
-            TestCollection coll = TestXmlParser.readXmlTestFile(file.toPath(), e -> logUserException(e, Category.TEST_LOADING_EXCEPTION));
+            TestCollection coll = TestXmlParser.parseXmlTests(file.toPath(), e -> logUserException(e, Category.TEST_LOADING_EXCEPTION));
             // TODO what if there's already test cases?
             getTestCollection().rebase(coll);
         });
