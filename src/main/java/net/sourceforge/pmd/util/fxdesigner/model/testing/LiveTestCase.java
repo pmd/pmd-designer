@@ -38,7 +38,7 @@ public class LiveTestCase implements SettingsOwner {
     private final ObservableMap<String, String> properties = FXCollections.observableHashMap();
     private final Var<Boolean> dirty = Var.newSimpleVar(false);
     private final LiveList<LiveViolationRecord> expectedViolations = new LiveArrayList<>();
-    private final Var<TestStatus> status = Var.newSimpleVar(TestStatus.UNKNOWN);
+    private final Var<TestResult> status = Var.newSimpleVar(new TestResult(TestStatus.UNKNOWN, null));
     private Consumer<LiveTestCase> commitHandler;
     private boolean frozen;
 
@@ -157,6 +157,7 @@ public class LiveTestCase implements SettingsOwner {
         LiveTestCase live = new LiveTestCase(commitHandler);
         live.setDescription(getDescription());
         live.expectedViolations.setAll(this.expectedViolations);
+        live.setProperties(this.properties);
         live.setLanguageVersion(getLanguageVersion());
         live.setDirty(false);
         live.setSource(getSource());
@@ -164,12 +165,20 @@ public class LiveTestCase implements SettingsOwner {
         return live;
     }
 
-    public TestStatus getStatus() {
+    public TestResult getStatus() {
         return status.getValue();
     }
 
-    public Var<TestStatus> statusProperty() {
+    public Var<TestResult> statusProperty() {
         return status;
+    }
+
+    public void setStatus(TestResult testResult) {
+        statusProperty().setValue(testResult);
+    }
+
+    public void setStatus(TestStatus status) {
+        statusProperty().setValue(new TestResult(status, null));
     }
 
     public static LiveTestCase fromDescriptor(TestDescriptor descriptor) {
@@ -187,7 +196,7 @@ public class LiveTestCase implements SettingsOwner {
             int line = lineNumbers.size() > i ? lineNumbers.get(i) : -1;
 
             TextRange tr = line >= 0
-                           ? TextRange.fullLine(line, lines.get(line).length())
+                           ? TextRange.fullLine(line, lines.get(line - 1).length())
                            : null;
 
             live.getExpectedViolations().add(new ViolationRecord(tr, false, m).unfreeze());

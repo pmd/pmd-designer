@@ -62,7 +62,7 @@ public class SerializerRegistrar {
 
 
     private static final SerializerRegistrar INSTANCE = new SerializerRegistrar();
-    private static final Pattern PARAM_TYPE_MATCHER = Pattern.compile("(\\w+(?:\\.\\w+)*)(<([^,]*)>)?((?:\\[])*)");
+    private static final Pattern PARAM_TYPE_MATCHER = Pattern.compile("(\\w+(?:[.$]\\w+)*)(<([^,]*)>)?((?:\\[])*)");
 
     // using a map of types obviously doesn't handle subtyping
     private final Map<Type, Serializer<?>> converters = new WeakHashMap<>();

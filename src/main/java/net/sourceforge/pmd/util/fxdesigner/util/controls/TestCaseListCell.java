@@ -81,10 +81,19 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
         Label label = new Label(testCase.getDescription());
 
         FontIcon statusIcon = new FontIcon();
+        Label statusLabel = new Label();
+        statusLabel.setGraphic(statusIcon);
         testCase.statusProperty().values()
                 .subscribe(st -> {
-                    statusIcon.getStyleClass().setAll(st.getStyleClass());
-                    statusIcon.setIconLiteral(st.getIcon());
+                    statusIcon.getStyleClass().setAll(st.getStatus().getStyleClass());
+                    statusIcon.setIconLiteral(st.getStatus().getIcon());
+
+                    String message = st.getMessage();
+                    if (message != null) {
+                        statusLabel.setTooltip(new Tooltip(message));
+                    } else {
+                        statusLabel.setTooltip(null);
+                    }
                 });
 
         Pane spacer = new Pane();
@@ -104,7 +113,7 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
         //            Tooltip.install(delete, new Tooltip("Remove property"));
         //            delete.setOnAction(e -> getItems().remove(spec));
 
-        hBox.getChildren().setAll(statusIcon, label, spacer, load);
+        hBox.getChildren().setAll(statusLabel, label, spacer, load);
         hBox.setAlignment(Pos.CENTER_LEFT);
 
         if (subscriber != null) {
@@ -184,18 +193,18 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
 
         @Override
         public void handleNoCompilationUnit() {
-            testCase.statusProperty().setValue(TestStatus.UNKNOWN);
+            testCase.setStatus(TestStatus.UNKNOWN);
         }
 
         @Override
         public void handleXPathSuccess(List<net.sourceforge.pmd.lang.ast.Node> results) {
             TestResult result = TestCaseUtil.doTest(testCase, results);
-            testCase.statusProperty().setValue(result.getStatus());
+            testCase.setStatus(result);
         }
 
         @Override
         public void handleXPathError(Exception e) {
-            testCase.statusProperty().setValue(TestStatus.ERROR);
+            testCase.setStatus(TestStatus.ERROR);
         }
     }
 }

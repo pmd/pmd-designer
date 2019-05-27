@@ -156,6 +156,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
         exportXpathToRuleButton.setOnAction(e -> showExportXPathToRuleWizard());
 
         // this is the source of xpath results
+        // FIXME should be local to a single rule builder
         getRuleBuilder().modificationsTicks().successionEnds(XPATH_REFRESH_DELAY)
                         .map(tick -> new VersionedXPathQuery(
                                  getRuleBuilder().getXpathVersion(),

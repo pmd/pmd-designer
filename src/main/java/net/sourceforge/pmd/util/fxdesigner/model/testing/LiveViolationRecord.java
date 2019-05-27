@@ -53,12 +53,12 @@ public class LiveViolationRecord implements SettingsOwner {
         return exactRange.getValue();
     }
 
-    public Var<Boolean> exactRangeProperty() {
-        return exactRange;
+    public void setExactRange(boolean exactRange) {
+        this.exactRange.setValue(exactRange);
     }
 
-    public void setExactRange(Boolean exactRange) {
-        this.exactRange.setValue(exactRange);
+    public Var<Boolean> exactRangeProperty() {
+        return exactRange;
     }
 
     @PersistentProperty

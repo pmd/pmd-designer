@@ -167,14 +167,14 @@ public class SourceEditorController extends AbstractController implements TestLo
             // TODO
             currentlyOpenTestCase.getValue().commitChanges();
         }
-        astManager.sourceCodeProperty().suspendWhile(() -> {
+//        astManager.sourceCodeProperty().suspendWhile(() -> {
             if (!liveTestCase.getSource().equals(nodeEditionCodeArea.getText())) {
                 nodeEditionCodeArea.replaceText(liveTestCase.getSource());
             }
             currentlyOpenTestCase.setValue(liveTestCase);
             Subscription sub = ReactfxUtil.rewireInit(liveTestCase.sourceProperty(), astManager.sourceCodeProperty());
             liveTestCase.addCommitHandler(t -> sub.unsubscribe());
-        });
+//        });
     }
 
 
