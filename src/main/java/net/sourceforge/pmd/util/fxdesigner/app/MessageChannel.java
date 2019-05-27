@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
+import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.util.fxdesigner.MainDesignerController;
@@ -48,7 +49,7 @@ public class MessageChannel<T> {
     private final Category logCategory;
 
 
-    MessageChannel(Category logCategory) {
+    public MessageChannel(Category logCategory) {
         this.logCategory = logCategory;
         latestMessage.pin();
     }
@@ -89,6 +90,14 @@ public class MessageChannel<T> {
      */
     public void pushEvent(ApplicationComponent origin, T content) {
         channel.push(new Message<>(origin, logCategory, content));
+    }
+
+    /**
+     * Make it so that this channel pushes all the messages of the given
+     * [source]. This can be canceled with the returned subscription.
+     */
+    public Subscription connect(MessageChannel<T> source) {
+        return source.channel.subscribe(this.channel::push);
     }
 
     /** Traces a message. */

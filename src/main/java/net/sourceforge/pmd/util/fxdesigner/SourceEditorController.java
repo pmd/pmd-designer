@@ -93,7 +93,6 @@ public class SourceEditorController extends AbstractController implements TestLo
     private NodeParentageCrumbBar focusNodeParentageCrumbBar;
 
 
-
     private Var<LanguageVersion> languageVersionUIProperty;
 
 
@@ -151,7 +150,6 @@ public class SourceEditorController extends AbstractController implements TestLo
         areaText.bindBidirectional(astManager.sourceCodeProperty());
 
 
-
         nodeEditionCodeArea.moveCaret(0, 0);
 
         initTreeView(astManager, astTreeView, editorTitledPane.errorMessageProperty());
@@ -167,14 +165,12 @@ public class SourceEditorController extends AbstractController implements TestLo
             // TODO
             currentlyOpenTestCase.getValue().commitChanges();
         }
-//        astManager.sourceCodeProperty().suspendWhile(() -> {
-            if (!liveTestCase.getSource().equals(nodeEditionCodeArea.getText())) {
-                nodeEditionCodeArea.replaceText(liveTestCase.getSource());
-            }
-            currentlyOpenTestCase.setValue(liveTestCase);
-            Subscription sub = ReactfxUtil.rewireInit(liveTestCase.sourceProperty(), astManager.sourceCodeProperty());
-            liveTestCase.addCommitHandler(t -> sub.unsubscribe());
-//        });
+        if (!liveTestCase.getSource().equals(nodeEditionCodeArea.getText())) {
+            nodeEditionCodeArea.replaceText(liveTestCase.getSource());
+        }
+        currentlyOpenTestCase.setValue(liveTestCase);
+        Subscription sub = ReactfxUtil.rewireInit(liveTestCase.sourceProperty(), astManager.sourceCodeProperty());
+        liveTestCase.addCommitHandler(t -> sub.unsubscribe());
     }
 
 
@@ -207,29 +203,27 @@ public class SourceEditorController extends AbstractController implements TestLo
     }
 
 
-
     private void initializeLanguageSelector() {
 
         ToggleGroup languageToggleGroup = new ToggleGroup();
 
         getSupportedLanguageVersions()
-                    .stream()
-                    .sorted(LanguageVersion::compareTo)
-                    .map(lv -> {
-                        RadioMenuItem item = new RadioMenuItem(lv.getShortName());
-                        item.setUserData(lv);
-                        return item;
-                    })
-                    .forEach(item -> {
-                        languageToggleGroup.getToggles().add(item);
-                        languageSelectionMenuButton.getItems().add(item);
-                    });
+            .stream()
+            .sorted(LanguageVersion::compareTo)
+            .map(lv -> {
+                RadioMenuItem item = new RadioMenuItem(lv.getShortName());
+                item.setUserData(lv);
+                return item;
+            })
+            .forEach(item -> {
+                languageToggleGroup.getToggles().add(item);
+                languageSelectionMenuButton.getItems().add(item);
+            });
 
         languageVersionUIProperty = mapToggleGroupToUserData(languageToggleGroup, LanguageRegistryUtil::defaultLanguageVersion);
         // this will be overwritten by property restore if needed
         languageVersionUIProperty.setValue(defaultLanguageVersion());
     }
-
 
 
     public void showAuxclasspathSetupPopup() {

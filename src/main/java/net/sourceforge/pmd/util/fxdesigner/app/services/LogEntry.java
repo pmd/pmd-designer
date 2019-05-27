@@ -152,7 +152,9 @@ public final class LogEntry implements Comparable<LogEntry> {
         INTERNAL("Internal event", CategoryType.INTERNAL),
         SERVICE_REGISTERING("Service registered", CategoryType.INTERNAL),
         RESOURCE_MANAGEMENT("Resource manager", CategoryType.INTERNAL),
-        SELECTION_EVENT_TRACING("Selection event", CategoryType.INTERNAL);
+        SELECTION_EVENT_TRACING("Selection event", CategoryType.INTERNAL),
+        XPATH_EVENT_FORWARDING("XPath update", CategoryType.INTERNAL),
+        ;
 
         public final String name;
         private final CategoryType type;
