@@ -21,6 +21,7 @@ import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
+import org.w3c.dom.Element;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.testframework.TestDescriptor;
@@ -46,15 +47,21 @@ public class LiveTestCase implements SettingsOwner {
     private final Var<TestResult> status = Var.newSimpleVar(new TestResult(TestStatus.UNKNOWN, null));
     private Consumer<LiveTestCase> commitHandler;
     private final Var<Boolean> frozen = Var.newSimpleVar(true);
+    @Nullable private final Element originalElement;
 
     private final UndoManager<TestCaseChange> myUndoModel;
 
     public LiveTestCase() {
-        this(t -> {});
+        this(null);
     }
 
-    public LiveTestCase(Consumer<LiveTestCase> commitHandler) {
+    public LiveTestCase(@Nullable Element originalElement) {
+        this(t -> {}, originalElement);
+    }
+
+    public LiveTestCase(Consumer<LiveTestCase> commitHandler, @Nullable Element originalElement) {
         this.commitHandler = commitHandler;
+        this.originalElement = originalElement;
 
         myUndoModel = UndoManagerFactory.unlimitedHistorySingleChangeUM(
             changeStream(),
@@ -63,6 +70,11 @@ public class LiveTestCase implements SettingsOwner {
             (a, b) -> Optional.of(a.mergeWith(b))
         );
 
+    }
+
+    @Nullable
+    public Element getOriginalElement() {
+        return originalElement;
     }
 
     public UndoManager<TestCaseChange> getUndoManager() {
@@ -252,9 +264,9 @@ public class LiveTestCase implements SettingsOwner {
     }
 
 
-    public static LiveTestCase fromDescriptor(TestDescriptor descriptor) {
+    public static LiveTestCase fromDescriptor(TestDescriptor descriptor, Element originalElement) {
 
-        LiveTestCase live = new LiveTestCase(t -> {});
+        LiveTestCase live = new LiveTestCase(originalElement);
         live.setSource(descriptor.getCode());
         live.setDescription(descriptor.getDescription());
 

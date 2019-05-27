@@ -12,7 +12,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -42,19 +45,19 @@ import net.sourceforge.pmd.testframework.TestDescriptor;
 public class TestXmlParser {
 
 
-    private List<TestDescriptor> parseTests(Rule rule, Document doc, Consumer<Exception> errorHandler) {
+    private Map<TestDescriptor, Element> parseTests(Rule rule, Document doc, Consumer<Exception> errorHandler) {
         Element root = doc.getDocumentElement();
         NodeList testCodes = root.getElementsByTagName("test-code");
 
 
-        List<TestDescriptor> tests = new ArrayList<>(testCodes.getLength());
+        Map<TestDescriptor, Element> tests = new LinkedHashMap<>(testCodes.getLength());
         for (int i = 0; i < testCodes.getLength(); i++) {
             Element testCode = (Element) testCodes.item(i);
 
             try {
                 TestDescriptor descriptor = parseSingle(rule, testCode, root);
                 descriptor.setNumberInDocument(i);
-                tests.add(descriptor);
+                tests.put(descriptor, testCode);
             } catch (Exception e) {
                 errorHandler.accept(new RuntimeException("Exception while parsing test #" + i, e));
             }
@@ -221,8 +224,8 @@ public class TestXmlParser {
                     // do nothing
                 }
             };
-            List<TestDescriptor> testDescriptors = new TestXmlParser().parseTests(rule, doc, errorHandler);
-            List<LiveTestCase> tests = testDescriptors.stream().map(LiveTestCase::fromDescriptor).collect(Collectors.toList());
+            Map<TestDescriptor, Element> testDescriptors = new TestXmlParser().parseTests(rule, doc, errorHandler);
+            List<LiveTestCase> tests = testDescriptors.entrySet().stream().map(e -> LiveTestCase.fromDescriptor(e.getKey(), e.getValue())).collect(Collectors.toList());
             return new TestCollection(tests);
         } catch (SAXException | ParserConfigurationException | IOException e) {
             errorHandler.accept(e);

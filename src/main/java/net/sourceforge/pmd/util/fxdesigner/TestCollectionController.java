@@ -16,6 +16,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCollection;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlDumper;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.TestCaseListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
@@ -71,6 +72,8 @@ public class TestCollectionController extends AbstractController {
         });
 
         addTestButton.setOnAction(any -> getTestCollection().addTestCase(new LiveTestCase().unfreeze()));
+
+        exportTestsButton.setOnAction(evt -> System.out.println(TestXmlDumper.dumpXmlTests(getTestCollection(), e -> logUserException(e, Category.TEST_LOADING_EXCEPTION))));
 
     }
 
