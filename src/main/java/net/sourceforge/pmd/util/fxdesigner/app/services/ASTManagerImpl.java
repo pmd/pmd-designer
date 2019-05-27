@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
+import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -48,7 +49,7 @@ public class ASTManagerImpl implements ASTManager {
     /**
      * Most up-to-date compilation unit. Is null if the current source cannot be parsed.
      */
-    private final Var<Node> compilationUnit = Var.newSimpleVar(null);
+    private final SuspendableVar<Node> compilationUnit = Var.<Node>newSimpleVar(null).suspendable();
     /**
      * Selected language version.
      */
@@ -56,7 +57,7 @@ public class ASTManagerImpl implements ASTManager {
     /**
      * Last valid source that was compiled, corresponds to {@link #compilationUnit}.
      */
-    private Var<String> sourceCode = Var.newSimpleVar("");
+    private SuspendableVar<String> sourceCode = Var.newSimpleVar("").suspendable();
 
     private Var<ParseAbortedException> currentException = Var.newSimpleVar(null);
 
@@ -112,8 +113,8 @@ public class ASTManagerImpl implements ASTManager {
 
 
     @Override
-    public Var<String> sourceCodeProperty() {
-        return Var.fromVal(sourceCode.orElseConst(""), this::setSourceCode);
+    public SuspendableVar<String> sourceCodeProperty() {
+        return sourceCode;
     }
 
     @PersistentProperty

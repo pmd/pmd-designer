@@ -141,7 +141,11 @@ public class SourceEditorController extends AbstractController implements TestLo
             latestValue(nodeEditionCodeArea.plainTextChanges()
                                            .successionEnds(AST_REFRESH_DELAY)
                                            .map(it -> nodeEditionCodeArea.getText())),
-            nodeEditionCodeArea::replaceText
+            text -> {
+                currentRuleResultsProperty().setValue(emptyList());
+                currentErrorNodesProperty().setValue(emptyList());
+                nodeEditionCodeArea.replaceText(text);
+            }
         );
 
         areaText.bindBidirectional(astManager.sourceCodeProperty());
@@ -163,9 +167,14 @@ public class SourceEditorController extends AbstractController implements TestLo
             // TODO
             currentlyOpenTestCase.getValue().commitChanges();
         }
-        currentlyOpenTestCase.setValue(liveTestCase);
-        Subscription sub = ReactfxUtil.rewireInit(liveTestCase.sourceProperty(), astManager.sourceCodeProperty());
-        liveTestCase.addCommitHandler(t -> sub.unsubscribe());
+        astManager.sourceCodeProperty().suspendWhile(() -> {
+            if (!liveTestCase.getSource().equals(nodeEditionCodeArea.getText())) {
+                nodeEditionCodeArea.replaceText(liveTestCase.getSource());
+            }
+            currentlyOpenTestCase.setValue(liveTestCase);
+            Subscription sub = ReactfxUtil.rewireInit(liveTestCase.sourceProperty(), astManager.sourceCodeProperty());
+            liveTestCase.addCommitHandler(t -> sub.unsubscribe());
+        });
     }
 
 

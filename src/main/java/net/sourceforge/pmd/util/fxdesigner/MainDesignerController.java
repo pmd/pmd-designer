@@ -18,8 +18,10 @@ import java.util.Stack;
 
 import org.apache.commons.io.IOUtils;
 import org.reactfx.Subscription;
+import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.popups.EventLogController;
@@ -134,7 +136,9 @@ public class MainDesignerController extends AbstractController {
     protected void afterChildrenInit() {
         updateRecentFilesMenu();
 
-        sourceEditorController.currentRuleResultsProperty().bind(ruleEditorsController.currentRuleResults());
+        ruleEditorsController.currentRuleResults()
+                             .values()
+                             .subscribe(sourceEditorController.currentRuleResultsProperty()::setValue);
 
         metricPaneController.numAvailableMetrics().values().subscribe(n -> {
             metricResultsTab.setText("Metrics\t(" + (n == 0 ? "none" : n) + ")");

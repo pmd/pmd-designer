@@ -27,6 +27,7 @@ import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 import org.reactfx.SuspendableEventStream;
 import org.reactfx.collection.LiveArrayList;
+import org.reactfx.util.FxTimer;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -352,7 +353,9 @@ public final class XPathRuleEditorController extends AbstractController implemen
 
         xpathResultListView.setPlaceholder(emptyLabel);
 
-        xpathResultListView.setItems(results.stream().map(getDesignerRoot().getService(DesignerRoot.RICH_TEXT_MAPPER)::wrapNode).collect(Collectors.toCollection(LiveArrayList::new)));
+        // we wait a bit to do that, so that the rich text is up to date
+        FxTimer.runLater(Duration.ofMillis(100), () -> xpathResultListView.setItems(results.stream().map(getDesignerRoot().getService(DesignerRoot.RICH_TEXT_MAPPER)::wrapNode).collect(Collectors.toCollection(LiveArrayList::new))));
+
         this.currentResults.setValue(results);
         // only show the error label here when it's an xpath error
         expressionTitledPane.errorMessageProperty().setValue(xpathError ? emptyResultsPlaceholder : "");

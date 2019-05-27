@@ -6,6 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.app.services;
 
 import java.util.Map;
 
+import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -26,7 +27,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 public interface ASTManager extends ApplicationComponent, SettingsOwner {
 
 
-    Var<String> sourceCodeProperty();
+    SuspendableVar<String> sourceCodeProperty();
 
 
     String getSourceCode();
