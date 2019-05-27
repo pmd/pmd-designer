@@ -6,8 +6,6 @@ package net.sourceforge.pmd.util.fxdesigner;
 
 import java.io.File;
 
-import org.kordamp.ikonli.javafx.FontIcon;
-
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
@@ -15,19 +13,12 @@ import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCollection;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.TestCaseListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Tooltip;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 
 public class TestCollectionController extends AbstractController {
@@ -41,7 +32,7 @@ public class TestCollectionController extends AbstractController {
     @FXML
     private Button addTestButton;
     @FXML
-    private Button exportTestsButton;
+    private Button exportTestsButton; // TODO
 
     private final ObservableXPathRuleBuilder builder;
 
@@ -54,7 +45,8 @@ public class TestCollectionController extends AbstractController {
     @Override
     protected void beforeParentInit() {
 
-        testsListView.setCellFactory(c -> new TestCaseListCell());
+        testsListView.setCellFactory(c -> new TestCaseListCell(this));
+        testsListView.setEditable(true);
         this.testsListView.setItems(getTestCollection().getStash());
 
         importTestsButton.setOnAction(any -> {
@@ -65,6 +57,11 @@ public class TestCollectionController extends AbstractController {
             TestCollection coll = TestXmlParser.readXmlTestFile(file.toPath(), e -> logUserException(e, Category.TEST_LOADING_EXCEPTION));
             // TODO what if there's already test cases?
             getTestCollection().rebase(coll);
+        });
+
+        addTestButton.setOnAction(any -> {
+            getTestCollection().getStash().add(new LiveTestCase());
+            loadTestCase(getTestCollection().getStash().size() - 1);
         });
 
     }
@@ -84,55 +81,5 @@ public class TestCollectionController extends AbstractController {
         getService(DesignerRoot.TEST_LOADER).handleTestOpenRequest(live);
     }
 
-
-    private class TestCaseListCell extends ListCell<LiveTestCase> {
-
-        @Override
-        protected void updateItem(LiveTestCase item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (empty || item == null) {
-                setText(null);
-                setGraphic(null);
-            } else {
-                setGraphic(buildGraphic(item));
-            }
-        }
-
-
-        private Node buildGraphic(LiveTestCase testCase) {
-
-            HBox hBox = new HBox();
-            Label label = new Label();
-
-            label.textProperty().bind(testCase.descriptionProperty());
-
-            Pane spacer = new Pane();
-            HBox.setHgrow(spacer, Priority.ALWAYS);
-
-
-            Button load = new Button();
-            load.setGraphic(new FontIcon("fas-external-link-alt"));
-            load.getStyleClass().addAll("edit-button", "icon-button");
-            Tooltip.install(load, new Tooltip("Load test case in editor"));
-
-
-            load.setOnAction(e -> loadTestCase(getIndex()));
-
-            //            Button delete = new Button();
-            //            delete.setGraphic(new FontIcon("fas-trash-alt"));
-            //            delete.getStyleClass().addAll(DELETE_BUTTON_CLASS, "icon-button");
-            //            Tooltip.install(delete, new Tooltip("Remove property"));
-            //            delete.setOnAction(e -> getItems().remove(spec));
-
-            hBox.getChildren().setAll(label, spacer, load);
-            hBox.setAlignment(Pos.CENTER_LEFT);
-
-            return hBox;
-
-
-        }
-
-    }
 
 }
