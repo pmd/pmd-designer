@@ -6,6 +6,10 @@ package net.sourceforge.pmd.util.fxdesigner;
 
 import java.io.File;
 
+import org.reactfx.value.Val;
+
+import net.sourceforge.pmd.lang.Language;
+import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
@@ -41,6 +45,9 @@ public class TestCollectionController extends AbstractController {
         this.builder = builder;
     }
 
+    public Val<LanguageVersion> getDefaultLanguageVersion() {
+        return builder.languageProperty().map(Language::getDefaultVersion);
+    }
 
     @Override
     protected void beforeParentInit() {

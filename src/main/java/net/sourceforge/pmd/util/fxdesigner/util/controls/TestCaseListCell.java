@@ -4,10 +4,20 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
+import java.util.List;
+
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import net.sourceforge.pmd.util.fxdesigner.TestCollectionController;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.app.XPathUpdateSubscriber;
+import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
+import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManagerImpl;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCaseUtil;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.TestResult;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.TestStatus;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -28,12 +38,14 @@ import javafx.scene.layout.Priority;
  */
 public class TestCaseListCell extends ListCell<LiveTestCase> {
 
-    private TestCollectionController testCollectionController;
+    private TestCollectionController collection;
 
     private TextField textField;
 
+    private MyXPathSubscriber subscriber;
+
     public TestCaseListCell(TestCollectionController testCollectionController) {
-        this.testCollectionController = testCollectionController;
+        this.collection = testCollectionController;
     }
 
     @Override
@@ -43,6 +55,10 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
         if (isEmpty() || item == null) {
             setGraphic(null);
             textField = null;
+            if (subscriber != null) {
+                subscriber.unsubscribe();
+                subscriber = null;
+            }
         } else {
             if (isEditing()) {
                 if (textField != null) {
@@ -60,8 +76,16 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
 
     private Node getNonEditingGraphic(LiveTestCase testCase) {
         HBox hBox = new HBox();
+        hBox.setSpacing(10);
 
         Label label = new Label(testCase.getDescription());
+
+        FontIcon statusIcon = new FontIcon();
+        testCase.statusProperty().values()
+                .subscribe(st -> {
+                    statusIcon.getStyleClass().setAll(st.getStyleClass());
+                    statusIcon.setIconLiteral(st.getIcon());
+                });
 
         Pane spacer = new Pane();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -72,7 +96,7 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
         Tooltip.install(load, new Tooltip("Load test case in editor"));
 
 
-        load.setOnAction(e -> testCollectionController.loadTestCase(getIndex()));
+        load.setOnAction(e -> collection.loadTestCase(getIndex()));
 
         //            Button delete = new Button();
         //            delete.setGraphic(new FontIcon("fas-trash-alt"));
@@ -80,8 +104,16 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
         //            Tooltip.install(delete, new Tooltip("Remove property"));
         //            delete.setOnAction(e -> getItems().remove(spec));
 
-        hBox.getChildren().setAll(label, spacer, load);
+        hBox.getChildren().setAll(statusIcon, label, spacer, load);
         hBox.setAlignment(Pos.CENTER_LEFT);
+
+        if (subscriber != null) {
+            subscriber.unsubscribe();
+        }
+
+        subscriber = new MyXPathSubscriber(testCase, collection.getDesignerRoot());
+        subscriber.init(getManagerOf(testCase));
+
 
         return hBox;
     }
@@ -130,4 +162,40 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
         setGraphic(getNonEditingGraphic(getItem()));
     }
 
+    private ASTManager getManagerOf(LiveTestCase testCase) {
+
+        ASTManagerImpl manager = new ASTManagerImpl(collection.getDesignerRoot());
+        manager.sourceCodeProperty().bind(testCase.sourceProperty());
+        manager.languageVersionProperty().bind(testCase.languageVersionProperty().orElse(collection.getDefaultLanguageVersion()));
+        manager.ruleProperties().bind(ReactfxUtil.observableMapVal(testCase.getProperties()));
+
+        return manager;
+    }
+
+    private class MyXPathSubscriber extends XPathUpdateSubscriber {
+
+        private final LiveTestCase testCase;
+
+        public MyXPathSubscriber(LiveTestCase testCase, DesignerRoot root) {
+            super(root);
+            this.testCase = testCase;
+        }
+
+
+        @Override
+        public void handleNoCompilationUnit() {
+            testCase.statusProperty().setValue(TestStatus.UNKNOWN);
+        }
+
+        @Override
+        public void handleXPathSuccess(List<net.sourceforge.pmd.lang.ast.Node> results) {
+            TestResult result = TestCaseUtil.doTest(testCase, results);
+            testCase.statusProperty().setValue(result.getStatus());
+        }
+
+        @Override
+        public void handleXPathError(Exception e) {
+            testCase.statusProperty().setValue(TestStatus.ERROR);
+        }
+    }
 }

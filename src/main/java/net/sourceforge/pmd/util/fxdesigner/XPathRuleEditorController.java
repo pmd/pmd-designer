@@ -20,7 +20,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -39,14 +38,11 @@ import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.app.XPathUpdateSubscriber;
-import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.CloseableService;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.VersionedXPathQuery;
-import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluationException;
-import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluator;
 import net.sourceforge.pmd.util.fxdesigner.popups.ExportXPathWizardController;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
@@ -66,7 +62,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.XpathViolationListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -169,7 +164,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
                         )
                         .subscribe(tick -> getService(DesignerRoot.LATEST_XPATH).pushEvent(this, tick));
 
-        new MyXpathSubscriber(getDesignerRoot(), getService(DesignerRoot.AST_MANAGER)).init();
+        new MyXpathSubscriber(getDesignerRoot()).init(getService(DesignerRoot.AST_MANAGER));
 
 
         selectionEvents = EventStreams.valuesOf(xpathResultListView.getSelectionModel().selectedItemProperty()).suppressible();
@@ -399,8 +394,8 @@ public final class XPathRuleEditorController extends AbstractController implemen
     private class MyXpathSubscriber extends XPathUpdateSubscriber {
 
 
-        public MyXpathSubscriber(DesignerRoot root, ASTManager astManager) {
-            super(root, astManager);
+        public MyXpathSubscriber(DesignerRoot root) {
+            super(root);
         }
 
         @Override
@@ -415,8 +410,8 @@ public final class XPathRuleEditorController extends AbstractController implemen
         }
 
         @Override
-        public void handleXPathSuccess(List<Node> result) {
-            updateResults(false, false, result, NO_MATCH_MESSAGE);
+        public void handleXPathSuccess(List<Node> results) {
+            updateResults(false, false, results, NO_MATCH_MESSAGE);
             // Notify that everything went OK so we can avoid logging very recent exceptions
             raiseParsableXPathFlag();
         }

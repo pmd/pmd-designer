@@ -280,4 +280,26 @@
   -fx-background-color: white;
 }
 
+.test-status {
+
+  &.status-pass {
+    -fx-fill: green;
+  }
+
+  &.status-fail {
+    -fx-fill: yellow;
+  }
+
+  &.status-unknown {
+    -fx-fill: gray;
+  }
+
+  &.status-error {
+    -fx-fill: red;
+  }
+
+
+}
+
+
 @import "popover";

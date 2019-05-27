@@ -38,6 +38,7 @@ public class LiveTestCase implements SettingsOwner {
     private final ObservableMap<String, String> properties = FXCollections.observableHashMap();
     private final Var<Boolean> dirty = Var.newSimpleVar(false);
     private final LiveList<LiveViolationRecord> expectedViolations = new LiveArrayList<>();
+    private final Var<TestStatus> status = Var.newSimpleVar(TestStatus.UNKNOWN);
     private Consumer<LiveTestCase> commitHandler;
     private boolean frozen;
 
@@ -155,6 +156,7 @@ public class LiveTestCase implements SettingsOwner {
     public LiveTestCase unfreeze(Consumer<LiveTestCase> commitHandler) {
         LiveTestCase live = new LiveTestCase(commitHandler);
         live.setDescription(getDescription());
+        live.expectedViolations.setAll(this.expectedViolations);
         live.setLanguageVersion(getLanguageVersion());
         live.setDirty(false);
         live.setSource(getSource());
@@ -162,6 +164,13 @@ public class LiveTestCase implements SettingsOwner {
         return live;
     }
 
+    public TestStatus getStatus() {
+        return status.getValue();
+    }
+
+    public Var<TestStatus> statusProperty() {
+        return status;
+    }
 
     public static LiveTestCase fromDescriptor(TestDescriptor descriptor) {
 
