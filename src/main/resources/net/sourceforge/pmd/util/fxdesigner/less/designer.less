@@ -299,5 +299,23 @@
 
 }
 
+.button.node-drag-over {
+
+  @fxcolor: derive(@selection-focus-color, +10%);
+  @darker: @darker-accent-border;
+  //-fx-border-color: @fxcolor;
+  //-fx-border-style: solid;
+  //-fx-border-width: 4;
+
+  @grad: linear-gradient(to bottom, derive(@fxcolor, -30%) 0%, derive(@fxcolor, -18%) 20%, derive(@fxcolor, -16%) 50%);
+
+  -fx-background-color: -fx-shadow-highlight-color, linear-gradient(to bottom, derive(@darker, -20%), @darker), @grad;
+
+  -fx-background-insets: 0 0 -1 0, 0, 1;
+
+  -fx-text-fill: white;
+}
+
+
 
 @import "popover";

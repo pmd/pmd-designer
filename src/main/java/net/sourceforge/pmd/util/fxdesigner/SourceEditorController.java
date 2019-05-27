@@ -5,10 +5,12 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import static java.util.Collections.emptyList;
+import static net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NODE_RANGE_DATA_FORMAT;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.mapToggleGroupToUserData;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExceptionMessage;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguageVersion;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguageVersions;
+import static net.sourceforge.pmd.util.fxdesigner.util.controls.ViolationCollectionView.NODE_DRAG_OVER;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.latestValue;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
 
@@ -36,11 +38,13 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManagerImpl;
 import net.sourceforge.pmd.util.fxdesigner.app.services.TestLoadHandler;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
 import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
+import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar;
@@ -54,6 +58,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 
 
 /**
@@ -135,6 +141,56 @@ public class SourceEditorController extends AbstractController implements TestLo
         setText(getDefaultText());
 
         violationsButton.setOnAction(e -> violationsPopover.showOrFocus(p -> p.show(violationsButton)));
+
+        violationsButton.textProperty().bind(
+            currentlyOpenTestCase.flatMap(it -> it.getExpectedViolations().sizeProperty())
+                                 .map(it -> "Expected violations (" + it + ")")
+        );
+
+        violationsButton.setOnDragOver(evt -> {
+            if (evt.getGestureSource() != violationsButton &&
+                evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
+                /* allow for both copying and moving, whatever user chooses */
+                evt.acceptTransferModes(TransferMode.LINK);
+            }
+            evt.consume();
+        });
+
+        violationsButton.setOnDragEntered(evt -> {
+
+            if (evt.getGestureSource() != violationsButton &&
+                evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
+                violationsButton.getStyleClass().addAll(NODE_DRAG_OVER);
+            }
+            evt.consume();
+        });
+
+        violationsButton.setOnDragExited(evt -> {
+            violationsButton.getStyleClass().removeAll(NODE_DRAG_OVER);
+            evt.consume();
+        });
+
+        violationsButton.setOnDragDropped(evt -> {
+
+            boolean success = false;
+
+            Dragboard db = evt.getDragboard();
+            if (db.hasContent(NODE_RANGE_DATA_FORMAT)) {
+                TextRange content = (TextRange) db.getContent(NODE_RANGE_DATA_FORMAT);
+
+                LiveViolationRecord record = new LiveViolationRecord();
+                record.setRange(content);
+                record.setExactRange(true);
+                currentlyOpenTestCase.ifPresent(v -> v.getExpectedViolations().add(record));
+                success = true;
+            }
+
+            violationsButton.getStyleClass().removeAll(NODE_DRAG_OVER);
+
+            evt.setDropCompleted(success);
+            evt.consume();
+        });
+
     }
 
     @Override

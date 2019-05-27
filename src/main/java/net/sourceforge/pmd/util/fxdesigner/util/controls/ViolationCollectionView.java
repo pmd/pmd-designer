@@ -83,12 +83,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
         footer.getStyleClass().addAll("footer");
         footer.getStylesheets().addAll(DesignerUtil.getCss("flat").toString());
 
-
-//        FontIcon fontIcon = new FontIcon("fas-plus");
-        Label addProperty = new Label("Drag and drop nodes from the treeview");
-//        addProperty.setGraphic(fontIcon);
-//        addProperty.getStyleClass().addAll("icon-button");
-//        addProperty.setTooltip(new Tooltip("Select new node as expected violation"));
+        Label addProperty = new Label("Drag and drop nodes from anywhere");
 
 
         AnchorPane.setLeftAnchor(addProperty, 0.);
@@ -97,17 +92,6 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
         AnchorPane.setTopAnchor(addProperty, 0.);
 
 
-//        addProperty.setOnAction(e -> {
-//            getDesignerRoot().getService(DesignerRoot.NODE_SELECTION_CHANNEL)
-//                             .messageStream(true, this)
-//                             .subscribeForOne(evt -> {
-//                                 LiveViolationRecord record = new LiveViolationRecord();
-//                                 record.setRange(rangeOf(evt.selected));
-//                                 record.setExactRange(true);
-//                                 getItems().add(record);
-//                             });
-//
-//        });
         footer.getChildren().addAll(addProperty);
         this.getChildren().addAll(view, footer);
 
