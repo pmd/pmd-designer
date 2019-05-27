@@ -19,10 +19,13 @@ import net.sourceforge.pmd.util.fxdesigner.model.testing.TestResult;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestStatus;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -105,6 +108,13 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
         Pane spacer = new Pane();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
+        Button duplicate = new Button();
+        duplicate.setGraphic(new FontIcon("far-copy"));
+        duplicate.getStyleClass().addAll("duplicate-test", "icon-button");
+        Tooltip.install(duplicate, new Tooltip("Copy test case"));
+        duplicate.setOnAction(e -> collection.duplicate(testCase));
+
+
         ToggleButton load = new ToggleButton();
         load.setToggleGroup(collection.getLoadedToggleGroup());
         load.setGraphic(new FontIcon("fas-external-link-alt"));
@@ -128,7 +138,7 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
         //            Tooltip.install(delete, new Tooltip("Remove property"));
         //            delete.setOnAction(e -> getItems().remove(spec));
 
-        hBox.getChildren().setAll(statusLabel, label, spacer, load);
+        hBox.getChildren().setAll(statusLabel, label, spacer, duplicate, new Separator(Orientation.VERTICAL), load);
         hBox.setAlignment(Pos.CENTER_LEFT);
 
         if (subscriber != null) {

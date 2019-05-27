@@ -169,8 +169,8 @@ public class LiveTestCase implements SettingsOwner {
         return this;
     }
 
-    private LiveTestCase deepCopy(Consumer<LiveTestCase> commitHandler) {
-        LiveTestCase live = new LiveTestCase(commitHandler);
+    public LiveTestCase deepCopy() {
+        LiveTestCase live = new LiveTestCase();
         live.setDescription(getDescription());
         live.expectedViolations.setAll(this.expectedViolations);
         live.setProperties(this.properties);

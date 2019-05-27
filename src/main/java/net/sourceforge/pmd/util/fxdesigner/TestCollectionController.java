@@ -96,4 +96,8 @@ public class TestCollectionController extends AbstractController {
     public void setLoadedToggleGroup(ToggleGroup loadedToggleGroup) {
         this.loadedToggleGroup = loadedToggleGroup;
     }
+
+    public void duplicate(LiveTestCase testCase) {
+        getTestCollection().addTestCase(testCase.deepCopy().unfreeze());
+    }
 }
