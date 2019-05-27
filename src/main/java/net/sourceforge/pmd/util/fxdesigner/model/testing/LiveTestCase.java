@@ -60,7 +60,7 @@ public class LiveTestCase implements SettingsOwner {
     }
 
     public LiveTestCase(Consumer<LiveTestCase> commitHandler, @Nullable Element originalElement) {
-        this.commitHandler = commitHandler;
+        this.commitHandler = t -> commitHandler.accept(t.freeze());
         this.originalElement = originalElement;
 
         myUndoModel = UndoManagerFactory.unlimitedHistorySingleChangeUM(
@@ -70,6 +70,7 @@ public class LiveTestCase implements SettingsOwner {
             (a, b) -> Optional.of(a.mergeWith(b))
         );
 
+        freeze();
     }
 
     @Nullable
@@ -183,11 +184,22 @@ public class LiveTestCase implements SettingsOwner {
         this.frozen.setValue(frozen);
     }
 
-    public LiveTestCase freeze() {
-        setFrozen(true);
+    /**
+     * Make a mark in the history of this test case and marks the
+     * descriptor as "read-only". Bindings may still exist but they
+     * shouldn't.
+     */
+    LiveTestCase freeze() {
+        if (!frozen.getValue()) {
+            setFrozen(true);
+            getUndoManager().mark();
+        }
         return this;
     }
 
+    /**
+     * Marks this descriptor as open for write.
+     */
     public LiveTestCase unfreeze() {
         setFrozen(false);
         return this;

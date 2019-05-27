@@ -32,6 +32,10 @@ public class TestCollection implements SettingsOwner {
         return stash;
     }
 
+    /**
+     * Mark the given [testCase] as the only unfrozen one and appends
+     * it to the {@link #stash}.
+     */
     public void addTestCase(LiveTestCase testCase) {
         if (!testCase.isFrozen()) {
             stash.forEach(LiveTestCase::freeze);
