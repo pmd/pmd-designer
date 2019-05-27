@@ -58,9 +58,6 @@ public interface DesignerRoot {
     <T> T getService(AppServiceDescriptor<T> descriptor);
 
 
-    void afterServiceRegistered(Runnable run, AppServiceDescriptor<?>... descriptors);
-
-
     /**
      * Register a service for the given descriptor.
      *

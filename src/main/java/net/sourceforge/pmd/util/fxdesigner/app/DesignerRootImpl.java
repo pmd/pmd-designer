@@ -4,12 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
@@ -42,7 +38,6 @@ public final class DesignerRootImpl implements DesignerRoot {
 
 
     private final Map<AppServiceDescriptor<?>, Object> services = new HashMap<>();
-    private final Map<Set<AppServiceDescriptor<?>>, Runnable> hooks = new ConcurrentHashMap<>();
 
 
     public DesignerRootImpl(Stage mainStage, DesignerParams params) {
@@ -87,35 +82,12 @@ public final class DesignerRootImpl implements DesignerRoot {
     }
 
     @Override
-    public void afterServiceRegistered(Runnable run, AppServiceDescriptor<?>... descriptors) {
-        if (services.keySet().containsAll(Arrays.asList(descriptors))) {
-            run.run();
-        } else {
-            hooks.merge(
-                new HashSet<>(Arrays.asList(descriptors)),
-                run,
-                (set, prev) -> () -> {
-                    prev.run();
-                    run.run();
-                }
-            );
-        }
-    }
-
-    @Override
     public <T> void registerService(AppServiceDescriptor<T> descriptor, T component) {
         if (getService(LOGGER) != null) {
             // event the logger needs to be registered hehe
             getService(LOGGER).logEvent(LogEntry.serviceRegistered(descriptor, component));
         }
         services.put(descriptor, component);
-
-        new HashMap<>(hooks).forEach((set, run) -> {
-            if (services.keySet().containsAll(set)) {
-                run.run();
-                hooks.remove(set);
-            }
-        });
     }
 
     @Override
