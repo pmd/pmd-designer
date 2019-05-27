@@ -104,7 +104,7 @@ public interface NodeSelectionSource extends ApplicationComponent {
             // drag and drop
             Dragboard db = source.startDragAndDrop(TransferMode.LINK);
             ClipboardContent content = new ClipboardContent();
-            content.put(NodeSelectionSource.NODE_RANGE_DATA_FORMAT, TextRange.fullLine(data.getBeginLine(), 10000);
+            content.put(NodeSelectionSource.NODE_RANGE_DATA_FORMAT, TextRange.fullLine(data.getBeginLine(), 10000));
             db.setContent(content);
             evt.consume();
         });
