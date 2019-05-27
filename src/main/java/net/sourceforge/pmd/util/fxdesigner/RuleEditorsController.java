@@ -19,6 +19,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.MessageChannel;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.VersionedXPathQuery;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.MutableTabPane;
@@ -103,18 +104,23 @@ public class RuleEditorsController extends AbstractController {
 
     @Override
     protected void afterChildrenInit() {
-        MessageChannel<VersionedXPathQuery> xpathChannel = getDesignerRoot().getService(DesignerRoot.LATEST_XPATH);
+        MessageChannel<VersionedXPathQuery> globalXpathChannel = getDesignerRoot().getService(DesignerRoot.LATEST_XPATH);
+        MessageChannel<LiveTestCase> globalTestChannel = getDesignerRoot().getService(DesignerRoot.TEST_LOADER);
         ReactfxExtensions.dynamic(LiveList.wrapVal(selectedEditorProperty()),
-                                  (x, i) -> xpathChannel.connect(x.getService(DesignerRoot.LATEST_XPATH)));
+                                  (x, i) -> globalXpathChannel.connect(x.getService(DesignerRoot.LATEST_XPATH)));
+
+        ReactfxExtensions.dynamic(LiveList.wrapVal(selectedEditorProperty()),
+                                  (x, i) -> globalTestChannel.connect(x.getService(DesignerRoot.TEST_LOADER)));
+
 
         selectedEditorProperty().values().filter(Objects::nonNull)
-                                .subscribe(it -> it.selectedTestCaseProperty().ifPresent(getService(DesignerRoot.TEST_LOADER)::handleTestOpenRequest));
-
+                                .subscribe(it -> it.selectedTestCaseProperty().ifPresent(t -> globalTestChannel.pushEvent(this, t)));
     }
 
     public DesignerRoot newScope() {
         DesignerRoot scope = getDesignerRoot().spawnScope();
         scope.registerService(DesignerRoot.LATEST_XPATH, new MessageChannel<>(Category.XPATH_EVENT_FORWARDING));
+        scope.registerService(DesignerRoot.TEST_LOADER, new MessageChannel<>(Category.TEST_LOADING_EVENT));
         return scope;
     }
 

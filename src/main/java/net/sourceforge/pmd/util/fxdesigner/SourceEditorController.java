@@ -36,7 +36,6 @@ import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManagerImpl;
-import net.sourceforge.pmd.util.fxdesigner.app.services.TestLoadHandler;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
@@ -70,7 +69,7 @@ import javafx.scene.input.TransferMode;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class SourceEditorController extends AbstractController implements TestLoadHandler {
+public class SourceEditorController extends AbstractController {
 
     private static final Duration AST_REFRESH_DELAY = Duration.ofMillis(100);
     private final ASTManager astManager;
@@ -215,7 +214,10 @@ public class SourceEditorController extends AbstractController implements TestLo
         initTreeView(astManager, astTreeView, editorTitledPane.errorMessageProperty());
 
         getDesignerRoot().registerService(DesignerRoot.RICH_TEXT_MAPPER, nodeEditionCodeArea);
-        getDesignerRoot().registerService(DesignerRoot.TEST_LOADER, this);
+
+        getService(DesignerRoot.TEST_LOADER)
+            .messageStream(true, this)
+            .subscribe(this::handleTestOpenRequest);
 
         currentlyOpenTestCase.values().subscribe(t -> {
             if (t == null) {
@@ -229,8 +231,7 @@ public class SourceEditorController extends AbstractController implements TestLo
 
     }
 
-    @Override
-    public void handleTestOpenRequest(@NonNull LiveTestCase liveTestCase) {
+    private void handleTestOpenRequest(@NonNull LiveTestCase liveTestCase) {
         if (currentlyOpenTestCase.isPresent()) {
             // TODO
             currentlyOpenTestCase.getValue().commitChanges();

@@ -147,7 +147,7 @@ public class LiveTestCase implements SettingsOwner {
                                .or(expectedViolations.changes());
     }
 
-
+    @PersistentProperty
     public boolean isFrozen() {
         return frozen.getValue();
     }

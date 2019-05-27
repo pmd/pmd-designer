@@ -60,6 +60,7 @@ public final class DesignerRootImpl implements DesignerRoot {
         registerService(PERSISTENCE_MANAGER, new OnDiskPersistenceManager(this, params.getPersistedInputFile(), params.getPersistedOutputFile()));
         registerService(NODE_SELECTION_CHANNEL, new MessageChannel<>(Category.SELECTION_EVENT_TRACING));
         registerService(LATEST_XPATH, new MessageChannel<>(Category.SELECTION_EVENT_TRACING));
+        registerService(TEST_LOADER, new MessageChannel<>(Category.TEST_LOADING_EVENT));
     }
 
 

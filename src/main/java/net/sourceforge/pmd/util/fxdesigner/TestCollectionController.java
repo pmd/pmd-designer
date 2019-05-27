@@ -17,6 +17,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCollection;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.TestCaseListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
@@ -85,7 +86,13 @@ public class TestCollectionController extends AbstractController {
             return;
         }
 
-        getService(DesignerRoot.TEST_LOADER).handleTestOpenRequest(live);
+        getService(DesignerRoot.TEST_LOADER).pushEvent(this, live);
+    }
+
+
+    @Override
+    protected void afterChildrenInit() {
+        super.afterChildrenInit();
     }
 
 

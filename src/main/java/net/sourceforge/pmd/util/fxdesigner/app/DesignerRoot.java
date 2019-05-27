@@ -14,8 +14,8 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.EventLogger;
 import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalDiskManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.PersistenceManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.RichTextMapper;
-import net.sourceforge.pmd.util.fxdesigner.app.services.TestLoadHandler;
 import net.sourceforge.pmd.util.fxdesigner.model.VersionedXPathQuery;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 
 import javafx.stage.Stage;
 
@@ -45,7 +45,7 @@ public interface DesignerRoot {
     /** AST manager of the current code. */
     AppServiceDescriptor<ASTManager> AST_MANAGER = new AppServiceDescriptor<>(ASTManager.class);
 
-    AppServiceDescriptor<TestLoadHandler> TEST_LOADER = new AppServiceDescriptor<>(TestLoadHandler.class);
+    AppServiceDescriptor<MessageChannel<LiveTestCase>> TEST_LOADER = new AppServiceDescriptor<>(MessageChannel.class);
 
     AppServiceDescriptor<MessageChannel<VersionedXPathQuery>> LATEST_XPATH = new AppServiceDescriptor<>(MessageChannel.class);
 
