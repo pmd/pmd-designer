@@ -7,14 +7,19 @@ package net.sourceforge.pmd.util.fxdesigner.model.testing;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.fxmisc.undo.UndoManager;
+import org.fxmisc.undo.UndoManagerFactory;
+import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
+import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
@@ -23,6 +28,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
@@ -36,12 +42,12 @@ public class LiveTestCase implements SettingsOwner {
     private final Var<String> description = Var.newSimpleVar("");
     private final Var<LanguageVersion> languageVersion = Var.newSimpleVar(null);
     private final ObservableMap<String, String> properties = FXCollections.observableHashMap();
-    private final Var<Boolean> dirty = Var.newSimpleVar(false);
     private final LiveList<LiveViolationRecord> expectedViolations = new LiveArrayList<>();
     private final Var<TestResult> status = Var.newSimpleVar(new TestResult(TestStatus.UNKNOWN, null));
     private Consumer<LiveTestCase> commitHandler;
     private final Var<Boolean> frozen = Var.newSimpleVar(true);
 
+    private final UndoManager<TestCaseChange> myUndoModel;
 
     public LiveTestCase() {
         this(t -> {});
@@ -49,7 +55,18 @@ public class LiveTestCase implements SettingsOwner {
 
     public LiveTestCase(Consumer<LiveTestCase> commitHandler) {
         this.commitHandler = commitHandler;
-        //        TODO // modificationTicks().subscribe(tick -> dirty.setValue(true));
+
+        myUndoModel = UndoManagerFactory.unlimitedHistorySingleChangeUM(
+            changeStream(),
+            TestCaseChange::invert,
+            TestCaseChange::redo,
+            (a, b) -> Optional.of(a.mergeWith(b))
+        );
+
+    }
+
+    public UndoManager<TestCaseChange> getUndoManager() {
+        return myUndoModel;
     }
 
     @PersistentProperty
@@ -92,17 +109,11 @@ public class LiveTestCase implements SettingsOwner {
         this.languageVersion.setValue(languageVersion);
     }
 
-    public Boolean getDirty() {
-        return dirty.getValue();
+
+    public Val<Boolean> dirtyProperty() {
+        return myUndoModel.undoAvailableProperty().map(it -> !it);
     }
 
-    public Var<Boolean> dirtyProperty() {
-        return dirty;
-    }
-
-    public void setDirty(Boolean dirty) {
-        this.dirty.setValue(dirty);
-    }
 
     @PersistentSequence
     public LiveList<LiveViolationRecord> getExpectedViolations() {
@@ -176,7 +187,6 @@ public class LiveTestCase implements SettingsOwner {
         live.expectedViolations.setAll(this.expectedViolations);
         live.setProperties(this.properties);
         live.setLanguageVersion(getLanguageVersion());
-        live.setDirty(this.dirty.getValue());
         live.setSource(getSource());
         live.setFrozen(isFrozen());
         return live;
@@ -197,6 +207,50 @@ public class LiveTestCase implements SettingsOwner {
     public void setStatus(TestStatus status) {
         statusProperty().setValue(new TestResult(status, null));
     }
+
+
+    public EventStream<TestCaseChange> changeStream() {
+
+        EventSource<TestCaseChange> sink = new EventSource<>();
+
+        sink.feedFrom(sourceProperty().changes().map(it -> new TestCaseChange(
+            this,
+            it,
+            null,
+            null,
+            null
+        )));
+
+        sink.feedFrom(languageVersionProperty().changes().map(it -> new TestCaseChange(
+            this,
+            null,
+            it,
+            null,
+            null
+        )));
+
+
+        sink.feedFrom(ReactfxUtil.observableMapVal(properties).changes().map(it -> new TestCaseChange(
+            this,
+            null,
+            null,
+            it,
+            null
+
+        )));
+
+        sink.feedFrom(descriptionProperty().changes().map(it -> new TestCaseChange(
+            this,
+            null,
+            null,
+            null,
+            it
+        )));
+
+
+        return sink;
+    }
+
 
     public static LiveTestCase fromDescriptor(TestDescriptor descriptor) {
 
