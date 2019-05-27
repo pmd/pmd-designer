@@ -203,6 +203,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
         private static final String DELETE_BUTTON_CLASS = "delete-property-button";
 
         public ViolationCell() {
+            getStyleClass().addAll("expected-violation-list-cell");
         }
 
 
@@ -218,13 +219,16 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
             Label label = new Label();
             label.textProperty().bind(violation.messageProperty()
                                                .filter(StringUtils::isNotBlank)
-                                               .orElseConst("(message not asserted)"));
+                                               .orElseConst("no message assertion"));
+            label.getStyleClass().addAll("message-label");
 
             Pane spacer = new Pane();
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
 
-            Label lineLabel = new Label(violation.getRange().startPos.toString());
+            Label lineLabel = new Label("l. " + violation.getRange().startPos.line);
+            lineLabel.getStyleClass().addAll("line-label");
+
 
             Button edit = new Button();
             edit.setGraphic(new FontIcon("fas-ellipsis-h"));
