@@ -15,6 +15,8 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Button?>
 <BorderPane xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="net.sourceforge.pmd.util.fxdesigner.SourceEditorController">
@@ -41,9 +43,11 @@
                                         <FontIcon iconLiteral="fas-cog"/>
                                     </graphic>
                                     <items>
-
+                                        <!-- Filled-in by controller -->
                                     </items>
                                 </MenuButton>
+                                <Separator orientation="VERTICAL" />
+                                <Button fx:id="commitTestCaseButton" text="Save test case" />
                             </toolbarItems>
                             <content>
                                 <NodeEditionCodeArea fx:id="nodeEditionCodeArea"
@@ -67,10 +71,6 @@
                                 AnchorPane.leftAnchor="0.0"
                                 AnchorPane.rightAnchor="0.0"
                                 AnchorPane.topAnchor="0.0">
-                            <toolbarItems>
-                                <Pane prefWidth="10"/>
-                                <Label fx:id="numNewNodesLabel"/>
-                            </toolbarItems>
 
                             <AstTreeView fx:id="astTreeView"/>
 

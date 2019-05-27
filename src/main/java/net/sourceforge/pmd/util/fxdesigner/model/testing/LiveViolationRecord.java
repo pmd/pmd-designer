@@ -6,14 +6,19 @@ package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
-public class LiveViolationRecord {
+public class LiveViolationRecord implements SettingsOwner {
 
     private final Var<TextRange> range;
     private final Var<Boolean> exactRange;
     private final Var<String> message;
 
+    public LiveViolationRecord() {
+        this(null, null, false);
+    }
 
     public LiveViolationRecord(TextRange range, String message, boolean exactRange) {
         this.range = Var.newSimpleVar(range);
@@ -30,6 +35,7 @@ public class LiveViolationRecord {
         );
     }
 
+    @PersistentProperty
     public TextRange getRange() {
         return range.getValue();
     }
@@ -42,7 +48,8 @@ public class LiveViolationRecord {
         this.range.setValue(range);
     }
 
-    public Boolean getExactRange() {
+    @PersistentProperty
+    public boolean getExactRange() {
         return exactRange.getValue();
     }
 
@@ -54,6 +61,7 @@ public class LiveViolationRecord {
         this.exactRange.setValue(exactRange);
     }
 
+    @PersistentProperty
     public String getMessage() {
         return message.getValue();
     }

@@ -202,7 +202,7 @@ public class TestXmlParser {
                 }
             };
             List<TestDescriptor> testDescriptors = new TestXmlParser().parseTests(rule, doc, errorHandler);
-            List<StashedTestCase> tests = testDescriptors.stream().map(StashedTestCase::fromDescriptor).collect(Collectors.toList());
+            List<LiveTestCase> tests = testDescriptors.stream().map(LiveTestCase::fromDescriptor).collect(Collectors.toList());
             return new TestCollection(tests);
         } catch (SAXException | ParserConfigurationException | IOException e) {
             errorHandler.accept(e);

@@ -14,6 +14,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.EventLogger;
 import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalDiskManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.PersistenceManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.RichTextMapper;
+import net.sourceforge.pmd.util.fxdesigner.app.services.TestLoadHandler;
 
 import javafx.stage.Stage;
 
@@ -42,6 +43,8 @@ public interface DesignerRoot {
     AppServiceDescriptor<MessageChannel<NodeSelectionEvent>> NODE_SELECTION_CHANNEL = new AppServiceDescriptor<>(MessageChannel.class);
     /** AST manager of the current code. */
     AppServiceDescriptor<ASTManager> AST_MANAGER = new AppServiceDescriptor<>(ASTManager.class);
+
+    AppServiceDescriptor<TestLoadHandler> TEST_LOADER = new AppServiceDescriptor<>(TestLoadHandler.class);
 
 
     /**

@@ -13,11 +13,9 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
-import net.sourceforge.pmd.util.fxdesigner.model.testing.StashedTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCollection;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
-import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -37,7 +35,7 @@ public class TestCollectionController extends AbstractController {
     @FXML
     private ToolbarTitledPane titledPane;
     @FXML
-    private ListView<StashedTestCase> testsListView;
+    private ListView<LiveTestCase> testsListView;
     @FXML
     private Button importTestsButton;
     @FXML
@@ -82,14 +80,15 @@ public class TestCollectionController extends AbstractController {
             logInternalException(new RuntimeException("Wrong index in test list: " + index));
             return;
         }
-        ReactfxUtil.rewireInit(live.sourceProperty(), getService(DesignerRoot.AST_MANAGER).sourceCodeProperty());
+
+        getService(DesignerRoot.TEST_LOADER).handleTestOpenRequest(live);
     }
 
 
-    private class TestCaseListCell extends ListCell<StashedTestCase> {
+    private class TestCaseListCell extends ListCell<LiveTestCase> {
 
         @Override
-        protected void updateItem(StashedTestCase item, boolean empty) {
+        protected void updateItem(LiveTestCase item, boolean empty) {
             super.updateItem(item, empty);
 
             if (empty || item == null) {
@@ -101,10 +100,12 @@ public class TestCollectionController extends AbstractController {
         }
 
 
-        private Node buildGraphic(StashedTestCase testCase) {
+        private Node buildGraphic(LiveTestCase testCase) {
 
             HBox hBox = new HBox();
-            Label label = new Label(testCase.getDescription());
+            Label label = new Label();
+
+            label.textProperty().bind(testCase.descriptionProperty());
 
             Pane spacer = new Pane();
             HBox.setHgrow(spacer, Priority.ALWAYS);

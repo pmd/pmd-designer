@@ -22,7 +22,8 @@ import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.reactfx.SuspendableEventStream;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -33,6 +34,8 @@ import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManagerImpl;
+import net.sourceforge.pmd.util.fxdesigner.app.services.TestLoadHandler;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
 import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
@@ -42,8 +45,10 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
@@ -57,7 +62,7 @@ import javafx.scene.control.ToggleGroup;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class SourceEditorController extends AbstractController {
+public class SourceEditorController extends AbstractController implements TestLoadHandler {
 
     private static final Duration AST_REFRESH_DELAY = Duration.ofMillis(100);
     private final ASTManager astManager;
@@ -71,6 +76,9 @@ public class SourceEditorController extends AbstractController {
         }
     }).orElseConst(SourceEditorController.class.getClassLoader());
 
+    private Var<LiveTestCase> currentlyOpenTestCase = Var.newSimpleVar(null);
+    @FXML
+    private Button commitTestCaseButton;
     @FXML
     private ToolbarTitledPane astTitledPane;
     @FXML
@@ -129,8 +137,6 @@ public class SourceEditorController extends AbstractController {
 
         nodeEditionCodeArea.replaceText(astManager.getSourceCode());
 
-        SuspendableEventStream<String> modelCode = astManager.sourceCodeProperty().values().suppressible();
-
         Var<String> areaText = Var.fromVal(
             latestValue(nodeEditionCodeArea.plainTextChanges()
                                            .successionEnds(AST_REFRESH_DELAY)
@@ -140,7 +146,6 @@ public class SourceEditorController extends AbstractController {
 
         areaText.bindBidirectional(astManager.sourceCodeProperty());
 
-//        astManager.sourceCodeProperty().values().subscribe(it -> modelCode.suspendWhile(() -> nodeEditionCodeArea.replaceText(it)));
 
 
         nodeEditionCodeArea.moveCaret(0, 0);
@@ -148,6 +153,19 @@ public class SourceEditorController extends AbstractController {
         initTreeView(astManager, astTreeView, editorTitledPane.errorMessageProperty());
 
         getDesignerRoot().registerService(DesignerRoot.RICH_TEXT_MAPPER, nodeEditionCodeArea);
+        getDesignerRoot().registerService(DesignerRoot.TEST_LOADER, this);
+    }
+
+
+    @Override
+    public void handleTestOpenRequest(@NonNull LiveTestCase liveTestCase) {
+        if (currentlyOpenTestCase.isPresent()) {
+            // TODO
+            currentlyOpenTestCase.getValue().commitChanges();
+        }
+        currentlyOpenTestCase.setValue(liveTestCase);
+        Subscription sub = ReactfxUtil.rewireInit(liveTestCase.sourceProperty(), astManager.sourceCodeProperty());
+        liveTestCase.addCommitHandler(t -> sub.unsubscribe());
     }
 
 
@@ -270,6 +288,7 @@ public class SourceEditorController extends AbstractController {
     public String getDebugName() {
         return "editor";
     }
+
 
     /**
      * Refreshes the AST and returns the new compilation unit if the parse didn't fail.

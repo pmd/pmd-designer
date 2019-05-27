@@ -5,7 +5,6 @@
 package net.sourceforge.pmd.util.fxdesigner.util.beans;
 
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -52,9 +51,9 @@ public class RestorePropertyVisitor extends BeanNodeVisitor<SettingsOwner> {
             if (descriptors.containsKey(saved.getKey())) {
                 try {
                     PropertyUtils.setProperty(target, saved.getKey(), saved.getValue());
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    System.err.println("Error setting property " + saved.getKey() + " on a " + target.getClass().getSimpleName());
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    new RuntimeException("Error setting property " + saved.getKey() + " on a "
+                                             + target.getClass().getSimpleName(), e).printStackTrace();
                 }
             }
         }
@@ -87,8 +86,11 @@ public class RestorePropertyVisitor extends BeanNodeVisitor<SettingsOwner> {
             @SuppressWarnings("unchecked")
             Collection<SettingsOwner> tmp = (Collection<SettingsOwner>) PropertyUtils.getProperty(target, model.getPropertyName());
             container = tmp;
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            if (container == null) {
+                throw new RuntimeException("Null container");
+            }
+        } catch (Exception e) {
+            new RuntimeException("Cannot fetch container for persistent sequence " + model.getPropertyName(), e).printStackTrace();
             return;
         }
 

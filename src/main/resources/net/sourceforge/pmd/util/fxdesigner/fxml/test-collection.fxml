@@ -53,7 +53,7 @@
             </Button>
         </toolbarItems>
         <content>
-            <ListView fx:id="testsListView"/>
+            <ListView fx:id="testsListView" stylesheets="@../css/flat.css"/>
         </content>
     </ToolbarTitledPane>
 </AnchorPane>

@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner.model;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.reactfx.collection.LiveArrayList;
@@ -253,6 +254,14 @@ public class ObservableRuleBuilder implements SettingsOwner {
         this.deprecated.setValue(deprecated);
     }
 
+    public TestCollection getTestCollection() {
+        return testCollection;
+    }
+
+    @Override
+    public List<? extends SettingsOwner> getChildrenSettingsNodes() {
+        return Collections.singletonList(testCollection);
+    }
 
     public Var<Boolean> deprecatedProperty() {
         return deprecated;
@@ -358,7 +367,4 @@ public class ObservableRuleBuilder implements SettingsOwner {
 
     }
 
-    public TestCollection getTestCollection() {
-        return testCollection;
-    }
 }

@@ -19,11 +19,15 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -32,7 +36,9 @@ import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.properties.PropertyTypeId;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.Serializer;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.SerializerRegistrar;
+import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
 
 /**
@@ -50,6 +56,19 @@ public final class SettingsPersistenceUtil {
         SerializerRegistrar.getInstance().registerMapped(PropertyTypeId.class, String.class, PropertyTypeId::getStringId, PropertyTypeId::lookupMnemonic);
         SerializerRegistrar.getInstance().registerMapped(LanguageVersion.class, String.class, LanguageVersion::getTerseName, LanguageRegistry::findLanguageVersionByTerseName);
         SerializerRegistrar.getInstance().registerMapped(Language.class, String.class, Language::getTerseName, LanguageRegistry::findLanguageByTerseName);
+        SerializerRegistrar.getInstance().registerMapped(TextRange.class, String.class, TextRange::toString, TextRange::fromString);
+        Serializer<Properties> propertiesSerializer =
+            SerializerRegistrar.getInstance().getSerializer(new TypeLiteral<Map<String, String>>() {})
+                               .map(m -> {
+                                   Properties p = new Properties();
+                                   m.forEach(p::put);
+                                   return p;
+                               }, ps -> {
+                                   Map<String, String> m = new HashMap<>();
+                                   ps.forEach((k, v) -> m.put(k.toString(), v.toString()));
+                                   return m;
+                               });
+        SerializerRegistrar.getInstance().register(propertiesSerializer, Properties.class);
     }
 
 

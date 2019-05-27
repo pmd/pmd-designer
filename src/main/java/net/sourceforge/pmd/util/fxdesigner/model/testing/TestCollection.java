@@ -10,12 +10,15 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
 
-public class TestCollection {
+import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
+
+public class TestCollection implements SettingsOwner {
 
 
-    private LiveList<StashedTestCase> stash;
+    private LiveList<LiveTestCase> stash;
 
-    public TestCollection(List<StashedTestCase> tests) {
+    public TestCollection(List<LiveTestCase> tests) {
         this.stash = new LiveArrayList<>(tests);
     }
 
@@ -24,7 +27,8 @@ public class TestCollection {
     }
 
 
-    public LiveList<StashedTestCase> getStash() {
+    @PersistentSequence
+    public LiveList<LiveTestCase> getStash() {
         return stash;
     }
 
