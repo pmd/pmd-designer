@@ -7,6 +7,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 import java.util.List;
 
 import org.kordamp.ikonli.javafx.FontIcon;
+import org.reactfx.EventStream;
 import org.reactfx.Subscription;
 import org.reactfx.value.Var;
 
@@ -157,6 +158,10 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
             this.testCase = testCase;
         }
 
+        @Override
+        public EventStream<?> additionalTicks() {
+            return testCase.modificationTicks();
+        }
 
         @Override
         public void handleNoCompilationUnit() {

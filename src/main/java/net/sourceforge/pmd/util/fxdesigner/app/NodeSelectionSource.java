@@ -5,10 +5,12 @@
 package net.sourceforge.pmd.util.fxdesigner.app;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.printShortStackTrace;
+import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.rangeOf;
 
 import java.util.Objects;
 
 import org.reactfx.EventStream;
+import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.ast.Node;
@@ -19,7 +21,10 @@ import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.Te
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 
 
 /**
@@ -88,6 +93,23 @@ public interface NodeSelectionSource extends ApplicationComponent {
         return ReactfxUtil.latestValue(selection.map(it -> it.selected));
     }
 
+
+    /**
+     * Registers the given [source] javafx Node as a source for a drag
+     * and drop even with {@link #NODE_RANGE_DATA_FORMAT} content.
+     */
+    static Subscription registerDragHandler(javafx.scene.Node source, Node data) {
+
+        source.setOnDragDetected(evt -> {
+            // drag and drop
+            Dragboard db = source.startDragAndDrop(TransferMode.LINK);
+            ClipboardContent content = new ClipboardContent();
+            content.put(NodeSelectionSource.NODE_RANGE_DATA_FORMAT, rangeOf(data));
+            db.setContent(content);
+            evt.consume();
+        });
+        return () -> source.setOnDragDetected(null);
+    }
 
 
     class NodeSelectionEvent {

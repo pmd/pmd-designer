@@ -206,14 +206,7 @@ public class ASTTreeCell extends TreeCell<Node> {
             setText(nodePresentableText(item));
             setContextMenu(buildContextMenu(item));
 
-            setOnDragDetected(evt -> {
-                // drag and drop
-                Dragboard db = startDragAndDrop(TransferMode.LINK);
-                ClipboardContent content = new ClipboardContent();
-                content.put(NodeSelectionSource.NODE_RANGE_DATA_FORMAT, rangeOf(item));
-                db.setContent(content);
-                evt.consume();
-            });
+            NodeSelectionSource.registerDragHandler(this, item);
         }
 
         // Reclicking the selected node in the ast will scroll back to the node in the editor

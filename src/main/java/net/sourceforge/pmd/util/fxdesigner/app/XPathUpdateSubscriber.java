@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.reactfx.EventStream;
+import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 
 import net.sourceforge.pmd.lang.ast.Node;
@@ -30,11 +32,14 @@ public abstract class XPathUpdateSubscriber implements ApplicationComponent {
         MessageChannel<VersionedXPathQuery> service = root.getService(DesignerRoot.LATEST_XPATH);
 
 
-        subscription = astManager.compilationUnitProperty()
-                                 .values()
-                                 .or(service.messageStream(true, this))
-                                 .or(astManager.ruleProperties().values().withDefaultEvent(Collections.emptyMap()))
-                                 .subscribe(tick -> {
+        EventStream<?> merged = EventStreams.merge(
+            astManager.compilationUnitProperty().values(),
+            additionalTicks(),
+            service.messageStream(true, this),
+            astManager.ruleProperties().values().withDefaultEvent(Collections.emptyMap())
+        );
+
+        subscription = merged.subscribe(tick -> {
                                      Node compil = astManager.compilationUnitProperty().getOrElse(null);
                                      VersionedXPathQuery query = service.latestMessage().getOrElse(null);
                                      Map<String, String> props = astManager.ruleProperties().getOrElse(Collections.emptyMap());
@@ -66,6 +71,17 @@ public abstract class XPathUpdateSubscriber implements ApplicationComponent {
 
         return this::unsubscribe;
     }
+
+    /**
+     * Additional refresh ticks. By default, the changes of
+     * {@link ASTManager#compilationUnitProperty()}, of the local XPath
+     * query (local as in scoped by a {@link DesignerRoot}), and of
+     * the {@link ASTManager#ruleProperties()} are taken into account.
+     */
+    public EventStream<?> additionalTicks() {
+        return EventStreams.never();
+    }
+
 
     @Override
     public DesignerRoot getDesignerRoot() {

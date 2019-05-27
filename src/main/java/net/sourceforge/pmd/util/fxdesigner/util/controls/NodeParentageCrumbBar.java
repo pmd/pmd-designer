@@ -77,6 +77,7 @@ public class NodeParentageCrumbBar extends BreadCrumbBar<Node> implements NodeSe
                 button.setTooltip(new Tooltip(numElidedNodes + " ancestors are not shown"));
             } else if (item != null) {
                 button.setText(item.getValue().getXPathNodeName());
+                NodeSelectionSource.registerDragHandler(button, item.getValue());
             }
 
             // we use that to communicate the node later on

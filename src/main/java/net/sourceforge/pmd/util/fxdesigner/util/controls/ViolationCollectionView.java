@@ -9,8 +9,6 @@
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import static net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NODE_RANGE_DATA_FORMAT;
-import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.rangeOf;
-import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -18,6 +16,7 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.tools.ValueExtractor;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.Subscription;
+import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -29,7 +28,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
 import javafx.beans.NamedArg;
-import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -139,13 +137,23 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
 
         view.setPrefWidth(250);
 
-        Val.wrap(view.itemsProperty())
-           .values()
-           .subscribe(e -> rewire(view.maxHeightProperty(), Bindings.size(e).multiply(LIST_CELL_HEIGHT).add(15)));
-
+        view.maxHeightProperty().bind(
+            Val.wrap(view.itemsProperty())
+               .flatMap(LiveList::sizeOf).map(it -> it * LIST_CELL_HEIGHT + 15)
+        );
 
         view.setEditable(true);
 
+        addDragHandlers(view);
+
+
+        Label placeholder = new Label("No violations expected in this code");
+        placeholder.getStyleClass().addAll("placeholder");
+        view.setPlaceholder(placeholder);
+        view.setCellFactory(lv -> new ViolationCell());
+    }
+
+    private void addDragHandlers(ListView<LiveViolationRecord> view) {
         view.setOnDragOver(evt -> {
             if (evt.getGestureSource() != view &&
                 evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
@@ -187,12 +195,6 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
 
             evt.consume();
         });
-
-
-        Label placeholder = new Label("No violations expected in this code");
-        placeholder.getStyleClass().addAll("placeholder");
-        view.setPlaceholder(placeholder);
-        view.setCellFactory(lv -> new ViolationCell());
     }
 
     /**
@@ -254,6 +256,8 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
 
             hBox.getChildren().setAll(lineLabel, label, spacer, delete, edit);
             hBox.setAlignment(Pos.CENTER_LEFT);
+
+            view.setMinWidth(Math.max(view.getMinWidth(), this.getWidth()));
 
             return new Pair<>(hBox, Subscription.EMPTY);
 

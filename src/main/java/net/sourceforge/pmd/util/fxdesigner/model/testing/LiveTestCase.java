@@ -122,6 +122,7 @@ public class LiveTestCase implements SettingsOwner {
         commitHandler = commitHandler.andThen(liveTestCaseConsumer);
     }
 
+    // It's hard to serialize a map bc of the Type parser so we put that into a Properties
     @PersistentProperty
     public Properties getPersistenceOnlyProps() {
         Properties props = new Properties();
