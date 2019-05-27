@@ -26,7 +26,7 @@ public abstract class XPathUpdateSubscriber implements ApplicationComponent {
         this.root = root;
     }
 
-    public void init(ASTManager astManager) {
+    public Subscription init(ASTManager astManager) {
         MessageChannel<VersionedXPathQuery> service = root.getService(DesignerRoot.LATEST_XPATH);
 
 
@@ -63,6 +63,8 @@ public abstract class XPathUpdateSubscriber implements ApplicationComponent {
                                      }
 
                                  });
+
+        return this::unsubscribe;
     }
 
     @Override

@@ -76,9 +76,10 @@ public class SourceEditorController extends AbstractController implements TestLo
         }
     }).orElseConst(SourceEditorController.class.getClassLoader());
 
-    private Var<LiveTestCase> currentlyOpenTestCase = Var.newSimpleVar(null);
     @FXML
-    private Button commitTestCaseButton;
+    private Button violationsButton;
+
+    private Var<LiveTestCase> currentlyOpenTestCase = Var.newSimpleVar(null);
     @FXML
     private ToolbarTitledPane astTitledPane;
     @FXML

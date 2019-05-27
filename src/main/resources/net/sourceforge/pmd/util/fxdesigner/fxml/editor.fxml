@@ -47,7 +47,7 @@
                                     </items>
                                 </MenuButton>
                                 <Separator orientation="VERTICAL" />
-                                <Button fx:id="commitTestCaseButton" text="Save test case" />
+                                <Button fx:id="violationsButton" text="Expected violations" />
                             </toolbarItems>
                             <content>
                                 <NodeEditionCodeArea fx:id="nodeEditionCodeArea"
