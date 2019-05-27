@@ -190,6 +190,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
         view.setItems(rule.getExpectedViolations());
 
         PopOver popOver = new SmartPopover(view);
+        popOver.setUserData(view);
         popOver.getRoot().getStylesheets().add(DesignerUtil.getCss("popover").toString());
         popOver.titleProperty().setValue("Expected violations");
         popOver.setHeaderAlwaysVisible(true);

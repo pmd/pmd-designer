@@ -5,6 +5,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.controlsfx.control.PopOver;
 import org.reactfx.value.Var;
 
@@ -26,12 +28,12 @@ public final class PopOverWrapper<T> {
     private BiFunction<T, PopOver, PopOver> rebinder;
     private T identity;
 
-    public PopOverWrapper(BiFunction<T, PopOver, PopOver> rebinder) {
+    public PopOverWrapper(BiFunction<T, @Nullable PopOver, @Nullable PopOver> rebinder) {
         this.identity = null;
         this.rebinder = rebinder;
     }
 
-    public void showOrFocus(Consumer<PopOver> showMethod) {
+    public void showOrFocus(Consumer<@NonNull PopOver> showMethod) {
         if (myPopover.isPresent() && myPopover.getValue().isShowing()) {
             myPopover.getValue().requestFocus();
         } else if (myPopover.isPresent()) {
@@ -56,6 +58,7 @@ public final class PopOverWrapper<T> {
         }
         PopOver popOver = supplier.get();
         if (popOver == null) {
+            myPopover.setValue(null);
             return;
         }
         popOver.getRoot().getStylesheets().addAll(DesignerUtil.getCss("popover").toString());

@@ -25,6 +25,7 @@ import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.controlsfx.control.PopOver;
 import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
@@ -111,7 +112,25 @@ public class SourceEditorController extends AbstractController {
 
         designerRoot.registerService(DesignerRoot.AST_MANAGER, astManager);
 
-        violationsPopover = new PopOverWrapper<>((t, p) -> ViolationCollectionView.makePopOver(t, getDesignerRoot()));
+        violationsPopover = new PopOverWrapper<>(this::rebindPopover);
+    }
+
+    private PopOver rebindPopover(LiveTestCase testCase, PopOver existing) {
+        if (testCase == null && existing != null) {
+            existing.hide();
+            return existing;
+        }
+
+        if (testCase != null) {
+            if (existing == null) {
+                return ViolationCollectionView.makePopOver(testCase, getDesignerRoot());
+            } else {
+                ViolationCollectionView view = (ViolationCollectionView) existing.getUserData();
+                view.setItems(testCase.getExpectedViolations());
+                return existing;
+            }
+        }
+        return null;
     }
 
 
