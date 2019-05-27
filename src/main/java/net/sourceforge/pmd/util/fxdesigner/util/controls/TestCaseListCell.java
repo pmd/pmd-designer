@@ -24,12 +24,10 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldListCell;
@@ -96,11 +94,11 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
 
         sub = sub.and(() -> load.setOnAction(null));
 
-        //            Button delete = new Button();
-        //            delete.setGraphic(new FontIcon("fas-trash-alt"));
-        //            delete.getStyleClass().addAll(DELETE_BUTTON_CLASS, "icon-button");
-        //            Tooltip.install(delete, new Tooltip("Remove property"));
-        //            delete.setOnAction(e -> getItems().remove(spec));
+        Button delete = new Button();
+        delete.setGraphic(new FontIcon("fas-trash-alt"));
+        delete.getStyleClass().addAll("delete-button", "icon-button");
+        Tooltip.install(delete, new Tooltip("Remove test case"));
+        delete.setOnAction(e -> getListView().getItems().remove(testCase));
 
         label.maxWidthProperty().bind(
             Bindings.subtract(
@@ -117,7 +115,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         );
 
 
-        hBox.getChildren().setAll(statusLabel, label, spacer, duplicate, new Separator(Orientation.VERTICAL), load);
+        hBox.getChildren().setAll(statusLabel, label, spacer, delete, duplicate, load);
         hBox.setAlignment(Pos.CENTER_LEFT);
 
 
