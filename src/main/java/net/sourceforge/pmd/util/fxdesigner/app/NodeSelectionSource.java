@@ -5,7 +5,6 @@
 package net.sourceforge.pmd.util.fxdesigner.app;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.printShortStackTrace;
-import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.rangeOf;
 
 import java.util.Objects;
 
@@ -18,6 +17,7 @@ import net.sourceforge.pmd.util.fxdesigner.XPathRuleEditorController;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder.DataKey;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;
+import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
@@ -104,7 +104,7 @@ public interface NodeSelectionSource extends ApplicationComponent {
             // drag and drop
             Dragboard db = source.startDragAndDrop(TransferMode.LINK);
             ClipboardContent content = new ClipboardContent();
-            content.put(NodeSelectionSource.NODE_RANGE_DATA_FORMAT, rangeOf(data));
+            content.put(NodeSelectionSource.NODE_RANGE_DATA_FORMAT, TextRange.fullLine(data.getBeginLine(), 10000);
             db.setContent(content);
             evt.consume();
         });
