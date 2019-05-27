@@ -148,11 +148,7 @@ public class SourceEditorController extends AbstractController implements TestLo
             latestValue(nodeEditionCodeArea.plainTextChanges()
                                            .successionEnds(AST_REFRESH_DELAY)
                                            .map(it -> nodeEditionCodeArea.getText())),
-            text -> {
-                currentRuleResultsProperty().setValue(emptyList());
-                currentErrorNodesProperty().setValue(emptyList());
-                nodeEditionCodeArea.replaceText(text);
-            }
+            text -> nodeEditionCodeArea.replaceText(text)
         );
 
         areaText.bindBidirectional(astManager.sourceCodeProperty());

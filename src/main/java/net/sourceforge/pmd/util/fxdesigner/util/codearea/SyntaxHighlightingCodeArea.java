@@ -17,6 +17,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.StyleSpans;
+import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
 import org.reactfx.value.Val;
@@ -59,6 +60,7 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
     /** Read-only view on the current highlighting spans. Can be absent. */
     protected final Val<StyleSpans<Collection<String>>> syntaxHighlight = currentSyntaxHighlight;
 
+    private final EventSource<?> synchronousUpdateTicks = new EventSource<>();
 
     public SyntaxHighlightingCodeArea() {
         // captured in the closure
@@ -104,7 +106,7 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
         syntaxHighlighter.setValue(highlighter);
 
         getStyleClass().add(highlighter.getLanguageTerseName());
-        syntaxAutoRefresh.setValue(subscribeSyntaxHighlighting(defaultHighlightingTicks(), highlighter));
+        syntaxAutoRefresh.setValue(subscribeSyntaxHighlighting(defaultHighlightingTicks(), synchronousUpdateTicks, highlighter));
 
         try { // refresh the highlighting once.
             Task<StyleSpans<Collection<String>>> t = computeHighlightingAsync(Executors.newSingleThreadExecutor(), highlighter, getText());
@@ -127,15 +129,14 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
     }
 
 
-    private Subscription subscribeSyntaxHighlighting(EventStream<?> ticks, SyntaxHighlighter highlighter) {
-        // captured in the closure, shutdown when unsubscribing
+    private Subscription subscribeSyntaxHighlighting(EventStream<?> ticks, EventStream<?> canceller, SyntaxHighlighter highlighter) {
         // captured in the closure, shutdown when unsubscribing
         final ExecutorService executorService = Executors.newSingleThreadExecutor(
             r -> new Thread(r, "Code-area-" + this.hashCode() + "-"
                 + highlighter.getLanguageTerseName() + "-highlighter"));
         return ticks.successionEnds(TEXT_CHANGE_DELAY)
                     .supplyTask(() -> computeHighlightingAsync(executorService, highlighter, this.getText()))
-                    .awaitLatest(ticks)
+                    .awaitLatest(ticks.or(canceller))
                     .filterMap(t -> {
                         t.ifFailure(Throwable::printStackTrace);
                         return t.toOptional();
@@ -200,6 +201,7 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
      * we want to overlay other spans on it.
      */
     protected void updateSyntaxHighlightingSynchronously() {
+        synchronousUpdateTicks.push(null);
         syntaxHighlighter.getOpt().map(h -> h.computeHighlighting(getText())).ifPresent(currentSyntaxHighlight::setValue);
     }
 
