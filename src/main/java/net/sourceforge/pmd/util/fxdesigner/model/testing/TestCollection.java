@@ -32,13 +32,21 @@ public class TestCollection implements SettingsOwner {
         return stash;
     }
 
+    public void addTestCase(LiveTestCase testCase) {
+        if (!testCase.isFrozen()) {
+            stash.forEach(LiveTestCase::freeze);
+            stash.add(testCase);
+        }
+    }
+
     /**
      * Opens a test case for write access.
      */
     @Nullable
     public LiveTestCase export(int i) {
         if (0 <= i && i < stash.size()) {
-            return stash.get(i).unfreeze(it -> stash.set(i, it.freeze()));
+            stash.forEach(LiveTestCase::freeze);
+            return stash.get(i).unfreeze();
         } else {
             return null;
         }

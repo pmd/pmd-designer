@@ -23,6 +23,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
 
 public class TestCollectionController extends AbstractController {
@@ -37,6 +38,9 @@ public class TestCollectionController extends AbstractController {
     private Button addTestButton;
     @FXML
     private Button exportTestsButton; // TODO
+
+
+    private ToggleGroup loadedToggleGroup = new ToggleGroup();
 
     private final ObservableXPathRuleBuilder builder;
 
@@ -66,17 +70,13 @@ public class TestCollectionController extends AbstractController {
             getTestCollection().rebase(coll);
         });
 
-        addTestButton.setOnAction(any -> {
-            getTestCollection().getStash().add(new LiveTestCase());
-            loadTestCase(getTestCollection().getStash().size() - 1);
-        });
+        addTestButton.setOnAction(any -> getTestCollection().addTestCase(new LiveTestCase().unfreeze()));
 
     }
 
     private TestCollection getTestCollection() {
         return builder.getTestCollection();
     }
-
 
     public void loadTestCase(int index) {
         LiveTestCase live = getTestCollection().export(index);
@@ -89,4 +89,11 @@ public class TestCollectionController extends AbstractController {
     }
 
 
+    public ToggleGroup getLoadedToggleGroup() {
+        return loadedToggleGroup;
+    }
+
+    public void setLoadedToggleGroup(ToggleGroup loadedToggleGroup) {
+        this.loadedToggleGroup = loadedToggleGroup;
+    }
 }

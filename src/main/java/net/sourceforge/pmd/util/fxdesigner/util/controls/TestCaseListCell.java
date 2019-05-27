@@ -21,10 +21,10 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyCode;
@@ -38,6 +38,7 @@ import javafx.scene.layout.Priority;
  */
 public class TestCaseListCell extends ListCell<LiveTestCase> {
 
+    public static final String LOAD_BUTTON = "load-button";
     private TestCollectionController collection;
 
     private TextField textField;
@@ -69,6 +70,10 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
                 setGraphic(textField);
             } else {
                 setGraphic(getNonEditingGraphic(item));
+                if (!item.isFrozen()) {
+                    ToggleButton b = (ToggleButton) lookup("." + LOAD_BUTTON);
+                    b.fire();
+                }
             }
         }
     }
@@ -83,6 +88,7 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
         FontIcon statusIcon = new FontIcon();
         Label statusLabel = new Label();
         statusLabel.setGraphic(statusIcon);
+        // todo subscription
         testCase.statusProperty().values()
                 .subscribe(st -> {
                     statusIcon.getStyleClass().setAll(st.getStatus().getStyleClass());
@@ -99,11 +105,20 @@ public class TestCaseListCell extends ListCell<LiveTestCase> {
         Pane spacer = new Pane();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button load = new Button();
+        ToggleButton load = new ToggleButton();
+        load.setToggleGroup(collection.getLoadedToggleGroup());
         load.setGraphic(new FontIcon("fas-external-link-alt"));
-        load.getStyleClass().addAll("edit-button", "icon-button");
+        load.getStyleClass().addAll(LOAD_BUTTON, "icon-button");
         Tooltip.install(load, new Tooltip("Load test case in editor"));
 
+        final String openTestCase = "loaded-test-case";
+        testCase.frozenProperty().values().subscribe(b -> {
+            if (b) {
+                getStyleClass().addAll(openTestCase);
+            } else {
+                getStyleClass().remove(openTestCase);
+            }
+        });
 
         load.setOnAction(e -> collection.loadTestCase(getIndex()));
 

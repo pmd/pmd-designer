@@ -10,10 +10,17 @@
  */
 
 .flat(@selection-focus-color);
+.flat-toggle(derive(@fx-base, -5%), -fx-outer-border, @selection-color: @selection-focus-color);
 
 // change the focus color when the background is already the default focus color
 .list-cell:selected {
   .flat(whitesmoke);
+  .flat-toggle(white, @selection-focus-color, @selection-color: @selection-focus-color);
+}
+
+.list-cell:focused {
+  .flat(whitesmoke);
+  .flat-toggle(white, gray, whitesmoke);
 }
 
 .property-collection-view {
@@ -114,14 +121,16 @@
       -fx-background-color: transparent;
     }
   }
+}
 
-  &.toggle-button:selected {
+.flat-toggle(@fxcolor, @darker, @selection-color) {
+  .toggle-button:selected {
 
     &, &:focused {
 
-      @grad: linear-gradient(to bottom, derive(-fx-color, -30%) 0%, derive(-fx-color, -18%) 20%, derive(-fx-color, -16%) 50%);
+      @grad: linear-gradient(to bottom, derive(@fxcolor, -30%) 0%, derive(@fxcolor, -18%) 20%, derive(@fxcolor, -16%) 50%);
 
-      -fx-background-color: -fx-shadow-highlight-color, linear-gradient(to bottom, derive(-fx-outer-border, -20%), -fx-outer-border), @grad;
+      -fx-background-color: -fx-shadow-highlight-color, linear-gradient(to bottom, derive(@darker, -20%), @darker), @grad;
 
       -fx-background-insets: 0 0 -1 0, 0, 1;
     }

@@ -40,7 +40,7 @@ public class LiveTestCase implements SettingsOwner {
     private final LiveList<LiveViolationRecord> expectedViolations = new LiveArrayList<>();
     private final Var<TestResult> status = Var.newSimpleVar(new TestResult(TestStatus.UNKNOWN, null));
     private Consumer<LiveTestCase> commitHandler;
-    private boolean frozen;
+    private final Var<Boolean> frozen = Var.newSimpleVar(true);
 
 
     public LiveTestCase() {
@@ -147,21 +147,37 @@ public class LiveTestCase implements SettingsOwner {
     }
 
 
-    public LiveTestCase freeze() {
-        LiveTestCase live = unfreeze(t -> {});
-        live.frozen = true;
-        return live;
+    public boolean isFrozen() {
+        return frozen.getValue();
     }
 
-    public LiveTestCase unfreeze(Consumer<LiveTestCase> commitHandler) {
+    public Var<Boolean> frozenProperty() {
+        return frozen;
+    }
+
+    public void setFrozen(boolean frozen) {
+        this.frozen.setValue(frozen);
+    }
+
+    public LiveTestCase freeze() {
+        setFrozen(true);
+        return this;
+    }
+
+    public LiveTestCase unfreeze() {
+        setFrozen(false);
+        return this;
+    }
+
+    private LiveTestCase deepCopy(Consumer<LiveTestCase> commitHandler) {
         LiveTestCase live = new LiveTestCase(commitHandler);
         live.setDescription(getDescription());
         live.expectedViolations.setAll(this.expectedViolations);
         live.setProperties(this.properties);
         live.setLanguageVersion(getLanguageVersion());
-        live.setDirty(false);
+        live.setDirty(this.dirty.getValue());
         live.setSource(getSource());
-        live.frozen = false;
+        live.setFrozen(isFrozen());
         return live;
     }
 
