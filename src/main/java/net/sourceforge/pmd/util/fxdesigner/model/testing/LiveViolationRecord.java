@@ -20,6 +20,10 @@ public class LiveViolationRecord implements SettingsOwner {
         this(null, null, false);
     }
 
+    public LiveViolationRecord(int line) {
+        this(TextRange.fullLine(line, 10000), null, false);
+    }
+
     public LiveViolationRecord(TextRange range, String message, boolean exactRange) {
         this.range = Var.newSimpleVar(range);
         this.message = Var.newSimpleVar(message);

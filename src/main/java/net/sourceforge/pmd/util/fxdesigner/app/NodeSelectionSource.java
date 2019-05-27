@@ -19,6 +19,8 @@ import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.Te
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
+import javafx.scene.input.DataFormat;
+
 
 /**
  * A control or controller that somehow displays nodes in a form that the user can select.
@@ -44,6 +46,7 @@ public interface NodeSelectionSource extends ApplicationComponent {
      * the code area.
      */
     DataKey<TextPos2D> CARET_POSITION = new DataKey<>("caretPosition");
+    DataFormat NODE_RANGE_DATA_FORMAT = new DataFormat("pmd/node");
 
 
     /**

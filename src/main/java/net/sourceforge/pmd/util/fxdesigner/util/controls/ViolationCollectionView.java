@@ -8,6 +8,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
+import static net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NODE_RANGE_DATA_FORMAT;
 import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.rangeOf;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
 
@@ -17,7 +18,6 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.tools.ValueExtractor;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.Subscription;
-import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -26,6 +26,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
 import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
@@ -37,6 +38,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -50,6 +53,7 @@ import javafx.util.Pair;
 public class ViolationCollectionView extends VBox implements ApplicationComponent {
 
     private static final int LIST_CELL_HEIGHT = 30;
+    public static final String NODE_DRAG_OVER = "node-drag-over";
     @NonNull
     private final DesignerRoot root;
     @NonNull
@@ -82,11 +86,11 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
         footer.getStylesheets().addAll(DesignerUtil.getCss("flat").toString());
 
 
-        FontIcon fontIcon = new FontIcon("fas-plus");
-        Button addProperty = new Button();
-        addProperty.setGraphic(fontIcon);
-        addProperty.getStyleClass().addAll("icon-button");
-        addProperty.setTooltip(new Tooltip("Select new node as expected violation"));
+//        FontIcon fontIcon = new FontIcon("fas-plus");
+        Label addProperty = new Label("Drag and drop nodes from the treeview");
+//        addProperty.setGraphic(fontIcon);
+//        addProperty.getStyleClass().addAll("icon-button");
+//        addProperty.setTooltip(new Tooltip("Select new node as expected violation"));
 
 
         AnchorPane.setLeftAnchor(addProperty, 0.);
@@ -95,17 +99,17 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
         AnchorPane.setTopAnchor(addProperty, 0.);
 
 
-        addProperty.setOnAction(e -> {
-            getDesignerRoot().getService(DesignerRoot.NODE_SELECTION_CHANNEL)
-                             .messageStream(true, this)
-                             .subscribeForOne(evt -> {
-                                 LiveViolationRecord record = new LiveViolationRecord();
-                                 record.setRange(rangeOf(evt.selected));
-                                 record.setExactRange(true);
-                                 getItems().add(record);
-                             });
-
-        });
+//        addProperty.setOnAction(e -> {
+//            getDesignerRoot().getService(DesignerRoot.NODE_SELECTION_CHANNEL)
+//                             .messageStream(true, this)
+//                             .subscribeForOne(evt -> {
+//                                 LiveViolationRecord record = new LiveViolationRecord();
+//                                 record.setRange(rangeOf(evt.selected));
+//                                 record.setExactRange(true);
+//                                 getItems().add(record);
+//                             });
+//
+//        });
         footer.getChildren().addAll(addProperty);
         this.getChildren().addAll(view, footer);
 
@@ -133,12 +137,58 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
     private void initListView(ListView<LiveViolationRecord> view) {
         view.setFixedCellSize(LIST_CELL_HEIGHT);
 
+        view.setPrefWidth(250);
+
+        Val.wrap(view.itemsProperty())
+           .values()
+           .subscribe(e -> rewire(view.maxHeightProperty(), Bindings.size(e).multiply(LIST_CELL_HEIGHT).add(15)));
+
+
         view.setEditable(true);
 
-//        Val.wrap(view.itemsProperty())
-//           .values()
-//           .subscribe(e -> rewire(view.maxHeightProperty(), Bindings.size(e).multiply(LIST_CELL_HEIGHT).add(5)));
-//
+        view.setOnDragOver(evt -> {
+            if (evt.getGestureSource() != view &&
+                evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
+                /* allow for both copying and moving, whatever user chooses */
+                evt.acceptTransferModes(TransferMode.LINK);
+            }
+            evt.consume();
+        });
+
+        view.setOnDragEntered(evt -> {
+            if (evt.getGestureSource() != view &&
+                evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
+                view.getStyleClass().addAll(NODE_DRAG_OVER);
+            }
+            evt.consume();
+        });
+
+        view.setOnDragExited(evt -> {
+            view.getStyleClass().remove(NODE_DRAG_OVER);
+            evt.consume();
+        });
+
+        view.setOnDragDropped(evt -> {
+
+            boolean success = false;
+
+            Dragboard db = evt.getDragboard();
+            if (db.hasContent(NODE_RANGE_DATA_FORMAT)) {
+                TextRange content = (TextRange) db.getContent(NODE_RANGE_DATA_FORMAT);
+
+                LiveViolationRecord record = new LiveViolationRecord();
+                record.setRange(content);
+                record.setExactRange(true);
+                getItems().add(record);
+                success = true;
+            }
+
+            evt.setDropCompleted(success);
+
+            evt.consume();
+        });
+
+
         Label placeholder = new Label("No violations expected in this code");
         placeholder.getStyleClass().addAll("placeholder");
         view.setPlaceholder(placeholder);

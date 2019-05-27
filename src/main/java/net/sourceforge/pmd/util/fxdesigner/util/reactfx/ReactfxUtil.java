@@ -17,6 +17,7 @@ import java.util.function.Function;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
+import org.reactfx.collection.LiveList;
 import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
 import org.reactfx.value.Val;
@@ -27,6 +28,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 
 /**
@@ -50,6 +52,10 @@ public final class ReactfxUtil {
 
     public static <I> EventStream<I> distinctBetween(EventStream<I> input, Duration duration) {
         return DistinctBetweenStream.distinctBetween(input, ReactfxUtil.defaultTimerFactory(duration));
+    }
+
+    public static <K, V> Val<Map<K, LiveList<V>>> groupBy(ObservableList<? extends V> base, Function<? super V, ? extends K> selector) {
+        return new GroupByLiveList<>(base, selector);
     }
 
     public static <K, V> Val<Map<K, V>> observableMapVal(ObservableMap<K, V> map) {

@@ -17,13 +17,19 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.event.MouseOverTextEvent;
 import org.reactfx.EventSource;
+import org.reactfx.Subscription;
+import org.reactfx.collection.LiveArrayList;
+import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -35,6 +41,8 @@ import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.app.services.RichTextMapper;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighlighters;
@@ -46,6 +54,9 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.css.PseudoClass;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 
 
 /**
@@ -90,7 +101,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
         this.designerRoot = root;
 
-        setParagraphGraphicFactory(lineNumberFactory());
+        setParagraphGraphicFactory(defaultLineNumberFactory());
 
         currentRuleResultsProperty().values().subscribe(this::highlightXPathResults);
         currentErrorNodesProperty().values().subscribe(this::highlightErrorNodes);
@@ -164,7 +175,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     }
 
 
-    private IntFunction<javafx.scene.Node> lineNumberFactory() {
+    public IntFunction<javafx.scene.Node> defaultLineNumberFactory() {
         IntFunction<javafx.scene.Node> base = LineNumberFactory.get(this);
         Val<Integer> activePar = Val.wrap(currentParagraphProperty());
 
@@ -184,6 +195,47 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
             return label;
         };
+    }
+
+    public IntFunction<javafx.scene.Node> testCaseLineNumberFactory(LiveTestCase liveTestCase) {
+        IntFunction<javafx.scene.Node> base = defaultLineNumberFactory();
+
+
+        Val<Map<Integer, LiveList<LiveViolationRecord>>> mapVal = ReactfxUtil.groupBy(liveTestCase.getExpectedViolations(), (LiveViolationRecord v) -> v.getRange().startPos.line);
+
+        Subscription pin = mapVal.pin();
+
+        liveTestCase.addCommitHandler(t -> pin.unsubscribe());
+
+        Val<IntFunction<Val<Integer>>> map1 = mapVal.map(it -> (int j) -> Optional.ofNullable(it.get(j)).orElse(new LiveArrayList<>()).sizeProperty());
+
+        IntFunction<Val<Integer>> numViolationsPerLine = i -> map1.flatMap(it -> it.apply(i));
+
+        return idx -> {
+            javafx.scene.Node label = base.apply(idx);
+
+            HBox hBox = new HBox();
+
+            hBox.setSpacing(3);
+
+
+            Label foo = buildExpectedLabel(numViolationsPerLine, idx);
+
+            hBox.getChildren().addAll(foo, label);
+
+            return hBox;
+        };
+    }
+
+    @NonNull
+    public Label buildExpectedLabel(IntFunction<Val<Integer>> numViolationsPerLine, int idx) {
+        Label foo = new Label();
+        foo.getStyleClass().addAll("num-violations-gutter-label");
+        Val<Integer> num = numViolationsPerLine.apply(idx + 1);
+        foo.textProperty().bind(num.map(Object::toString));
+        foo.setTooltip(new Tooltip("Number of violations expected on this line"));
+        foo.visibleProperty().bind(num.map(it -> it > 0));
+        return foo;
     }
 
 

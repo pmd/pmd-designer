@@ -177,7 +177,6 @@ public class SourceEditorController extends AbstractController implements TestLo
 
     }
 
-
     @Override
     public void handleTestOpenRequest(@NonNull LiveTestCase liveTestCase) {
         if (currentlyOpenTestCase.isPresent()) {

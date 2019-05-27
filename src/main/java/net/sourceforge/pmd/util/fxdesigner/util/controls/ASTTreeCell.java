@@ -4,9 +4,16 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
+import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.rangeOf;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.function.Consumer;
 
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.PropertyUtils;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
@@ -16,8 +23,10 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 
 
 /**
@@ -185,7 +194,6 @@ public class ASTTreeCell extends TreeCell<Node> {
         return contextMenu;
     }
 
-
     @Override
     protected void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
@@ -197,6 +205,15 @@ public class ASTTreeCell extends TreeCell<Node> {
         } else {
             setText(nodePresentableText(item));
             setContextMenu(buildContextMenu(item));
+
+            setOnDragDetected(evt -> {
+                // drag and drop
+                Dragboard db = startDragAndDrop(TransferMode.LINK);
+                ClipboardContent content = new ClipboardContent();
+                content.put(NodeSelectionSource.NODE_RANGE_DATA_FORMAT, rangeOf(item));
+                db.setContent(content);
+                evt.consume();
+            });
         }
 
         // Reclicking the selected node in the ast will scroll back to the node in the editor

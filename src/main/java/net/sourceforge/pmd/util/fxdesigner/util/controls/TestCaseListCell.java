@@ -89,6 +89,8 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         load.setGraphic(new FontIcon("fas-external-link-alt"));
         load.getStyleClass().addAll("load-button", "icon-button");
         Tooltip.install(load, new Tooltip("Load test case in editor"));
+
+        load.setUserData(testCase);
         load.setOnAction(e -> collection.loadTestCase(getIndex()));
 
         sub = sub.and(() -> load.setOnAction(null));

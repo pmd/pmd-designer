@@ -10,6 +10,7 @@ import static java.lang.Math.min;
 import static net.sourceforge.pmd.util.fxdesigner.util.AstTraversalUtil.parentIterator;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.toIterable;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
@@ -206,7 +207,7 @@ public final class PmdCoordinatesSystem {
     }
 
 
-    public static final class TextRange {
+    public static final class TextRange implements Serializable {
 
         public final TextPos2D startPos;
         public final TextPos2D endPos;
@@ -265,7 +266,7 @@ public final class PmdCoordinatesSystem {
      *
      * @author Clément Fournier
      */
-    public static final class TextPos2D implements Comparable<TextPos2D> {
+    public static final class TextPos2D implements Comparable<TextPos2D>, Serializable {
 
         public static final Comparator<TextPos2D> COMPARATOR =
             Comparator.<TextPos2D>comparingInt(o -> o.line).thenComparing(o -> o.column);

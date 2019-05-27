@@ -6,6 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
@@ -106,6 +107,8 @@ public class RuleEditorsController extends AbstractController {
         ReactfxExtensions.dynamic(LiveList.wrapVal(selectedEditorProperty()),
                                   (x, i) -> xpathChannel.connect(x.getService(DesignerRoot.LATEST_XPATH)));
 
+        selectedEditorProperty().values().filter(Objects::nonNull)
+                                .subscribe(it -> it.selectedTestCaseProperty().ifPresent(getService(DesignerRoot.TEST_LOADER)::handleTestOpenRequest));
 
     }
 

@@ -100,4 +100,9 @@ public class TestCollectionController extends AbstractController {
     public void duplicate(LiveTestCase testCase) {
         getTestCollection().addTestCase(testCase.deepCopy().unfreeze());
     }
+
+    public Val<LiveTestCase> selectedTestCase() {
+        return Val.wrap(loadedToggleGroup.selectedToggleProperty())
+                  .map(it -> ((LiveTestCase) it.getUserData()));
+    }
 }

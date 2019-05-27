@@ -44,6 +44,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.VersionedXPathQuery;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.popups.ExportXPathWizardController;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
@@ -198,6 +199,9 @@ public final class XPathRuleEditorController extends AbstractController implemen
         }
     }
 
+    public Val<LiveTestCase> selectedTestCaseProperty() {
+        return testCollectionController.selectedTestCase();
+    }
 
     @Override
     public void afterParentInit() {
