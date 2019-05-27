@@ -4,6 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app.services;
 
+import java.util.Map;
+
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -43,5 +45,8 @@ public interface ASTManager extends ApplicationComponent, SettingsOwner {
 
 
     Val<ParseAbortedException> currentExceptionProperty();
+
+
+    Var<Map<String, String>> ruleProperties();
 
 }

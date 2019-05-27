@@ -5,14 +5,18 @@
 package net.sourceforge.pmd.util.fxdesigner.model;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.sourceforge.pmd.Rule;
 import net.sourceforge.pmd.RuleContext;
 import net.sourceforge.pmd.RuleSet;
 import net.sourceforge.pmd.RuleSetFactory;
@@ -21,6 +25,7 @@ import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.rule.XPathRule;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
+import net.sourceforge.pmd.properties.PropertyDescriptor;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 
@@ -55,6 +60,7 @@ public final class XPathEvaluator {
                                                 component.getGlobalLanguageVersion(),
                                                 XPathRuleQuery.XPATH_2_0,
                                                 query,
+                                                emptyMap(),
                                                 emptyList());
                        } catch (XPathEvaluationException e) {
                            e.printStackTrace();
@@ -80,6 +86,7 @@ public final class XPathEvaluator {
                                            LanguageVersion languageVersion,
                                            String xpathVersion,
                                            String xpathQuery,
+                                           Map<String, String> propertyValues,
                                            List<PropertyDescriptorSpec> properties) throws XPathEvaluationException {
 
         if (StringUtils.isBlank(xpathQuery)) {
@@ -106,6 +113,16 @@ public final class XPathEvaluator {
                       .map(PropertyDescriptorSpec::build)
                       .forEach(xpathRule::definePropertyDescriptor);
 
+            propertyValues.forEach((k, v) -> {
+                PropertyDescriptor<?> d = xpathRule.getPropertyDescriptor(k);
+                if (d != null) {
+                    setRulePropertyCapture(xpathRule, d, v);
+                } else {
+                    throw new RuntimeException("Property '" + k + "' is not defined, available properties: "
+                                                   + properties.stream().map(PropertyDescriptorSpec::getName).collect(Collectors.toList()));
+                }
+            });
+
             final RuleSet ruleSet = new RuleSetFactory().createSingleRuleRuleSet(xpathRule);
 
             RuleSets ruleSets = new RuleSets(ruleSet);
@@ -122,4 +139,9 @@ public final class XPathEvaluator {
             throw new XPathEvaluationException(e);
         }
     }
+
+    private static <T> void setRulePropertyCapture(Rule rule, PropertyDescriptor<T> descriptor, String value) {
+        rule.setProperty(descriptor, descriptor.valueFrom(value));
+    }
+
 }

@@ -9,6 +9,8 @@ import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStre
 
 import java.io.StringReader;
 import java.time.Duration;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -57,6 +59,8 @@ public class ASTManagerImpl implements ASTManager {
     private Var<String> sourceCode = Var.newSimpleVar("");
 
     private Var<ParseAbortedException> currentException = Var.newSimpleVar(null);
+
+    private Var<Map<String, String>> ruleProperties = Var.newSimpleVar(Collections.emptyMap());
 
     public ASTManagerImpl(DesignerRoot owner) {
         this.designerRoot = owner;
@@ -134,6 +138,12 @@ public class ASTManagerImpl implements ASTManager {
     @Override
     public DesignerRoot getDesignerRoot() {
         return designerRoot;
+    }
+
+
+    @Override
+    public Var<Map<String, String>> ruleProperties() {
+        return ruleProperties;
     }
 
     @Override

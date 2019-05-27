@@ -12,7 +12,7 @@ public interface TestLoadHandler {
 
 
     /**
-     * Handle a load request for a single test case.
+     * Handle a load request in an editor for a single test case.
      * Previously loaded test must be clearer or committed.
      *
      * @param liveTestCase Test to load

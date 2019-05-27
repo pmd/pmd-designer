@@ -15,6 +15,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalDiskManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.PersistenceManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.RichTextMapper;
 import net.sourceforge.pmd.util.fxdesigner.app.services.TestLoadHandler;
+import net.sourceforge.pmd.util.fxdesigner.model.VersionedXPathQuery;
 
 import javafx.stage.Stage;
 
@@ -46,6 +47,8 @@ public interface DesignerRoot {
 
     AppServiceDescriptor<TestLoadHandler> TEST_LOADER = new AppServiceDescriptor<>(TestLoadHandler.class);
 
+    AppServiceDescriptor<MessageChannel<VersionedXPathQuery>> LATEST_XPATH = new AppServiceDescriptor<>(MessageChannel.class);
+
 
     /**
      * Gets the instance of a service shared by the app.
@@ -53,6 +56,9 @@ public interface DesignerRoot {
      * @param descriptor Service descriptor
      */
     <T> T getService(AppServiceDescriptor<T> descriptor);
+
+
+    void afterServiceRegistered(Runnable run, AppServiceDescriptor<?>... descriptors);
 
 
     /**
