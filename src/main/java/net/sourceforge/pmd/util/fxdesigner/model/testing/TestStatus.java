@@ -8,18 +8,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import javafx.scene.paint.Color;
+
 public enum TestStatus {
-    PASS("fas-check-circle"),
-    FAIL("fas-times-circle"),
-    ERROR("fas-exclamation-circle"),
-    UNKNOWN("fas-circle");
+    PASS("fas-check-circle", Color.GREEN),
+    FAIL("fas-times-circle", Color.ORANGE),
+    ERROR("fas-exclamation-circle", Color.DARKRED),
+    UNKNOWN("fas-circle", Color.GRAY);
 
     public static final String STATUS_CLASS = "test-status";
 
     private final String icon;
+    private final Color color;
 
-    TestStatus(String icon) {
+    TestStatus(String icon, Color color) {
         this.icon = icon;
+        this.color = color;
+    }
+
+
+    public Color getColor() {
+        return color;
     }
 
     public List<String> getStyleClass() {

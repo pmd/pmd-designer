@@ -84,9 +84,11 @@ public class SourceEditorController extends AbstractController {
         }
     }).orElseConst(SourceEditorController.class.getClassLoader());
 
+
+    @FXML
+    private ToolbarTitledPane testCaseToolsTitledPane;
     @FXML
     private Button violationsButton;
-
     private Var<LiveTestCase> currentlyOpenTestCase = Var.newSimpleVar(null);
     @FXML
     private ToolbarTitledPane astTitledPane;

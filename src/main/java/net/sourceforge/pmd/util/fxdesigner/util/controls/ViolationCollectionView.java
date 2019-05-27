@@ -12,6 +12,7 @@ import static net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NODE_R
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.tools.ValueExtractor;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -213,6 +214,12 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
             return liveViolationRecord.messageProperty();
         }
 
+
+        @Override
+        protected @Nullable String getPrompt() {
+            return "No message";
+        }
+
         @Override
         protected Pair<Node, Subscription> getNonEditingGraphic(LiveViolationRecord violation) {
 
@@ -220,14 +227,14 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
             Label label = new Label();
             label.textProperty().bind(violation.messageProperty()
                                                .filter(StringUtils::isNotBlank)
-                                               .orElseConst("no message assertion"));
+                                               .orElseConst(""));
             label.getStyleClass().addAll("message-label");
 
             Pane spacer = new Pane();
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
 
-            Label lineLabel = new Label("l. " + violation.getRange().startPos.line);
+            Label lineLabel = new Label("(Line " + violation.getRange().startPos.line + ")");
             lineLabel.getStyleClass().addAll("line-label");
 
 

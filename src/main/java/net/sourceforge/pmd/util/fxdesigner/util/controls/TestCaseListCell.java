@@ -4,6 +4,10 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
+import static java.lang.Double.max;
+import static java.lang.Math.abs;
+import static java.lang.Math.min;
+
 import java.util.List;
 
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -22,8 +26,12 @@ import net.sourceforge.pmd.util.fxdesigner.model.testing.TestResult;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestStatus;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
+import javafx.animation.Animation;
+import javafx.animation.Interpolator;
+import javafx.animation.Transition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -31,9 +39,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 /**
@@ -59,10 +72,18 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         statusLabel.setGraphic(statusIcon);
         // todo subscription
 
-        Subscription sub = testCase.statusProperty().values()
-                                   .subscribe(st -> {
+        Subscription sub = testCase.statusProperty()
+                                   .changes()
+                                   .subscribe(ch -> {
+                                       TestResult st = ch.getNewValue();
                                        statusIcon.getStyleClass().setAll(st.getStatus().getStyleClass());
                                        statusIcon.setIconLiteral(st.getStatus().getIcon());
+
+                                       if (ch.getOldValue() != null
+                                           && ch.getNewValue().getStatus() != ch.getOldValue().getStatus()) {
+                                           getStatusTransition(ch.getNewValue().getStatus()).play();
+                                       }
+
 
                                        String message = st.getMessage();
                                        if (message != null) {
@@ -145,6 +166,33 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         manager.ruleProperties().bind(ReactfxUtil.observableMapVal(testCase.getProperties()));
 
         return manager;
+    }
+
+    private Animation getStatusTransition(TestStatus newStatus) {
+
+        return new Transition() {
+
+            {
+                setCycleDuration(Duration.millis(1200));
+                setInterpolator(Interpolator.EASE_BOTH);
+                setOnFinished(t -> applyCss());
+            }
+
+
+            @Override
+            protected void interpolate(double frac) {
+                Color vColor = newStatus.getColor().deriveColor(0, 1, 1, clip(map(frac)));
+                setBackground(new Background(new BackgroundFill(vColor, CornerRadii.EMPTY, Insets.EMPTY)));
+            }
+
+            private double map(double x) {
+                return -abs(x - 0.5) + 0.5;
+            }
+
+            private double clip(double i) {
+                return min(1, max(0, i));
+            }
+        };
     }
 
     private class MyXPathSubscriber extends XPathUpdateSubscriber {

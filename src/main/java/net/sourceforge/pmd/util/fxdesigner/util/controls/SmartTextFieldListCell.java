@@ -8,6 +8,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.Subscription;
 import org.reactfx.value.Var;
 
@@ -65,9 +66,16 @@ public abstract class SmartTextFieldListCell<T> extends ListCell<T> {
     protected abstract Var<String> extractEditable(T t);
 
 
+    @Nullable
+    protected String getPrompt() {
+        return null;
+    }
+
     private final TextField getEditingGraphic(T t) {
         Var<String> stringVar = extractEditable(t);
         final TextField textField = new TextField(stringVar.getValue());
+
+        textField.setPromptText(getPrompt());
 
         // Use onAction here rather than onKeyReleased (with check for Enter),
         // as otherwise we encounter RT-34685
