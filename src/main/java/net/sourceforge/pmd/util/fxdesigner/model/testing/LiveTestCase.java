@@ -216,7 +216,7 @@ public class LiveTestCase implements SettingsOwner {
                            ? TextRange.fullLine(line, lines.get(line - 1).length())
                            : null;
 
-            live.getExpectedViolations().add(new ViolationRecord(tr, false, m).unfreeze());
+            live.getExpectedViolations().add(new LiveViolationRecord(tr, m, false));
         }
 
         descriptor.getProperties().forEach((k, v) -> live.getProperties().put(k.toString(), v.toString()));

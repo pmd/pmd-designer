@@ -31,14 +31,6 @@ public class LiveViolationRecord implements SettingsOwner {
     }
 
 
-    public ViolationRecord freeze() {
-        return new ViolationRecord(
-            range.getValue(),
-            exactRange.getValue(),
-            message.getValue()
-        );
-    }
-
     @PersistentProperty
     public TextRange getRange() {
         return range.getValue();
