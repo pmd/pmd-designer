@@ -38,8 +38,8 @@ import javafx.collections.ObservableMap;
  */
 public class LiveTestCase implements SettingsOwner {
 
-    private final Var<String> source = Var.newSimpleVar("");
-    private final Var<String> description = Var.newSimpleVar("");
+    private final Var<String> source = Var.newSimpleVar(""); // TODO defaults per language
+    private final Var<String> description = Var.newSimpleVar("New test case");
     private final Var<LanguageVersion> languageVersion = Var.newSimpleVar(null);
     private final ObservableMap<String, String> properties = FXCollections.observableHashMap();
     private final LiveList<LiveViolationRecord> expectedViolations = new LiveArrayList<>();

@@ -24,6 +24,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCaseUtil;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestResult;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestStatus;
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.animation.Animation;
@@ -211,7 +212,13 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
 
         @Override
         public void handleNoCompilationUnit() {
-            testCase.setStatus(TestStatus.UNKNOWN);
+            testCase.setStatus(new TestResult(TestStatus.UNKNOWN, "No compilation unit"));
+        }
+
+
+        @Override
+        public void handleNoXPath() {
+            testCase.setStatus(new TestResult(TestStatus.UNKNOWN, "No XPath query"));
         }
 
         @Override
@@ -222,7 +229,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
 
         @Override
         public void handleXPathError(Exception e) {
-            testCase.setStatus(TestStatus.ERROR);
+            testCase.setStatus(new TestResult(TestStatus.ERROR, DesignerUtil.sanitizeExceptionMessage(e)));
         }
     }
 }
