@@ -96,4 +96,14 @@ public interface DesignerRoot {
      */
     void shutdownServices();
 
+
+    /**
+     * Returns a new designer root that can delegates to
+     * this one, can register services independently to
+     * override them.
+     */
+    default DesignerRoot spawnScope() {
+        return new ScopedRoot(this);
+    }
+
 }
