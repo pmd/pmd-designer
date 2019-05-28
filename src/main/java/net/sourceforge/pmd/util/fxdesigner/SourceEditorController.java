@@ -165,6 +165,7 @@ public class SourceEditorController extends AbstractController {
         violationsButton.textProperty().bind(
             currentlyOpenTestCase.flatMap(it -> it.getExpectedViolations().sizeProperty())
                                  .map(it -> "Expected violations (" + it + ")")
+                                 .orElseConst("Expected violations")
         );
 
         DragAndDropUtil.registerAsNodeDragTarget(
@@ -204,14 +205,7 @@ public class SourceEditorController extends AbstractController {
             .messageStream(true, this)
             .subscribe(this::handleTestOpenRequest);
 
-        currentlyOpenTestCase.values().subscribe(t -> {
-            if (t == null) {
-                violationsButton.setVisible(false);
-            } else {
-                violationsPopover.rebind(t);
-                violationsButton.setVisible(true);
-            }
-        });
+        currentlyOpenTestCase.values().subscribe(violationsPopover::rebind);
 
 
     }

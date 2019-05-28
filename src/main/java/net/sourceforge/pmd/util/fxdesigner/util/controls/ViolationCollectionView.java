@@ -32,14 +32,15 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 
@@ -75,18 +76,13 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
         view = new ListView<>();
         initListView(view);
 
-        AnchorPane footer = new AnchorPane();
+        StackPane footer = new StackPane();
         footer.setPrefHeight(30);
         footer.getStyleClass().addAll("footer");
         footer.getStylesheets().addAll(DesignerUtil.getCss("flat").toString());
 
         Label addProperty = new Label("Drag and drop nodes from anywhere");
-
-
-        AnchorPane.setLeftAnchor(addProperty, 0.);
-        AnchorPane.setRightAnchor(addProperty, 0.);
-        AnchorPane.setBottomAnchor(addProperty, 0.);
-        AnchorPane.setTopAnchor(addProperty, 0.);
+        StackPane.setAlignment(addProperty, Pos.CENTER);
 
 
         footer.getChildren().addAll(addProperty);
@@ -120,7 +116,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
 
         view.maxHeightProperty().bind(
             Val.wrap(view.itemsProperty())
-               .flatMap(LiveList::sizeOf).map(it -> it * LIST_CELL_HEIGHT + 15)
+               .flatMap(LiveList::sizeOf).map(it -> it == 0 ? LIST_CELL_HEIGHT : it * LIST_CELL_HEIGHT + 5)
         );
 
         view.setEditable(true);
