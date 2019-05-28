@@ -20,6 +20,7 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
+import net.sourceforge.pmd.util.fxdesigner.util.DragAndDropUtil;
 
 import javafx.beans.NamedArg;
 import javafx.css.PseudoClass;
@@ -77,7 +78,7 @@ public class NodeParentageCrumbBar extends BreadCrumbBar<Node> implements NodeSe
                 button.setTooltip(new Tooltip(numElidedNodes + " ancestors are not shown"));
             } else if (item != null) {
                 button.setText(item.getValue().getXPathNodeName());
-                NodeSelectionSource.registerDragHandler(button, item.getValue());
+                DragAndDropUtil.registerAsNodeDragSource(button, item.getValue());
             }
 
             // we use that to communicate the node later on

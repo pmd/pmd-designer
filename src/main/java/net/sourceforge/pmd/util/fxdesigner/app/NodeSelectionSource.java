@@ -9,7 +9,6 @@ import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.printShortSt
 import java.util.Objects;
 
 import org.reactfx.EventStream;
-import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.ast.Node;
@@ -17,14 +16,8 @@ import net.sourceforge.pmd.util.fxdesigner.XPathRuleEditorController;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder.DataKey;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
-
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 
 
 /**
@@ -51,7 +44,6 @@ public interface NodeSelectionSource extends ApplicationComponent {
      * the code area.
      */
     DataKey<TextPos2D> CARET_POSITION = new DataKey<>("caretPosition");
-    DataFormat NODE_RANGE_DATA_FORMAT = new DataFormat("pmd/node");
 
 
     /**
@@ -91,24 +83,6 @@ public interface NodeSelectionSource extends ApplicationComponent {
             }
         });
         return ReactfxUtil.latestValue(selection.map(it -> it.selected));
-    }
-
-
-    /**
-     * Registers the given [source] javafx Node as a source for a drag
-     * and drop even with {@link #NODE_RANGE_DATA_FORMAT} content.
-     */
-    static Subscription registerDragHandler(javafx.scene.Node source, Node data) {
-
-        source.setOnDragDetected(evt -> {
-            // drag and drop
-            Dragboard db = source.startDragAndDrop(TransferMode.LINK);
-            ClipboardContent content = new ClipboardContent();
-            content.put(NodeSelectionSource.NODE_RANGE_DATA_FORMAT, TextRange.fullLine(data.getBeginLine(), 10000));
-            db.setContent(content);
-            evt.consume();
-        });
-        return () -> source.setOnDragDetected(null);
     }
 
 

@@ -24,12 +24,17 @@ import org.reactfx.value.Val;
 import org.reactfx.value.ValBase;
 import org.reactfx.value.Var;
 
+import com.github.oowekyala.rxstring.ReactfxExtensions;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.stage.Window;
 
 /**
  * Extensions to ReactFX Val and EventStreams. Some can be deemed as too
@@ -44,6 +49,25 @@ public final class ReactfxUtil {
 
     }
 
+    /**
+     * Add a hook on the owner window. It's not possible to do this statically,
+     * since at construction time the window might not be set.
+     */
+    public static void subscribeOnWindow(javafx.scene.Node node,
+                                         Function<Window, Subscription> hook) {
+        ReactfxExtensions.dynamic(
+            LiveList.wrapVal(Val.wrap(node.sceneProperty()).flatMap(Scene::windowProperty)),
+            (w, i) -> hook.apply(w)
+        );
+    }
+
+
+    //    public static <T extends Event> Subscription addEventHandler(Consumer<EventHandler<T>> addMethod, Consumer<EventHandler<T>> removeMethod,)
+
+    public static <T extends Event> Subscription addEventHandler(Property<EventHandler<T>> addMethod, EventHandler<T> handler) {
+        addMethod.setValue(handler);
+        return () -> addMethod.setValue(null);
+    }
 
     static Function<Runnable, Timer> defaultTimerFactory(Duration duration) {
         return action -> FxTimer.create(duration, action);

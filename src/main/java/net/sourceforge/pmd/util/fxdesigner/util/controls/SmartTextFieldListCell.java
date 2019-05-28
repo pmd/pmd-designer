@@ -114,11 +114,14 @@ public abstract class SmartTextFieldListCell<T> extends ListCell<T> {
     @Override
     public final void cancelEdit() {
         super.cancelEdit();
-        Pair<Node, Subscription> nonEditingGraphic = getNonEditingGraphic(getItem());
-        if (subscriber != null) {
-            subscriber.unsubscribe();
+        T item = getItem();
+        if (item != null) {
+            Pair<Node, Subscription> nonEditingGraphic = getNonEditingGraphic(item);
+            if (subscriber != null) {
+                subscriber.unsubscribe();
+            }
+            subscriber = nonEditingGraphic.getValue();
+            setGraphic(nonEditingGraphic.getKey());
         }
-        subscriber = nonEditingGraphic.getValue();
-        setGraphic(nonEditingGraphic.getKey());
     }
 }

@@ -59,6 +59,7 @@
                                                        AnchorPane.topAnchor="0.0">
                                         <toolbarItems>
                                             <Button fx:id="violationsButton" text="Expected violations"/>
+                                            <Button fx:id="propertiesMapButton" text="Property mapping"/>
                                         </toolbarItems>
                                         <content>
                                             <AnchorPane>

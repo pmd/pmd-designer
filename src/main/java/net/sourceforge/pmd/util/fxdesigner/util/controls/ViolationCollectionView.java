@@ -8,8 +8,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
-import static net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NODE_RANGE_DATA_FORMAT;
-
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -26,7 +24,8 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
+import net.sourceforge.pmd.util.fxdesigner.util.DragAndDropUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.beans.NamedArg;
 import javafx.collections.ObservableList;
@@ -37,8 +36,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -52,7 +49,6 @@ import javafx.util.Pair;
 public class ViolationCollectionView extends VBox implements ApplicationComponent {
 
     private static final int LIST_CELL_HEIGHT = 30;
-    public static final String NODE_DRAG_OVER = "node-drag-over";
     @NonNull
     private final DesignerRoot root;
     @NonNull
@@ -129,57 +125,23 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
 
         view.setEditable(true);
 
-        addDragHandlers(view);
+        DragAndDropUtil.registerAsNodeDragTarget(view, textRange -> {
+            LiveViolationRecord record = new LiveViolationRecord();
+            record.setRange(textRange);
+            record.setExactRange(true);
+            getItems().add(record);
+        });
 
+        // go into normal state on window hide
+        ReactfxUtil.subscribeOnWindow(
+            this,
+            w -> ReactfxUtil.addEventHandler(w.onHiddenProperty(), evt -> view.edit(-1))
+        );
 
         Label placeholder = new Label("No violations expected in this code");
         placeholder.getStyleClass().addAll("placeholder");
         view.setPlaceholder(placeholder);
         view.setCellFactory(lv -> new ViolationCell());
-    }
-
-    private void addDragHandlers(ListView<LiveViolationRecord> view) {
-        view.setOnDragOver(evt -> {
-            if (evt.getGestureSource() != view &&
-                evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
-                /* allow for both copying and moving, whatever user chooses */
-                evt.acceptTransferModes(TransferMode.LINK);
-            }
-            evt.consume();
-        });
-
-        view.setOnDragEntered(evt -> {
-            if (evt.getGestureSource() != view &&
-                evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
-                view.getStyleClass().addAll(NODE_DRAG_OVER);
-            }
-            evt.consume();
-        });
-
-        view.setOnDragExited(evt -> {
-            view.getStyleClass().remove(NODE_DRAG_OVER);
-            evt.consume();
-        });
-
-        view.setOnDragDropped(evt -> {
-
-            boolean success = false;
-
-            Dragboard db = evt.getDragboard();
-            if (db.hasContent(NODE_RANGE_DATA_FORMAT)) {
-                TextRange content = (TextRange) db.getContent(NODE_RANGE_DATA_FORMAT);
-
-                LiveViolationRecord record = new LiveViolationRecord();
-                record.setRange(content);
-                record.setExactRange(true);
-                getItems().add(record);
-                success = true;
-            }
-
-            evt.setDropCompleted(success);
-
-            evt.consume();
-        });
     }
 
     /**

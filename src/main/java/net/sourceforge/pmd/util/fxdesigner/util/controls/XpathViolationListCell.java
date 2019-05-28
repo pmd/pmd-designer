@@ -10,7 +10,7 @@ import java.util.Collection;
 import org.fxmisc.richtext.model.StyleSpan;
 import org.fxmisc.richtext.model.StyledDocument;
 
-import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
+import net.sourceforge.pmd.util.fxdesigner.util.DragAndDropUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 
 import javafx.scene.control.ListCell;
@@ -37,7 +37,7 @@ public class XpathViolationListCell extends ListCell<TextAwareNodeWrapper> {
             // Use the first line of the rich text of the node
             setGraphic(richTextForNode(item));
 
-            NodeSelectionSource.registerDragHandler(this, item.getNode());
+            DragAndDropUtil.registerAsNodeDragSource(this, item.getNode());
         }
     }
 
