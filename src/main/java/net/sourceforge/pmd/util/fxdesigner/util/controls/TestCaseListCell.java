@@ -81,8 +81,9 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
                                        statusIcon.setIconLiteral(st.getStatus().getIcon());
 
                                        if (ch.getOldValue() != null
-                                           && ch.getNewValue().getStatus() != ch.getOldValue().getStatus()) {
-                                           getStatusTransition(ch.getNewValue().getStatus()).play();
+                                           && st.getStatus() != ch.getOldValue().getStatus()
+                                           && st.getStatus() == TestStatus.FAIL) {
+                                           getStatusTransition(st.getStatus()).play();
                                        }
 
 
