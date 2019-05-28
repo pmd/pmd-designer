@@ -75,6 +75,7 @@ public final class XPathAutocompleteProvider {
                                     || e.getEventType().equals(KeyEvent.KEY_PRESSED) && e.getCode() == KeyCode.TAB
 
                     )
+                    .conditionOn(autoCompletePopup.showingProperty())
                     .subscribe(e -> {
                         int focusIdx = getFocusIdx();
                         if (focusIdx == -1) {
@@ -88,6 +89,8 @@ public final class XPathAutocompleteProvider {
                     });
 
         EventStream<Integer> changesEventStream = myCodeArea.plainTextChanges()
+                                                            // filter out copy paste
+                                                            .filter(it -> it.getNetLength() == 1)
                                                             .map(characterChanges -> {
                                                                 if (characterChanges.getRemoved().length() > 0) {
                                                                     return characterChanges.getRemovalEnd() - 1;
@@ -120,10 +123,12 @@ public final class XPathAutocompleteProvider {
             searchPoint = input.length();
         }
         if (insertionPoint > searchPoint) {
-            throw new StringIndexOutOfBoundsException("Cannot extract query from subtext \"" + input.substring(0, insertionPoint) + "\"");
+            new StringIndexOutOfBoundsException("Cannot extract query from subtext \"" + input.substring(0, insertionPoint) + "\"").printStackTrace();
+            return null;
         }
 
-        input = input.substring(insertionPoint, searchPoint).trim();
+        // don't trim, if there is any whitespace we abort
+        input = input.substring(insertionPoint, searchPoint);
 
         return StringUtils.isAlpha(input) ? Tuples.t(insertionPoint, input.trim()) : null;
     }
@@ -177,7 +182,7 @@ public final class XPathAutocompleteProvider {
 
     private void applySuggestion(int insertionIndex, String toReplace, String replacement) {
         myCodeArea.replaceText(insertionIndex, insertionIndex + toReplace.length(), replacement);
-        Platform.runLater(autoCompletePopup::hide);
+        autoCompletePopup.hide();
     }
 
 
