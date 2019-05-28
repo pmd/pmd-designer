@@ -43,6 +43,11 @@ public class TestCollection implements SettingsOwner {
         }
     }
 
+    @Nullable
+    public LiveTestCase getOpenTest() {
+        return stash.stream().filter(it -> !it.isFrozen()).findFirst().orElse(null);
+    }
+
     /**
      * Opens a test case for write access.
      */

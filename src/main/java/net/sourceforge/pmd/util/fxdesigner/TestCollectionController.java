@@ -96,7 +96,13 @@ public class TestCollectionController extends AbstractController {
     protected void afterChildrenInit() {
         super.afterChildrenInit();
         if (getTestCollection().getStash().isEmpty()) {
-            addTestButton.fire();
+            addTestButton.fire(); // if no tests, add a first one
+        } else {
+            LiveTestCase openTest = getTestCollection().getOpenTest();
+            if (openTest == null) {
+                // there's at least one, otherwise we'd have fallen in the first branch
+                loadTestCase(0);
+            }
         }
     }
 
