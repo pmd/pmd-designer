@@ -4,34 +4,42 @@
 
 @import "constants";
 
-.test-status {
+.test-statuses(@stack) {
 
-  &.status-pass {
-    -fx-fill: green;
-  }
+  .test-status {
+    &.status-pass {
+      -fx-fill: extract(@stack, 1);
+    }
 
-  &.status-fail {
-    -fx-fill: orange;
-  }
+    &.status-fail {
+      -fx-fill: extract(@stack, 2);
+    }
 
-  &.status-unknown {
-    -fx-fill: gray;
-  }
+    &.status-error {
+      -fx-fill: extract(@stack, 3);
+    }
 
-  &.status-error {
-    -fx-fill: red;
+    &.status-unknown {
+      -fx-fill: extract(@stack, 4);
+    }
   }
 }
 
-.num-violations-gutter-label {
-  .fix-width(10);
-  -fx-padding: 0 0 0 0;
+@normal-test-status-stack: green, orange, red, gray;
+@test-status-on-gray-stack: lighten(green, 60%), orange, red, gray;
 
-  .tooltip {
-    -fx-text-fill: white;
+
+.test-statuses(@normal-test-status-stack);
+
+
+.list-cell:selected,
+.list-cell:focused {
+  .test-status {
+    -fx-fill: white;
   }
-
 }
+
+
 
 .button.node-drag-over {
 
