@@ -1,0 +1,59 @@
+/*
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
+@import "constants";
+
+.test-status {
+
+  &.status-pass {
+    -fx-fill: green;
+  }
+
+  &.status-fail {
+    -fx-fill: orange;
+  }
+
+  &.status-unknown {
+    -fx-fill: gray;
+  }
+
+  &.status-error {
+    -fx-fill: red;
+  }
+}
+
+.num-violations-gutter-label {
+  .fix-width(10);
+  -fx-padding: 0 0 0 0;
+
+  .tooltip {
+    -fx-text-fill: white;
+  }
+
+}
+
+.button.node-drag-over {
+
+  @fxcolor: derive(@selection-focus-color, +10%);
+  @darker: @darker-accent-border;
+  //-fx-border-color: @fxcolor;
+  //-fx-border-style: solid;
+  //-fx-border-width: 4;
+
+  @grad: linear-gradient(to bottom, derive(@fxcolor, -30%) 0%, derive(@fxcolor, -18%) 20%, derive(@fxcolor, -16%) 50%);
+
+  -fx-background-color: -fx-shadow-highlight-color, linear-gradient(to bottom, derive(@darker, -20%), @darker), @grad;
+
+  -fx-background-insets: 0 0 -1 0, 0, 1;
+
+  -fx-text-fill: white;
+}
+
+
+.expected-violation-list-cell {
+  .line-label {
+    -fx-padding: 0 10 0 0;
+  }
+}
+

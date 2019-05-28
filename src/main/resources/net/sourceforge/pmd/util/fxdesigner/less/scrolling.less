@@ -4,8 +4,6 @@
 
 @import "constants";
 
-@scrollbar-width: 17px;
-
 // Useful link: http://www.guigarage.com/2015/11/styling-a-javafx-scrollbar/
 .scroll-bar {
 
@@ -20,29 +18,6 @@
     -fx-background-radius: 2em;
   }
 
-  &:vertical {
-    .fix-width(@scrollbar-width);
-
-
-    .increment-button, .decrement-button {
-      .fix-height(0);
-    }
-  }
-
-  &:horizontal {
-    .fix-height(@scrollbar-width);
-
-
-    .increment-button, .decrement-button {
-      .fix-width(0);
-    }
-
-  }
-
-  .increment-button, .decrement-button {
-    -fx-padding: 0 0 0 0;
-  }
-
   .increment-arrow, .decrement-arrow {
     -fx-shape: " ";
   }
@@ -51,28 +26,4 @@
 // this is the corner when there is a horizontal and vertical scrollbar
 .corner {
   -fx-background-color: white;
-}
-
-
-.no-horizontal-scroll {
-
-  .scroll-bar:horizontal {
-    //-fx-scale-y: 0;
-    //-fx-padding: -1em;
-    .fix-height(0);
-  }
-
-  .corner {
-    -fx-padding: -1em;
-
-  }
-
-
-  &.list-view:vertical-scroll-showing {
-
-    .list-cell {
-      -fx-padding: 5 (@scrollbar-width + 5) 5 5;
-    }
-  }
-
 }
