@@ -47,21 +47,15 @@ public class LiveTestCase implements SettingsOwner {
     private final Var<TestResult> status = Var.newSimpleVar(new TestResult(TestStatus.UNKNOWN, null));
     private Consumer<LiveTestCase> commitHandler;
     private final Var<Boolean> frozen = Var.newSimpleVar(true);
-    @Nullable private final Element originalElement;
 
     private final UndoManager<TestCaseChange> myUndoModel;
 
     public LiveTestCase() {
-        this(null);
+        this(t -> {});
     }
 
-    public LiveTestCase(@Nullable Element originalElement) {
-        this(t -> {}, originalElement);
-    }
-
-    public LiveTestCase(Consumer<LiveTestCase> commitHandler, @Nullable Element originalElement) {
+    public LiveTestCase(Consumer<LiveTestCase> commitHandler) {
         this.commitHandler = t -> commitHandler.accept(t.freeze());
-        this.originalElement = originalElement;
 
         myUndoModel = UndoManagerFactory.unlimitedHistorySingleChangeUM(
             changeStream(),
@@ -71,11 +65,6 @@ public class LiveTestCase implements SettingsOwner {
         );
 
         freeze();
-    }
-
-    @Nullable
-    public Element getOriginalElement() {
-        return originalElement;
     }
 
     public UndoManager<TestCaseChange> getUndoManager() {
@@ -278,7 +267,7 @@ public class LiveTestCase implements SettingsOwner {
 
     public static LiveTestCase fromDescriptor(TestDescriptor descriptor, Element originalElement) {
 
-        LiveTestCase live = new LiveTestCase(originalElement);
+        LiveTestCase live = new LiveTestCase();
         live.setSource(descriptor.getCode());
         live.setDescription(descriptor.getDescription());
 

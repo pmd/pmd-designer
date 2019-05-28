@@ -50,14 +50,10 @@ public class TestXmlDumper {
         Element root = doc.getDocumentElement();
 
         for (LiveTestCase descriptor : descriptors) {
-            if (!descriptor.getUndoManager().isUndoAvailable() && descriptor.getOriginalElement() != null) {
-                root.appendChild(doc.adoptNode(descriptor.getOriginalElement()));
-            } else {
-                Element elt = doc.createElementNS(NS, "test-code");
-                appendSingle(elt, descriptor, doc);
-                root.appendChild(elt);
-                root.appendChild(doc.createTextNode("\n\n"));
-            }
+            Element elt = doc.createElementNS(NS, "test-code");
+            appendSingle(elt, descriptor, doc);
+            root.appendChild(elt);
+            root.appendChild(doc.createTextNode("\n\n"));
         }
     }
 
