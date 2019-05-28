@@ -40,6 +40,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -65,8 +67,6 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
     protected Pair<Node, Subscription> getNonEditingGraphic(LiveTestCase testCase) {
         HBox hBox = new HBox();
         hBox.setSpacing(10);
-
-        Label label = new Label(testCase.getDescription());
 
         FontIcon statusIcon = new FontIcon();
         Label statusLabel = new Label();
@@ -94,6 +94,26 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
                                            statusLabel.setTooltip(null);
                                        }
                                    });
+
+
+        Label descriptionLabel = new Label(testCase.getDescription());
+
+        descriptionLabel.addEventHandler(MouseEvent.MOUSE_CLICKED,
+                                         e -> {
+                                             if (e.getButton() == MouseButton.PRIMARY
+                                                 && e.getClickCount() > 1) {
+                                                 doStartEdit();
+                                                 e.consume();
+                                             }
+                                         });
+
+
+        Button editDescription = new Button();
+        editDescription.setGraphic(new FontIcon("far-edit"));
+        editDescription.getStyleClass().addAll("edit-test-description", "icon-button");
+        Tooltip.install(editDescription, new Tooltip("Edit test description"));
+        editDescription.setOnAction(e1 -> doStartEdit());
+        sub = sub.and(() -> editDescription.setOnAction(null));
 
         Pane spacer = new Pane();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -123,22 +143,35 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         Tooltip.install(delete, new Tooltip("Remove test case"));
         delete.setOnAction(e -> getListView().getItems().remove(testCase));
 
-        label.maxWidthProperty().bind(
-            Bindings.subtract(
-                collection.testsListView.widthProperty(),
-                Bindings.add(
-                    Bindings.add(
-                        load.widthProperty(),
-                        duplicate.widthProperty()
-                    ),
-                    50// spacing + sep
-                )
+//        descriptionLabel.maxWidthProperty().bind(
+//            Bindings.subtract(
+//                collection.testsListView.widthProperty(),
+//                Bindings.add(
+//                    Bindings.add(
+//                        Bindings.add(
+//                            delete.widthProperty(),
+//                            load.widthProperty()
+//                        ),
+//                        duplicate.widthProperty()
+//                    ),
+//                    50// spacing + sep
+//                )
+//
+//            )
+//        );
 
-            )
-        );
+
+        spacer.addEventHandler(MouseEvent.MOUSE_CLICKED,
+                               e -> {
+                                   if (e.getButton() == MouseButton.PRIMARY
+                                       && (e.getClickCount() > 1)) {
+                                       load.fire();
+                                       e.consume();
+                                   }
+                               });
 
 
-        hBox.getChildren().setAll(statusLabel, label, spacer, delete, duplicate, load);
+        hBox.getChildren().setAll(statusLabel, descriptionLabel, editDescription, spacer, delete, duplicate, load);
         hBox.setAlignment(Pos.CENTER_LEFT);
 
 

@@ -96,6 +96,17 @@ public abstract class SmartTextFieldListCell<T> extends ListCell<T> {
 
     @Override
     public final void startEdit() {
+        super.cancelEdit();
+    }
+
+    /**
+     * Call this to really start editing.
+     *
+     * {@link #startEdit()} does nothing, to prevent the edit behaviour
+     * from triggering on double-click on any part of the cell. Instead,
+     * trigger it on the label part.
+     */
+    public final void doStartEdit() {
         super.startEdit();
         if (textField == null) {
             textField = getEditingGraphic(getItem());
