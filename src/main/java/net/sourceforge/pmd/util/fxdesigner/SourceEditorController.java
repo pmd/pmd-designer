@@ -5,7 +5,6 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import static java.util.Collections.emptyList;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.mapToggleGroupToUserData;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExceptionMessage;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguageVersion;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguageVersions;
@@ -19,6 +18,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,12 +38,13 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManagerImpl;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
-import net.sourceforge.pmd.util.fxdesigner.util.controls.DragAndDropUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.DragAndDropUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar;
@@ -54,10 +55,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.MenuButton;
-import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.ToggleGroup;
 
 
 /**
@@ -85,7 +83,7 @@ public class SourceEditorController extends AbstractController {
     private final Var<LiveTestCase> currentlyOpenTestCase = Var.newSimpleVar(null);
 
     @FXML
-    private DynamicWidthChoicebox languageChoiceBox;
+    private DynamicWidthChoicebox<LanguageVersion> languageChoiceBox;
     @FXML
     private ToolbarTitledPane testCaseToolsTitledPane;
     @FXML
@@ -148,13 +146,6 @@ public class SourceEditorController extends AbstractController {
                                  .filterMap(Objects::nonNull, LanguageVersion::getLanguage)
                                  .distinct()
                                  .subscribe(nodeEditionCodeArea::updateSyntaxHighlighter);
-
-        languageVersionProperty().values()
-                                 .filter(Objects::nonNull)
-                                 .map(LanguageVersion::getShortName)
-                                 .map(lang -> "Source Code (" + lang + ")")
-                                 .subscribe(editorTitledPane::setTitle);
-
 
         ((ASTManagerImpl) astManager).classLoaderProperty().bind(auxclasspathClassLoader);
 
@@ -255,23 +246,11 @@ public class SourceEditorController extends AbstractController {
 
 
     private void initializeLanguageSelector() {
+        languageChoiceBox.getItems().addAll(getSupportedLanguageVersions().stream().sorted().collect(Collectors.toList()));
 
-        ToggleGroup languageToggleGroup = new ToggleGroup();
+        languageChoiceBox.setConverter(DesignerUtil.stringConverter(LanguageVersion::getName, LanguageRegistryUtil::getLanguageVersionByName));
 
-        getSupportedLanguageVersions()
-            .stream()
-            .sorted(LanguageVersion::compareTo)
-            .map(lv -> {
-                RadioMenuItem item = new RadioMenuItem(lv.getShortName());
-                item.setUserData(lv);
-                return item;
-            })
-            .forEach(item -> {
-                languageToggleGroup.getToggles().add(item);
-                languageSelectionMenuButton.getItems().add(item);
-            });
-
-        languageVersionUIProperty = mapToggleGroupToUserData(languageToggleGroup, LanguageRegistryUtil::defaultLanguageVersion);
+        languageVersionUIProperty = Var.suspendable(languageChoiceBox.valueProperty());
         // this will be overwritten by property restore if needed
         languageVersionUIProperty.setValue(defaultLanguageVersion());
     }

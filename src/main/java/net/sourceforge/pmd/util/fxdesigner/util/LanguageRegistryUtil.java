@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageRegistry;
@@ -75,6 +76,11 @@ public final class LanguageRegistryUtil {
             supportedLanguageVersions = findAllVersions().stream().filter(LanguageRegistryUtil::filterLanguageVersion).collect(Collectors.toList());
         }
         return supportedLanguageVersions;
+    }
+
+    @Nullable
+    public static LanguageVersion getLanguageVersionByName(String name) {
+        return getSupportedLanguageVersions().stream().filter(it -> it.getName().equals(name)).findFirst().orElse(null);
     }
 
     public static Stream<Language> getSupportedLanguages() {
