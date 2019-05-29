@@ -216,6 +216,11 @@
   -fx-background-color: @app-darker-slate-color;
 }
 
+.text-field:empty-input {
+  -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);
+}
+
+
 @import "tabs";
 @import "scrolling";
 @import "tests";

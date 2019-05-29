@@ -76,6 +76,7 @@ public abstract class SmartTextFieldListCell<T> extends ListCell<T> {
         final TextField textField = new TextField(stringVar.getValue());
 
         textField.setPromptText(getPrompt());
+        ControlUtil.makeTextFieldShowPromptEvenIfFocused(textField);
 
         // Use onAction here rather than onKeyReleased (with check for Enter),
         // as otherwise we encounter RT-34685

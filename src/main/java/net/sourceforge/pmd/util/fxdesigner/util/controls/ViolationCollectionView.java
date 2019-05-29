@@ -75,7 +75,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
         initListView(view);
 
         StackPane footer = new StackPane();
-        footer.setPrefHeight(30);
+        footer.setPrefHeight(LIST_CELL_HEIGHT);
         footer.getStyleClass().addAll("footer");
         footer.getStylesheets().addAll(DesignerUtil.getCss("flat").toString());
 
@@ -110,7 +110,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
     private void initListView(ListView<LiveViolationRecord> view) {
         view.setFixedCellSize(LIST_CELL_HEIGHT);
 
-        view.setPrefWidth(250);
+        //        view.setPrefWidth(250);
 
         view.maxHeightProperty().bind(
             Val.wrap(view.itemsProperty())
@@ -125,6 +125,8 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
             record.setExactRange(true);
             getItems().add(record);
         });
+
+        ControlUtil.makeListViewNeverScrollHorizontal(view);
 
         // go into normal state on window hide
         ControlUtil.subscribeOnWindow(
@@ -151,14 +153,12 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
         popOver.getRoot().getStylesheets().add(DesignerUtil.getCss("popover").toString());
         popOver.titleProperty().setValue("Expected violations");
         popOver.setHeaderAlwaysVisible(true);
-        popOver.setPrefWidth(150);
+
+        //        popOver.setPrefWidth(150);
         return popOver;
     }
 
     private class ViolationCell extends SmartTextFieldListCell<LiveViolationRecord> {
-
-        private static final String DETAILS_BUTTON_CLASS = "my-details-button";
-        private static final String DELETE_BUTTON_CLASS = "delete-property-button";
 
         public ViolationCell() {
             getStyleClass().addAll("expected-violation-list-cell");
@@ -173,40 +173,44 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
 
         @Override
         protected @Nullable String getPrompt() {
-            return "No message";
+            return "Expected violation message...";
         }
 
         @Override
         protected Pair<Node, Subscription> getNonEditingGraphic(LiveViolationRecord violation) {
 
             HBox hBox = new HBox();
-            Label label = new Label();
-            label.textProperty().bind(violation.messageProperty()
-                                               .filter(StringUtils::isNotBlank)
-                                               .orElseConst(""));
-            label.getStyleClass().addAll("message-label");
 
             Pane spacer = new Pane();
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
 
-            Label lineLabel = new Label("(Line " + violation.getRange().startPos.line + ")");
+            Label lineLabel = new Label("(L. " + violation.getRange().startPos.line + ")");
             lineLabel.getStyleClass().addAll("line-label");
+
+            Label messageLabel = new Label();
+            messageLabel.textProperty().bind(violation.messageProperty()
+                                                      .filter(StringUtils::isNotBlank)
+                                                      .orElseConst(""));
+            messageLabel.getStyleClass().addAll("message-label");
+
+            ControlUtil.registerDoubleClickListener(messageLabel, this::doStartEdit);
 
 
             Button edit = new Button();
-            edit.setGraphic(new FontIcon("fas-ellipsis-h"));
-            edit.getStyleClass().addAll(DETAILS_BUTTON_CLASS, "icon-button");
-            Tooltip.install(edit, new Tooltip("Edit property..."));
+            edit.setGraphic(new FontIcon("far-edit"));
+            edit.getStyleClass().addAll("edit-message", "icon-button");
+            edit.setOnAction(e -> doStartEdit());
+            Tooltip.install(edit, new Tooltip("Edit expected message"));
 
 
             Button delete = new Button();
             delete.setGraphic(new FontIcon("fas-trash-alt"));
-            delete.getStyleClass().addAll(DELETE_BUTTON_CLASS, "icon-button");
-            Tooltip.install(delete, new Tooltip("Remove property"));
+            delete.getStyleClass().addAll("delete-violation-button", "icon-button");
+            Tooltip.install(delete, new Tooltip("Remove violation"));
             delete.setOnAction(e -> getItems().remove(violation));
 
-            hBox.getChildren().setAll(lineLabel, label, spacer, delete, edit);
+            hBox.getChildren().setAll(lineLabel, messageLabel, edit, spacer, delete);
             hBox.setAlignment(Pos.CENTER_LEFT);
 
             view.setMinWidth(Math.max(view.getMinWidth(), this.getWidth()));

@@ -10,6 +10,7 @@ import static java.lang.Math.min;
 
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
@@ -96,15 +97,8 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
 
         Label descriptionLabel = new Label(testCase.getDescription());
 
-        descriptionLabel.addEventHandler(MouseEvent.MOUSE_CLICKED,
-                                         e -> {
-                                             if (e.getButton() == MouseButton.PRIMARY
-                                                 && e.getClickCount() > 1) {
-                                                 doStartEdit();
-                                                 e.consume();
-                                             }
-                                         });
 
+        ControlUtil.registerDoubleClickListener(descriptionLabel, this::doStartEdit);
 
         Button editDescription = new Button();
         editDescription.setGraphic(new FontIcon("far-edit"));
@@ -141,14 +135,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         Tooltip.install(delete, new Tooltip("Remove test case"));
         delete.setOnAction(e -> getListView().getItems().remove(testCase));
 
-        spacer.addEventHandler(MouseEvent.MOUSE_CLICKED,
-                               e -> {
-                                   if (e.getButton() == MouseButton.PRIMARY
-                                       && (e.getClickCount() > 1)) {
-                                       load.fire();
-                                       e.consume();
-                                   }
-                               });
+        ControlUtil.registerDoubleClickListener(spacer, load::fire);
 
 
         hBox.getChildren().setAll(statusLabel, descriptionLabel, editDescription, spacer, delete, duplicate, load);
@@ -163,7 +150,14 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
             load.fire();
         }
 
+        ControlUtil.makeListCellFitListViewWidth(this);
+
         return new Pair<>(hBox, sub);
+    }
+
+    @Override
+    protected @Nullable String getPrompt() {
+        return "Test description...";
     }
 
     @Override

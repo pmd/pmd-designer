@@ -6,7 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.util.function.Function;
 
-import org.fxmisc.flowless.VirtualFlow;
+import org.apache.commons.lang3.StringUtils;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
@@ -20,6 +20,9 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.Skin;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.stage.Window;
 import javafx.util.Callback;
@@ -27,6 +30,26 @@ import javafx.util.Callback;
 public final class ControlUtil {
 
     private ControlUtil() {
+
+    }
+
+    public static void makeTextFieldShowPromptEvenIfFocused(TextField field) {
+
+        // See css
+        field.textProperty().addListener((obs, old, n) -> field.pseudoClassStateChanged(PseudoClass.getPseudoClass("empty-input"), StringUtils.isBlank(n)));
+
+    }
+
+    public static void registerDoubleClickListener(javafx.scene.Node node, Runnable action) {
+
+        node.addEventHandler(MouseEvent.MOUSE_CLICKED,
+                             e -> {
+                                 if (e.getButton() == MouseButton.PRIMARY
+                                     && (e.getClickCount() > 1)) {
+                                     action.run();
+                                     e.consume();
+                                 }
+                             });
 
     }
 
@@ -60,7 +83,6 @@ public final class ControlUtil {
      */
     public static <T> void makeListViewNeverScrollHorizontal(ListView<T> lv) {
 
-        decorateCellFactory(lv, ControlUtil::makeListCellFitListViewWidth);
 
         lv.getStyleClass().addAll("no-horizontal-scroll");
         subscribeOnSkin(lv, skin -> {
