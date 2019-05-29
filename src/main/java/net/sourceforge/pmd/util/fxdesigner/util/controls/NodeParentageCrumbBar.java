@@ -20,7 +20,6 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
-import net.sourceforge.pmd.util.fxdesigner.util.DragAndDropUtil;
 
 import javafx.beans.NamedArg;
 import javafx.css.PseudoClass;

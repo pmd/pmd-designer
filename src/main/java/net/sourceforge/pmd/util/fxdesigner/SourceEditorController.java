@@ -38,7 +38,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManagerImpl;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
-import net.sourceforge.pmd.util.fxdesigner.util.DragAndDropUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.DragAndDropUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;

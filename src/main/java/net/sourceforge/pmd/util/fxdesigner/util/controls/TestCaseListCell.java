@@ -30,8 +30,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -143,24 +141,6 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         Tooltip.install(delete, new Tooltip("Remove test case"));
         delete.setOnAction(e -> getListView().getItems().remove(testCase));
 
-//        descriptionLabel.maxWidthProperty().bind(
-//            Bindings.subtract(
-//                collection.testsListView.widthProperty(),
-//                Bindings.add(
-//                    Bindings.add(
-//                        Bindings.add(
-//                            delete.widthProperty(),
-//                            load.widthProperty()
-//                        ),
-//                        duplicate.widthProperty()
-//                    ),
-//                    50// spacing + sep
-//                )
-//
-//            )
-//        );
-
-
         spacer.addEventHandler(MouseEvent.MOUSE_CLICKED,
                                e -> {
                                    if (e.getButton() == MouseButton.PRIMARY
@@ -178,11 +158,12 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         MyXPathSubscriber subscriber = new MyXPathSubscriber(testCase, collection.getDesignerRoot());
         sub = sub.and(subscriber.init(getManagerOf(testCase)));
 
-        Platform.runLater(() -> {
-            if (!testCase.isFrozen()) {
-                load.fire();
-            }
-        });
+
+        if (!testCase.isFrozen()) {
+            load.fire();
+        }
+
+        ControlUtil.makeListCellFitListViewWidth(this);
 
         return new Pair<>(hBox, sub); // TODO
     }

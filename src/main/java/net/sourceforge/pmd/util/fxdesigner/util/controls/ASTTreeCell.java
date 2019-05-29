@@ -10,7 +10,6 @@ import java.lang.reflect.Modifier;
 import java.util.function.Consumer;
 
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.util.fxdesigner.util.DragAndDropUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.PropertyUtils;
 
 import javafx.scene.control.ContextMenu;

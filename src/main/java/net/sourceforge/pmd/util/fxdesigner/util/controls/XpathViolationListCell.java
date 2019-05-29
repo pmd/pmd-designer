@@ -10,7 +10,6 @@ import java.util.Collection;
 import org.fxmisc.richtext.model.StyleSpan;
 import org.fxmisc.richtext.model.StyledDocument;
 
-import net.sourceforge.pmd.util.fxdesigner.util.DragAndDropUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 
 import javafx.scene.control.ListCell;
