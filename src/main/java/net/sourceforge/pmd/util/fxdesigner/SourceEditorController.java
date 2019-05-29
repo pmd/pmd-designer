@@ -44,6 +44,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PopOverWrapper;
@@ -53,6 +54,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
@@ -82,6 +84,8 @@ public class SourceEditorController extends AbstractController {
 
     private final Var<LiveTestCase> currentlyOpenTestCase = Var.newSimpleVar(null);
 
+    @FXML
+    private DynamicWidthChoicebox languageChoiceBox;
     @FXML
     private ToolbarTitledPane testCaseToolsTitledPane;
     @FXML
