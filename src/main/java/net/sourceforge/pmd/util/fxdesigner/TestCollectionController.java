@@ -18,6 +18,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCollection;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlDumper;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.ControlUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.TestCaseListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
@@ -59,7 +60,11 @@ public class TestCollectionController extends AbstractController {
 
         testsListView.setCellFactory(c -> new TestCaseListCell(this));
         testsListView.setEditable(true);
+
+        ControlUtil.makeListViewNeverScrollHorizontal(testsListView);
+
         this.testsListView.setItems(getTestCollection().getStash());
+
 
         importTestsButton.setOnAction(any -> {
             FileChooser chooser = new FileChooser();

@@ -127,7 +127,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
         });
 
         // go into normal state on window hide
-        ReactfxUtil.subscribeOnWindow(
+        ControlUtil.subscribeOnWindow(
             this,
             w -> ReactfxUtil.addEventHandler(w.onHiddenProperty(), evt -> view.edit(-1))
         );

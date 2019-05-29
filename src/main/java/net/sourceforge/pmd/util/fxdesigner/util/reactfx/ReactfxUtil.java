@@ -34,6 +34,8 @@ import javafx.collections.ObservableMap;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Control;
+import javafx.scene.control.Skin;
 import javafx.stage.Window;
 
 /**
@@ -47,18 +49,6 @@ public final class ReactfxUtil {
 
     private ReactfxUtil() {
 
-    }
-
-    /**
-     * Add a hook on the owner window. It's not possible to do this statically,
-     * since at construction time the window might not be set.
-     */
-    public static void subscribeOnWindow(javafx.scene.Node node,
-                                         Function<Window, Subscription> hook) {
-        ReactfxExtensions.dynamic(
-            LiveList.wrapVal(Val.wrap(node.sceneProperty()).flatMap(Scene::windowProperty)),
-            (w, i) -> hook.apply(w)
-        );
     }
 
 
