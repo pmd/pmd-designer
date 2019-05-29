@@ -88,9 +88,7 @@ public abstract class XPathUpdateSubscriber implements ApplicationComponent {
         return root;
     }
 
-    public void handleNoXPath() {
-        // do nothing
-    }
+    public abstract void handleNoXPath();
 
 
     public abstract void handleNoCompilationUnit();
