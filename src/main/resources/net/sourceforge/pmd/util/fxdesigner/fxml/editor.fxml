@@ -34,7 +34,7 @@
                                            AnchorPane.rightAnchor="0.0"
                                            AnchorPane.topAnchor="0.0">
                             <toolbarItems>
-                                <DynamicWidthChoicebox fx:id="languageChoiceBox" styleClass="no-arrow"/>
+                                <DynamicWidthChoicebox fx:id="languageChoiceBox"/>
                             </toolbarItems>
                             <content>
                                 <AnchorPane>

@@ -30,7 +30,6 @@
   }
 }
 
-
 .flat(@selection-color) {
 
   .button, .choice-box, .toggle-button {
@@ -42,6 +41,17 @@
     -fx-background-insets: 0;
     -fx-border-insets: 0;
     -fx-border-radius: 3;
+
+    -fx-padding: 3;
+
+    &.choice-box {
+      .label {
+        -fx-padding: 0;
+      }
+      .open-button {
+        -fx-padding: 0;
+      }
+    }
 
     &:hover {
       -fx-background-color: @selection-color;

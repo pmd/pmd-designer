@@ -12,6 +12,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 
 /**
  * A choicebox that fits the width of the currently displayed item instead
@@ -26,19 +27,24 @@ public class DynamicWidthChoicebox<T> extends ChoiceBox<T> {
 
         EventStreams.valuesOf(skinProperty())
                     .filter(Objects::nonNull)
-                    .map(skin -> (Label) skin.getNode().lookup(".label"))
                     .subscribe(
-                        label -> {
-                            label.setAlignment(Pos.CENTER);
+                        skin -> {
+                            Label label = (Label) skin.getNode().lookup(".label");
+                            StackPane arrow = (StackPane) skin.getNode().lookup(".open-button");
+                            boolean showArrow = !getStyleClass().contains("no-arrow");
+
+                            label.setAlignment(showArrow ? Pos.CENTER_LEFT: Pos.CENTER);
 
                             DoubleBinding widthBinding = Bindings.createDoubleBinding(
                                 () -> {
                                     Insets myInsets = getInsets();
-                                    return myInsets.getLeft() + label.prefWidth(-1) + myInsets.getRight();
+                                    double arrowWidth = showArrow ? arrow.prefWidth(-1) : 0;
+                                    return myInsets.getLeft() + label.prefWidth(-1) + arrowWidth + myInsets.getRight();
                                 },
                                 label.widthProperty(),
                                 this.getSelectionModel().selectedItemProperty(),
-                                this.insetsProperty());
+                                this.insetsProperty()
+                            );
 
 
                             rewire(this.prefWidthProperty(), widthBinding);
