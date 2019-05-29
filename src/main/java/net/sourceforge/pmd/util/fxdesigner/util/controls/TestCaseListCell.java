@@ -13,7 +13,6 @@ import java.util.List;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
-import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.TestCollectionController;
@@ -164,9 +163,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
             load.fire();
         }
 
-        ControlUtil.makeListCellFitListViewWidth(this);
-
-        return new Pair<>(hBox, sub); // TODO
+        return new Pair<>(hBox, sub);
     }
 
     @Override

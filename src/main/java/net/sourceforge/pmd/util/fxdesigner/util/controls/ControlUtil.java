@@ -6,20 +6,19 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.util.function.Function;
 
+import org.fxmisc.flowless.VirtualFlow;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 
 import com.github.oowekyala.rxstring.ReactfxExtensions;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.css.PseudoClass;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.Region;
 import javafx.stage.Window;
@@ -37,7 +36,8 @@ public final class ControlUtil {
             cell.prefWidthProperty().bind(
                 Val.wrap(cell.listViewProperty())
                    .flatMap(Region::widthProperty).map(it -> it.doubleValue() - 5)
-                   .orElseConst(0.));
+                   .orElseConst(0.)
+            );
             cell.setMaxWidth(Control.USE_PREF_SIZE);
         }
         return cell;
@@ -52,32 +52,22 @@ public final class ControlUtil {
     }
 
     /**
-     * This is supported by some CSS.
+     * This is supported by some CSS. Hides the horizontal scroll, and
+     * alters the padding when the vertical scrollbar is shown so that
+     * the whole contents of the list cell are shown.
      *
-     * @param lv
-     * @param <T>
+     * @param lv List view to alter
      */
     public static <T> void makeListViewNeverScrollHorizontal(ListView<T> lv) {
 
-//        decorateCellFactory(lv, ControlUtil::makeListCellFitListViewWidth);
+        decorateCellFactory(lv, ControlUtil::makeListCellFitListViewWidth);
 
         lv.getStyleClass().addAll("no-horizontal-scroll");
-
         subscribeOnSkin(lv, skin -> {
-            Group group = (Group) skin.getNode().lookup(".sheet");
+            ScrollBar scroll = (ScrollBar) skin.getNode().lookup(".scroll-bar:vertical");
 
-            final double tolerance = 5;
-
-            BooleanBinding yOverflow = Bindings.createBooleanBinding(
-                () -> group.getLayoutBounds().getHeight() - lv.getHeight() > tolerance,
-                group.layoutBoundsProperty(),
-                lv.heightProperty()
-            );
-
-            return EventStreams.valuesOf(yOverflow)
-                               .distinct()
+            return EventStreams.valuesOf(scroll.visibleProperty())
                                .subscribe(it -> lv.pseudoClassStateChanged(PseudoClass.getPseudoClass("vertical-scroll-showing"), it));
-
         });
 
 
