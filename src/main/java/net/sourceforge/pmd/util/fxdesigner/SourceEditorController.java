@@ -151,9 +151,6 @@ public class SourceEditorController extends AbstractController {
                                  .map(lang -> "Source Code (" + lang + ")")
                                  .subscribe(editorTitledPane::setTitle);
 
-        astManager.languageVersionProperty()
-                  .changes()
-                  .subscribe(c -> astTreeView.setAstRoot(null));
 
         ((ASTManagerImpl) astManager).classLoaderProperty().bind(auxclasspathClassLoader);
 
