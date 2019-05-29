@@ -68,12 +68,15 @@ public final class PopOverWrapper<T> {
 
     /**
      * This is a weird hack to preload the FXML and CSS, so that the
-     * first opening of the popover doesn't look completely broken.
+     * first opening of the popover doesn't look completely broken
+     * (twitching and obviously being restyled). We show the popover
+     * briefly way outside the screen bounds, just the time for its
+     * content graph to load.
      */
     public void doFirstLoad(Stage stage) {
         myPopover.ifPresent(pop -> {
             pop.getRoot().setOpacity(0);
-            pop.show(stage);
+            pop.show(stage, 40000, 40000);
             Platform.runLater(() -> {
                 pop.hide();
                 pop.getRoot().setOpacity(1);
