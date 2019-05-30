@@ -172,7 +172,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
 
 
         @Override
-        protected @Nullable String getPrompt() {
+        protected String getPrompt() {
             return "Expected violation message...";
         }
 

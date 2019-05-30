@@ -34,9 +34,12 @@ public final class ControlUtil {
     }
 
     public static void makeTextFieldShowPromptEvenIfFocused(TextField field) {
-
         // See css
-        field.textProperty().addListener((obs, old, n) -> field.pseudoClassStateChanged(PseudoClass.getPseudoClass("empty-input"), StringUtils.isBlank(n)));
+
+        Val.wrap(field.textProperty())
+           .values()
+           .withDefaultEvent(field.getText())
+           .subscribe(text -> field.pseudoClassStateChanged(PseudoClass.getPseudoClass("empty-input"), StringUtils.isBlank(text)));
 
     }
 
