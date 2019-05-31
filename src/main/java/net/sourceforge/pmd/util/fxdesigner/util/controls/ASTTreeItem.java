@@ -13,8 +13,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
@@ -37,8 +35,8 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> {
      */
     private final Var<Collection<String>> latentStyleClasses = Var.newSimpleVar(Collections.emptyList());
 
-    private ASTTreeItem(Node n, int treeIndex) {
-        super(n, treeIndex);
+    private ASTTreeItem(Node n) {
+        super(n);
         setExpanded(true);
 
         treeCellProperty().changes().subscribe(change -> {
@@ -71,7 +69,7 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> {
      * @param node The node to find
      *
      * @return The found item, or null if this item doesn't wrap the
-     *     root of the tree to which the parameter belongs
+     *         root of the tree to which the parameter belongs
      */
     public ASTTreeItem findItem(Node node) {
         // This is an improvement over the previous algorithm which performed a greedy
@@ -106,33 +104,25 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> {
         return current;
     }
 
+
+    /** Builds an ASTTreeItem recursively from a node. */
+    static ASTTreeItem buildRoot(Node n) {
+        ASTTreeItem item = new ASTTreeItem(n);
+        if (n.jjtGetNumChildren() > 0) {
+            for (int i = 0; i < n.jjtGetNumChildren(); i++) {
+                item.getChildren().add(buildRoot(n.jjtGetChild(i)));
+            }
+        }
+        return item;
+    }
+
+
     public void setStyleClasses(Collection<String> classes) {
         latentStyleClasses.setValue(classes == null ? Collections.emptyList() : classes);
     }
 
     public void setStyleClasses(String... classes) {
         setStyleClasses(Arrays.asList(classes));
-    }
-
-    @Override
-    public String getSearchableText() {
-        return getValue() != null ? nodePresentableText(getValue()) : null;
-    }
-
-    /** Builds an ASTTreeItem recursively from a node. */
-    static ASTTreeItem buildRoot(Node n) {
-        return buildRootImpl(n, new MutableInt(0));
-    }
-
-    /** Builds an ASTTreeItem recursively from a node. */
-    private static ASTTreeItem buildRootImpl(Node n, MutableInt idx) {
-        ASTTreeItem item = new ASTTreeItem(n, idx.getAndIncrement());
-        if (n.jjtGetNumChildren() > 0) {
-            for (int i = 0; i < n.jjtGetNumChildren(); i++) {
-                item.getChildren().add(buildRootImpl(n.jjtGetChild(i), idx));
-            }
-        }
-        return item;
     }
 
     public static <T, N extends TreeItem<T>> void foreach(N root, Consumer<? super N> fun) {
@@ -150,9 +140,5 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> {
         }
     }
 
-    private static String nodePresentableText(Node node) {
-        String image = node.getImage() == null ? "" : " \"" + StringEscapeUtils.escapeJava(node.getImage()) + "\"";
-        return node.getXPathNodeName() + image;
-    }
 
 }

@@ -6,7 +6,10 @@ package net.sourceforge.pmd.util.fxdesigner.util.autocomplete;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
 
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -22,7 +25,7 @@ import javafx.scene.text.TextFlow;
  * @author Clément Fournier
  * @since 7.0.0
  */
-class ResultSelectionStrategy {
+public class ResultSelectionStrategy {
 
     private static final int MIN_QUERY_LENGTH = 1;
 
@@ -32,7 +35,21 @@ class ResultSelectionStrategy {
             // shorter results are displayed first when there's a tie
             .thenComparing(CompletionResult::getNodeName, Comparator.comparing(String::length));
 
-    Stream<CompletionResult> filterResults(List<String> candidates, String query, int limit) {
+    public Optional<CompletionResult> evaluateBestSingle(String candidate, String query) {
+        if (query == null || query.length() < MIN_QUERY_LENGTH || StringUtils.isEmpty(candidate)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(computeMatchingSegments(candidate, query, false))
+                       .filter(it -> it.getScore() > 0)
+                       .map(prev -> {
+                           CompletionResult refined = computeMatchingSegments(prev.getNodeName(), query, true);
+                           // keep the best
+                           return refined.getScore() > prev.getScore() ? refined : prev;
+                       });
+    }
+
+    public Stream<CompletionResult> filterResults(List<String> candidates, String query, int limit) {
         if (query.length() < MIN_QUERY_LENGTH) {
             return Stream.empty();
         }
@@ -71,11 +88,16 @@ class ResultSelectionStrategy {
 
 
     private Text makeHighlightedText(String match) {
-        Text matchLabel = new Text(match);
+        Text matchLabel = makeNormalText(match);
         matchLabel.getStyleClass().add("autocomplete-match");
         return matchLabel;
     }
 
+    private Text makeNormalText(String text) {
+        Text matchLabel = new Text(text);
+        matchLabel.getStyleClass().add("text");
+        return matchLabel;
+    }
 
     private boolean isWordStart(String pascalCased, int idx) {
         return idx == 0 || Character.isUpperCase(pascalCased.charAt(idx)) && Character.isLowerCase(pascalCased.charAt(idx - 1));
@@ -196,7 +218,7 @@ class ResultSelectionStrategy {
                     String match = candidate.substring(curMatchStart, curMatchStart + matchLength);
 
                     if (before.length() > 0) {
-                        flow.getChildren().add(new Text(before));
+                        flow.getChildren().add(makeNormalText(before));
                     }
 
                     flow.getChildren().add(makeHighlightedText(match));
@@ -223,7 +245,7 @@ class ResultSelectionStrategy {
             String match = candidate.substring(curMatchStart, candIdx);
 
             if (before.length() > 0) {
-                flow.getChildren().add(new Text(before));
+                flow.getChildren().add(makeNormalText(before));
             }
 
             flow.getChildren().add(makeHighlightedText(match));
@@ -234,14 +256,14 @@ class ResultSelectionStrategy {
         // add the rest of the candidate
         String rest = candidate.substring(lastMatchEnd);
         if (!rest.isEmpty()) {
-            flow.getChildren().add(new Text(rest));
+            flow.getChildren().add(makeNormalText(rest));
         }
 
         int remainingChars = query.length() - queryIdx;
 
         if (remainingChars > 0) {
             // some chars were not found, penalize that
-            score -= remainingChars * 2;
+            score -= remainingChars * 5;
         }
 
         return new CompletionResult(score, candidate, flow);

@@ -25,6 +25,7 @@ import org.reactfx.value.ValBase;
 import org.reactfx.value.Var;
 
 import com.github.oowekyala.rxstring.ReactfxExtensions;
+import com.github.oowekyala.rxstring.ReactfxExtensions.RebindSubscription;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
@@ -33,10 +34,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.Control;
-import javafx.scene.control.Skin;
-import javafx.stage.Window;
 
 /**
  * Extensions to ReactFX Val and EventStreams. Some can be deemed as too
@@ -49,6 +46,35 @@ public final class ReactfxUtil {
 
     private ReactfxUtil() {
 
+    }
+
+
+    private static final RebindSubscription<?> EMPTY_SUB = new RebindSubscription<Object>() {
+        @Override
+        public RebindSubscription<Object> rebind(Object newItem) {
+            return emptySub();
+        }
+
+        @Override
+        public void unsubscribe() {
+
+        }
+    };
+
+    public static <T> RebindSubscription<T> emptySub() {
+        return (RebindSubscription<T>) EMPTY_SUB;
+    }
+
+    /**
+     * Add a hook on the owner window. It's not possible to do this statically,
+     * since at construction time the window might not be set.
+     */
+    public static <T> Subscription subscribeDynamic(Val<T> node,
+                                                    Function<T, Subscription> subscriber) {
+        return ReactfxExtensions.dynamic(
+            LiveList.wrapVal(node),
+            (w, i) -> subscriber.apply(w)
+        );
     }
 
 

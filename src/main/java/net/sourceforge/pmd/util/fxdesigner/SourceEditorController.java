@@ -56,6 +56,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
+import javafx.scene.control.TextField;
 
 
 /**
@@ -82,6 +83,8 @@ public class SourceEditorController extends AbstractController {
 
     private final Var<LiveTestCase> currentlyOpenTestCase = Var.newSimpleVar(null);
 
+    @FXML
+    private TextField searchField;
     @FXML
     private DynamicWidthChoicebox<LanguageVersion> languageChoiceBox;
     @FXML
@@ -159,6 +162,8 @@ public class SourceEditorController extends AbstractController {
                                  .map(it -> "Expected violations (" + it + ")")
                                  .orElseConst("Expected violations")
         );
+
+        astTreeView.bindSearchQuery(searchField.textProperty());
 
         DragAndDropUtil.registerAsNodeDragTarget(
             violationsButton,
