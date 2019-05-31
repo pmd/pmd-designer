@@ -70,9 +70,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
         return ReactfxUtil.subscribeDynamic(
             queryVal,
             q -> {
-                final int resultLimit = 10;
-
-                Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults = allItems.map(it -> selector.filterResults(it, SearchableTreeItem::getSearchableText, q, MatchLimiter.limited(resultLimit)).collect(Collectors.toList()));
+                Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults = allItems.map(it -> selector.filterResults(it, SearchableTreeItem::getSearchableText, q, MatchLimiter.selectBestTies()).collect(Collectors.toList()));
                 return selectedResults.values()
                                       .subscribe(newRes -> {
                                           // the values are never null, at most empty, because of orElseConst above
@@ -80,7 +78,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                                           refresh();
                                       })
                                       .and(() -> {
-                                          selectedResults.getOpt().ifPresent(lst -> lst.forEach(it -> it.getData().currentSearchResult.setValue(null)));
+                                          selectedResults.ifPresent(lst -> lst.forEach(it -> it.getData().currentSearchResult.setValue(null)));
                                           refresh();
                                       });
             }

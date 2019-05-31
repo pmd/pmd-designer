@@ -13,9 +13,13 @@
 package net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.mutable.MutableInt;
 
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.MatchResult;
 
@@ -243,6 +247,7 @@ public class CamelCaseMatcher implements StringMatchAlgo {
         return idx == 0 || Character.isUpperCase(pascalCased.charAt(idx)) && Character.isLowerCase(pascalCased.charAt(
             idx - 1));
     }
+
 
     /**
      * Breaks some ties, but still scans once left to right so misses some opportunities.
