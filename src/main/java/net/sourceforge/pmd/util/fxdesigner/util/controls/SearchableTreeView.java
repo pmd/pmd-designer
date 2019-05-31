@@ -5,23 +5,21 @@
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.reactfx.Subscription;
-import org.reactfx.collection.LiveArrayList;
-import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.CompletionResult;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.MatchResult;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.ResultSelectionStrategy;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
-import com.github.oowekyala.rxstring.ReactfxExtensions;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -54,41 +52,44 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
     private Subscription searchSub(ObservableValue<String> query) {
 
-        LiveList<SearchableTreeItem<T>> allItems = new LiveArrayList<>();
+        Val<List<SearchableTreeItem<T>>> allItems =
+            Val.wrap(rootProperty())
+               .map(it -> getRealRoot())
+               .map(it -> {
+                   List<SearchableTreeItem<T>> tmp = new ArrayList<>();
+                   it.foreach(tmp::add);
+                   return tmp;
+               })
+               .orElseConst(Collections.emptyList());
 
-        Subscription rootSub = Val.wrap(rootProperty())
-                                  .map(it -> getRealRoot())
-                                  .changes()
-                                  .subscribe(ch -> {
-                                      if (ch.getOldValue() != null) {
-                                          allItems.clear();
-                                      }
-                                      if (ch.getNewValue() != null) {
-                                          List<SearchableTreeItem<T>> tmp = new ArrayList<>();
-                                          ch.getNewValue().foreach(tmp::add);
-                                          allItems.addAll(tmp);
-                                      }
-                                  });
 
         Val<String> queryVal = Val.wrap(query).filter(StringUtils::isNotBlank);
 
         return ReactfxUtil.subscribeDynamic(
             queryVal,
-            q -> ReactfxExtensions.dynamic(
-                allItems,
-                (item, i) -> {
-                    item.searchFunctionProperty().setValue(candidate -> selector.evaluateBestSingle(candidate, q));
-                    return () -> item.searchFunctionProperty().setValue(null);
-                }
-            )
-        ).and(rootSub);
+            q -> {
+                final int resultLimit = 10;
+
+                Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults = allItems.map(it -> selector.filterResults(it, SearchableTreeItem::getSearchableText, q, resultLimit).collect(Collectors.toList()));
+                return selectedResults.values()
+                                      .subscribe(newRes -> {
+                                          // the values are never null, at most empty, because of orElseConst above
+                                          newRes.forEach(res -> res.getData().currentSearchResult.setValue(res));
+                                          refresh();
+                                      })
+                                      .and(() -> {
+                                          selectedResults.getOpt().ifPresent(lst -> lst.forEach(it -> it.getData().currentSearchResult.setValue(null)));
+                                          refresh();
+                                      });
+            }
+        );
 
     }
 
     public static abstract class SearchableTreeItem<T> extends TreeItem<T> {
 
         private final Var<SearchableTreeCell<T>> treeCell = Var.newSimpleVar(null);
-        private final Var<Function<String, Optional<CompletionResult>>> searchFunction = Var.newSimpleVar(null);
+        private final Var<MatchResult> currentSearchResult = Var.newSimpleVar(null);
 
         public SearchableTreeItem() {
         }
@@ -106,10 +107,12 @@ public class SearchableTreeView<T> extends TreeView<T> {
             return treeCell;
         }
 
-
-        public Var<Function<String, Optional<CompletionResult>>> searchFunctionProperty() {
-            return searchFunction;
+        public Val<MatchResult> currentSearchResultProperty() {
+            return currentSearchResult;
         }
+
+        public abstract String getSearchableText();
+
     }
 
     public abstract static class SearchableTreeCell<T> extends TreeCell<T> {
@@ -129,25 +132,38 @@ public class SearchableTreeView<T> extends TreeView<T> {
                 });
         }
 
-        protected Val<Function<String, Optional<CompletionResult>>> searchFunctionProperty() {
-            return realItemProperty().flatMap(SearchableTreeItem::searchFunctionProperty);
+        protected Val<MatchResult> searchResultProperty() {
+            return realItemProperty().flatMap(SearchableTreeItem::currentSearchResultProperty);
         }
 
 
         @Override
         public void updateItem(T item, boolean empty) {
             super.updateItem(item, empty);
+            if (empty || item == null) {
+                setText(null);
+                setGraphic(null);
+            } else {
+
+                Optional<MatchResult> completionResult = searchResultProperty().getOpt();
+
+                if (completionResult.isPresent()) {
+                    setGraphic(completionResult.get().getTextFlow());
+                    setText(null);
+                } else {
+                    setGraphic(null);
+                    setText(realItemProperty().getValue().getSearchableText());
+                }
+
+                commonUpdate(item);
+            }
         }
+
+        public abstract void commonUpdate(T item);
+
 
         public final Val<SearchableTreeItem<T>> realItemProperty() {
             return Val.wrap(treeItemProperty()).map(it -> (SearchableTreeItem<T>) it);
         }
-
-        /**
-         * Text that should be matched against the query.
-         */
-        public abstract String getSearchableText();
-
-
     }
 }

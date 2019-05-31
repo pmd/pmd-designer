@@ -6,13 +6,11 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.DumpUtil.dumpToSubtreeTest;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.CompletionResult;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.SearchableTreeView.SearchableTreeCell;
 
 import javafx.scene.control.ContextMenu;
@@ -61,48 +59,22 @@ public class ASTTreeCell extends SearchableTreeCell<Node> {
         return contextMenu;
     }
 
+
     @Override
-    public final void updateItem(Node item, boolean empty) {
-        super.updateItem(item, empty);
+    public void commonUpdate(Node item) {
+        setContextMenu(buildContextMenu(item));
 
-        if (empty || item == null) {
-            setText(null);
-            setGraphic(null);
-        } else {
+        DragAndDropUtil.registerAsNodeDragSource(this, item);
 
-            searchFunctionProperty().changes().subscribe(it -> getTreeView().refresh());
-            Optional<CompletionResult> completionResult = searchFunctionProperty().getOpt().flatMap(it -> it.apply(nodePresentableText(item)));
-
-            if (completionResult.isPresent()) {
-                setGraphic(completionResult.get().getTextFlow());
-                setText(null);
-            } else {
-                setGraphic(null);
-                setText(nodePresentableText(item));
-                setContextMenu(buildContextMenu(item));
+        // Reclicking the selected node in the ast will scroll back to the node in the editor
+        this.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
+            TreeItem<Node> selectedItem = getTreeView().getSelectionModel().getSelectedItem();
+            if (t.getButton() == MouseButton.PRIMARY
+                && selectedItem != null && selectedItem.getValue() == item) {
+                onNodeItemSelected.accept(item);
+                t.consume();
             }
-
-            DragAndDropUtil.registerAsNodeDragSource(this, item);
-
-            // Reclicking the selected node in the ast will scroll back to the node in the editor
-            this.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
-                TreeItem<Node> selectedItem = getTreeView().getSelectionModel().getSelectedItem();
-                if (t.getButton() == MouseButton.PRIMARY
-                    && selectedItem != null && selectedItem.getValue() == item) {
-                    onNodeItemSelected.accept(item);
-                    t.consume();
-                }
-            });
-        }
+        });
     }
 
-    private static String nodePresentableText(Node node) {
-        String image = node.getImage() == null ? "" : " \"" + StringEscapeUtils.escapeJava(node.getImage()) + "\"";
-        return node.getXPathNodeName() + image;
-    }
-
-    @Override
-    public String getSearchableText() {
-        return getItem() != null ? nodePresentableText(getItem()) : null;
-    }
 }

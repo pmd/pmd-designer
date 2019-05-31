@@ -7,6 +7,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.autocomplete;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,34 +30,20 @@ public class ResultSelectionStrategy {
 
     private static final int MIN_QUERY_LENGTH = 1;
 
-    private static final Comparator<CompletionResult> DISPLAY_ORDER =
-        Comparator.<CompletionResult>naturalOrder()
+    private static final Comparator<? extends MatchResult<?>> DISPLAY_ORDER =
+        Comparator.<MatchResult<?>>naturalOrder()
             .reversed()
             // shorter results are displayed first when there's a tie
-            .thenComparing(CompletionResult::getNodeName, Comparator.comparing(String::length));
+            .thenComparing(MatchResult::getStringMatch, Comparator.comparing(String::length));
 
-    public Optional<CompletionResult> evaluateBestSingle(String candidate, String query) {
-        if (query == null || query.length() < MIN_QUERY_LENGTH || StringUtils.isEmpty(candidate)) {
-            return Optional.empty();
-        }
-
-        return Optional.of(computeMatchingSegments(candidate, query, false))
-                       .filter(it -> it.getScore() > 0)
-                       .map(prev -> {
-                           CompletionResult refined = computeMatchingSegments(prev.getNodeName(), query, true);
-                           // keep the best
-                           return refined.getScore() > prev.getScore() ? refined : prev;
-                       });
-    }
-
-    public Stream<CompletionResult> filterResults(List<String> candidates, String query, int limit) {
+    public <T> Stream<MatchResult<T>> filterResults(List<T> candidates, Function<T, String> candExtractor, String query, int limit) {
         if (query.length() < MIN_QUERY_LENGTH) {
             return Stream.empty();
         }
 
-        return candidates.stream().filter(s -> !s.isEmpty())
-                         .map(cand -> computeMatchingSegments(cand, query, false))
-                         .sorted(Comparator.<CompletionResult>naturalOrder().reversed())
+        return candidates.stream()
+                         .map(cand -> computeMatchingSegments(cand, candExtractor.apply(cand), query, false))
+                         .sorted(Comparator.<MatchResult<?>>naturalOrder().reversed())
                          .filter(it -> it.getScore() > 0)
                          .limit(limit)
                          // second pass is done only on those we know we'll keep
@@ -76,31 +63,27 @@ public class ResultSelectionStrategy {
                              //      candidate   ClassOrInterfaceDeclaration     : 32
                              //                  ^    ^ ^ ^
 
-                             CompletionResult refined = computeMatchingSegments(prev.getNodeName(), query, true);
+                             MatchResult<T> refined = computeMatchingSegments(prev.getData(), prev.getStringMatch(), query, true);
                              // keep the best
                              return refined.getScore() > prev.getScore() ? refined : prev;
                          })
-                         .sorted(DISPLAY_ORDER);
+                         .sorted(displayOrder());
 
 
     }
 
+    public <T> Optional<MatchResult<T>> evaluateBestSingle(T data, String candidate, String query) {
+        if (query == null || query.length() < MIN_QUERY_LENGTH || StringUtils.isEmpty(candidate)) {
+            return Optional.empty();
+        }
 
-
-    private Text makeHighlightedText(String match) {
-        Text matchLabel = makeNormalText(match);
-        matchLabel.getStyleClass().add("autocomplete-match");
-        return matchLabel;
-    }
-
-    private Text makeNormalText(String text) {
-        Text matchLabel = new Text(text);
-        matchLabel.getStyleClass().add("text");
-        return matchLabel;
-    }
-
-    private boolean isWordStart(String pascalCased, int idx) {
-        return idx == 0 || Character.isUpperCase(pascalCased.charAt(idx)) && Character.isLowerCase(pascalCased.charAt(idx - 1));
+        return Optional.of(computeMatchingSegments(data, candidate, query, false))
+                       .filter(it -> it.getScore() > 0)
+                       .map(prev -> {
+                           MatchResult<T> refined = computeMatchingSegments(data, prev.getStringMatch(), query, true);
+                           // keep the best
+                           return refined.getScore() > prev.getScore() ? refined : prev;
+                       });
     }
 
     /**
@@ -111,11 +94,11 @@ public class ResultSelectionStrategy {
      * @param matchOnlyWordStarts Whether to only match word starts. This is a more unfair strategy
      *                            that can be used to break ties.
      */
-    private CompletionResult computeMatchingSegments(String candidate, String query, boolean matchOnlyWordStarts) {
+    private <T> MatchResult<T> computeMatchingSegments(T data, String candidate, String query, boolean matchOnlyWordStarts) {
         if (candidate.equalsIgnoreCase(query)) {
             // perfect match
             TextFlow flow = new TextFlow(makeHighlightedText(candidate));
-            return new CompletionResult(Integer.MAX_VALUE, candidate, flow);
+            return new MatchResult<>(Integer.MAX_VALUE, data, candidate, flow);
         }
 
         // Performs a left-to-right scan of the candidate string,
@@ -266,7 +249,32 @@ public class ResultSelectionStrategy {
             score -= remainingChars * 5;
         }
 
-        return new CompletionResult(score, candidate, flow);
+        final int finalScore = score;
+
+        return new MatchResult<>(finalScore, data, candidate, flow);
+    }
+
+
+    private Text makeHighlightedText(String match) {
+        Text matchLabel = makeNormalText(match);
+        matchLabel.getStyleClass().add("autocomplete-match");
+        return matchLabel;
+    }
+
+    private Text makeNormalText(String text) {
+        Text matchLabel = new Text(text);
+        matchLabel.getStyleClass().add("text");
+        return matchLabel;
+    }
+
+    private boolean isWordStart(String pascalCased, int idx) {
+        return idx == 0 || Character.isUpperCase(pascalCased.charAt(idx)) && Character.isLowerCase(pascalCased.charAt(
+            idx - 1));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> Comparator<MatchResult<T>> displayOrder() {
+        return (Comparator<MatchResult<T>>) DISPLAY_ORDER;
     }
 
 }
