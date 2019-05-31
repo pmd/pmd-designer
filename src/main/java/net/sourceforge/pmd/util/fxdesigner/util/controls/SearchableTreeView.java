@@ -16,8 +16,8 @@ import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchResult;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.CamelCaseMatcher;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchResult;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchSelector;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchAlgo;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
@@ -51,24 +51,25 @@ public class SearchableTreeView<T> extends TreeView<T> {
     }
 
     private Subscription searchSub(ObservableValue<String> query) {
-
-        Val<List<SearchableTreeItem<T>>> allItems =
-            Val.wrap(rootProperty())
-               .map(it -> getRealRoot())
-               .map(it -> {
-                   List<SearchableTreeItem<T>> tmp = new ArrayList<>();
-                   it.foreach(tmp::add);
-                   return tmp;
-               })
-               .orElseConst(Collections.emptyList());
-
-
-        Val<String> queryVal = Val.wrap(query).filter(StringUtils::isNotBlank);
+        Val<String> queryVal = Val.wrap(query).filter(StringUtils::isNotBlank).map(String::trim)
+                                  .filter(it -> it.length() > 1);
 
         return ReactfxUtil.subscribeDynamic(
             queryVal,
             q -> {
-                Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults = allItems.map(it -> selectMatches(q, it));
+
+                Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults =
+                    Val.wrap(rootProperty())
+                       .map(it1 -> getRealRoot())
+                       .map(it1 -> {
+                           List<SearchableTreeItem<T>> tmp = new ArrayList<>();
+                           it1.foreach(tmp::add);
+                           return tmp;
+                       })
+                       .orElseConst(Collections.emptyList())
+                       // here we match the items
+                       .map(it -> selectMatches(q, it));
+
                 return selectedResults.values()
                                       .subscribe(newRes -> {
                                           // the values are never null, at most empty, because of orElseConst above
