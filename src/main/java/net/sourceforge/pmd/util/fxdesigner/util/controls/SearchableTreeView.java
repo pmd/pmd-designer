@@ -80,12 +80,15 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
         Bounds bounds = localToScreen(getBoundsInLocal());
         popup.show(this, bounds.getMaxX() - textField.getPrefWidth() - 5, bounds.getMinY());
-
         popup.setOnHidden(e -> subscription.unsubscribe());
 
+        // Hide popup when ENTER is pressed
         EventStreams.eventsOf(popup, KeyEvent.KEY_RELEASED)
                     .filter(it -> it.getCode() == KeyCode.ENTER)
-                    .subscribeForOne(e -> popup.hide());
+                    .subscribeForOne(e -> {
+                        popup.hide();
+                        e.consume();
+                    });
 
         textField.requestFocus();
     }
@@ -107,35 +110,57 @@ public class SearchableTreeView<T> extends TreeView<T> {
                                                        })
                                                        .orElseConst(Collections.emptyList());
 
-        return ReactfxUtil.subscribeDynamic(
+        return ReactfxUtil.subscribeDisposable(
             queryVal,
             q -> {
-
 
                 Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults =
                     allItems.map(it -> selectMatches(q, it));
 
-                return selectedResults.values()
-                                      .subscribe(newRes -> {
-                                          // the values are never null, at most empty, because of orElseConst above
-                                          newRes.forEach(res -> res.getData().currentSearchResult.setValue(res));
-                                          if (!newRes.isEmpty()) {
+                return ReactfxUtil.subscribeDisposable(
+                    selectedResults,
+                    newRes -> {
+                        // the values are never null, at most empty, because of orElseConst above
+                        newRes.forEach(res -> res.getData().currentSearchResult.setValue(res));
+                        Subscription sub = Subscription.EMPTY;
+                        if (!newRes.isEmpty()) {
 
-                                              int fst = newRes.get(0).getData().treeIndex;
-                                              getSelectionModel().select(fst);
+                            Var<Integer> curIdx = Var.newSimpleVar(0);
+                            curIdx.values()
+                                  .subscribe(idx -> {
+                                      SearchableTreeItem<T> item = newRes.get(idx).getData();
+                                      int row = getRow(item);
+                                      getSelectionModel().select(row);
 
-                                              if (!myWrapper.isIndexVisible(fst)) {
-                                                  scrollTo(fst);
-                                              }
-                                          }
-                                          refresh();
-                                      })
-                                      .and(() -> {
-                                          selectedResults.ifPresent(lst -> lst.forEach(it -> it.getData().currentSearchResult.setValue(null)));
-                                          refresh();
-                                      });
+                                      if (!myWrapper.isIndexVisible(row)) {
+                                          int safe = row < 3 ? 0 : row - 3;
+                                          scrollTo(safe);
+                                      }
+                                  });
+
+                            sub = sub.and(subscribeKeyNav(newRes.size(), curIdx));
+                        }
+                        refresh();
+                        return sub;
+                    }).and(
+                    () -> {
+                        selectedResults.ifPresent(lst -> lst.forEach(it -> it.getData().currentSearchResult.setValue(null)));
+                        refresh();
+                    });
             }
         );
+
+    }
+
+    private Subscription subscribeKeyNav(int numResults, Var<Integer> curIdx) {
+
+        return EventStreams.eventsOf(this, KeyEvent.KEY_RELEASED)
+                           .filter(it -> it.getCode() == KeyCode.F3)
+                           .subscribe(ke -> {
+                               curIdx.setValue((curIdx.getValue() + 1) % numResults);
+                               ke.consume();
+                           });
+
 
     }
 
