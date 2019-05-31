@@ -84,8 +84,6 @@ public class SourceEditorController extends AbstractController {
     private final Var<LiveTestCase> currentlyOpenTestCase = Var.newSimpleVar(null);
 
     @FXML
-    private TextField searchField;
-    @FXML
     private DynamicWidthChoicebox<LanguageVersion> languageChoiceBox;
     @FXML
     private ToolbarTitledPane testCaseToolsTitledPane;

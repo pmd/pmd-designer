@@ -84,9 +84,6 @@
                                 AnchorPane.leftAnchor="0.0"
                                 AnchorPane.rightAnchor="0.0"
                                 AnchorPane.topAnchor="0.0">
-                            <toolbarItems>
-                                <TextField fx:id="searchField"/>
-                            </toolbarItems>
 
                             <AstTreeView fx:id="astTreeView"/>
 
