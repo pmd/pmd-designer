@@ -4,8 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -45,7 +45,7 @@ public interface MatchLimiter {
 
                 MutableInt bestScore = new MutableInt(Integer.MIN_VALUE);
 
-                Set<MatchResult<T>> bestTies = new HashSet<>();
+                List<MatchResult<T>> bestTies = new ArrayList<>();
 
                 raw.forEach(it -> {
                     if (it.getScore() > bestScore.getValue()) {

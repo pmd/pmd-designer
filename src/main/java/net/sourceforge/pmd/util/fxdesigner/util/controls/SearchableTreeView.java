@@ -29,6 +29,8 @@ import javafx.scene.control.TreeView;
 
 public class SearchableTreeView<T> extends TreeView<T> {
 
+    private final TreeViewWrapper<T> myWrapper = new TreeViewWrapper<>(this);
+
 
     private StringMatchAlgo selector = new CamelCaseMatcher();
 
@@ -70,11 +72,18 @@ public class SearchableTreeView<T> extends TreeView<T> {
         return ReactfxUtil.subscribeDynamic(
             queryVal,
             q -> {
-                Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults = allItems.map(it -> selector.filterResults(it, SearchableTreeItem::getSearchableText, q, MatchLimiter.selectBestTies()).collect(Collectors.toList()));
+                Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults = allItems.map(it -> selectMatches(q, it));
                 return selectedResults.values()
                                       .subscribe(newRes -> {
                                           // the values are never null, at most empty, because of orElseConst above
                                           newRes.forEach(res -> res.getData().currentSearchResult.setValue(res));
+                                          if (!newRes.isEmpty()) {
+                                              getSelectionModel().select(newRes.get(0).getData());
+                                              int idx = getSelectionModel().getSelectedIndex();
+                                              if (!myWrapper.isIndexVisible(idx)) {
+                                                  scrollTo(idx);
+                                              }
+                                          }
                                           refresh();
                                       })
                                       .and(() -> {
@@ -84,6 +93,11 @@ public class SearchableTreeView<T> extends TreeView<T> {
             }
         );
 
+    }
+
+    private List<MatchResult<SearchableTreeItem<T>>> selectMatches(String query, List<SearchableTreeItem<T>> items) {
+        return selector.filterResults(items, SearchableTreeItem::getSearchableText, query, MatchLimiter.selectBestTies())
+                       .collect(Collectors.toList());
     }
 
     public static abstract class SearchableTreeItem<T> extends TreeItem<T> {
