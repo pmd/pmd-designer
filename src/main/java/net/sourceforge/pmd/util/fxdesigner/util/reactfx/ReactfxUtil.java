@@ -71,8 +71,8 @@ public final class ReactfxUtil {
      * Add a hook on the owner window. It's not possible to do this statically,
      * since at construction time the window might not be set.
      */
-    public static <T> Subscription subscribeDisposable(Val<T> node,
-                                                       Function<T, Subscription> subscriber) {
+    public static <T> Subscription subscribeDisposable(ObservableValue<? extends T> node,
+                                                       Function<? super T, Subscription> subscriber) {
         return ReactfxExtensions.dynamic(
             LiveList.wrapVal(node),
             (w, i) -> subscriber.apply(w)

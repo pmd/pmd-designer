@@ -43,10 +43,6 @@ public final class CamelCaseMatcher {
      *                            that can be used to break ties.
      */
     private static <T> MatchResult<T> computeMatchingSegments(T data, String candidate, String query, int fromIndex, boolean matchOnlyWordStarts) {
-        if (candidate.equalsIgnoreCase(query)) {
-            // perfect match
-            return perfectMatch(data, candidate, query);
-        }
 
         // Performs a left-to-right scan of the candidate string,
         // trying to assign each of the chars of the query to a

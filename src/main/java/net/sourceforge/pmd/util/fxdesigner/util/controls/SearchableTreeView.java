@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -27,13 +28,16 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Popup;
 
 public class SearchableTreeView<T> extends TreeView<T> {
@@ -64,23 +68,46 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
     private void popSearchField() {
         TextField textField = new TextField();
-
-
-        HBox box = new HBox(10., textField);
-
-        Val<String> query = Val.wrap(textField.textProperty());
         textField.setPrefWidth(150);
-        Subscription subscription = bindSearchQuery(query.conditionOnShowing(box));
+        textField.setPromptText("Search tree");
+        ControlUtil.makeTextFieldShowPromptEvenIfFocused(textField);
+
+        Label label = new Label();
+        label.getStyleClass().addAll("hint-label");
+        label.setTooltip(new Tooltip("Go to next result with F3"));
+
+        StackPane pane = new StackPane();
+        pane.getStyleClass().addAll("search-popup");
+        pane.getStylesheets().addAll(DesignerUtil.getCss("designer").toString());
+
+        StackPane.setAlignment(textField, Pos.TOP_RIGHT);
+        StackPane.setAlignment(label, Pos.BOTTOM_RIGHT);
+
+
+        pane.getChildren().addAll(textField, label);
+
+        Val<String> query = Val.wrap(textField.textProperty())
+                               .filter(StringUtils::isNotBlank).map(String::trim)
+                               .filter(it -> it.length() > 1);
+
+        Var<Integer> numResults = Var.newSimpleVar(0);
+
+        Subscription subscription = bindSearchQuery(query.conditionOnShowing(pane), numResults);
+
+        label.textProperty().bind(
+            numResults.map(n -> n == 0 ? "no match" : n == 1 ? "1 match" : n + " matches")
+        );
+
+        label.visibleProperty().bind(query.map(Objects::nonNull));
 
         Popup popup = new Popup();
-        popup.getScene().getStylesheets().addAll(DesignerUtil.getCss("designer").toExternalForm());
-        popup.getContent().addAll(box);
+        popup.getContent().addAll(pane);
         popup.setAutoHide(true);
         popup.setHideOnEscape(true);
 
         Bounds bounds = localToScreen(getBoundsInLocal());
-        popup.show(this, bounds.getMaxX() - textField.getPrefWidth() - 5, bounds.getMinY());
-        popup.setOnHidden(e -> subscription.unsubscribe());
+        popup.show(this, bounds.getMaxX() - textField.getPrefWidth() - 1, bounds.getMinY());
+        popup.setOnHidden(e -> subscription.unsubscribe()); // release resources
 
         // Hide popup when ENTER is pressed
         EventStreams.eventsOf(popup, KeyEvent.KEY_RELEASED)
@@ -96,10 +123,8 @@ public class SearchableTreeView<T> extends TreeView<T> {
     /**
      * Update the cells to search for anything.
      */
-    public final Subscription bindSearchQuery(ObservableValue<String> query) {
+    private Subscription bindSearchQuery(ObservableValue<String> query, Var<Integer> numResults) {
 
-        Val<String> queryVal = Val.wrap(query).filter(StringUtils::isNotBlank).map(String::trim)
-                                  .filter(it -> it.length() > 1);
 
         Val<List<SearchableTreeItem<T>>> allItems = Val.wrap(rootProperty())
                                                        .map(it1 -> getRealRoot())
@@ -111,7 +136,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                                                        .orElseConst(Collections.emptyList());
 
         return ReactfxUtil.subscribeDisposable(
-            queryVal,
+            query,
             q -> {
 
                 Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults =
@@ -120,6 +145,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                 return ReactfxUtil.subscribeDisposable(
                     selectedResults,
                     newRes -> {
+                        numResults.setValue(newRes.size());
                         // the values are never null, at most empty, because of orElseConst above
                         newRes.forEach(res -> res.getData().currentSearchResult.setValue(res));
                         Subscription sub = Subscription.EMPTY;
