@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.MatchResult;
-
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -21,7 +19,7 @@ import javafx.scene.text.TextFlow;
 /**
  * Selects the best match results given a list of candidates and a query.
  *
- * The results are useless unless you provide the {@link MatchLimiter} that
+ * The results are useless unless you provide the {@link MatchSelector} that
  * suits your use case.
  *
  * We can abstract that later if we need it. E.g. we could provide more
@@ -32,14 +30,14 @@ import javafx.scene.text.TextFlow;
  * @author Clément Fournier
  * @since 7.0.0
  */
-public class StringMatchAlgo {
+public final class StringMatchAlgo {
 
     public static final int MIN_QUERY_LENGTH = 1;
     public static final int WORST_SCORE = Integer.MIN_VALUE;
     public static final int PERFECT_SCORE = Integer.MAX_VALUE;
 
 
-    public static <T> Stream<MatchResult<T>> filterResults(List<T> candidates, Function<T, String> matchExtractor, String query, MatchLimiter<T> limiter) {
+    public static <T> Stream<MatchResult<T>> filterResults(List<T> candidates, Function<T, String> matchExtractor, String query, MatchSelector<T> limiter) {
         if (query.length() < MIN_QUERY_LENGTH) {
             return Stream.empty();
         }

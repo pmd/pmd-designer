@@ -12,7 +12,8 @@ import java.util.stream.Stream;
 
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.CamelCaseMatcher;
-import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchLimiter;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchResult;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchSelector;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchAlgo;
 
 
@@ -36,8 +37,8 @@ public final class XPathCompletionSource implements CompletionResultSource {
 
     }
 
-    private MatchLimiter<String> getLimiter(int limit) {
-        MatchLimiter<String> limited = MatchLimiter.limitToBest(limit);
+    private MatchSelector<String> getLimiter(int limit) {
+        MatchSelector<String> limited = MatchSelector.limitToBest(limit);
         return CamelCaseMatcher.<String>sparseCamelMatcher().andThen(limited)
                                                             .andThen(CamelCaseMatcher.onlyWordStarts())
                                                             .andThen(limited);

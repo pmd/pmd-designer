@@ -16,9 +16,9 @@ import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.MatchResult;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchResult;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.CamelCaseMatcher;
-import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchLimiter;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchSelector;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchAlgo;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
@@ -92,11 +92,11 @@ public class SearchableTreeView<T> extends TreeView<T> {
     }
 
     private List<MatchResult<SearchableTreeItem<T>>> selectMatches(String query, List<SearchableTreeItem<T>> items) {
-        MatchLimiter<SearchableTreeItem<T>> limiter =
+        MatchSelector<SearchableTreeItem<T>> limiter =
             CamelCaseMatcher.<SearchableTreeItem<T>>allQueryStarts()
                 .andThen(c -> c.filter(it -> it.getScore() > 0))
                 //.andThen(CamelCaseMatcher.onlyWordStarts())
-                .andThen(MatchLimiter.selectBestTies());
+                .andThen(MatchSelector.selectBestTies());
 
         return StringMatchAlgo.filterResults(items, SearchableTreeItem::getSearchableText, query, limiter)
                               .collect(Collectors.toList());

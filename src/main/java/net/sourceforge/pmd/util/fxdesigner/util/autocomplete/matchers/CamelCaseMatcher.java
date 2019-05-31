@@ -17,8 +17,6 @@ import static net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.Str
 
 import java.util.Locale;
 
-import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.MatchResult;
-
 import javafx.scene.text.TextFlow;
 
 
@@ -28,8 +26,12 @@ import javafx.scene.text.TextFlow;
  * @author Clément Fournier
  * @since 7.0.0
  */
-public class CamelCaseMatcher {
+public final class CamelCaseMatcher {
 
+
+    private CamelCaseMatcher() {
+
+    }
 
     /**
      * Computes a match result with its score for the candidate and query.
@@ -40,7 +42,7 @@ public class CamelCaseMatcher {
      * @param matchOnlyWordStarts Whether to only match word starts. This is a more unfair strategy
      *                            that can be used to break ties.
      */
-    private <T> MatchResult<T> computeMatchingSegments(T data, String candidate, String query, int fromIndex, boolean matchOnlyWordStarts) {
+    private static <T> MatchResult<T> computeMatchingSegments(T data, String candidate, String query, int fromIndex, boolean matchOnlyWordStarts) {
         if (candidate.equalsIgnoreCase(query)) {
             // perfect match
             return perfectMatch(data, candidate, query);
@@ -203,7 +205,7 @@ public class CamelCaseMatcher {
         return new MatchResult<>(finalScore, data, candidate, query, flow);
     }
 
-    private boolean isWordStart(String pascalCased, int idx, int fromIndex) {
+    private static boolean isWordStart(String pascalCased, int idx, int fromIndex) {
         if (idx == fromIndex || idx == 0) {
             return true;
         }
@@ -222,10 +224,9 @@ public class CamelCaseMatcher {
     }
 
     /**
-     * Breaks some ties, but still scans once left to right so misses some opportunities.
+     * Breaks some ties, by only matching the input words.
      */
-    public static <T> MatchLimiter<T> onlyWordStarts() {
-        CamelCaseMatcher matcher = new CamelCaseMatcher();
+    public static <T> MatchSelector<T> onlyWordStarts() {
         return raw -> raw.map(prev -> {
             // try to break ties between the top results, e.g.
             //
@@ -242,7 +243,7 @@ public class CamelCaseMatcher {
             //      candidate   ClassOrInterfaceDeclaration     : 32
             //                  ^    ^ ^ ^
 
-            MatchResult<T> refined = matcher.computeMatchingSegments(prev.getData(), prev.getStringMatch(), prev.getQuery(), 0, true);
+            MatchResult<T> refined = computeMatchingSegments(prev.getData(), prev.getStringMatch(), prev.getQuery(), 0, true);
             // keep the best
             return refined.getScore() > prev.getScore() ? refined : prev;
         });
@@ -250,13 +251,16 @@ public class CamelCaseMatcher {
 
 
     /**
-     * Enough when the candidate is a single word, but still scans once left to right
-     * so misses some opportunities. The
+     * Scans once left-to-right from the start, picking up on any character
+     * in scan order.
+     *
+     * <p>Enough when the candidate is a single word, but still scans only
+     * once so it may miss some opportunities. {@link #onlyWordStarts()} can
+     * be used to break ties (they look stupid with this matcher).
      */
-    public static <T> MatchLimiter<T> sparseCamelMatcher() {
-        CamelCaseMatcher matcher = new CamelCaseMatcher();
+    public static <T> MatchSelector<T> sparseCamelMatcher() {
         return raw -> raw.map(prev -> {
-            MatchResult<T> refined = matcher.computeMatchingSegments(prev.getData(), prev.getStringMatch(), prev.getQuery(), 0, false);
+            MatchResult<T> refined = computeMatchingSegments(prev.getData(), prev.getStringMatch(), prev.getQuery(), 0, false);
             // keep the best
             return refined.getScore() > prev.getScore() ? refined : prev;
         });
@@ -264,10 +268,10 @@ public class CamelCaseMatcher {
 
     /**
      * Scans several times from left to right, once for each of the possible
-     * match starts, and keeps the best result.
+     * match starts, and keeps the best result. This IMO gives the best results,
+     * especially when the candidate may be composed of several words.
      */
-    public static <T> MatchLimiter<T> allQueryStarts() {
-        CamelCaseMatcher matcher = new CamelCaseMatcher();
+    public static <T> MatchSelector<T> allQueryStarts() {
         return raw -> raw.map(prev -> {
             if (prev.getScore() == PERFECT_SCORE) {
                 return prev;
@@ -289,7 +293,7 @@ public class CamelCaseMatcher {
 
             MatchResult<T> best = prev;
             while (i >= 0) {
-                MatchResult<T> attempt = matcher.computeMatchingSegments(prev.getData(), cand, query, i, false);
+                MatchResult<T> attempt = computeMatchingSegments(prev.getData(), cand, query, i, false);
                 best = attempt.getScore() > best.getScore() ? attempt : best;
 
                 i = lowerCand.indexOf(first, i + 1);
