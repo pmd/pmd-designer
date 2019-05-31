@@ -13,13 +13,9 @@
 package net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers;
 
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
-import org.apache.commons.lang3.mutable.MutableInt;
 
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.MatchResult;
 
@@ -160,7 +156,11 @@ public class CamelCaseMatcher implements StringMatchAlgo {
                     //                   ^   ^   ^
                     //      score       6 = 2 + 2 + 2
 
-                    int multiplier = isStartOfWord ? 4 : 2;
+                    // matching at the very beginning of the candidate is heavily prioritized
+                    int multiplier =
+                        isStartOfWord && curMatchStart == 0 ? 8
+                                                            : isStartOfWord ? 4 : 2;
+
                     score += matchLength * multiplier;
                 }
 
