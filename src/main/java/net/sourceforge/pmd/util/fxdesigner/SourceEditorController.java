@@ -163,8 +163,6 @@ public class SourceEditorController extends AbstractController {
                                  .orElseConst("Expected violations")
         );
 
-        astTreeView.bindSearchQuery(searchField.textProperty());
-
         DragAndDropUtil.registerAsNodeDragTarget(
             violationsButton,
             range -> {

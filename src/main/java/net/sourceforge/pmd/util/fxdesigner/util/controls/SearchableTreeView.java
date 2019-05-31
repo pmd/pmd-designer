@@ -6,12 +6,14 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
@@ -23,15 +25,31 @@ import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatc
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javafx.stage.Popup;
 
 public class SearchableTreeView<T> extends TreeView<T> {
 
     private final TreeViewWrapper<T> myWrapper = new TreeViewWrapper<>(this);
 
     public SearchableTreeView() {
+
+
+        addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
+            System.out.println(evt);
+            // CTRL + F should be normal
+            if (evt.isControlDown() && evt.getCode() == KeyCode.F) {
+                popSearchField();
+                evt.consume();
+            }
+        });
 
     }
 
@@ -43,14 +61,39 @@ public class SearchableTreeView<T> extends TreeView<T> {
         return (SearchableTreeItem<T>) getRoot();
     }
 
+
+    private void popSearchField() {
+        TextField tf = new TextField();
+
+
+        HBox box = new HBox(10., tf);
+
+        Val<String> query = Val.wrap(tf.textProperty());
+        tf.setPrefWidth(150);
+        Subscription subscription = bindSearchQuery(query.conditionOnShowing(box));
+
+        Popup popup = new Popup();
+        popup.getContent().addAll(box);
+        popup.setAutoHide(true);
+        popup.setHideOnEscape(true);
+
+        Bounds bounds = localToScreen(getBoundsInLocal());
+        popup.show(this, bounds.getMaxX() - tf.getPrefWidth(), bounds.getMinY());
+
+        popup.setOnHidden(e -> subscription.unsubscribe());
+
+        EventStreams.eventsOf(popup, KeyEvent.KEY_RELEASED)
+                    .filter(it -> it.getCode() == KeyCode.ENTER)
+                    .subscribeForOne(e -> popup.hide());
+
+        tf.requestFocus();
+    }
+
     /**
      * Update the cells to search for anything.
      */
     public final Subscription bindSearchQuery(ObservableValue<String> query) {
-        return searchSub(query);
-    }
 
-    private Subscription searchSub(ObservableValue<String> query) {
         Val<String> queryVal = Val.wrap(query).filter(StringUtils::isNotBlank).map(String::trim)
                                   .filter(it -> it.length() > 1);
 
@@ -58,17 +101,17 @@ public class SearchableTreeView<T> extends TreeView<T> {
             queryVal,
             q -> {
 
+                Val<List<SearchableTreeItem<T>>> allItems = Val.wrap(rootProperty())
+                                                               .map(it1 -> getRealRoot())
+                                                               .map(it1 -> {
+                                                                   List<SearchableTreeItem<T>> tmp = new ArrayList<>();
+                                                                   it1.foreach(tmp::add);
+                                                                   return tmp;
+                                                               })
+                                                               .orElseConst(Collections.emptyList());
+
                 Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults =
-                    Val.wrap(rootProperty())
-                       .map(it1 -> getRealRoot())
-                       .map(it1 -> {
-                           List<SearchableTreeItem<T>> tmp = new ArrayList<>();
-                           it1.foreach(tmp::add);
-                           return tmp;
-                       })
-                       .orElseConst(Collections.emptyList())
-                       // here we match the items
-                       .map(it -> selectMatches(q, it));
+                    allItems.map(it -> selectMatches(q, it));
 
                 return selectedResults.values()
                                       .subscribe(newRes -> {
@@ -76,6 +119,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                                           newRes.forEach(res -> res.getData().currentSearchResult.setValue(res));
                                           if (!newRes.isEmpty()) {
                                               getSelectionModel().select(newRes.get(0).getData());
+
                                               int idx = getSelectionModel().getSelectedIndex();
                                               if (!myWrapper.isIndexVisible(idx)) {
                                                   scrollTo(idx);
@@ -92,6 +136,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
     }
 
+
     private List<MatchResult<SearchableTreeItem<T>>> selectMatches(String query, List<SearchableTreeItem<T>> items) {
         MatchSelector<SearchableTreeItem<T>> limiter =
             CamelCaseMatcher.<SearchableTreeItem<T>>allQueryStarts()
@@ -100,6 +145,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                 .andThen(MatchSelector.selectBestTies());
 
         return StringMatchAlgo.filterResults(items, SearchableTreeItem::getSearchableText, query, limiter)
+                              .sorted(Comparator.comparingInt(res -> res.getData().getTreeIndex()))
                               .collect(Collectors.toList());
     }
 
@@ -107,13 +153,13 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
         private final Var<SearchableTreeCell<T>> treeCell = Var.newSimpleVar(null);
         private final Var<MatchResult> currentSearchResult = Var.newSimpleVar(null);
+        private final int treeIndex;
 
-        public SearchableTreeItem() {
+        public SearchableTreeItem(T n, int treeIndex) {
+            super(n);
+            this.treeIndex = treeIndex;
         }
 
-        public SearchableTreeItem(T value) {
-            super(value);
-        }
 
         void foreach(Consumer<? super SearchableTreeItem<T>> consumer) {
             ASTTreeItem.foreach(this, consumer);
@@ -130,6 +176,9 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
         public abstract String getSearchableText();
 
+        public int getTreeIndex() {
+            return treeIndex;
+        }
     }
 
     public abstract static class SearchableTreeCell<T> extends TreeCell<T> {

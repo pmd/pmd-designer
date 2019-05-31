@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
@@ -36,8 +37,8 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> {
      */
     private final Var<Collection<String>> latentStyleClasses = Var.newSimpleVar(Collections.emptyList());
 
-    private ASTTreeItem(Node n) {
-        super(n);
+    private ASTTreeItem(Node n, int treeIndex) {
+        super(n, treeIndex);
         setExpanded(true);
 
         treeCellProperty().changes().subscribe(change -> {
@@ -120,10 +121,15 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> {
 
     /** Builds an ASTTreeItem recursively from a node. */
     static ASTTreeItem buildRoot(Node n) {
-        ASTTreeItem item = new ASTTreeItem(n);
+        return buildRootImpl(n, new MutableInt(0));
+    }
+
+    /** Builds an ASTTreeItem recursively from a node. */
+    private static ASTTreeItem buildRootImpl(Node n, MutableInt idx) {
+        ASTTreeItem item = new ASTTreeItem(n, idx.getAndIncrement());
         if (n.jjtGetNumChildren() > 0) {
             for (int i = 0; i < n.jjtGetNumChildren(); i++) {
-                item.getChildren().add(buildRoot(n.jjtGetChild(i)));
+                item.getChildren().add(buildRootImpl(n.jjtGetChild(i), idx));
             }
         }
         return item;

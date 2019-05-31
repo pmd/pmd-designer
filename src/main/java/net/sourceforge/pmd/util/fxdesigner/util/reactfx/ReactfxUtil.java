@@ -34,6 +34,8 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
+import javafx.scene.Node;
 
 /**
  * Extensions to ReactFX Val and EventStreams. Some can be deemed as too
@@ -83,6 +85,11 @@ public final class ReactfxUtil {
     public static <T extends Event> Subscription addEventHandler(Property<EventHandler<T>> addMethod, EventHandler<T> handler) {
         addMethod.setValue(handler);
         return () -> addMethod.setValue(null);
+    }
+
+    public static <T extends Event> Subscription addEventHandler(Node node, EventType<T> type, EventHandler<T> handler) {
+        node.addEventHandler(type, handler);
+        return () -> node.removeEventHandler(type, handler);
     }
 
     static Function<Runnable, Timer> defaultTimerFactory(Duration duration) {
