@@ -6,13 +6,14 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.DumpUtil.dumpToSubtreeTest;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.CompletionResult;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.SearchableTreeView.SearchableTreeCell;
-import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
@@ -68,15 +69,18 @@ public class ASTTreeCell extends SearchableTreeCell<Node> {
             setText(null);
             setGraphic(null);
         } else {
-            if (searchText.isPresent()) {
-                setGraphic(searchText.getValue());
-                setText(null);
-                return;
-            }
 
-            setGraphic(null);
-            setText(nodePresentableText(item));
-            setContextMenu(buildContextMenu(item));
+            searchFunctionProperty().changes().subscribe(it -> getTreeView().refresh());
+            Optional<CompletionResult> completionResult = searchFunctionProperty().getOpt().flatMap(it -> it.apply(nodePresentableText(item)));
+
+            if (completionResult.isPresent()) {
+                setGraphic(completionResult.get().getTextFlow());
+                setText(null);
+            } else {
+                setGraphic(null);
+                setText(nodePresentableText(item));
+                setContextMenu(buildContextMenu(item));
+            }
 
             DragAndDropUtil.registerAsNodeDragSource(this, item);
 
