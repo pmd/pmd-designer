@@ -20,13 +20,15 @@ public class MatchResult<T> implements Comparable<MatchResult<?>> {
     private final T data;
     private final String suggestion;
     private final TextFlow textFlow;
+    private final String query;
 
 
-    MatchResult(int score, T data, String suggestion, TextFlow textFlow) {
+    public MatchResult(int score, T data, String suggestion, String query, TextFlow textFlow) {
         this.score = score;
         this.data = data;
         this.suggestion = suggestion;
         this.textFlow = textFlow;
+        this.query = query;
     }
 
     public T getData() {
@@ -38,6 +40,10 @@ public class MatchResult<T> implements Comparable<MatchResult<?>> {
         return suggestion;
     }
 
+    public String getQuery() {
+        return query;
+    }
+
 
     /**
      * Formatted TextFlow with the match regions highlighted.
@@ -47,8 +53,12 @@ public class MatchResult<T> implements Comparable<MatchResult<?>> {
     }
 
 
-    /** Relevance score of this result. */
-    int getScore() {
+    /**
+     * Relevance score of this result. This is largely implementation specific
+     * and has no meaning unless comparing with results selected by the same implementation
+     * that produced this match.
+     */
+    public int getScore() {
         return score;
     }
 

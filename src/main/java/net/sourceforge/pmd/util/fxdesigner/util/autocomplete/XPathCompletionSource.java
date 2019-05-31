@@ -10,6 +10,9 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import net.sourceforge.pmd.lang.Language;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.CamelCaseMatcher;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchLimiter;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchAlgo;
 
 
 /**
@@ -18,7 +21,7 @@ import net.sourceforge.pmd.lang.Language;
 public final class XPathCompletionSource implements CompletionResultSource {
 
     private final NodeNameFinder myNameFinder;
-    private final ResultSelectionStrategy mySelectionStrategy = new ResultSelectionStrategy();
+    private final StringMatchAlgo mySelectionStrategy = new CamelCaseMatcher();
     // if we don't cache them the classpath exploration is done on each character typed
     private static final Map<Language, XPathCompletionSource> BY_LANGUAGE = new HashMap<>();
 
@@ -33,7 +36,7 @@ public final class XPathCompletionSource implements CompletionResultSource {
      */
     @Override
     public Stream<MatchResult<String>> getSortedMatches(String input, int limit) {
-        return mySelectionStrategy.filterResults(myNameFinder.getNodeNames(), Function.identity(), input, limit);
+        return mySelectionStrategy.filterResults(myNameFinder.getNodeNames(), Function.identity(), input, MatchLimiter.limited(limit));
     }
 
     /**

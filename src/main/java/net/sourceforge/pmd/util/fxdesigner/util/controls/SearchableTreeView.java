@@ -17,7 +17,9 @@ import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.MatchResult;
-import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.ResultSelectionStrategy;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.CamelCaseMatcher;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchLimiter;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchAlgo;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.beans.value.ObservableValue;
@@ -28,7 +30,7 @@ import javafx.scene.control.TreeView;
 public class SearchableTreeView<T> extends TreeView<T> {
 
 
-    private ResultSelectionStrategy selector = new ResultSelectionStrategy();
+    private StringMatchAlgo selector = new CamelCaseMatcher();
 
 
     public SearchableTreeView() {
@@ -70,7 +72,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
             q -> {
                 final int resultLimit = 10;
 
-                Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults = allItems.map(it -> selector.filterResults(it, SearchableTreeItem::getSearchableText, q, resultLimit).collect(Collectors.toList()));
+                Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults = allItems.map(it -> selector.filterResults(it, SearchableTreeItem::getSearchableText, q, MatchLimiter.limited(resultLimit)).collect(Collectors.toList()));
                 return selectedResults.values()
                                       .subscribe(newRes -> {
                                           // the values are never null, at most empty, because of orElseConst above
