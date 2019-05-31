@@ -4,6 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.autocomplete;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -19,6 +20,13 @@ import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatc
  * Language specific tool to suggest auto-completion results.
  */
 public final class XPathCompletionSource implements CompletionResultSource {
+
+    private static final Comparator<? extends MatchResult<?>> DISPLAY_ORDER =
+        Comparator.<MatchResult<?>>naturalOrder()
+            .reversed()
+            // shorter results are displayed first when there's a tie
+            .thenComparing(MatchResult::getStringMatch, Comparator.comparing(String::length));
+
 
     private final NodeNameFinder myNameFinder;
     private final StringMatchAlgo mySelectionStrategy = new CamelCaseMatcher();
@@ -36,7 +44,8 @@ public final class XPathCompletionSource implements CompletionResultSource {
      */
     @Override
     public Stream<MatchResult<String>> getSortedMatches(String input, int limit) {
-        return mySelectionStrategy.filterResults(myNameFinder.getNodeNames(), Function.identity(), input, MatchLimiter.limited(limit));
+        return mySelectionStrategy.filterResults(myNameFinder.getNodeNames(), Function.identity(), input, MatchLimiter.limited(limit))
+                                  .sorted(displayOrder());
     }
 
     /**
@@ -44,5 +53,11 @@ public final class XPathCompletionSource implements CompletionResultSource {
      */
     public static XPathCompletionSource forLanguage(Language language) {
         return BY_LANGUAGE.computeIfAbsent(language, l -> new XPathCompletionSource(NodeNameFinder.forLanguage(l)));
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private static <T> Comparator<MatchResult<T>> displayOrder() {
+        return (Comparator<MatchResult<T>>) DISPLAY_ORDER;
     }
 }

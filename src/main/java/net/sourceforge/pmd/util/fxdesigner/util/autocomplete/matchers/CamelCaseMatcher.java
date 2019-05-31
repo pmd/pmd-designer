@@ -33,11 +33,6 @@ public class CamelCaseMatcher implements StringMatchAlgo {
 
     private static final int MIN_QUERY_LENGTH = 1;
 
-    private static final Comparator<? extends MatchResult<?>> DISPLAY_ORDER =
-        Comparator.<MatchResult<?>>naturalOrder()
-            .reversed()
-            // shorter results are displayed first when there's a tie
-            .thenComparing(MatchResult::getStringMatch, Comparator.comparing(String::length));
 
     @Override
     public <T> Stream<MatchResult<T>> filterResults(List<T> candidates, Function<T, String> candExtractor, String query, MatchLimiter limiter) {
@@ -54,7 +49,7 @@ public class CamelCaseMatcher implements StringMatchAlgo {
         Stream<MatchResult<T>> tieBreak = simpleCamelCaseWordStart().selectBest(limiter.selectBest(preFilter));
 
 
-        return limiter.selectBest(tieBreak).sorted(displayOrder());
+        return limiter.selectBest(tieBreak);
 
 
     }
@@ -279,11 +274,6 @@ public class CamelCaseMatcher implements StringMatchAlgo {
                 });
             }
         };
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> Comparator<MatchResult<T>> displayOrder() {
-        return (Comparator<MatchResult<T>>) DISPLAY_ORDER;
     }
 
 }
