@@ -12,14 +12,13 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Stream;
+import static net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchAlgo.PERFECT_SCORE;
+import static net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchAlgo.WORST_SCORE;
+
+import java.util.Locale;
 
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.MatchResult;
 
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 
@@ -29,44 +28,22 @@ import javafx.scene.text.TextFlow;
  * @author Clément Fournier
  * @since 7.0.0
  */
-public class CamelCaseMatcher implements StringMatchAlgo {
+public class CamelCaseMatcher {
 
-    private static final int MIN_QUERY_LENGTH = 1;
-
-
-    @Override
-    public <T> Stream<MatchResult<T>> filterResults(List<T> candidates, Function<T, String> candExtractor, String query, MatchLimiter limiter) {
-        if (query.length() < MIN_QUERY_LENGTH) {
-            return Stream.empty();
-        }
-
-        Stream<MatchResult<T>> preFilter = candidates.stream()
-                                                     .map(cand -> computeMatchingSegments(cand, candExtractor.apply(cand), query, false))
-                                                     .sorted(Comparator.<MatchResult<?>>naturalOrder().reversed())
-                                                     .filter(it -> it.getScore() > 0);
-
-        // second pass is done only on those we know we'll keep
-        Stream<MatchResult<T>> tieBreak = simpleCamelCaseWordStart().selectBest(limiter.selectBest(preFilter));
-
-
-        return limiter.selectBest(tieBreak);
-
-
-    }
 
     /**
      * Computes a match result with its score for the candidate and query.
      *
      * @param candidate           Candidate string
      * @param query               Query
+     * @param fromIndex           Index in the candidate where to start the match
      * @param matchOnlyWordStarts Whether to only match word starts. This is a more unfair strategy
      *                            that can be used to break ties.
      */
-    private <T> MatchResult<T> computeMatchingSegments(T data, String candidate, String query, boolean matchOnlyWordStarts) {
+    private <T> MatchResult<T> computeMatchingSegments(T data, String candidate, String query, int fromIndex, boolean matchOnlyWordStarts) {
         if (candidate.equalsIgnoreCase(query)) {
             // perfect match
-            TextFlow flow = new TextFlow(makeHighlightedText(candidate));
-            return new MatchResult<>(Integer.MAX_VALUE, data, candidate, query, flow);
+            return perfectMatch(data, candidate, query);
         }
 
         // Performs a left-to-right scan of the candidate string,
@@ -83,7 +60,7 @@ public class CamelCaseMatcher implements StringMatchAlgo {
         // This algorithm is greedy and doesn't always select the best possible match result
         // The second pass is even more unfair and allows to break ties
 
-        int candIdx = 0;  // current index in the candidate
+        int candIdx = fromIndex;  // current index in the candidate
         int queryIdx = 0; // current index in the query
         int score = 0;
 
@@ -108,7 +85,7 @@ public class CamelCaseMatcher implements StringMatchAlgo {
                 if (curMatchStart == -1) {
                     // start of a match
 
-                    if (matchOnlyWordStarts && !isStartOfWord && !isWordStart(candidate, candIdx)) {
+                    if (matchOnlyWordStarts && !isStartOfWord && !isWordStart(candidate, candIdx, fromIndex)) {
                         // not the start of a word, don't record it as a match
                         candIdx++;
                         continue;
@@ -117,7 +94,7 @@ public class CamelCaseMatcher implements StringMatchAlgo {
                     // set match start to current
                     curMatchStart = candIdx;
 
-                    if (isWordStart(candidate, candIdx)) {
+                    if (isWordStart(candidate, candIdx, fromIndex)) {
                         // start of a match on the start of a word
                         // e.g. query       coit
                         //      candidate   ClassOrInterfaceType
@@ -173,10 +150,10 @@ public class CamelCaseMatcher implements StringMatchAlgo {
                     String match = candidate.substring(curMatchStart, curMatchStart + matchLength);
 
                     if (before.length() > 0) {
-                        flow.getChildren().add(makeNormalText(before));
+                        flow.getChildren().add(StringMatchAlgo.makeNormalText(before));
                     }
 
-                    flow.getChildren().add(makeHighlightedText(match));
+                    flow.getChildren().add(StringMatchAlgo.makeHighlightedText(match));
 
                     lastMatchEnd = curMatchStart + matchLength;
                 }
@@ -200,10 +177,10 @@ public class CamelCaseMatcher implements StringMatchAlgo {
             String match = candidate.substring(curMatchStart, candIdx);
 
             if (before.length() > 0) {
-                flow.getChildren().add(makeNormalText(before));
+                flow.getChildren().add(StringMatchAlgo.makeNormalText(before));
             }
 
-            flow.getChildren().add(makeHighlightedText(match));
+            flow.getChildren().add(StringMatchAlgo.makeHighlightedText(match));
 
             lastMatchEnd = candIdx; // shift
         }
@@ -211,14 +188,14 @@ public class CamelCaseMatcher implements StringMatchAlgo {
         // add the rest of the candidate
         String rest = candidate.substring(lastMatchEnd);
         if (!rest.isEmpty()) {
-            flow.getChildren().add(makeNormalText(rest));
+            flow.getChildren().add(StringMatchAlgo.makeNormalText(rest));
         }
 
         int remainingChars = query.length() - queryIdx;
 
         if (remainingChars > 0) {
             // some chars were not found, penalize that
-            score -= remainingChars * 5;
+            //            score -= remainingChars * 5;
         }
 
         final int finalScore = score;
@@ -226,54 +203,101 @@ public class CamelCaseMatcher implements StringMatchAlgo {
         return new MatchResult<>(finalScore, data, candidate, query, flow);
     }
 
-    private Text makeHighlightedText(String match) {
-        Text matchLabel = makeNormalText(match);
-        matchLabel.getStyleClass().add("autocomplete-match");
-        return matchLabel;
+    private boolean isWordStart(String pascalCased, int idx, int fromIndex) {
+        if (idx == fromIndex || idx == 0) {
+            return true;
+        }
+        char c = pascalCased.charAt(idx);
+        char prev = pascalCased.charAt(idx - 1);
+        return Character.isUpperCase(c) && Character.isLowerCase(prev)
+            || Character.isAlphabetic(c) && !Character.isAlphabetic(prev);
     }
 
-    private Text makeNormalText(String text) {
-        Text matchLabel = new Text(text);
-        matchLabel.getStyleClass().add("text");
-        return matchLabel;
+    private static <T> MatchResult<T> impossibleMatch(T data, String candidate, String query) {
+        return new MatchResult<>(WORST_SCORE, data, candidate, query, new TextFlow(StringMatchAlgo.makeNormalText(candidate)));
     }
 
-    private boolean isWordStart(String pascalCased, int idx) {
-        return idx == 0 || Character.isUpperCase(pascalCased.charAt(idx)) && Character.isLowerCase(pascalCased.charAt(
-            idx - 1));
+    private static <T> MatchResult<T> perfectMatch(T data, String candidate, String query) {
+        return new MatchResult<>(PERFECT_SCORE, data, candidate, query, new TextFlow(StringMatchAlgo.makeHighlightedText(candidate)));
     }
-
 
     /**
      * Breaks some ties, but still scans once left to right so misses some opportunities.
      */
-    public MatchLimiter simpleCamelCaseWordStart() {
-        return new MatchLimiter() {
-            @Override
-            public <T> Stream<MatchResult<T>> selectBest(Stream<MatchResult<T>> raw) {
-                return raw.map(prev -> {
-                    // try to break ties between the top results, e.g.
-                    //
-                    // without second pass, we have a tie:
-                    //      query       coit
-                    //      candidate   ClassOrInterfaceType            : 32
-                    //      candidate   ClassOrInterfaceBodyDeclaration : 32
-                    //                  ^    ^ ^ ^
-                    // with second pass:
-                    //
-                    //      query       coit
-                    //      candidate   ClassOrInterfaceType            : 40 -> and indeed it's a better match
-                    //                  ^    ^ ^        ^
-                    //      candidate   ClassOrInterfaceDeclaration     : 32
-                    //                  ^    ^ ^ ^
+    public static <T> MatchLimiter<T> onlyWordStarts() {
+        CamelCaseMatcher matcher = new CamelCaseMatcher();
+        return raw -> raw.map(prev -> {
+            // try to break ties between the top results, e.g.
+            //
+            // without second pass, we have a tie:
+            //      query       coit
+            //      candidate   ClassOrInterfaceType            : 32
+            //      candidate   ClassOrInterfaceBodyDeclaration : 32
+            //                  ^    ^ ^ ^
+            // with second pass:
+            //
+            //      query       coit
+            //      candidate   ClassOrInterfaceType            : 40 -> and indeed it's a better match
+            //                  ^    ^ ^        ^
+            //      candidate   ClassOrInterfaceDeclaration     : 32
+            //                  ^    ^ ^ ^
 
-                    MatchResult<T> refined = computeMatchingSegments(prev.getData(), prev.getStringMatch(), prev.getQuery(), true);
-                    // keep the best
-                    return refined.getScore() > prev.getScore() ? refined
-                                                                : prev;
-                });
+            MatchResult<T> refined = matcher.computeMatchingSegments(prev.getData(), prev.getStringMatch(), prev.getQuery(), 0, true);
+            // keep the best
+            return refined.getScore() > prev.getScore() ? refined : prev;
+        });
+    }
+
+
+    /**
+     * Enough when the candidate is a single word, but still scans once left to right
+     * so misses some opportunities. The
+     */
+    public static <T> MatchLimiter<T> sparseCamelMatcher() {
+        CamelCaseMatcher matcher = new CamelCaseMatcher();
+        return raw -> raw.map(prev -> {
+            MatchResult<T> refined = matcher.computeMatchingSegments(prev.getData(), prev.getStringMatch(), prev.getQuery(), 0, false);
+            // keep the best
+            return refined.getScore() > prev.getScore() ? refined : prev;
+        });
+    }
+
+    /**
+     * Scans several times from left to right, once for each of the possible
+     * match starts, and keeps the best result.
+     */
+    public static <T> MatchLimiter<T> allQueryStarts() {
+        CamelCaseMatcher matcher = new CamelCaseMatcher();
+        return raw -> raw.map(prev -> {
+            if (prev.getScore() == PERFECT_SCORE) {
+                return prev;
             }
-        };
+
+            String query = prev.getQuery();
+            String cand = prev.getStringMatch();
+            String lowerCand = cand.toLowerCase(Locale.ROOT);
+            char first = Character.toLowerCase(query.charAt(0));
+            int i = lowerCand.indexOf(first);
+
+            if (i < 0) {
+                // impossible match
+                // the algo scans left to right and begins giving out points on the first
+                // occurrence of the first char of the query
+                // we can weed this case immediately
+                return impossibleMatch(prev.getData(), cand, query);
+            }
+
+            MatchResult<T> best = prev;
+            while (i >= 0) {
+                MatchResult<T> attempt = matcher.computeMatchingSegments(prev.getData(), cand, query, i, false);
+                best = attempt.getScore() > best.getScore() ? attempt : best;
+
+                i = lowerCand.indexOf(first, i + 1);
+            }
+
+
+            return best;
+        });
     }
 
 }

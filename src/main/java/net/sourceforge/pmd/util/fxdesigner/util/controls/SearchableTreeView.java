@@ -31,10 +31,6 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
     private final TreeViewWrapper<T> myWrapper = new TreeViewWrapper<>(this);
 
-
-    private StringMatchAlgo selector = new CamelCaseMatcher();
-
-
     public SearchableTreeView() {
 
     }
@@ -96,8 +92,14 @@ public class SearchableTreeView<T> extends TreeView<T> {
     }
 
     private List<MatchResult<SearchableTreeItem<T>>> selectMatches(String query, List<SearchableTreeItem<T>> items) {
-        return selector.filterResults(items, SearchableTreeItem::getSearchableText, query, MatchLimiter.selectBestTies())
-                       .collect(Collectors.toList());
+        MatchLimiter<SearchableTreeItem<T>> limiter =
+            CamelCaseMatcher.<SearchableTreeItem<T>>allQueryStarts()
+                .andThen(c -> c.filter(it -> it.getScore() > 0))
+                //.andThen(CamelCaseMatcher.onlyWordStarts())
+                .andThen(MatchLimiter.selectBestTies());
+
+        return StringMatchAlgo.filterResults(items, SearchableTreeItem::getSearchableText, query, limiter)
+                              .collect(Collectors.toList());
     }
 
     public static abstract class SearchableTreeItem<T> extends TreeItem<T> {

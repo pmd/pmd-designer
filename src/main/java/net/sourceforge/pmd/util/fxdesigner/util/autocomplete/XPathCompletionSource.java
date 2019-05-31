@@ -26,17 +26,23 @@ public final class XPathCompletionSource implements CompletionResultSource {
             .reversed()
             // shorter results are displayed first when there's a tie
             .thenComparing(MatchResult::getStringMatch, Comparator.comparing(String::length));
-
-
-    private final NodeNameFinder myNameFinder;
-    private final StringMatchAlgo mySelectionStrategy = new CamelCaseMatcher();
     // if we don't cache them the classpath exploration is done on each character typed
     private static final Map<Language, XPathCompletionSource> BY_LANGUAGE = new HashMap<>();
+    private final NodeNameFinder myNameFinder;
 
     private XPathCompletionSource(NodeNameFinder nodeNameFinder) {
         this.myNameFinder = nodeNameFinder;
+
+
     }
 
+    private MatchLimiter<String> getLimiter(int limit) {
+        MatchLimiter<String> limited = MatchLimiter.limitToBest(limit);
+        return CamelCaseMatcher.<String>sparseCamelMatcher().andThen(limited)
+                                                            .andThen(CamelCaseMatcher.onlyWordStarts())
+                                                            .andThen(limited);
+
+    }
 
     /**
      * Returns a stream of pre-built TextFlows sorted by relevance.
@@ -44,8 +50,13 @@ public final class XPathCompletionSource implements CompletionResultSource {
      */
     @Override
     public Stream<MatchResult<String>> getSortedMatches(String input, int limit) {
-        return mySelectionStrategy.filterResults(myNameFinder.getNodeNames(), Function.identity(), input, MatchLimiter.limited(limit))
-                                  .sorted(displayOrder());
+
+        return StringMatchAlgo.filterResults(
+            myNameFinder.getNodeNames(),
+            Function.identity(),
+            input,
+            getLimiter(limit)
+        ).sorted(displayOrder());
     }
 
     /**
