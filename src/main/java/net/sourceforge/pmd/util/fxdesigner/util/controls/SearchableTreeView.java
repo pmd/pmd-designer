@@ -18,6 +18,7 @@ import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.CamelCaseMatcher;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchResult;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchSelector;
@@ -43,7 +44,6 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
 
         addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
-            System.out.println(evt);
             // CTRL + F should be normal
             if (evt.isControlDown() && evt.getCode() == KeyCode.F) {
                 popSearchField();
@@ -63,22 +63,23 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
 
     private void popSearchField() {
-        TextField tf = new TextField();
+        TextField textField = new TextField();
 
 
-        HBox box = new HBox(10., tf);
+        HBox box = new HBox(10., textField);
 
-        Val<String> query = Val.wrap(tf.textProperty());
-        tf.setPrefWidth(150);
+        Val<String> query = Val.wrap(textField.textProperty());
+        textField.setPrefWidth(150);
         Subscription subscription = bindSearchQuery(query.conditionOnShowing(box));
 
         Popup popup = new Popup();
+        popup.getScene().getStylesheets().addAll(DesignerUtil.getCss("designer").toExternalForm());
         popup.getContent().addAll(box);
         popup.setAutoHide(true);
         popup.setHideOnEscape(true);
 
         Bounds bounds = localToScreen(getBoundsInLocal());
-        popup.show(this, bounds.getMaxX() - tf.getPrefWidth(), bounds.getMinY());
+        popup.show(this, bounds.getMaxX() - textField.getPrefWidth() - 5, bounds.getMinY());
 
         popup.setOnHidden(e -> subscription.unsubscribe());
 
@@ -86,7 +87,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                     .filter(it -> it.getCode() == KeyCode.ENTER)
                     .subscribeForOne(e -> popup.hide());
 
-        tf.requestFocus();
+        textField.requestFocus();
     }
 
     /**
@@ -97,18 +98,19 @@ public class SearchableTreeView<T> extends TreeView<T> {
         Val<String> queryVal = Val.wrap(query).filter(StringUtils::isNotBlank).map(String::trim)
                                   .filter(it -> it.length() > 1);
 
+        Val<List<SearchableTreeItem<T>>> allItems = Val.wrap(rootProperty())
+                                                       .map(it1 -> getRealRoot())
+                                                       .map(it1 -> {
+                                                           List<SearchableTreeItem<T>> tmp = new ArrayList<>();
+                                                           it1.foreach(tmp::add);
+                                                           return tmp;
+                                                       })
+                                                       .orElseConst(Collections.emptyList());
+
         return ReactfxUtil.subscribeDynamic(
             queryVal,
             q -> {
 
-                Val<List<SearchableTreeItem<T>>> allItems = Val.wrap(rootProperty())
-                                                               .map(it1 -> getRealRoot())
-                                                               .map(it1 -> {
-                                                                   List<SearchableTreeItem<T>> tmp = new ArrayList<>();
-                                                                   it1.foreach(tmp::add);
-                                                                   return tmp;
-                                                               })
-                                                               .orElseConst(Collections.emptyList());
 
                 Val<List<MatchResult<SearchableTreeItem<T>>>> selectedResults =
                     allItems.map(it -> selectMatches(q, it));
@@ -118,11 +120,12 @@ public class SearchableTreeView<T> extends TreeView<T> {
                                           // the values are never null, at most empty, because of orElseConst above
                                           newRes.forEach(res -> res.getData().currentSearchResult.setValue(res));
                                           if (!newRes.isEmpty()) {
-                                              getSelectionModel().select(newRes.get(0).getData());
 
-                                              int idx = getSelectionModel().getSelectedIndex();
-                                              if (!myWrapper.isIndexVisible(idx)) {
-                                                  scrollTo(idx);
+                                              int fst = newRes.get(0).getData().treeIndex;
+                                              getSelectionModel().select(fst);
+
+                                              if (!myWrapper.isIndexVisible(fst)) {
+                                                  scrollTo(fst);
                                               }
                                           }
                                           refresh();
