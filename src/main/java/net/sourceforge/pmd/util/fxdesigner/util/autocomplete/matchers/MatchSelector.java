@@ -5,12 +5,11 @@
 package net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-
-import org.apache.commons.lang3.mutable.MutableInt;
-
 
 /**
  * Strategy to filter {@link MatchResult}s.
@@ -51,21 +50,21 @@ public interface MatchSelector<T> {
      */
     static <T> MatchSelector<T> selectBestTies() {
         return raw -> {
+            // the raw stream may be parallel
 
-            MutableInt bestScore = new MutableInt(Integer.MIN_VALUE);
+            AtomicInteger bestScore = new AtomicInteger(Integer.MIN_VALUE);
 
-            List<MatchResult<T>> bestTies = new ArrayList<>();
+            List<MatchResult<T>> bestTies = Collections.synchronizedList(new ArrayList<>());
 
             raw.forEach(it -> {
-                if (it.getScore() > bestScore.getValue()) {
-                    bestScore.setValue(it.getScore());
+                if (it.getScore() > bestScore.get()) {
+                    bestScore.set(it.getScore());
                     bestTies.clear();
                     bestTies.add(it);
-                } else if (it.getScore() == bestScore.getValue()) {
+                } else if (it.getScore() == bestScore.get()) {
                     bestTies.add(it);
                 }
             });
-
 
             return bestTies.stream();
         };

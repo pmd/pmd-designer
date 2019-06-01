@@ -269,9 +269,7 @@ public final class CamelCaseMatcher {
      * quite costly when there are many suggestions though.
      */
     public static <T> MatchSelector<T> allQueryStarts() {
-        // we make this parallel because it may speed it up,
-        // and the pipeline is completely associative
-        return raw -> raw.parallel().map(prev -> {
+        return raw -> raw.map(prev -> {
             if (prev.getScore() == PERFECT_SCORE) {
                 return prev;
             }

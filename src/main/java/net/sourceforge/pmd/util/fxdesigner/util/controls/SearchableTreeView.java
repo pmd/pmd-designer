@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -209,7 +210,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
         MatchSelector<SearchableTreeItem<T>> limiter =
             CamelCaseMatcher.<SearchableTreeItem<T>>allQueryStarts()
                 .andThen(c -> c.filter(it -> it.getScore() > 0))
-                //.andThen(CamelCaseMatcher.onlyWordStarts())
+                .andThen(Stream::parallel)
                 .andThen(MatchSelector.selectBestTies());
 
         return StringMatchAlgo.filterResults(items, SearchableTreeItem::getSearchableText, query, limiter)
