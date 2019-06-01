@@ -39,35 +39,36 @@ public abstract class XPathUpdateSubscriber implements ApplicationComponent {
             astManager.ruleProperties().values().withDefaultEvent(Collections.emptyMap())
         );
 
-        subscription = merged.subscribe(tick -> {
-                                     Node compil = astManager.compilationUnitProperty().getOrElse(null);
-                                     VersionedXPathQuery query = service.latestMessage().getOrElse(null);
-                                     Map<String, String> props = astManager.ruleProperties().getOrElse(Collections.emptyMap());
+        subscription = merged.subscribe(
+            tick -> {
+                Node compil = astManager.compilationUnitProperty().getOrElse(null);
+                VersionedXPathQuery query = service.latestMessage().getOrElse(null);
+                Map<String, String> props = astManager.ruleProperties().getOrElse(Collections.emptyMap());
 
-                                     if (compil == null) {
-                                         handleNoCompilationUnit();
-                                         return;
-                                     }
-                                     if (query == null || StringUtils.isBlank(query.getExpression())) {
-                                         handleNoXPath();
-                                         return;
-                                     }
+                if (compil == null) {
+                    handleNoCompilationUnit();
+                    return;
+                }
+                if (query == null || StringUtils.isBlank(query.getExpression())) {
+                    handleNoXPath();
+                    return;
+                }
 
 
-                                     try {
-                                         List<Node> results = XPathEvaluator.evaluateQuery(compil,
-                                                                                           astManager.languageVersionProperty().getValue(),
-                                                                                           query.getVersion(),
-                                                                                           query.getExpression(),
-                                                                                           props,
-                                                                                           query.getDefinedProperties());
+                try {
+                    List<Node> results = XPathEvaluator.evaluateQuery(compil,
+                                                                      astManager.languageVersionProperty().getValue(),
+                                                                      query.getVersion(),
+                                                                      query.getExpression(),
+                                                                      props,
+                                                                      query.getDefinedProperties());
 
-                                         handleXPathSuccess(results);
-                                     } catch (XPathEvaluationException e) {
-                                         handleXPathError(e);
-                                     }
+                    handleXPathSuccess(results);
+                } catch (XPathEvaluationException e) {
+                    handleXPathError(e);
+                }
 
-                                 });
+            });
 
         return this::unsubscribe;
     }

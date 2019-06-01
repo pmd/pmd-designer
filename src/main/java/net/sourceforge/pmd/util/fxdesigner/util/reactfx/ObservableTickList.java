@@ -42,16 +42,8 @@ public final class ObservableTickList<E> extends BaseObservableListDelegate<E> {
         extends ArrayList<QuasiListModification<? extends E>>
         implements QuasiListChange<E> {
 
-        public MyQuasiChange() {
+        MyQuasiChange() {
             super();
-        }
-
-        public MyQuasiChange(int initialCapacity) {
-            super(initialCapacity);
-        }
-
-        public MyQuasiChange(QuasiListChange<E> change) {
-            super(change.getModifications());
         }
 
         @Override

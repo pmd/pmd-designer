@@ -92,7 +92,7 @@ public class SourceEditorController extends AbstractController {
     @FXML
     private Button convertToTestCaseButton;
     @FXML
-    private DynamicWidthChoicebox<LanguageVersion> languageChoiceBox;
+    private DynamicWidthChoicebox<LanguageVersion> languageChoicebox;
     @FXML
     private ToolbarTitledPane testCaseToolsTitledPane;
     @FXML
@@ -284,11 +284,11 @@ public class SourceEditorController extends AbstractController {
 
 
     private void initializeLanguageSelector() {
-        languageChoiceBox.getItems().addAll(getSupportedLanguageVersions().stream().sorted().collect(Collectors.toList()));
+        languageChoicebox.getItems().addAll(getSupportedLanguageVersions().stream().sorted().collect(Collectors.toList()));
 
-        languageChoiceBox.setConverter(DesignerUtil.stringConverter(LanguageVersion::getName, LanguageRegistryUtil::getLanguageVersionByName));
+        languageChoicebox.setConverter(DesignerUtil.stringConverter(LanguageVersion::getName, LanguageRegistryUtil::getLanguageVersionByName));
 
-        languageVersionUIProperty = Var.suspendable(languageChoiceBox.valueProperty());
+        languageVersionUIProperty = Var.suspendable(languageChoicebox.valueProperty());
         // this will be overwritten by property restore if needed
         languageVersionUIProperty.setValue(defaultLanguageVersion());
     }

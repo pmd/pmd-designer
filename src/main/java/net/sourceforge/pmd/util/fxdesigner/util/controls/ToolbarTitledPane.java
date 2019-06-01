@@ -13,7 +13,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 

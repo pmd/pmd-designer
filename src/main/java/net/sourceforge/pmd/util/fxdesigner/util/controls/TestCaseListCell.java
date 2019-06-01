@@ -217,7 +217,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
 
         private final LiveTestCase testCase;
 
-        public MyXPathSubscriber(LiveTestCase testCase, DesignerRoot root) {
+        MyXPathSubscriber(LiveTestCase testCase, DesignerRoot root) {
             super(root);
             this.testCase = testCase;
         }

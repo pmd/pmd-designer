@@ -14,7 +14,7 @@ import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.CamelCaseMatcher;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchResult;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchSelector;
-import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchAlgo;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchUtil;
 
 
 /**
@@ -52,7 +52,7 @@ public final class XPathCompletionSource implements CompletionResultSource {
     @Override
     public Stream<MatchResult<String>> getSortedMatches(String input, int limit) {
 
-        return StringMatchAlgo.filterResults(
+        return StringMatchUtil.filterResults(
             myNameFinder.getNodeNames(),
             Function.identity(),
             input,

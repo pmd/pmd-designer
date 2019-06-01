@@ -2,10 +2,6 @@
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
-/*
- * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
- */
-
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.util.function.Consumer;
@@ -59,8 +55,8 @@ public final class DragAndDropUtil {
      */
     public static void registerAsNodeDragTarget(javafx.scene.Node target, Consumer<TextRange> nodeRangeConsumer) {
         target.setOnDragOver(evt -> {
-            if (evt.getGestureSource() != target &&
-                evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
+            if (evt.getGestureSource() != target
+                && evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
                 /* allow for both copying and moving, whatever user chooses */
                 evt.acceptTransferModes(TransferMode.LINK);
             }
@@ -68,8 +64,8 @@ public final class DragAndDropUtil {
         });
 
         target.setOnDragEntered(evt -> {
-            if (evt.getGestureSource() != target &&
-                evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
+            if (evt.getGestureSource() != target
+                && evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
                 target.getStyleClass().addAll(NODE_DRAG_OVER);
             }
             evt.consume();

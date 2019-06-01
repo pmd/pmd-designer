@@ -1,4 +1,4 @@
-/**
+/*
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
@@ -63,7 +63,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.XpathViolationListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -366,6 +365,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
         expressionTitledPane.errorMessageProperty().setValue(xpathError ? emptyResultsPlaceholder : "");
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void addProperty(String name) {
         // TODO
     }
@@ -402,7 +402,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
     private class MyXpathSubscriber extends XPathUpdateSubscriber {
 
 
-        public MyXpathSubscriber(DesignerRoot root) {
+        MyXpathSubscriber(DesignerRoot root) {
             super(root);
         }
 

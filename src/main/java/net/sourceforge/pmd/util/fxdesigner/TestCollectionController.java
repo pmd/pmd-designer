@@ -127,6 +127,6 @@ public class TestCollectionController extends AbstractController {
 
     public Val<LiveTestCase> selectedTestCase() {
         return Val.wrap(loadedToggleGroup.selectedToggleProperty())
-                  .map(it -> ((LiveTestCase) it.getUserData()));
+                  .map(it -> (LiveTestCase) it.getUserData());
     }
 }

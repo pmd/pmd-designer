@@ -114,8 +114,8 @@ public interface Serializer<T> {
                     Node item = children.item(i);
                     if (item.getNodeType() == Element.ELEMENT_NODE) {
                         Element entry = (Element) item;
-                        Element key = ((Element) entry.getFirstChild());
-                        Element value = ((Element) entry.getLastChild());
+                        Element key = (Element) entry.getFirstChild();
+                        Element value = (Element) entry.getLastChild();
                         result.put(nullableKey.fromXml(key), nullableValue.fromXml(value));
                     }
                 }

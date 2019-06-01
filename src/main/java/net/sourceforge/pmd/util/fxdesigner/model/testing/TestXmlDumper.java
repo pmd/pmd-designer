@@ -8,11 +8,12 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -124,7 +125,7 @@ public class TestXmlDumper {
 
 
     public static void dumpXmlTests(Path path, TestCollection collection, Consumer<Exception> errorHandler) {
-        try (FileOutputStream is = new FileOutputStream(path.toFile());
+        try (OutputStream is = Files.newOutputStream(path);
              Writer out = new OutputStreamWriter(is)) {
 
             dumpXmlTests(out, collection, errorHandler);

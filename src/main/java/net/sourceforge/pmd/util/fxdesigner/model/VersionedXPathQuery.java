@@ -41,9 +41,9 @@ public class VersionedXPathQuery {
             return false;
         }
         VersionedXPathQuery query = (VersionedXPathQuery) o;
-        return Objects.equals(version, query.version) &&
-            Objects.equals(expression, query.expression) &&
-            Objects.equals(definedProperties, query.definedProperties);
+        return Objects.equals(version, query.version)
+            && Objects.equals(expression, query.expression)
+            && Objects.equals(definedProperties, query.definedProperties);
     }
 
     @Override

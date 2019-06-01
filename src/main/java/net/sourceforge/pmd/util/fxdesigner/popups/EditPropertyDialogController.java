@@ -102,7 +102,6 @@ public class EditPropertyDialogController implements Initializable, ApplicationC
      */
     public Subscription bindToDescriptor(PropertyDescriptorSpec spec, ObservableList<PropertyDescriptorSpec> allDescriptors) {
 
-//        Val.wrap(nameField.focusedProperty()).values().subscribe(v -> System.out.println(v + " " + new Date()));
         backingDescriptor.setValue(spec);
         backingDescriptorList.setValue(allDescriptors);
         return Subscription.multi(

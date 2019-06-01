@@ -234,7 +234,7 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
         private static final String DELETE_BUTTON_CLASS = "delete-property-button";
         private final Stage owner;
 
-        public PropertyDescriptorCell(Stage owner) {
+        PropertyDescriptorCell(Stage owner) {
             this.owner = owner;
         }
 

@@ -8,8 +8,6 @@ import static net.sourceforge.pmd.util.fxdesigner.util.DumpUtil.dumpToSubtreeTes
 
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.SearchableTreeView.SearchableTreeCell;
 

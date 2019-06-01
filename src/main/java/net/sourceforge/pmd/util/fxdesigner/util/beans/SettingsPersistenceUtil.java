@@ -58,16 +58,18 @@ public final class SettingsPersistenceUtil {
         SerializerRegistrar.getInstance().registerMapped(Language.class, String.class, Language::getTerseName, LanguageRegistry::findLanguageByTerseName);
         SerializerRegistrar.getInstance().registerMapped(TextRange.class, String.class, TextRange::toString, TextRange::fromString);
         Serializer<Properties> propertiesSerializer =
-            SerializerRegistrar.getInstance().getSerializer(new TypeLiteral<Map<String, String>>() {})
-                               .map(m -> {
-                                   Properties p = new Properties();
-                                   m.forEach(p::put);
-                                   return p;
-                               }, ps -> {
-                                   Map<String, String> m = new HashMap<>();
-                                   ps.forEach((k, v) -> m.put(k.toString(), v.toString()));
-                                   return m;
-                               });
+            SerializerRegistrar.getInstance().getSerializer(new TypeLiteral<Map<String, String>>() { })
+                               .map(
+                                   m -> {
+                                       Properties p = new Properties();
+                                       m.forEach(p::put);
+                                       return p;
+                                   },
+                                   ps -> {
+                                       Map<String, String> m = new HashMap<>();
+                                       ps.forEach((k, v) -> m.put(k.toString(), v.toString()));
+                                       return m;
+                                   });
         SerializerRegistrar.getInstance().register(propertiesSerializer, Properties.class);
     }
 

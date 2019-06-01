@@ -1,3 +1,7 @@
+/*
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
@@ -33,7 +37,7 @@ public class DynamicWidthChoicebox<T> extends ChoiceBox<T> {
                             StackPane arrow = (StackPane) skin.getNode().lookup(".open-button");
                             boolean showArrow = !getStyleClass().contains("no-arrow");
 
-                            label.setAlignment(showArrow ? Pos.CENTER_LEFT: Pos.CENTER);
+                            label.setAlignment(showArrow ? Pos.CENTER_LEFT : Pos.CENTER);
 
                             DoubleBinding widthBinding = Bindings.createDoubleBinding(
                                 () -> {
@@ -49,7 +53,7 @@ public class DynamicWidthChoicebox<T> extends ChoiceBox<T> {
 
                             rewire(this.prefWidthProperty(), widthBinding);
                         }
-                    );
+            );
 
 
     }

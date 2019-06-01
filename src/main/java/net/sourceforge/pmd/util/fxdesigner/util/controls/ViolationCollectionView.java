@@ -151,7 +151,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
 
     private class ViolationCell extends SmartTextFieldListCell<LiveViolationRecord> {
 
-        public ViolationCell() {
+        ViolationCell() {
             getStyleClass().addAll("expected-violation-list-cell");
         }
 

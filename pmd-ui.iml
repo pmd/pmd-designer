@@ -46,6 +46,10 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.ant:ant:1.10.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.ant:ant-launcher:1.10.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.ant:ant-testutil:1.10.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.sourceforge.pmd:pmd-test:6.12.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.ant:ant:1.10.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.ant:ant-launcher:1.10.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.ant:ant-testutil:1.10.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-base:11" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-base:linux:11" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-controls:11" level="project" />
@@ -63,6 +67,7 @@
     <orderEntry type="library" name="Maven: org.fxmisc.undo:undofx:2.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.fxmisc.flowless:flowless:0.6" level="project" />
     <orderEntry type="library" name="Maven: org.fxmisc.wellbehaved:wellbehavedfx:0.3.3" level="project" />
+    <orderEntry type="library" name="Maven: org.checkerframework:checker-qual:2.5.2" level="project" />
     <orderEntry type="library" name="Maven: org.controlsfx.custom:controlsfx-mr-jar:1.0" level="project" />
     <orderEntry type="library" name="Maven: com.github.oowekyala:fx-live-templates:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.8.1" level="project" />

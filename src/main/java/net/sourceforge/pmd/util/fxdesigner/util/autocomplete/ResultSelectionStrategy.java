@@ -1,28 +1,84 @@
-/*
+/**
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
-package net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers;
+package net.sourceforge.pmd.util.fxdesigner.util.autocomplete;
 
-import static net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchUtil.PERFECT_SCORE;
-import static net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchUtil.WORST_SCORE;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
 
-import java.util.Locale;
-
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 
 /**
- * This works ok for single camel-case words, but
+ * Selects the best match results given a list of candidates and a query.
+ * We can abstract that later if we need it. E.g. we could provide more
+ * informed guesses based on what nodes are frequently found in that position
+ * in known XPath queries, or parse JJDoc output and suggest nodes that we
+ * know can be children of the previous node.
  *
  * @author Clément Fournier
  * @since 7.0.0
  */
-public final class CamelCaseMatcher {
+class ResultSelectionStrategy {
+
+    private static final int MIN_QUERY_LENGTH = 1;
+
+    private static final Comparator<CompletionResult> DISPLAY_ORDER =
+        Comparator.<CompletionResult>naturalOrder()
+            .reversed()
+            // shorter results are displayed first when there's a tie
+            .thenComparing(CompletionResult::getNodeName, Comparator.comparing(String::length));
+
+    Stream<CompletionResult> filterResults(List<String> candidates, String query, int limit) {
+        if (query.length() < MIN_QUERY_LENGTH) {
+            return Stream.empty();
+        }
+
+        return candidates.stream().filter(s -> !s.isEmpty())
+                         .map(cand -> computeMatchingSegments(cand, query, false))
+                         .sorted(Comparator.<CompletionResult>naturalOrder().reversed())
+                         .filter(it -> it.getScore() > 0)
+                         .limit(limit)
+                         // second pass is done only on those we know we'll keep
+                         .map(prev -> {
+                             // try to break ties between the top results, e.g.
+                             //
+                             // without second pass, we have a tie:
+                             //      query       coit
+                             //      candidate   ClassOrInterfaceType            : 32
+                             //      candidate   ClassOrInterfaceBodyDeclaration : 32
+                             //                  ^    ^ ^ ^
+                             // with second pass:
+                             //
+                             //      query       coit
+                             //      candidate   ClassOrInterfaceType            : 40 -> and indeed it's a better match
+                             //                  ^    ^ ^        ^
+                             //      candidate   ClassOrInterfaceDeclaration     : 32
+                             //                  ^    ^ ^ ^
+
+                             CompletionResult refined = computeMatchingSegments(prev.getNodeName(), query, true);
+                             // keep the best
+                             return refined.getScore() > prev.getScore() ? refined : prev;
+                         })
+                         .sorted(DISPLAY_ORDER);
 
 
-    private CamelCaseMatcher() {
+    }
 
+
+
+    private Text makeHighlightedText(String match) {
+        Text matchLabel = new Text(match);
+        matchLabel.getStyleClass().add("autocomplete-match");
+        return matchLabel;
+    }
+
+
+    private boolean isWordStart(String pascalCased, int idx) {
+        return idx == 0 || Character.isUpperCase(pascalCased.charAt(idx)) && Character.isLowerCase(pascalCased.charAt(idx - 1));
     }
 
     /**
@@ -30,11 +86,15 @@ public final class CamelCaseMatcher {
      *
      * @param candidate           Candidate string
      * @param query               Query
-     * @param fromIndex           Index in the candidate where to start the match
      * @param matchOnlyWordStarts Whether to only match word starts. This is a more unfair strategy
      *                            that can be used to break ties.
      */
-    private static <T> MatchResult<T> computeMatchingSegments(T data, String candidate, String query, int fromIndex, boolean matchOnlyWordStarts) {
+    private CompletionResult computeMatchingSegments(String candidate, String query, boolean matchOnlyWordStarts) {
+        if (candidate.equalsIgnoreCase(query)) {
+            // perfect match
+            TextFlow flow = new TextFlow(makeHighlightedText(candidate));
+            return new CompletionResult(Integer.MAX_VALUE, candidate, flow);
+        }
 
         // Performs a left-to-right scan of the candidate string,
         // trying to assign each of the chars of the query to a
@@ -50,7 +110,7 @@ public final class CamelCaseMatcher {
         // This algorithm is greedy and doesn't always select the best possible match result
         // The second pass is even more unfair and allows to break ties
 
-        int candIdx = fromIndex;  // current index in the candidate
+        int candIdx = 0;  // current index in the candidate
         int queryIdx = 0; // current index in the query
         int score = 0;
 
@@ -118,11 +178,7 @@ public final class CamelCaseMatcher {
                     //                   ^   ^   ^
                     //      score       6 = 2 + 2 + 2
 
-                    // matching at the very beginning of the candidate is heavily prioritized
-                    int multiplier =
-                        isStartOfWord && curMatchStart == fromIndex ? 8
-                                                                    : isStartOfWord ? 4 : 2;
-
+                    int multiplier = isStartOfWord ? 4 : 2;
                     score += matchLength * multiplier;
                 }
 
@@ -140,10 +196,10 @@ public final class CamelCaseMatcher {
                     String match = candidate.substring(curMatchStart, curMatchStart + matchLength);
 
                     if (before.length() > 0) {
-                        flow.getChildren().add(StringMatchUtil.makeNormalText(before));
+                        flow.getChildren().add(new Text(before));
                     }
 
-                    flow.getChildren().add(StringMatchUtil.makeHighlightedText(match));
+                    flow.getChildren().add(makeHighlightedText(match));
 
                     lastMatchEnd = curMatchStart + matchLength;
                 }
@@ -167,10 +223,10 @@ public final class CamelCaseMatcher {
             String match = candidate.substring(curMatchStart, candIdx);
 
             if (before.length() > 0) {
-                flow.getChildren().add(StringMatchUtil.makeNormalText(before));
+                flow.getChildren().add(new Text(before));
             }
 
-            flow.getChildren().add(StringMatchUtil.makeHighlightedText(match));
+            flow.getChildren().add(makeHighlightedText(match));
 
             lastMatchEnd = candIdx; // shift
         }
@@ -178,115 +234,17 @@ public final class CamelCaseMatcher {
         // add the rest of the candidate
         String rest = candidate.substring(lastMatchEnd);
         if (!rest.isEmpty()) {
-            flow.getChildren().add(StringMatchUtil.makeNormalText(rest));
+            flow.getChildren().add(new Text(rest));
         }
 
         int remainingChars = query.length() - queryIdx;
 
         if (remainingChars > 0) {
             // some chars were not found, penalize that
-            //            score -= remainingChars * 5;
+            score -= remainingChars * 2;
         }
 
-        final int finalScore = score;
-
-        return new MatchResult<>(finalScore, data, candidate, query, flow);
-    }
-
-    private static boolean isWordStart(String pascalCased, int idx) {
-        if (idx == 0) {
-            return true;
-        }
-        char c = pascalCased.charAt(idx);
-        char prev = pascalCased.charAt(idx - 1);
-        return Character.isUpperCase(c) && Character.isLowerCase(prev)
-            || Character.isAlphabetic(c) && !Character.isAlphabetic(prev);
-    }
-
-    private static <T> MatchResult<T> impossibleMatch(T data, String candidate, String query) {
-        return new MatchResult<>(WORST_SCORE, data, candidate, query, new TextFlow(StringMatchUtil.makeNormalText(candidate)));
-    }
-
-    /**
-     * Breaks some ties, by only matching the input words.
-     */
-    public static <T> MatchSelector<T> onlyWordStarts() {
-        return raw -> raw.map(prev -> {
-            // try to break ties between the top results, e.g.
-            //
-            // without second pass, we have a tie:
-            //      query       coit
-            //      candidate   ClassOrInterfaceType            : 32
-            //      candidate   ClassOrInterfaceBodyDeclaration : 32
-            //                  ^    ^ ^ ^
-            // with second pass:
-            //
-            //      query       coit
-            //      candidate   ClassOrInterfaceType            : 40 -> and indeed it's a better match
-            //                  ^    ^ ^        ^
-            //      candidate   ClassOrInterfaceDeclaration     : 32
-            //                  ^    ^ ^ ^
-
-            MatchResult<T> refined = computeMatchingSegments(prev.getData(), prev.getStringMatch(), prev.getQuery(), 0, true);
-            // keep the best
-            return refined.getScore() > prev.getScore() ? refined : prev;
-        });
-    }
-
-
-    /**
-     * Scans once left-to-right from the start, picking up on any character
-     * in scan order.
-     *
-     * <p>Enough when the candidate is a single word, but still scans only
-     * once so it may miss some opportunities. {@link #onlyWordStarts()} can
-     * be used to break ties (they look stupid with this matcher).
-     */
-    public static <T> MatchSelector<T> sparseCamelMatcher() {
-        return raw -> raw.map(prev -> {
-            MatchResult<T> refined = computeMatchingSegments(prev.getData(), prev.getStringMatch(), prev.getQuery(), 0, false);
-            // keep the best
-            return refined.getScore() > prev.getScore() ? refined : prev;
-        });
-    }
-
-    /**
-     * Scans several times from left to right, once for each of the possible
-     * match starts, and keeps the best result. This IMO gives the best results,
-     * especially when the candidate may be composed of several words. It's
-     * quite costly when there are many suggestions though.
-     */
-    public static <T> MatchSelector<T> allQueryStarts() {
-        return raw -> raw.map(prev -> {
-            if (prev.getScore() == PERFECT_SCORE) {
-                return prev;
-            }
-
-            String query = prev.getQuery();
-            String cand = prev.getStringMatch();
-            String lowerCand = cand.toLowerCase(Locale.ROOT);
-            char first = Character.toLowerCase(query.charAt(0));
-            int i = lowerCand.indexOf(first);
-
-            if (i < 0) {
-                // impossible match
-                // the algo scans left to right and begins giving out points on the first
-                // occurrence of the first char of the query
-                // we can weed this case immediately
-                return impossibleMatch(prev.getData(), cand, query);
-            }
-
-            MatchResult<T> best = prev;
-            while (i >= 0) {
-                MatchResult<T> attempt = computeMatchingSegments(prev.getData(), cand, query, i, false);
-                best = attempt.getScore() > best.getScore() ? attempt : best;
-
-                i = lowerCand.indexOf(first, i + 1);
-            }
-
-
-            return best;
-        });
+        return new CompletionResult(score, candidate, flow);
     }
 
 }

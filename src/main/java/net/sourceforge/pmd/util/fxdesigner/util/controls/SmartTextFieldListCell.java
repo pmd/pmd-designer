@@ -71,7 +71,7 @@ public abstract class SmartTextFieldListCell<T> extends ListCell<T> {
         return null;
     }
 
-    private final TextField getEditingGraphic(T t) {
+    private TextField getEditingGraphic(T t) {
         Var<String> stringVar = extractEditable(t);
         final TextField textField = new TextField(stringVar.getValue());
 

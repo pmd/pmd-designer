@@ -18,10 +18,8 @@ import java.util.Stack;
 
 import org.apache.commons.io.IOUtils;
 import org.reactfx.Subscription;
-import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.popups.EventLogController;

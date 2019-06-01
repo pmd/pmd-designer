@@ -1,17 +1,15 @@
+/*
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import static java.util.Objects.requireNonNull;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.addCustomStyleSheets;
 
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.controlsfx.control.PopOver;
 
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-
-import javafx.css.Styleable;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.stage.Window;
 
 /**
@@ -23,14 +21,6 @@ public final class PopOverUtil {
 
     }
 
-
-    public static Styleable getStyleableNode(PopOver popOver) {
-        try {
-            return ((Styleable) FieldUtils.readField(popOver, "bridge", true));
-        } catch (IllegalAccessException e) {
-            return null;
-        }
-    }
 
     public static void showAt(PopOver popOver, Window owner, javafx.scene.Node anchor) {
         //todo there's a bug with placement
