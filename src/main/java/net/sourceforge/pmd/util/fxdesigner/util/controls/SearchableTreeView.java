@@ -111,7 +111,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
         // Hide popup when ENTER is pressed
         EventStreams.eventsOf(popup, KeyEvent.KEY_RELEASED)
-                    .filter(it -> it.getCode() == KeyCode.ENTER)
+                    .filter(it -> it.getCode() == KeyCode.ENTER || it.getCode() == KeyCode.ESCAPE)
                     .subscribeForOne(e -> {
                         popup.hide();
                         e.consume();
@@ -181,9 +181,10 @@ public class SearchableTreeView<T> extends TreeView<T> {
     private Subscription subscribeKeyNav(int numResults, Var<Integer> curIdx) {
 
         return EventStreams.eventsOf(this, KeyEvent.KEY_RELEASED)
-                           .filter(it -> it.getCode() == KeyCode.F3)
+                           .filter(it -> it.getCode() == KeyCode.F3 || it.getCode() == KeyCode.TAB)
                            .subscribe(ke -> {
-                               curIdx.setValue((curIdx.getValue() + 1) % numResults);
+                               int offset = ke.isShiftDown() ? -1 : +1;
+                               curIdx.setValue((curIdx.getValue() + offset) % numResults);
                                ke.consume();
                            });
 
