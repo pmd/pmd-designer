@@ -54,8 +54,10 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.ViolationCollectionView
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
+import javafx.scene.layout.AnchorPane;
 
 
 /**
@@ -207,7 +209,31 @@ public class SourceEditorController extends AbstractController {
 
         currentlyOpenTestCase.values().subscribe(violationsPopover::rebind);
 
+        currentlyOpenTestCase.map(it -> true).orElseConst(false)
+                             .values().distinct()
+                             .subscribe(isTestCaseMode -> {
+                                 if (isTestCaseMode) {
+                                     AnchorPane pane = emptyPane();
+                                     editorTitledPane.setContent(pane);
 
+                                     AnchorPane otherPane = emptyPane();
+                                     testCaseToolsTitledPane.setContent(otherPane);
+
+                                     otherPane.getChildren().addAll(nodeEditionCodeArea);
+                                     pane.getChildren().addAll(testCaseToolsTitledPane);
+                                 } else {
+                                     AnchorPane otherPane = emptyPane();
+                                     editorTitledPane.setContent(otherPane);
+                                     otherPane.getChildren().addAll(nodeEditionCodeArea);
+                                 }
+                             });
+
+    }
+
+    private static AnchorPane emptyPane() {
+        AnchorPane pane = new AnchorPane();
+        pane.setPadding(Insets.EMPTY);
+        return pane;
     }
 
     private void handleTestOpenRequest(@NonNull LiveTestCase oldValue, @NonNull LiveTestCase newValue) {

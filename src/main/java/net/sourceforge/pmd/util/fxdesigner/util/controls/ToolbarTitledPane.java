@@ -94,7 +94,6 @@ public final class ToolbarTitledPane extends TitledPane implements TitleOwner {
                 );
             });
 
-
     }
 
     private Label buildTitleLabel() {
