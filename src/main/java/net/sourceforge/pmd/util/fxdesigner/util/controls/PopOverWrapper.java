@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.controlsfx.control.PopOver;
+import org.reactfx.EventStreams;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
@@ -15,6 +16,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 
 /**
  * Wrapper around a popover, that remembers whether it's already shown
@@ -69,18 +71,20 @@ public final class PopOverWrapper<T> {
     /**
      * This is a weird hack to preload the FXML and CSS, so that the
      * first opening of the popover doesn't look completely broken
-     * (twitching and obviously being restyled). We show the popover
-     * briefly way outside the screen bounds, just the time for its
-     * content graph to load.
+     * (twitching and obviously being restyled).
+     *
+     * <p>We show the popover briefly with opacity 0, just the time for its
+     * content graph to load. When hidden the opacity is reset to 1.
      */
     public void doFirstLoad(Stage stage) {
         myPopover.ifPresent(pop -> {
-            pop.getRoot().setOpacity(0);
+            pop.setOpacity(0);
             pop.show(stage, 40000, 40000);
-            Platform.runLater(() -> {
-                pop.hide();
-                pop.getRoot().setOpacity(1);
-            });
+
+            EventStreams.eventsOf(pop, WindowEvent.WINDOW_HIDDEN)
+                        .subscribeForOne(e -> pop.setOpacity(1));
+
+            Platform.runLater(pop::hide);
         });
     }
 

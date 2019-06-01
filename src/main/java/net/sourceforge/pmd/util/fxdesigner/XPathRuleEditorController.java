@@ -182,7 +182,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
         showPropertiesButton.setOnAction(e -> propertiesPopover.showOrFocus(p -> p.show(showPropertiesButton)));
 
         propertiesPopover.rebind(getRuleBuilder());
-        Platform.runLater(() -> propertiesPopover.doFirstLoad(getMainStage()));
+        propertiesPopover.doFirstLoad(getMainStage());
     }
 
     @Override
