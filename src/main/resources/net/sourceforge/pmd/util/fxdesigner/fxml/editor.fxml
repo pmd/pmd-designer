@@ -11,7 +11,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <BorderPane xmlns="http://javafx.com/javafx/8"
@@ -34,7 +34,11 @@
                                            AnchorPane.topAnchor="0.0">
                             <toolbarItems>
                                 <DynamicWidthChoicebox fx:id="languageChoiceBox"/>
-                                <Button fx:id="convertToTestCaseButton" text="Convert to test case" />
+                                <Button fx:id="convertToTestCaseButton" text="Convert to test case">
+                                    <tooltip>
+                                        <Tooltip text="Add a new test case for the contents of the area"/>
+                                    </tooltip>
+                                </Button>
                             </toolbarItems>
                             <content>
                                 <AnchorPane>
