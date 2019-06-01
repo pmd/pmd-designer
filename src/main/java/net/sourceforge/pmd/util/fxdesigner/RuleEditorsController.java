@@ -106,11 +106,15 @@ public class RuleEditorsController extends AbstractController {
     protected void afterChildrenInit() {
         MessageChannel<VersionedXPathQuery> globalXpathChannel = getDesignerRoot().getService(DesignerRoot.LATEST_XPATH);
         MessageChannel<LiveTestCase> globalTestChannel = getDesignerRoot().getService(DesignerRoot.TEST_LOADER);
+
         ReactfxExtensions.dynamic(LiveList.wrapVal(selectedEditorProperty()),
                                   (x, i) -> globalXpathChannel.connect(x.getService(DesignerRoot.LATEST_XPATH)));
 
         ReactfxExtensions.dynamic(LiveList.wrapVal(selectedEditorProperty()),
                                   (x, i) -> globalTestChannel.connect(x.getService(DesignerRoot.TEST_LOADER)));
+
+        ReactfxExtensions.dynamic(LiveList.wrapVal(selectedEditorProperty()),
+                                  (x, i) -> x.getService(DesignerRoot.TEST_CREATOR).connect(getService(DesignerRoot.TEST_CREATOR)));
 
 
         selectedEditorProperty().values().filter(Objects::nonNull)
@@ -121,6 +125,7 @@ public class RuleEditorsController extends AbstractController {
         DesignerRoot scope = getDesignerRoot().spawnScope();
         scope.registerService(DesignerRoot.LATEST_XPATH, new MessageChannel<>(Category.XPATH_EVENT_FORWARDING));
         scope.registerService(DesignerRoot.TEST_LOADER, new MessageChannel<>(Category.TEST_LOADING_EVENT));
+        scope.registerService(DesignerRoot.TEST_CREATOR, new MessageChannel<>(Category.TEST_LOADING_EVENT));
         return scope;
     }
 

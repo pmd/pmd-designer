@@ -34,6 +34,7 @@
                                            AnchorPane.topAnchor="0.0">
                             <toolbarItems>
                                 <DynamicWidthChoicebox fx:id="languageChoiceBox"/>
+                                <Button fx:id="convertToTestCaseButton" text="Convert to test case" />
                             </toolbarItems>
                             <content>
                                 <AnchorPane>

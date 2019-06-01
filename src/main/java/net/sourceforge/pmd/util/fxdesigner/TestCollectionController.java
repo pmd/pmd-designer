@@ -80,6 +80,10 @@ public class TestCollectionController extends AbstractController {
 
         exportTestsButton.setOnAction(evt -> System.out.println(TestXmlDumper.dumpXmlTests(getTestCollection(), e -> logUserException(e, Category.TEST_LOADING_EXCEPTION))));
 
+        getService(DesignerRoot.TEST_CREATOR)
+            .messageStream(true, this)
+            .subscribe(ltc -> getTestCollection().addTestCase(ltc.unfreeze()));
+
     }
 
     private TestCollection getTestCollection() {

@@ -4,6 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.value.Val;
 
@@ -46,7 +47,14 @@ public interface DesignerRoot {
     /** AST manager of the current code. */
     AppServiceDescriptor<ASTManager> AST_MANAGER = new AppServiceDescriptor<>(ASTManager.class);
 
+    /** Requests to load a test case in the editor. */
     AppServiceDescriptor<MessageChannel<@Nullable LiveTestCase>> TEST_LOADER = new AppServiceDescriptor<>(MessageChannel.class);
+
+    /**
+     *  Requests to create a test case for the currently open rule.
+     *  The test case should be deep copied first *by the sender*.
+     */
+    AppServiceDescriptor<MessageChannel<@NonNull LiveTestCase>> TEST_CREATOR = new AppServiceDescriptor<>(MessageChannel.class);
 
     AppServiceDescriptor<MessageChannel<VersionedXPathQuery>> LATEST_XPATH = new AppServiceDescriptor<>(MessageChannel.class);
 

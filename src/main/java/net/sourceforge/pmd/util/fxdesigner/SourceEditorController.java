@@ -89,7 +89,8 @@ public class SourceEditorController extends AbstractController {
         }
     }).orElseConst(SourceEditorController.class.getClassLoader());
 
-
+    @FXML
+    private Button convertToTestCaseButton;
     @FXML
     private DynamicWidthChoicebox<LanguageVersion> languageChoiceBox;
     @FXML
@@ -160,6 +161,8 @@ public class SourceEditorController extends AbstractController {
         // default text, will be overwritten by settings restore
         setText(getDefaultText());
 
+        convertToTestCaseButton.setOnAction(e -> getService(DesignerRoot.TEST_CREATOR).pushEvent(this, defaultTestCase.deepCopy()));
+
         violationsButton.setOnAction(e -> violationsPopover.showOrFocus(p -> p.show(violationsButton)));
 
         violationsButton.textProperty().bind(
@@ -213,6 +216,8 @@ public class SourceEditorController extends AbstractController {
                              .values().distinct()
                              .subscribe(isTestCaseMode -> {
                                  if (isTestCaseMode) {
+                                     convertToTestCaseButton.setVisible(false);
+
                                      AnchorPane pane = emptyPane();
                                      editorTitledPane.setContent(pane);
 
@@ -222,6 +227,7 @@ public class SourceEditorController extends AbstractController {
                                      otherPane.getChildren().addAll(nodeEditionCodeArea);
                                      pane.getChildren().addAll(testCaseToolsTitledPane);
                                  } else {
+                                     convertToTestCaseButton.setVisible(true);
                                      AnchorPane otherPane = emptyPane();
                                      editorTitledPane.setContent(otherPane);
                                      otherPane.getChildren().addAll(nodeEditionCodeArea);
