@@ -1,0 +1,66 @@
+/*
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
+@import "constants";
+@import "scrolling";
+
+.test-statuses(@stack) {
+
+  .test-status {
+    &.status-pass {
+      -fx-fill: extract(@stack, 1);
+    }
+
+    &.status-fail {
+      -fx-fill: extract(@stack, 2);
+    }
+
+    &.status-error {
+      -fx-fill: extract(@stack, 3);
+    }
+
+    &.status-unknown {
+      -fx-fill: extract(@stack, 4);
+    }
+  }
+}
+
+@normal-test-status-stack: green, orange, red, gray;
+@test-status-on-gray-stack: lighten(green, 60%), orange, red, gray;
+
+
+.test-statuses(@normal-test-status-stack);
+
+
+.list-cell:selected,
+.list-cell:focused {
+  .test-status {
+    -fx-fill: white;
+  }
+}
+
+.button.node-drag-over {
+
+  @fxcolor: derive(@selection-focus-color, +10%);
+  @darker: @darker-accent-border;
+  //-fx-border-color: @fxcolor;
+  //-fx-border-style: solid;
+  //-fx-border-width: 4;
+
+  @grad: linear-gradient(to bottom, derive(@fxcolor, -30%) 0%, derive(@fxcolor, -18%) 20%, derive(@fxcolor, -16%) 50%);
+
+  -fx-background-color: -fx-shadow-highlight-color, linear-gradient(to bottom, derive(@darker, -20%), @darker), @grad;
+
+  -fx-background-insets: 0 0 -1 0, 0, 1;
+
+  -fx-text-fill: white;
+}
+
+
+.expected-violation-list-cell {
+  .line-label {
+    -fx-padding: 0 10 0 0;
+  }
+}
+
