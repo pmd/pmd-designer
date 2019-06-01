@@ -4,6 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExceptionMessage;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguageVersion;
@@ -15,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -56,7 +56,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
-import javafx.scene.control.TextField;
 
 
 /**
@@ -69,6 +68,13 @@ import javafx.scene.control.TextField;
  */
 public class SourceEditorController extends AbstractController {
 
+    /**
+     * When no user-defined test case is loaded, then this is where
+     * source changes end up.
+     */
+    private final LiveTestCase defaultTestCase = new LiveTestCase();
+    /** Contains the loaded *user-defined* test case. */
+    private final Var<LiveTestCase> currentlyOpenTestCase = Var.newSimpleVar(null);
     private static final Duration AST_REFRESH_DELAY = Duration.ofMillis(100);
     private final ASTManager astManager;
     private final Var<List<File>> auxclasspathFiles = Var.newSimpleVar(emptyList());
@@ -81,7 +87,6 @@ public class SourceEditorController extends AbstractController {
         }
     }).orElseConst(SourceEditorController.class.getClassLoader());
 
-    private final Var<LiveTestCase> currentlyOpenTestCase = Var.newSimpleVar(null);
 
     @FXML
     private DynamicWidthChoicebox<LanguageVersion> languageChoiceBox;
@@ -196,24 +201,24 @@ public class SourceEditorController extends AbstractController {
 
         getService(DesignerRoot.TEST_LOADER)
             .messageStream(true, this)
-            .subscribe(this::handleTestOpenRequest);
+            .subscribe(currentlyOpenTestCase::setValue);
+
+        currentlyOpenTestCase.orElseConst(defaultTestCase).changes().subscribe(it -> handleTestOpenRequest(it.getOldValue(), it.getNewValue()));
 
         currentlyOpenTestCase.values().subscribe(violationsPopover::rebind);
 
 
     }
 
-    private void handleTestOpenRequest(@NonNull LiveTestCase liveTestCase) {
-        if (currentlyOpenTestCase.isPresent()) {
-            // TODO
-            currentlyOpenTestCase.getValue().commitChanges();
+    private void handleTestOpenRequest(@NonNull LiveTestCase oldValue, @NonNull LiveTestCase newValue) {
+        oldValue.commitChanges();
+
+        if (!newValue.getSource().equals(nodeEditionCodeArea.getText())) {
+            nodeEditionCodeArea.replaceText(newValue.getSource());
         }
-        if (!liveTestCase.getSource().equals(nodeEditionCodeArea.getText())) {
-            nodeEditionCodeArea.replaceText(liveTestCase.getSource());
-        }
-        currentlyOpenTestCase.setValue(liveTestCase);
-        Subscription sub = ReactfxUtil.rewireInit(liveTestCase.sourceProperty(), astManager.sourceCodeProperty());
-        liveTestCase.addCommitHandler(t -> sub.unsubscribe());
+
+        Subscription sub = ReactfxUtil.rewireInit(newValue.sourceProperty(), astManager.sourceCodeProperty());
+        newValue.addCommitHandler(t -> sub.unsubscribe());
     }
 
 
@@ -315,7 +320,7 @@ public class SourceEditorController extends AbstractController {
 
     @Override
     public List<? extends SettingsOwner> getChildrenSettingsNodes() {
-        return Collections.singletonList(astManager);
+        return asList(astManager, defaultTestCase);
     }
 
     @Override

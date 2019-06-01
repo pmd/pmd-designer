@@ -86,6 +86,18 @@ public class TestCollectionController extends AbstractController {
         return builder.getTestCollection();
     }
 
+    public void deleteTestCase(LiveTestCase tc) {
+        testsListView.getItems().remove(tc);
+
+        if (!tc.isFrozen()) {
+            unloadTestCase();
+        }
+    }
+
+    public void unloadTestCase() {
+        getService(DesignerRoot.TEST_LOADER).pushEvent(this, null);
+    }
+
     public void loadTestCase(int index) {
         LiveTestCase live = getTestCollection().export(index);
         if (live == null) {
@@ -94,21 +106,6 @@ public class TestCollectionController extends AbstractController {
         }
 
         getService(DesignerRoot.TEST_LOADER).pushEvent(this, live);
-    }
-
-
-    @Override
-    protected void afterChildrenInit() {
-        super.afterChildrenInit();
-        if (getTestCollection().getStash().isEmpty()) {
-            addTestButton.fire(); // if no tests, add a first one
-        } else {
-            LiveTestCase openTest = getTestCollection().getOpenTest();
-            if (openTest == null) {
-                // there's at least one, otherwise we'd have fallen in the first branch
-                loadTestCase(0);
-            }
-        }
     }
 
 

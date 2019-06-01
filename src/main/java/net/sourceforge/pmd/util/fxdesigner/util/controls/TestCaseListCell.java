@@ -31,6 +31,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -124,7 +125,13 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         Tooltip.install(load, new Tooltip("Load test case in editor"));
 
         load.setUserData(testCase);
-        load.setOnAction(e -> collection.loadTestCase(getIndex()));
+        load.setOnAction(e -> {
+            if (load.isSelected()) {
+                collection.loadTestCase(getIndex());
+            } else {
+                collection.unloadTestCase();
+            }
+        });
 
         sub = sub.and(() -> {
             collection.getLoadedToggleGroup().getToggles().removeAll(load);
@@ -135,7 +142,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         delete.setGraphic(new FontIcon("fas-trash-alt"));
         delete.getStyleClass().addAll("delete-button", "icon-button");
         Tooltip.install(delete, new Tooltip("Remove test case"));
-        delete.setOnAction(e -> getListView().getItems().remove(testCase));
+        delete.setOnAction(e -> collection.deleteTestCase(testCase));
 
         ControlUtil.registerDoubleClickListener(spacer, load::fire);
 
@@ -150,6 +157,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
 
         if (!testCase.isFrozen() && !load.isSelected()) {
             load.setSelected(true);
+            load.getOnAction().handle(new ActionEvent());
         }
 
         ControlUtil.makeListCellFitListViewWidth(this);

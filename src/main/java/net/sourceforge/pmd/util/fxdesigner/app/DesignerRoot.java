@@ -4,6 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NodeSelectionEvent;
@@ -45,7 +46,7 @@ public interface DesignerRoot {
     /** AST manager of the current code. */
     AppServiceDescriptor<ASTManager> AST_MANAGER = new AppServiceDescriptor<>(ASTManager.class);
 
-    AppServiceDescriptor<MessageChannel<LiveTestCase>> TEST_LOADER = new AppServiceDescriptor<>(MessageChannel.class);
+    AppServiceDescriptor<MessageChannel<@Nullable LiveTestCase>> TEST_LOADER = new AppServiceDescriptor<>(MessageChannel.class);
 
     AppServiceDescriptor<MessageChannel<VersionedXPathQuery>> LATEST_XPATH = new AppServiceDescriptor<>(MessageChannel.class);
 

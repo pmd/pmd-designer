@@ -114,7 +114,7 @@ public class RuleEditorsController extends AbstractController {
 
 
         selectedEditorProperty().values().filter(Objects::nonNull)
-                                .subscribe(it -> it.selectedTestCaseProperty().ifPresent(t -> globalTestChannel.pushEvent(this, t)));
+                                .subscribe(it -> globalTestChannel.pushEvent(this, it.selectedTestCaseProperty().getValue()));
     }
 
     public DesignerRoot newScope() {
