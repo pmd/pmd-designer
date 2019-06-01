@@ -6,9 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.reactfx;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
@@ -25,13 +23,9 @@ import org.reactfx.value.ValBase;
 import org.reactfx.value.Var;
 
 import com.github.oowekyala.rxstring.ReactfxExtensions;
-import com.github.oowekyala.rxstring.ReactfxExtensions.RebindSubscription;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.MapChangeListener;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -51,30 +45,14 @@ public final class ReactfxUtil {
     }
 
 
-    private static final RebindSubscription<?> EMPTY_SUB = new RebindSubscription<Object>() {
-        @Override
-        public RebindSubscription<Object> rebind(Object newItem) {
-            return emptySub();
-        }
-
-        @Override
-        public void unsubscribe() {
-            // do nothing
-        }
-    };
-
-    public static <T> RebindSubscription<T> emptySub() {
-        return (RebindSubscription<T>) EMPTY_SUB;
-    }
-
     /**
-     * Add a hook on the owner window. It's not possible to do this statically,
-     * since at construction time the window might not be set.
+     * Subscribe to the values of the given observable, with a function
+     * that needs unsubscription when the value changes.
      */
-    public static <T> Subscription subscribeDisposable(ObservableValue<? extends T> node,
+    public static <T> Subscription subscribeDisposable(ObservableValue<? extends T> obs,
                                                        Function<? super T, Subscription> subscriber) {
         return ReactfxExtensions.dynamic(
-            LiveList.wrapVal(node),
+            LiveList.wrapVal(obs),
             (w, i) -> subscriber.apply(w)
         );
     }
@@ -103,29 +81,6 @@ public final class ReactfxUtil {
 
     public static <I> EventStream<I> distinctBetween(EventStream<I> input, Duration duration) {
         return DistinctBetweenStream.distinctBetween(input, ReactfxUtil.defaultTimerFactory(duration));
-    }
-
-    public static <K, V> Val<Map<K, LiveList<V>>> groupBy(ObservableList<? extends V> base, Function<? super V, ? extends K> selector) {
-        return new GroupByLiveList<>(base, selector);
-    }
-
-    public static <K, V> Val<Map<K, V>> observableMapVal(ObservableMap<K, V> map) {
-        return new ValBase<Map<K, V>>() {
-            EventSource<Map<K, V>> source = new EventSource<>();
-
-            @Override
-            protected Subscription connect() {
-
-                MapChangeListener<K, V> listener = ch -> source.push(new HashMap<>(map));
-                map.addListener(listener);
-                return () -> map.removeListener(listener);
-            }
-
-            @Override
-            protected Map<K, V> computeValue() {
-                return new HashMap<>(map);
-            }
-        };
     }
 
     /**
