@@ -4,8 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers;
 
-import static net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchAlgo.PERFECT_SCORE;
-import static net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchAlgo.WORST_SCORE;
+import static net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchUtil.PERFECT_SCORE;
+import static net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchUtil.WORST_SCORE;
 
 import java.util.Locale;
 
@@ -140,10 +140,10 @@ public final class CamelCaseMatcher {
                     String match = candidate.substring(curMatchStart, curMatchStart + matchLength);
 
                     if (before.length() > 0) {
-                        flow.getChildren().add(StringMatchAlgo.makeNormalText(before));
+                        flow.getChildren().add(StringMatchUtil.makeNormalText(before));
                     }
 
-                    flow.getChildren().add(StringMatchAlgo.makeHighlightedText(match));
+                    flow.getChildren().add(StringMatchUtil.makeHighlightedText(match));
 
                     lastMatchEnd = curMatchStart + matchLength;
                 }
@@ -167,10 +167,10 @@ public final class CamelCaseMatcher {
             String match = candidate.substring(curMatchStart, candIdx);
 
             if (before.length() > 0) {
-                flow.getChildren().add(StringMatchAlgo.makeNormalText(before));
+                flow.getChildren().add(StringMatchUtil.makeNormalText(before));
             }
 
-            flow.getChildren().add(StringMatchAlgo.makeHighlightedText(match));
+            flow.getChildren().add(StringMatchUtil.makeHighlightedText(match));
 
             lastMatchEnd = candIdx; // shift
         }
@@ -178,7 +178,7 @@ public final class CamelCaseMatcher {
         // add the rest of the candidate
         String rest = candidate.substring(lastMatchEnd);
         if (!rest.isEmpty()) {
-            flow.getChildren().add(StringMatchAlgo.makeNormalText(rest));
+            flow.getChildren().add(StringMatchUtil.makeNormalText(rest));
         }
 
         int remainingChars = query.length() - queryIdx;
@@ -204,7 +204,7 @@ public final class CamelCaseMatcher {
     }
 
     private static <T> MatchResult<T> impossibleMatch(T data, String candidate, String query) {
-        return new MatchResult<>(WORST_SCORE, data, candidate, query, new TextFlow(StringMatchAlgo.makeNormalText(candidate)));
+        return new MatchResult<>(WORST_SCORE, data, candidate, query, new TextFlow(StringMatchUtil.makeNormalText(candidate)));
     }
 
     /**

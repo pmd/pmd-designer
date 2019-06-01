@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 /**
- * Strategy to select a {@link StringMatchAlgo} to make more precise guesses.
+ * Strategy to filter {@link MatchResult}s.
  *
  * <p>Depending on the use case (multi-word input, short input, etc),
  * you compose a pipeline of {@link MatchSelector}s, which will filter

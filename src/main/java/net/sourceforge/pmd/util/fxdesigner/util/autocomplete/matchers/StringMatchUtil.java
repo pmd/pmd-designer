@@ -13,29 +13,24 @@ import javafx.scene.text.TextFlow;
 
 
 /**
- * Selects the best match results given a list of candidates and a query.
- *
- * The results are useless unless you provide the {@link MatchSelector} that
- * suits your use case.
- *
- * We can abstract that later if we need it. E.g. we could provide more
- * informed guesses based on what nodes are frequently found in that position
- * in known XPath queries, or parse JJDoc output and suggest nodes that we
- * know can be children of the previous node.
- *
- * @author Clément Fournier
- * @since 7.0.0
+ * Utility class.
  */
-public final class StringMatchAlgo {
+public final class StringMatchUtil {
 
     public static final int MIN_QUERY_LENGTH = 1;
     public static final int WORST_SCORE = Integer.MIN_VALUE;
     public static final int PERFECT_SCORE = Integer.MAX_VALUE;
 
-    private StringMatchAlgo() {
+    private StringMatchUtil() {
 
     }
 
+    /**
+     * Selects the best {@link MatchResult} given a list of candidates and a query.
+     *
+     * The results are useless unless you provide the {@link MatchSelector} that
+     * suits your use case.
+     */
     public static <T> Stream<MatchResult<T>> filterResults(List<T> candidates, Function<T, String> matchExtractor, String query, MatchSelector<T> limiter) {
         if (query.length() < MIN_QUERY_LENGTH) {
             return Stream.empty();

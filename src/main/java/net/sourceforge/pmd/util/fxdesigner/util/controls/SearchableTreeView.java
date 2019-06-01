@@ -25,7 +25,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.CamelCaseMatcher;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchResult;
 import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchSelector;
-import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchAlgo;
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.beans.value.ObservableValue;
@@ -213,7 +213,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                 .andThen(Stream::parallel)
                 .andThen(MatchSelector.selectBestTies());
 
-        return StringMatchAlgo.filterResults(items, SearchableTreeItem::getSearchableText, query, limiter)
+        return StringMatchUtil.filterResults(items, SearchableTreeItem::getSearchableText, query, limiter)
                               .sorted(Comparator.comparingInt(res -> res.getData().getTreeIndex()))
                               .collect(Collectors.toList());
     }
