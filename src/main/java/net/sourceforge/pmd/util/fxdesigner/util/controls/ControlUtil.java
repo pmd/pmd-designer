@@ -16,6 +16,7 @@ import com.github.oowekyala.rxstring.ReactfxExtensions;
 import javafx.css.PseudoClass;
 import javafx.scene.Scene;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollBar;
@@ -30,6 +31,19 @@ import javafx.util.Callback;
 public final class ControlUtil {
 
     private ControlUtil() {
+
+    }
+
+    /**
+     * When the [boundProp] is blank, display instead the [defaultText]
+     * as grayed.
+     */
+    public static void bindLabelPropertyWithDefault(Label label, String defaultText, Val<String> boundProp) {
+        Val<String> filteredContent = boundProp.filter(StringUtils::isNotBlank);
+        label.textProperty().bind(filteredContent.orElseConst(defaultText));
+
+        filteredContent.values().subscribe(it -> label.pseudoClassStateChanged(PseudoClass.getPseudoClass("default-message"),
+                                                                               it == null));
 
     }
 

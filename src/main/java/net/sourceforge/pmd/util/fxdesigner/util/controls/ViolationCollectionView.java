@@ -8,7 +8,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
-import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.tools.ValueExtractor;
@@ -181,10 +180,8 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
             lineLabel.getStyleClass().addAll("line-label");
 
             Label messageLabel = new Label();
-            messageLabel.textProperty().bind(violation.messageProperty()
-                                                      .filter(StringUtils::isNotBlank)
-                                                      .orElseConst(""));
-            messageLabel.getStyleClass().addAll("message-label");
+
+            ControlUtil.bindLabelPropertyWithDefault(messageLabel, "(no message)", violation.messageProperty());
 
             ControlUtil.registerDoubleClickListener(messageLabel, this::doStartEdit);
 

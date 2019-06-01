@@ -39,8 +39,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -95,8 +93,9 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
                                    });
 
 
-        Label descriptionLabel = new Label(testCase.getDescription());
+        Label descriptionLabel = new Label();
 
+        ControlUtil.bindLabelPropertyWithDefault(descriptionLabel, "(no description)", testCase.descriptionProperty());
 
         ControlUtil.registerDoubleClickListener(descriptionLabel, this::doStartEdit);
 
@@ -127,7 +126,10 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         load.setUserData(testCase);
         load.setOnAction(e -> collection.loadTestCase(getIndex()));
 
-        sub = sub.and(() -> load.setOnAction(null));
+        sub = sub.and(() -> {
+            collection.getLoadedToggleGroup().getToggles().removeAll(load);
+            load.setOnAction(null);
+        });
 
         Button delete = new Button();
         delete.setGraphic(new FontIcon("fas-trash-alt"));
@@ -146,8 +148,8 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         sub = sub.and(subscriber.init(getManagerOf(testCase)));
 
 
-        if (!testCase.isFrozen()) {
-            load.fire();
+        if (!testCase.isFrozen() && !load.isSelected()) {
+            load.setSelected(true);
         }
 
         ControlUtil.makeListCellFitListViewWidth(this);

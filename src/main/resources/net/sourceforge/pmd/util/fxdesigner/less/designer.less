@@ -234,15 +234,20 @@
 }
 
 .text-field:empty-input {
-  -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);
+  -fx-prompt-text-fill: @fx-grayed-text-fill;
 }
+
+.label:default-message {
+  -fx-text-fill: @fx-grayed-text-fill;
+}
+
 
 .search-popup {
 
   .hint-label {
     -fx-translate-y: 8;
     -fx-translate-x: -5;
-    -fx-text-fill: derive(-fx-control-inner-background, -30%);
+    -fx-text-fill: @fx-grayed-text-fill;
     -fx-background-color: white;
     -fx-background-insets: 3 0 2 0;
     -fx-font-size: 10pt;
