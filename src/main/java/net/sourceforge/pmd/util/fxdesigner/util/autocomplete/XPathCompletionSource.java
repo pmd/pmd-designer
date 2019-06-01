@@ -39,9 +39,9 @@ public final class XPathCompletionSource implements CompletionResultSource {
 
     private MatchSelector<String> getLimiter(int limit) {
         MatchSelector<String> limited = MatchSelector.limitToBest(limit);
-        return CamelCaseMatcher.<String>sparseCamelMatcher().andThen(limited)
-                                                            .andThen(CamelCaseMatcher.onlyWordStarts())
-                                                            .andThen(limited);
+        return CamelCaseMatcher.<String>allQueryStarts().andThen(limited)
+                                                        .andThen(CamelCaseMatcher.onlyWordStarts())
+                                                        .andThen(limited);
 
     }
 

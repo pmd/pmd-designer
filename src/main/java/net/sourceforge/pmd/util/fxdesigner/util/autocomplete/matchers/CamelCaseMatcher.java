@@ -265,10 +265,13 @@ public final class CamelCaseMatcher {
     /**
      * Scans several times from left to right, once for each of the possible
      * match starts, and keeps the best result. This IMO gives the best results,
-     * especially when the candidate may be composed of several words.
+     * especially when the candidate may be composed of several words. It's
+     * quite costly when there are many suggestions though.
      */
     public static <T> MatchSelector<T> allQueryStarts() {
-        return raw -> raw.map(prev -> {
+        // we make this parallel because it may speed it up,
+        // and the pipeline is completely associative
+        return raw -> raw.parallel().map(prev -> {
             if (prev.getScore() == PERFECT_SCORE) {
                 return prev;
             }

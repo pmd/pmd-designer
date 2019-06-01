@@ -157,20 +157,22 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         int visibleLength = lastVisibleParToAllParIndex() - firstVisibleParToAllParIndex();
 
         boolean fitsViewPort = node.getEndLine() - node.getBeginLine() <= visibleLength;
-        boolean isStartVisible =
-            getRtfxParIndexFromPmdLine(node.getBeginLine()) >= firstVisibleParToAllParIndex();
-        boolean isEndVisible =
-            getRtfxParIndexFromPmdLine(node.getEndLine()) <= lastVisibleParToAllParIndex();
+        int rtfxLine = getRtfxParIndexFromPmdLine(node.getBeginLine());
+        int rtfxEndLine = getRtfxParIndexFromPmdLine(node.getEndLine());
+
+        boolean isStartVisible = rtfxLine >= firstVisibleParToAllParIndex();
+        boolean isEndVisible = rtfxEndLine <= lastVisibleParToAllParIndex();
+
 
         if (fitsViewPort) {
             if (!isStartVisible && scrollToTop) {
-                showParagraphAtTop(max(node.getBeginLine() - 2, 0));
+                showParagraphAtTop(max(rtfxLine - 2, 0));
             }
             if (!isEndVisible) {
-                showParagraphAtBottom(min(node.getEndLine(), getParagraphs().size()));
+                showParagraphAtBottom(min(rtfxEndLine, getParagraphs().size()));
             }
         } else if (!isStartVisible && scrollToTop) {
-            showParagraphAtTop(max(node.getBeginLine() - 2, 0));
+            showParagraphAtTop(max(rtfxLine - 2, 0));
         }
     }
 

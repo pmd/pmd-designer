@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 import org.reactfx.value.Val;
@@ -44,13 +45,20 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
     private final TreeViewWrapper<T> myWrapper = new TreeViewWrapper<>(this);
 
+    @Nullable
+    private TextField openSearchField;
+
     public SearchableTreeView() {
 
 
         addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
             // CTRL + F should be normal
             if (evt.isControlDown() && evt.getCode() == KeyCode.F) {
-                popSearchField();
+                if (openSearchField != null) {
+                    openSearchField.requestFocus();
+                } else {
+                    popSearchField();
+                }
                 evt.consume();
             }
         });
@@ -107,7 +115,10 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
         Bounds bounds = localToScreen(getBoundsInLocal());
         popup.show(this, bounds.getMaxX() - textField.getPrefWidth() - 1, bounds.getMinY());
-        popup.setOnHidden(e -> subscription.unsubscribe()); // release resources
+        popup.setOnHidden(e -> {
+            openSearchField = null;
+            subscription.unsubscribe();
+        }); // release resources
 
         // Hide popup when ENTER or ESCAPE is pressed
         EventStreams.eventsOf(popup, KeyEvent.KEY_RELEASED)
@@ -118,6 +129,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                     });
 
         textField.requestFocus();
+        openSearchField = textField;
     }
 
     /**

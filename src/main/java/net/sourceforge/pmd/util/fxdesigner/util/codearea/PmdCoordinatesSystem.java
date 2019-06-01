@@ -206,6 +206,16 @@ public final class PmdCoordinatesSystem {
         return new TextRange(startPosition(node), endPosition(node));
     }
 
+    /**
+     * Returns a {@link TextPos2D} that uses its coordinates as begin
+     * and end offset of the [node] in the [area].
+     */
+    public static TextPos2D rtfxRangeOf(Node node, CodeArea area) {
+        return new TextPos2D(
+            getOffsetFromPmdPosition(area, node.getBeginLine(), node.getBeginColumn()),
+            getOffsetFromPmdPosition(area, node.getEndLine(), node.getEndColumn())
+        );
+    }
 
     public static final class TextRange implements Serializable {
 
