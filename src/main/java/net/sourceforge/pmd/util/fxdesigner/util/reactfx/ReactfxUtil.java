@@ -1,3 +1,4 @@
+
 /**
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
@@ -6,7 +7,9 @@ package net.sourceforge.pmd.util.fxdesigner.util.reactfx;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
@@ -15,15 +18,25 @@ import java.util.function.Function;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
+import org.reactfx.collection.LiveList;
 import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
 import org.reactfx.value.Val;
 import org.reactfx.value.ValBase;
 import org.reactfx.value.Var;
 
+import com.github.oowekyala.rxstring.ReactfxExtensions;
+import com.github.oowekyala.rxstring.ReactfxExtensions.RebindSubscription;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
+import javafx.scene.Node;
 
 /**
  * Extensions to ReactFX Val and EventStreams. Some can be deemed as too
@@ -39,6 +52,51 @@ public final class ReactfxUtil {
     }
 
 
+    private static final RebindSubscription<?> EMPTY_SUB = new RebindSubscription<Object>() {
+        @Override
+        public RebindSubscription<Object> rebind(Object newItem) {
+            return emptySub();
+        }
+
+        @Override
+        public void unsubscribe() {
+
+        }
+    };
+
+    public static <T> RebindSubscription<T> emptySub() {
+        return (RebindSubscription<T>) EMPTY_SUB;
+    }
+
+    /**
+     * Add a hook on the owner window. It's not possible to do this statically,
+     * since at construction time the window might not be set.
+     */
+    public static <T> Subscription subscribeDisposable(ObservableValue<? extends T> node,
+                                                       Function<? super T, Subscription> subscriber) {
+        return ReactfxExtensions.dynamic(
+            LiveList.wrapVal(node),
+            (w, i) -> subscriber.apply(w)
+        );
+    }
+
+    public static <T> Subscription subscribeDisposable(EventStream<T> stream, Function<T, Subscription> subscriber) {
+        return subscribeDisposable(latestValue(stream), subscriber);
+    }
+
+
+    //    public static <T extends Event> Subscription addEventHandler(Consumer<EventHandler<T>> addMethod, Consumer<EventHandler<T>> removeMethod,)
+
+    public static <T extends Event> Subscription addEventHandler(Property<EventHandler<T>> addMethod, EventHandler<T> handler) {
+        addMethod.setValue(handler);
+        return () -> addMethod.setValue(null);
+    }
+
+    public static <T extends Event> Subscription addEventHandler(Node node, EventType<T> type, EventHandler<T> handler) {
+        node.addEventHandler(type, handler);
+        return () -> node.removeEventHandler(type, handler);
+    }
+
     static Function<Runnable, Timer> defaultTimerFactory(Duration duration) {
         return action -> FxTimer.create(duration, action);
     }
@@ -46,6 +104,29 @@ public final class ReactfxUtil {
 
     public static <I> EventStream<I> distinctBetween(EventStream<I> input, Duration duration) {
         return DistinctBetweenStream.distinctBetween(input, ReactfxUtil.defaultTimerFactory(duration));
+    }
+
+    public static <K, V> Val<Map<K, LiveList<V>>> groupBy(ObservableList<? extends V> base, Function<? super V, ? extends K> selector) {
+        return new GroupByLiveList<>(base, selector);
+    }
+
+    public static <K, V> Val<Map<K, V>> observableMapVal(ObservableMap<K, V> map) {
+        return new ValBase<Map<K, V>>() {
+            EventSource<Map<K, V>> source = new EventSource<>();
+
+            @Override
+            protected Subscription connect() {
+
+                MapChangeListener<K, V> listener = ch -> source.push(new HashMap<>(map));
+                map.addListener(listener);
+                return () -> map.removeListener(listener);
+            }
+
+            @Override
+            protected Map<K, V> computeValue() {
+                return new HashMap<>(map);
+            }
+        };
     }
 
     /**

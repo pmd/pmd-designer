@@ -25,7 +25,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.reactfx.Subscription;
 import org.reactfx.value.Var;
 
@@ -35,14 +37,18 @@ import net.sourceforge.pmd.lang.symboltable.NameDeclaration;
 import net.sourceforge.pmd.lang.symboltable.NameOccurrence;
 import net.sourceforge.pmd.lang.symboltable.Scope;
 import net.sourceforge.pmd.lang.symboltable.ScopedNode;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 
+import com.sun.javafx.fxml.builder.ProxyBuilder;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.Parent;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.util.BuilderFactory;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -84,12 +90,30 @@ public final class DesignerUtil {
     /**
      * Gets the URL to an fxml file from its simple name.
      *
-     * @param simpleName Simple name of the file, i.e. with no directory prefixes
+     * @param simpleName Simple name of the file, i.e. with no directory prefixes (with extension)
      *
      * @return A URL to an fxml file
      */
     public static URL getFxml(String simpleName) {
         return DesignerUtil.class.getResource("/net/sourceforge/pmd/util/fxdesigner/fxml/" + simpleName);
+    }
+
+    /**
+     * Gets the URL to an css file from its simple name.
+     *
+     * @param simpleName Simple name of the file, i.e. with no directory prefixes or extension
+     *
+     * @return A URL to a css file
+     */
+    public static URL getCss(String simpleName) {
+        return DesignerUtil.class.getResource("/net/sourceforge/pmd/util/fxdesigner/css/" + simpleName + ".css");
+    }
+
+    public static void addCustomStyleSheets(Parent target, String... styleSheetSimpleName) {
+        Arrays.stream(styleSheetSimpleName)
+              .map(DesignerUtil::getCss)
+              .map(URL::toExternalForm)
+              .forEach(target.getStylesheets()::add);
     }
 
 
@@ -358,4 +382,21 @@ public final class DesignerUtil {
         }
     }
 
+    public static BuilderFactory customBuilderFactory(@NonNull DesignerRoot owner) {
+        return type -> {
+
+            boolean needsRoot = Arrays.stream(type.getConstructors()).anyMatch(it -> ArrayUtils.contains(it.getParameterTypes(), DesignerRoot.class));
+
+            if (needsRoot) {
+                // Controls that need the DesignerRoot can declare a constructor
+                // with a parameter w/ signature @NamedArg("designerRoot") DesignerRoot
+                // to be injected with the relevant instance of the app.
+                ProxyBuilder<Object> builder = new ProxyBuilder<>(type);
+                builder.put("designerRoot", owner);
+                return builder;
+            } else {
+                return null; //use default
+            }
+        };
+    }
 }
