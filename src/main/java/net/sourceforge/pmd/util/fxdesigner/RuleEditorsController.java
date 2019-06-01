@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import org.reactfx.Subscription;
 import org.reactfx.collection.LiveArrayList;
-import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.ast.Node;
@@ -18,13 +18,11 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.MessageChannel;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
-import net.sourceforge.pmd.util.fxdesigner.model.VersionedXPathQuery;
-import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.MutableTabPane;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
-import com.github.oowekyala.rxstring.ReactfxExtensions;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -104,24 +102,22 @@ public class RuleEditorsController extends AbstractController {
 
     @Override
     protected void afterChildrenInit() {
-        MessageChannel<VersionedXPathQuery> globalXpathChannel = getDesignerRoot().getService(DesignerRoot.LATEST_XPATH);
-        MessageChannel<LiveTestCase> globalTestChannel = getDesignerRoot().getService(DesignerRoot.TEST_LOADER);
 
-        ReactfxExtensions.dynamic(LiveList.wrapVal(selectedEditorProperty()),
-                                  (x, i) -> globalXpathChannel.connect(x.getService(DesignerRoot.LATEST_XPATH)));
-
-        ReactfxExtensions.dynamic(LiveList.wrapVal(selectedEditorProperty()),
-                                  (x, i) -> globalTestChannel.connect(x.getService(DesignerRoot.TEST_LOADER)));
-
-        ReactfxExtensions.dynamic(LiveList.wrapVal(selectedEditorProperty()),
-                                  (x, i) -> x.getService(DesignerRoot.TEST_CREATOR).connect(getService(DesignerRoot.TEST_CREATOR)));
-
+        ReactfxUtil.subscribeDisposable(
+            selectedEditorProperty(),
+            x -> // connect the currently selected rule to the global state of the app
+                Subscription.multi(
+                    getService(DesignerRoot.LATEST_XPATH).connect(x.getService(DesignerRoot.LATEST_XPATH)),
+                    getService(DesignerRoot.TEST_LOADER).connect(x.getService(DesignerRoot.TEST_LOADER)),
+                    x.getService(DesignerRoot.TEST_CREATOR).connect(getService(DesignerRoot.TEST_CREATOR))
+                ));
 
         selectedEditorProperty().values().filter(Objects::nonNull)
-                                .subscribe(it -> globalTestChannel.pushEvent(this, it.selectedTestCaseProperty().getValue()));
+                                .subscribe(it -> getService(DesignerRoot.TEST_LOADER).pushEvent(this, it.selectedTestCaseProperty().getValue()));
     }
 
     public DesignerRoot newScope() {
+        // mock some services
         DesignerRoot scope = getDesignerRoot().spawnScope();
         scope.registerService(DesignerRoot.LATEST_XPATH, new MessageChannel<>(Category.XPATH_EVENT_FORWARDING));
         scope.registerService(DesignerRoot.TEST_LOADER, new MessageChannel<>(Category.TEST_LOADING_EVENT));
