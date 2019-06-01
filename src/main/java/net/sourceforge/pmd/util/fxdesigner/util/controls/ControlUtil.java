@@ -33,6 +33,25 @@ public final class ControlUtil {
 
     }
 
+    /**
+     * Make a list view fit precisely the height of its items.
+     *
+     * @param view            The listview to configure
+     * @param fixedCellHeight The cell height to use, a good default is 24
+     */
+    public static void makeListViewFitToChildren(ListView<?> view, double fixedCellHeight) {
+        view.setFixedCellSize(fixedCellHeight);
+
+        view.maxHeightProperty().bind(
+            Val.wrap(view.itemsProperty())
+               .flatMap(LiveList::sizeOf).map(it -> it == 0 ? fixedCellHeight : it * fixedCellHeight + 5)
+        );
+    }
+
+    /**
+     * By default text fields don't show the prompt when the caret is
+     * inside the field, even if the text is empty.
+     */
     public static void makeTextFieldShowPromptEvenIfFocused(TextField field) {
         // See css
 
@@ -56,7 +75,13 @@ public final class ControlUtil {
 
     }
 
-
+    /**
+     * Make a list cell never overflow the width of its container, to
+     * avoid having a horizontal scroll bar showing up. This defers
+     * resizing constraints to the contents of the cell.
+     *
+     * @return The given cell
+     */
     public static <T> ListCell<T> makeListCellFitListViewWidth(ListCell<T> cell) {
         if (cell != null) {
             cell.prefWidthProperty().bind(

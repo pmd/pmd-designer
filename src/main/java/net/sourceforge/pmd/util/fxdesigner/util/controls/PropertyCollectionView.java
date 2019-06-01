@@ -4,8 +4,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
-import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
-
 import java.io.IOException;
 import java.util.Optional;
 
@@ -26,7 +24,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
-import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -208,11 +205,8 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
     }
 
     private static void initListView(ListView<PropertyDescriptorSpec> view) {
-        view.setFixedCellSize(LIST_CELL_HEIGHT);
 
-        Val.wrap(view.itemsProperty())
-           .values()
-           .subscribe(e -> rewire(view.maxHeightProperty(), Bindings.size(e).multiply(LIST_CELL_HEIGHT).add(5)));
+        ControlUtil.makeListViewFitToChildren(view, LIST_CELL_HEIGHT);
 
         Label placeholder = new Label("No properties yet");
         placeholder.getStyleClass().addAll("placeholder");

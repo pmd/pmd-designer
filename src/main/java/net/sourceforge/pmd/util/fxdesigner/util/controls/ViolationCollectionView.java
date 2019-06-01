@@ -10,12 +10,10 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.tools.ValueExtractor;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.Subscription;
-import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -108,14 +106,8 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
     }
 
     private void initListView(ListView<LiveViolationRecord> view) {
-        view.setFixedCellSize(LIST_CELL_HEIGHT);
 
-        //        view.setPrefWidth(250);
-
-        view.maxHeightProperty().bind(
-            Val.wrap(view.itemsProperty())
-               .flatMap(LiveList::sizeOf).map(it -> it == 0 ? LIST_CELL_HEIGHT : it * LIST_CELL_HEIGHT + 5)
-        );
+        ControlUtil.makeListViewFitToChildren(view, LIST_CELL_HEIGHT);
 
         view.setEditable(true);
 

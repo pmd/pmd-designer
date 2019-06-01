@@ -109,7 +109,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
         popup.show(this, bounds.getMaxX() - textField.getPrefWidth() - 1, bounds.getMinY());
         popup.setOnHidden(e -> subscription.unsubscribe()); // release resources
 
-        // Hide popup when ENTER is pressed
+        // Hide popup when ENTER or ESCAPE is pressed
         EventStreams.eventsOf(popup, KeyEvent.KEY_RELEASED)
                     .filter(it -> it.getCode() == KeyCode.ENTER || it.getCode() == KeyCode.ESCAPE)
                     .subscribeForOne(e -> {
@@ -179,7 +179,8 @@ public class SearchableTreeView<T> extends TreeView<T> {
     }
 
     private Subscription subscribeKeyNav(int numResults, Var<Integer> curIdx) {
-
+        // Make TAB or F3 cycle forward,
+        // SHIFT+TAB or SHIFT+F3 cycle backwards
         return EventStreams.eventsOf(this, KeyEvent.KEY_RELEASED)
                            .filter(it -> it.getCode() == KeyCode.F3 || it.getCode() == KeyCode.TAB)
                            .subscribe(ke -> {
