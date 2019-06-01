@@ -44,6 +44,7 @@ import javafx.stage.Popup;
 
 public class SearchableTreeView<T> extends TreeView<T> {
 
+    public static final int MIN_QUERY_LENGTH = 1;
     private final TreeViewWrapper<T> myWrapper = new TreeViewWrapper<>(this);
 
     @Nullable
@@ -97,7 +98,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
         Val<String> query = Val.wrap(textField.textProperty())
                                .filter(StringUtils::isNotBlank).map(String::trim)
-                               .filter(it -> it.length() > 1);
+                               .filter(it -> it.length() >= MIN_QUERY_LENGTH);
 
         Var<Integer> numResults = Var.newSimpleVar(0);
 

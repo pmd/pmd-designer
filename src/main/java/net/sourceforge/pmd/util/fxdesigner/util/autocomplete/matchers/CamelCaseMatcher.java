@@ -83,7 +83,7 @@ public final class CamelCaseMatcher {
                 if (curMatchStart == -1) {
                     // start of a match
 
-                    if (matchOnlyWordStarts && !isStartOfWord && !isWordStart(candidate, candIdx, fromIndex)) {
+                    if (matchOnlyWordStarts && !isStartOfWord && !isWordStart(candidate, candIdx)) {
                         // not the start of a word, don't record it as a match
                         candIdx++;
                         continue;
@@ -92,7 +92,7 @@ public final class CamelCaseMatcher {
                     // set match start to current
                     curMatchStart = candIdx;
 
-                    if (isWordStart(candidate, candIdx, fromIndex)) {
+                    if (isWordStart(candidate, candIdx)) {
                         // start of a match on the start of a word
                         // e.g. query       coit
                         //      candidate   ClassOrInterfaceType
@@ -128,8 +128,8 @@ public final class CamelCaseMatcher {
 
                     // matching at the very beginning of the candidate is heavily prioritized
                     int multiplier =
-                        isStartOfWord && curMatchStart == 0 ? 8
-                                                            : isStartOfWord ? 4 : 2;
+                        isStartOfWord && curMatchStart == fromIndex ? 8
+                                                                    : isStartOfWord ? 4 : 2;
 
                     score += matchLength * multiplier;
                 }
@@ -201,8 +201,8 @@ public final class CamelCaseMatcher {
         return new MatchResult<>(finalScore, data, candidate, query, flow);
     }
 
-    private static boolean isWordStart(String pascalCased, int idx, int fromIndex) {
-        if (idx == fromIndex || idx == 0) {
+    private static boolean isWordStart(String pascalCased, int idx) {
+        if (idx == 0) {
             return true;
         }
         char c = pascalCased.charAt(idx);
