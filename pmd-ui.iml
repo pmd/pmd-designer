@@ -59,6 +59,7 @@
     <orderEntry type="library" name="Maven: org.fxmisc.undo:undofx:2.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.fxmisc.flowless:flowless:0.6" level="project" />
     <orderEntry type="library" name="Maven: org.fxmisc.wellbehaved:wellbehavedfx:0.3.3" level="project" />
+    <orderEntry type="library" name="Maven: org.checkerframework:checker-qual:2.5.2" level="project" />
     <orderEntry type="library" name="Maven: org.controlsfx.custom:controlsfx-mr-jar:1.0" level="project" />
     <orderEntry type="library" name="Maven: com.github.oowekyala:fx-live-templates:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.8.1" level="project" />
@@ -85,7 +86,6 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.google.errorprone:error_prone_annotations:2.1.3" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.google.guava:guava:26.0-jre" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.checkerframework:checker-qual:2.5.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.google.j2objc:j2objc-annotations:1.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.antlr:antlr-runtime:3.5.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.antlr:stringtemplate:3.2.1" level="project" />
