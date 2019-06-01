@@ -143,8 +143,25 @@
     }
   }
 
-  .autocomplete-match {
+  .text.autocomplete-match {
     -fx-fill: orange;
+  }
+}
+
+.tree-cell {
+  .text {
+    -fx-fill: @fx-text-fill;
+  }
+
+  .text.autocomplete-match {
+    -fx-fill: darken(orange, 5%);
+    -fx-font-weight: bold;
+    -fx-underline: true;
+  }
+
+  &.depth-0 .text.autocomplete-match {
+    -fx-fill: white;
+
   }
 }
 
