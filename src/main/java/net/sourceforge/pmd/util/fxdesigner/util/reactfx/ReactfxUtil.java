@@ -1,5 +1,4 @@
-
-/**
+/*
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
@@ -60,7 +59,7 @@ public final class ReactfxUtil {
 
         @Override
         public void unsubscribe() {
-
+            // do nothing
         }
     };
 

@@ -182,8 +182,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                         }
                         refresh();
                         return sub;
-                    }).and(
-                    () -> {
+                    }).and(() -> {
                         selectedResults.ifPresent(lst -> lst.forEach(it -> it.getData().currentSearchResult.setValue(null)));
                         refresh();
                     });
@@ -219,7 +218,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                               .collect(Collectors.toList());
     }
 
-    public static abstract class SearchableTreeItem<T> extends TreeItem<T> {
+    public abstract static class SearchableTreeItem<T> extends TreeItem<T> {
 
         private final Var<SearchableTreeCell<T>> treeCell = Var.newSimpleVar(null);
         private final Var<MatchResult> currentSearchResult = Var.newSimpleVar(null);

@@ -72,20 +72,21 @@ public final class ControlUtil {
         Val.wrap(field.textProperty())
            .values()
            .withDefaultEvent(field.getText())
-           .subscribe(text -> field.pseudoClassStateChanged(PseudoClass.getPseudoClass("empty-input"), StringUtils.isBlank(text)));
+            .subscribe(text -> field.pseudoClassStateChanged(PseudoClass.getPseudoClass("empty-input"), StringUtils.isBlank(text)));
 
     }
 
     public static void registerDoubleClickListener(javafx.scene.Node node, Runnable action) {
 
-        node.addEventHandler(MouseEvent.MOUSE_CLICKED,
-                             e -> {
-                                 if (e.getButton() == MouseButton.PRIMARY
-                                     && (e.getClickCount() > 1)) {
-                                     action.run();
-                                     e.consume();
-                                 }
-                             });
+        node.addEventHandler(
+            MouseEvent.MOUSE_CLICKED,
+            e -> {
+                if (e.getButton() == MouseButton.PRIMARY
+                    && e.getClickCount() > 1) {
+                    action.run();
+                    e.consume();
+                }
+            });
 
     }
 

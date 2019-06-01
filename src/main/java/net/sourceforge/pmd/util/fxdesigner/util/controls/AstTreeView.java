@@ -1,4 +1,4 @@
-/**
+/*
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
@@ -28,7 +28,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import javafx.beans.NamedArg;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 
 
 /**

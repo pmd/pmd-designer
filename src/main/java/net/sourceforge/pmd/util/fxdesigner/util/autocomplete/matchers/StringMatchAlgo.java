@@ -2,10 +2,6 @@
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
-/**
- * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
- */
-
 package net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers;
 
 import java.util.List;
@@ -36,6 +32,9 @@ public final class StringMatchAlgo {
     public static final int WORST_SCORE = Integer.MIN_VALUE;
     public static final int PERFECT_SCORE = Integer.MAX_VALUE;
 
+    private StringMatchAlgo() {
+
+    }
 
     public static <T> Stream<MatchResult<T>> filterResults(List<T> candidates, Function<T, String> matchExtractor, String query, MatchSelector<T> limiter) {
         if (query.length() < MIN_QUERY_LENGTH) {

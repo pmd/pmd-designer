@@ -2,14 +2,6 @@
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
-/*
- * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
- */
-
-/**
- * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
- */
-
 package net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.StringMatchAlgo.PERFECT_SCORE;
@@ -213,10 +205,6 @@ public final class CamelCaseMatcher {
 
     private static <T> MatchResult<T> impossibleMatch(T data, String candidate, String query) {
         return new MatchResult<>(WORST_SCORE, data, candidate, query, new TextFlow(StringMatchAlgo.makeNormalText(candidate)));
-    }
-
-    private static <T> MatchResult<T> perfectMatch(T data, String candidate, String query) {
-        return new MatchResult<>(PERFECT_SCORE, data, candidate, query, new TextFlow(StringMatchAlgo.makeHighlightedText(candidate)));
     }
 
     /**
