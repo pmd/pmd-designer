@@ -32,7 +32,6 @@ import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
@@ -139,6 +138,10 @@ public final class XPathRuleEditorController extends AbstractController implemen
         this.testCollectionController = new TestCollectionController(root, ruleBuilder);
         this.ruleBuilder = ruleBuilder;
 
+        if (ruleBuilder.getLanguage() == null) {
+            ruleBuilder.setLanguage(globalLanguageProperty().getValue());
+        }
+
         this.exportWizard = new SoftReferenceCache<>(() -> new ExportXPathWizardController(root));
         this.propertiesPopover = new PopOverWrapper<>((t, f) -> PropertyCollectionView.makePopOver(t, titleProperty(), root));
     }
@@ -156,7 +159,6 @@ public final class XPathRuleEditorController extends AbstractController implemen
         exportXpathToRuleButton.setOnAction(e -> showExportXPathToRuleWizard());
 
         // this is the source of xpath results
-        // FIXME should be local to a single rule builder
         getRuleBuilder().modificationsTicks().successionEnds(XPATH_REFRESH_DELAY)
                         .map(tick -> new VersionedXPathQuery(
                                  getRuleBuilder().getXpathVersion(),
@@ -215,7 +217,10 @@ public final class XPathRuleEditorController extends AbstractController implemen
 
     // Binds the underlying rule parameters to the parent UI, disconnecting it from the wizard if need be
     private void bindToParent() {
-        DesignerUtil.rewire(getRuleBuilder().languageProperty(), getService(DesignerRoot.AST_MANAGER).languageVersionProperty().map(LanguageVersion::getLanguage));
+        if (getRuleBuilder().getLanguage() == null) {
+            DesignerUtil.rewire(getRuleBuilder().languageProperty(),
+                                globalLanguageProperty());
+        }
 
         ReactfxUtil.rewireInit(getRuleBuilder().xpathVersionProperty(), xpathVersionProperty());
         ReactfxUtil.rewireInit(getRuleBuilder().xpathExpressionProperty(), xpathExpressionProperty());

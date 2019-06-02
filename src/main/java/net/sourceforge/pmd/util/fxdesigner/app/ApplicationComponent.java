@@ -52,6 +52,9 @@ public interface ApplicationComponent {
     }
 
 
+    /**
+     * The language is now global to the app.
+     */
     default Val<Language> globalLanguageProperty() {
         return getService(DesignerRoot.APP_GLOBAL_LANGUAGE);
     }
