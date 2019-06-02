@@ -31,7 +31,6 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
 import net.sourceforge.pmd.util.fxdesigner.util.Tuple3;
-import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 
 
 /**
@@ -117,7 +116,6 @@ public class ASTManagerImpl implements ASTManager {
         return sourceCode;
     }
 
-    @PersistentProperty
     @Override
     public String getSourceCode() {
         return sourceCode.getValue();
@@ -153,7 +151,6 @@ public class ASTManagerImpl implements ASTManager {
     }
 
 
-    @PersistentProperty
     public LanguageVersion getLanguageVersion() {
         return languageVersion.getValue();
     }

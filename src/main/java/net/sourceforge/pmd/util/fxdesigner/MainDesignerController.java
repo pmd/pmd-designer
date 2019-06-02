@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import static net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups.showLicensePopup;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguages;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,19 +16,25 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.reactfx.Subscription;
+import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.lang.Language;
+import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.popups.EventLogController;
 import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LimitedSizeStack;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox;
 
 import javafx.beans.NamedArg;
 import javafx.fxml.FXML;
@@ -36,6 +43,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
@@ -50,6 +58,7 @@ import javafx.stage.FileChooser;
  */
 @SuppressWarnings("PMD.UnusedPrivateField")
 public class MainDesignerController extends AbstractController {
+
 
 
     /* Menu bar */
@@ -69,6 +78,9 @@ public class MainDesignerController extends AbstractController {
     private Menu openRecentMenu;
     @FXML
     private Menu fileMenu;
+
+    private final Var<Language> globalLanguage = Var.newSimpleVar(LanguageRegistry.getDefaultLanguage());
+
     /* Bottom panel */
     @FXML
     private SplitPane mainHorizontalSplitPane;
@@ -92,14 +104,17 @@ public class MainDesignerController extends AbstractController {
 
     // we cache it but if it's not used the FXML is not created, etc
     private final SoftReferenceCache<EventLogController> eventLogController;
+    @FXML
+    private DynamicWidthChoicebox<Language> languageChoicebox;
 
     // Other fields
     private final Stack<File> recentFiles = new LimitedSizeStack<>(5);
 
-
     public MainDesignerController(@NamedArg("designerRoot") DesignerRoot designerRoot) {
         super(designerRoot);
         eventLogController = new SoftReferenceCache<>(() -> new EventLogController(designerRoot));
+
+        designerRoot.registerService(DesignerRoot.APP_GLOBAL_LANGUAGE, globalLanguage);
     }
 
 
@@ -115,7 +130,6 @@ public class MainDesignerController extends AbstractController {
         saveMenuItem.setOnAction(e -> getService(DesignerRoot.PERSISTENCE_MANAGER).persistSettings(this));
         fileMenu.setOnShowing(e -> onFileMenuShowing());
         aboutMenuItem.setOnAction(e -> SimplePopups.showAboutPopup(getDesignerRoot()));
-
         setupAuxclasspathMenuItem.setOnAction(e -> sourceEditorController.showAuxclasspathSetupPopup());
 
         openEventLogMenuItem.setOnAction(e -> {
@@ -126,6 +140,17 @@ public class MainDesignerController extends AbstractController {
         openEventLogMenuItem.textProperty().bind(
             getLogger().numNewLogEntriesProperty().map(i -> "Event _Log (" + (i > 0 ? i : "no") + " new)")
         );
+
+        languageChoicebox.getItems().addAll(getSupportedLanguages().sorted().collect(Collectors.toList()));
+        languageChoicebox.setConverter(DesignerUtil.stringConverter(Language::getName, LanguageRegistryUtil::findLanguageByName));
+
+        SingleSelectionModel<Language> langSelector = languageChoicebox.getSelectionModel();
+        Language restored = globalLanguage.getValue();
+
+        Var.fromVal(langSelector.selectedItemProperty(), langSelector::select)
+           .bindBidirectional(globalLanguage);
+
+        langSelector.select(restored);
 
     }
 
@@ -234,6 +259,14 @@ public class MainDesignerController extends AbstractController {
         getMainStage().setMaximized(b);
     }
 
+    @PersistentProperty
+    public Language getGlobalLanguage() {
+        return globalLanguage.getValue();
+    }
+
+    public void setGlobalLanguage(Language lang) {
+        globalLanguage.setValue(lang);
+    }
 
     @Override
     public List<AbstractController> getChildren() {

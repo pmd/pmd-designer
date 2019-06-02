@@ -4,10 +4,13 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app;
 
+import java.util.function.Supplier;
+
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.value.Val;
 
+import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NodeSelectionEvent;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
@@ -49,6 +52,8 @@ public interface DesignerRoot {
 
     /** Requests to load a test case in the editor. */
     AppServiceDescriptor<MessageChannel<@Nullable LiveTestCase>> TEST_LOADER = new AppServiceDescriptor<>(MessageChannel.class);
+
+    AppServiceDescriptor<Val<Language>> APP_GLOBAL_LANGUAGE = new AppServiceDescriptor<>(Val.class);
 
     /**
      *  Requests to create a test case for the currently open rule.

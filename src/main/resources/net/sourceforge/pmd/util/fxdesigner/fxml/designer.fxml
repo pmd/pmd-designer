@@ -2,6 +2,7 @@
 
 <!--suppress JavaFxDefaultTag -->
 
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -54,6 +55,12 @@
                                         <MenuItem fx:id="licenseMenuItem" text="_License" />
                                         <MenuItem fx:id="aboutMenuItem" text="_About"/>
                                     </items>
+                                </Menu>
+
+                                <Menu>
+                                    <graphic>
+                                        <DynamicWidthChoicebox fx:id="languageChoicebox"/>
+                                    </graphic>
                                 </Menu>
 
                             </menus>

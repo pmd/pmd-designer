@@ -93,4 +93,7 @@ public final class LanguageRegistryUtil {
                                       .get();
     }
 
+    public static Language findLanguageByName(String n) {
+        return getSupportedLanguages().filter(it -> it.getName().equals(n)).findFirst().orElse(LanguageRegistry.getDefaultLanguage());
+    }
 }

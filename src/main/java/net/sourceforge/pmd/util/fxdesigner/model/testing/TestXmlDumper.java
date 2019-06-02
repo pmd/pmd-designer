@@ -17,7 +17,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -108,7 +107,11 @@ public class TestXmlDumper {
         testCode.appendChild(codeElement);
 
 
-        if (descriptor.getLanguageVersion() != null) {
+        boolean hasNonDefaultVersion = descriptor.languageVersionProperty()
+                                                 .getOpt()
+                                                 .filter(it -> it.getLanguage().getDefaultVersion() != it)
+                                                 .isPresent();
+        if (hasNonDefaultVersion) {
             Element sourceType = doc.createElementNS(NS, "source-type");
             sourceType.setTextContent(descriptor.getLanguageVersion().getTerseName());
             testCode.appendChild(sourceType);

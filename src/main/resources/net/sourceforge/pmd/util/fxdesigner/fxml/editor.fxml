@@ -33,7 +33,7 @@
                                            AnchorPane.rightAnchor="0.0"
                                            AnchorPane.topAnchor="0.0">
                             <toolbarItems>
-                                <DynamicWidthChoicebox fx:id="languageChoicebox"/>
+                                <DynamicWidthChoicebox fx:id="languageVersionChoicebox"/>
                                 <Button fx:id="convertToTestCaseButton" text="Convert to test case">
                                     <tooltip>
                                         <Tooltip text="Add a new test case for the contents of the area"/>

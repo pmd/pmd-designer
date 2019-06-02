@@ -4,18 +4,16 @@
 
 package net.sourceforge.pmd.util.fxdesigner;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExceptionMessage;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguageVersion;
-import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguageVersions;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.latestValue;
-import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -25,9 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.controlsfx.control.PopOver;
 import org.reactfx.Subscription;
+import org.reactfx.collection.LiveArrayList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.ClasspathClassLoader;
@@ -92,7 +92,7 @@ public class SourceEditorController extends AbstractController {
     @FXML
     private Button convertToTestCaseButton;
     @FXML
-    private DynamicWidthChoicebox<LanguageVersion> languageChoicebox;
+    private DynamicWidthChoicebox<LanguageVersion> languageVersionChoicebox;
     @FXML
     private ToolbarTitledPane testCaseToolsTitledPane;
     @FXML
@@ -149,12 +149,10 @@ public class SourceEditorController extends AbstractController {
 
     @Override
     protected void beforeParentInit() {
-        initializeLanguageSelector(); // languageVersionProperty() must be initialized
 
-        languageVersionProperty().values()
-                                 .filterMap(Objects::nonNull, LanguageVersion::getLanguage)
-                                 .distinct()
-                                 .subscribe(nodeEditionCodeArea::updateSyntaxHighlighter);
+        globalLanguageProperty().values()
+                                .filter(Objects::nonNull)
+                                .subscribe(nodeEditionCodeArea::updateSyntaxHighlighter);
 
         ((ASTManagerImpl) astManager).classLoaderProperty().bind(auxclasspathClassLoader);
 
@@ -179,14 +177,25 @@ public class SourceEditorController extends AbstractController {
                 record.setExactRange(true);
                 currentlyOpenTestCase.ifPresent(v -> v.getExpectedViolations().add(record));
             });
+
+        currentlyOpenTestCase.orElseConst(defaultTestCase)
+                             .changes()
+                             .subscribe(it -> handleTestOpenRequest(it.getOldValue(), it.getNewValue()));
+
+        currentlyOpenTestCase.values().subscribe(violationsPopover::rebind);
+
     }
 
     @Override
     public void afterParentInit() {
+        initializeLanguageSelector();
 
-        rewire(((ASTManagerImpl) astManager).languageVersionProperty(), languageVersionUIProperty);
+        // languageVersionUiProperty is initialised
 
-        nodeEditionCodeArea.replaceText(astManager.getSourceCode());
+        ((ASTManagerImpl) astManager).languageVersionProperty().bind(languageVersionUIProperty.orElse(globalLanguageProperty().map(Language::getDefaultVersion)));
+
+        handleTestOpenRequest(defaultTestCase, defaultTestCase);
+
 
         Var<String> areaText = Var.fromVal(
             latestValue(nodeEditionCodeArea.plainTextChanges()
@@ -208,10 +217,8 @@ public class SourceEditorController extends AbstractController {
             .messageStream(true, this)
             .subscribe(currentlyOpenTestCase::setValue);
 
-        currentlyOpenTestCase.orElseConst(defaultTestCase).changes().subscribe(it -> handleTestOpenRequest(it.getOldValue(), it.getNewValue()));
 
-        currentlyOpenTestCase.values().subscribe(violationsPopover::rebind);
-
+        // this is to hide the toolbar when we're not in test case mode
         currentlyOpenTestCase.map(it -> true).orElseConst(false)
                              .values().distinct()
                              .subscribe(isTestCaseMode -> {
@@ -249,7 +256,15 @@ public class SourceEditorController extends AbstractController {
             nodeEditionCodeArea.replaceText(newValue.getSource());
         }
 
-        Subscription sub = ReactfxUtil.rewireInit(newValue.sourceProperty(), astManager.sourceCodeProperty());
+        if (newValue.getLanguageVersion() == null) {
+            newValue.setLanguageVersion(globalLanguageProperty().getValue().getDefaultVersion());
+        }
+
+        Subscription sub = Subscription.multi(
+            ReactfxUtil.rewireInit(newValue.sourceProperty(), astManager.sourceCodeProperty()),
+            ReactfxUtil.rewireInit(newValue.languageVersionProperty(), languageVersionUIProperty)
+        );
+
         newValue.addCommitHandler(t -> sub.unsubscribe());
     }
 
@@ -284,11 +299,22 @@ public class SourceEditorController extends AbstractController {
 
 
     private void initializeLanguageSelector() {
-        languageChoicebox.getItems().addAll(getSupportedLanguageVersions().stream().sorted().collect(Collectors.toList()));
 
-        languageChoicebox.setConverter(DesignerUtil.stringConverter(LanguageVersion::getName, LanguageRegistryUtil::getLanguageVersionByName));
+        languageVersionChoicebox.setConverter(DesignerUtil.stringConverter(LanguageVersion::getName, LanguageRegistryUtil::getLanguageVersionByName));
 
-        languageVersionUIProperty = Var.suspendable(languageChoicebox.valueProperty());
+        getService(DesignerRoot.APP_GLOBAL_LANGUAGE)
+            .values()
+            .subscribe(lang -> {
+                languageVersionChoicebox.setItems(lang.getVersions().stream().sorted().collect(Collectors.toCollection(LiveArrayList::new)));
+                languageVersionChoicebox.getSelectionModel().select(lang.getDefaultVersion());
+                boolean disable = lang.getVersions().size() == 1;
+
+                languageVersionChoicebox.setVisible(!disable);
+                languageVersionChoicebox.setManaged(!disable);
+            });
+
+
+        languageVersionUIProperty = Var.suspendable(languageVersionChoicebox.valueProperty());
         // this will be overwritten by property restore if needed
         languageVersionUIProperty.setValue(defaultLanguageVersion());
     }
@@ -352,7 +378,7 @@ public class SourceEditorController extends AbstractController {
 
     @Override
     public List<? extends SettingsOwner> getChildrenSettingsNodes() {
-        return asList(astManager, defaultTestCase);
+        return Collections.singletonList(defaultTestCase);
     }
 
     @Override
