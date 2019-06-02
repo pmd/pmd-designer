@@ -12,7 +12,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.Subscription;
 
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
@@ -25,13 +24,12 @@ import net.sourceforge.pmd.util.fxdesigner.util.StageBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighlighters;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlSyntaxHighlighter;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.ControlUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -99,24 +97,21 @@ public final class TestExportWizardController extends AbstractController {
         exportResultArea.setSyntaxHighlighter(AvailableSyntaxHighlighters.XML);
 
 
-        copyResultButton.setOnAction(e -> {
-            final ClipboardContent content = new ClipboardContent();
-            content.putString(exportResultArea.getText());
-            Clipboard.getSystemClipboard().setContent(content);
-            SimplePopups.showActionFeedback(copyResultButton, AlertType.CONFIRMATION, "Copied to clipboard");
-        });
+        ControlUtil.copyToClipboardButton(copyResultButton, exportResultArea::getText);
 
         saveToFileButton.setOnAction(e -> {
 
             FileChooser chooser = new FileChooser();
-            chooser.setTitle("Pick a file to write to");
+            chooser.setTitle("Write XML to a file");
             File file = chooser.showSaveDialog(myPopupStage);
 
             if (file != null) {
+
                 try (OutputStream is = Files.newOutputStream(file.toPath());
                      Writer out = new BufferedWriter(new OutputStreamWriter(is))) {
 
                     out.write(exportResultArea.getText());
+                    SimplePopups.showActionFeedback(saveToFileButton, AlertType.CONFIRMATION, "File saved");
 
                 } catch (IOException ex) {
                     logUserException(ex, Category.TEST_EXPORT_EXCEPTION);

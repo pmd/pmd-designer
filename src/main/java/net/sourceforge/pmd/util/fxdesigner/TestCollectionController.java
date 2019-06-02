@@ -86,6 +86,11 @@ public class TestCollectionController extends AbstractController {
             wizard.showYourself(wizard.bindToTestCollection(getTestCollection()));
         });
 
+        // disable export if no test cases
+        exportTestsButton.disableProperty().bind(
+            getTestCollection().getStash().sizeProperty().map(it -> it == 0)
+        );
+
         getService(DesignerRoot.TEST_CREATOR)
             .messageStream(true, this)
             .subscribe(ltc -> getTestCollection().addTestCase(ltc.unfreeze()));

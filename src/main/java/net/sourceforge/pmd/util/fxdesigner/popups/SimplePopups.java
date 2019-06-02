@@ -30,6 +30,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
@@ -139,6 +140,13 @@ public final class SimplePopups {
         };
 
 
+    }
+
+    public static boolean confirmAction(String question) {
+        Alert licenseAlert = new Alert(AlertType.CONFIRMATION);
+
+        licenseAlert.setContentText(question);
+        return licenseAlert.showAndWait().map(it -> it == ButtonType.YES).orElse(false);
     }
 
     public static void showLicensePopup() {

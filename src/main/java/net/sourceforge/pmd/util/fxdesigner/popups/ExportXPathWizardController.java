@@ -36,6 +36,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.StageBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlSyntaxHighlighter;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.ControlUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyCollectionView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.RulePrioritySlider;
@@ -57,8 +58,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -133,11 +132,7 @@ public final class ExportXPathWizardController implements Initializable {
         exportResultArea.setSyntaxHighlighter(new XmlSyntaxHighlighter());
         exportResultArea.setEditable(false);
 
-        copyResultButton.setOnAction(e -> {
-            final ClipboardContent content = new ClipboardContent();
-            content.putString(exportResultArea.getText());
-            Clipboard.getSystemClipboard().setContent(content);
-        });
+        ControlUtil.copyToClipboardButton(copyResultButton, exportResultArea::getText);
 
         resetMetadataButton.setOnAction(e -> {
             Alert alert = new Alert(AlertType.CONFIRMATION, "Wipe out the rule's metadata?",

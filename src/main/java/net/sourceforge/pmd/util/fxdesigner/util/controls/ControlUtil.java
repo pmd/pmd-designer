@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.reactfx.EventStreams;
@@ -12,9 +13,13 @@ import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 
+import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
+
 import com.github.oowekyala.rxstring.ReactfxExtensions;
 import javafx.css.PseudoClass;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -22,6 +27,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -160,5 +167,14 @@ public final class ControlUtil {
             LiveList.wrapVal(node.skinProperty()),
             (w, i) -> hook.apply(w)
         );
+    }
+
+    public static void copyToClipboardButton(Button button, Supplier<String> copiedText) {
+        button.setOnAction(e -> {
+            final ClipboardContent content = new ClipboardContent();
+            content.putString(copiedText.get());
+            Clipboard.getSystemClipboard().setContent(content);
+            SimplePopups.showActionFeedback(button, AlertType.CONFIRMATION, "Copied to clipboard");
+        });
     }
 }
