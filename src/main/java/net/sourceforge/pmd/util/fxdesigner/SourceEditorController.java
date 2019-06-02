@@ -150,9 +150,11 @@ public class SourceEditorController extends AbstractController {
     @Override
     protected void beforeParentInit() {
 
-        globalLanguageProperty().values()
-                                .filter(Objects::nonNull)
-                                .subscribe(nodeEditionCodeArea::updateSyntaxHighlighter);
+        astManager.languageVersionProperty()
+                  .map(LanguageVersion::getLanguage)
+                  .values()
+                  .filter(Objects::nonNull)
+                  .subscribe(nodeEditionCodeArea::updateSyntaxHighlighter);
 
         ((ASTManagerImpl) astManager).classLoaderProperty().bind(auxclasspathClassLoader);
 

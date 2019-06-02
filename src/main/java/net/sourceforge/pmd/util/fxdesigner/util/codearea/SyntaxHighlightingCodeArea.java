@@ -97,13 +97,14 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
         syntaxHighlighter.ifPresent(previous -> getStyleClass().remove(previous.getLanguageTerseName()));
         syntaxAutoRefresh.ifPresent(Subscription::unsubscribe);
 
+        syntaxHighlighter.setValue(highlighter);
+
         if (highlighter == null) {
             syntaxAutoRefresh.setValue(null);
             this.setCurrentSyntaxHighlight(null);
             return;
         }
 
-        syntaxHighlighter.setValue(highlighter);
 
         getStyleClass().add(highlighter.getLanguageTerseName());
         syntaxAutoRefresh.setValue(subscribeSyntaxHighlighting(defaultHighlightingTicks(), synchronousUpdateTicks, highlighter));
