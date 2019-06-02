@@ -17,6 +17,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.MessageChannel;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
+import net.sourceforge.pmd.util.fxdesigner.app.services.TestCreatorService;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
@@ -106,11 +107,18 @@ public class RuleEditorsController extends AbstractController {
         ReactfxUtil.subscribeDisposable(
             selectedEditorProperty(),
             x -> // connect the currently selected rule to the global state of the app
-                Subscription.multi(
+            {
+                TestCreatorService localCreator = x.getService(DesignerRoot.TEST_CREATOR);
+                TestCreatorService globalCreator = getService(DesignerRoot.TEST_CREATOR);
+                return Subscription.multi(
+                    // it's downstream.connect(upstream)
                     getService(DesignerRoot.LATEST_XPATH).connect(x.getService(DesignerRoot.LATEST_XPATH)),
                     getService(DesignerRoot.TEST_LOADER).connect(x.getService(DesignerRoot.TEST_LOADER)),
-                    x.getService(DesignerRoot.TEST_CREATOR).connect(getService(DesignerRoot.TEST_CREATOR))
-                ));
+                    // those two channels forward messages in opposite directions
+                    localCreator.getAdditionRequests().connect(globalCreator.getAdditionRequests()),
+                    globalCreator.getSourceFetchRequests().connect(localCreator.getSourceFetchRequests())
+                );
+            });
 
         selectedEditorProperty().values().filter(Objects::nonNull)
                                 .subscribe(it -> getService(DesignerRoot.TEST_LOADER).pushEvent(this, it.selectedTestCaseProperty().getValue()));
@@ -121,7 +129,7 @@ public class RuleEditorsController extends AbstractController {
         DesignerRoot scope = getDesignerRoot().spawnScope();
         scope.registerService(DesignerRoot.LATEST_XPATH, new MessageChannel<>(Category.XPATH_EVENT_FORWARDING));
         scope.registerService(DesignerRoot.TEST_LOADER, new MessageChannel<>(Category.TEST_LOADING_EVENT));
-        scope.registerService(DesignerRoot.TEST_CREATOR, new MessageChannel<>(Category.TEST_LOADING_EVENT));
+        scope.registerService(DesignerRoot.TEST_CREATOR, new TestCreatorService());
         return scope;
     }
 

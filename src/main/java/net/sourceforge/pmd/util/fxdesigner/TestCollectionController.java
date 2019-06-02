@@ -20,6 +20,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser;
 import net.sourceforge.pmd.util.fxdesigner.popups.TestExportWizardController;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ControlUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.HelpfulPlaceholder;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.TestCaseListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
@@ -63,6 +64,12 @@ public class TestCollectionController extends AbstractController {
 
         testsListView.setCellFactory(c -> new TestCaseListCell(this));
         testsListView.setEditable(true);
+        testsListView.setPlaceholder(
+            HelpfulPlaceholder.withMessage("There's no tests cases here")
+                              .withSuggestedAction("Add empty test case", addTestButton::fire)
+                              .withSuggestedAction("Add from current source", () -> getService(DesignerRoot.TEST_CREATOR).getSourceFetchRequests().pushEvent(this, null))
+                              .build()
+        );
 
         ControlUtil.makeListViewNeverScrollHorizontal(testsListView);
 
@@ -92,6 +99,7 @@ public class TestCollectionController extends AbstractController {
         );
 
         getService(DesignerRoot.TEST_CREATOR)
+            .getAdditionRequests()
             .messageStream(true, this)
             .subscribe(ltc -> getTestCollection().addTestCase(ltc.unfreeze()));
 

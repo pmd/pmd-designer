@@ -22,8 +22,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.controlsfx.control.PopOver;
+import org.reactfx.EventSource;
 import org.reactfx.Subscription;
+import org.reactfx.SuspendableEventStream;
 import org.reactfx.collection.LiveArrayList;
+import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -35,9 +38,11 @@ import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManagerImpl;
+import net.sourceforge.pmd.util.fxdesigner.app.services.TestCreatorService;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
+import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
@@ -55,6 +60,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.layout.AnchorPane;
@@ -76,7 +82,7 @@ public class SourceEditorController extends AbstractController {
      */
     private final LiveTestCase defaultTestCase = new LiveTestCase();
     /** Contains the loaded *user-defined* test case. */
-    private final Var<LiveTestCase> currentlyOpenTestCase = Var.newSimpleVar(null);
+    private final SuspendableVar<LiveTestCase> currentlyOpenTestCase = Var.suspendable(Var.newSimpleVar(null));
     private static final Duration AST_REFRESH_DELAY = Duration.ofMillis(100);
     private final ASTManager astManager;
     private final Var<List<File>> auxclasspathFiles = Var.newSimpleVar(emptyList());
@@ -146,6 +152,8 @@ public class SourceEditorController extends AbstractController {
         return null;
     }
 
+    private EventSource<Boolean> convertButtonVisibilitySource = new EventSource<>();
+    private SuspendableEventStream<Boolean> convertButtonVisibility = convertButtonVisibilitySource.suppressible();
 
     @Override
     protected void beforeParentInit() {
@@ -161,7 +169,20 @@ public class SourceEditorController extends AbstractController {
         // default text, will be overwritten by settings restore
         setText(getDefaultText());
 
-        convertToTestCaseButton.setOnAction(e -> getService(DesignerRoot.TEST_CREATOR).pushEvent(this, defaultTestCase.deepCopy()));
+        TestCreatorService creatorService = getService(DesignerRoot.TEST_CREATOR);
+        convertToTestCaseButton.setOnAction(
+            e -> {
+                convertButtonVisibility.suspendWhile(() -> creatorService.getAdditionRequests().pushEvent(this, defaultTestCase.deepCopy()));
+                SimplePopups.showActionFeedback(convertToTestCaseButton, AlertType.CONFIRMATION, "Test created")
+                            .subscribeForOne(done -> convertButtonVisibilitySource.push(false));
+
+            }
+        );
+
+        creatorService.getSourceFetchRequests()
+                      .messageStream(true, this)
+                      .subscribe(tick -> convertToTestCaseButton.fire());
+
 
         violationsButton.setOnAction(e -> violationsPopover.showOrFocus(p -> p.show(violationsButton)));
 
@@ -223,26 +244,30 @@ public class SourceEditorController extends AbstractController {
         // this is to hide the toolbar when we're not in test case mode
         currentlyOpenTestCase.map(it -> true).orElseConst(false)
                              .values().distinct()
-                             .subscribe(isTestCaseMode -> {
-                                 if (isTestCaseMode) {
-                                     convertToTestCaseButton.setVisible(false);
+                             .subscribe(this::toggleTestEditMode);
 
-                                     AnchorPane pane = emptyPane();
-                                     editorTitledPane.setContent(pane);
+        convertButtonVisibility.subscribe(visible -> convertToTestCaseButton.setVisible(visible));
 
-                                     AnchorPane otherPane = emptyPane();
-                                     testCaseToolsTitledPane.setContent(otherPane);
+    }
 
-                                     otherPane.getChildren().addAll(nodeEditionCodeArea);
-                                     pane.getChildren().addAll(testCaseToolsTitledPane);
-                                 } else {
-                                     convertToTestCaseButton.setVisible(true);
-                                     AnchorPane otherPane = emptyPane();
-                                     editorTitledPane.setContent(otherPane);
-                                     otherPane.getChildren().addAll(nodeEditionCodeArea);
-                                 }
-                             });
+    private void toggleTestEditMode(boolean isTestCaseMode) {
+        if (isTestCaseMode) {
+            convertButtonVisibilitySource.push(false);
 
+            AnchorPane pane = emptyPane();
+            editorTitledPane.setContent(pane);
+
+            AnchorPane otherPane = emptyPane();
+            testCaseToolsTitledPane.setContent(otherPane);
+
+            otherPane.getChildren().addAll(nodeEditionCodeArea);
+            pane.getChildren().addAll(testCaseToolsTitledPane);
+        } else {
+            convertButtonVisibilitySource.push(true);
+            AnchorPane otherPane = emptyPane();
+            editorTitledPane.setContent(otherPane);
+            otherPane.getChildren().addAll(nodeEditionCodeArea);
+        }
     }
 
     private static AnchorPane emptyPane() {

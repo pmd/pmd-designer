@@ -15,6 +15,8 @@ import org.apache.commons.io.IOUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
+import org.reactfx.EventSource;
+import org.reactfx.EventStream;
 
 import net.sourceforge.pmd.PMDVersion;
 import net.sourceforge.pmd.lang.Language;
@@ -30,7 +32,6 @@ import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
@@ -52,7 +53,7 @@ public final class SimplePopups {
     }
 
 
-    public static void showActionFeedback(@NonNull Node owner, AlertType type, @NonNull String message) {
+    public static EventStream<?> showActionFeedback(@NonNull Node owner, AlertType type, @NonNull String message) {
 
         @Nullable String iconLit;
         switch (type) {
@@ -75,11 +76,11 @@ public final class SimplePopups {
 
         Node icon = iconLit == null ? null : new FontIcon(iconLit);
 
-        showActionFeedback(owner, icon, message);
+        return showActionFeedback(owner, icon, message);
     }
 
-    public static void showActionFeedback(@NonNull Node owner, @NonNull String message) {
-        showActionFeedback(owner, (Node) null, message);
+    public static EventStream<?> showActionFeedback(@NonNull Node owner, @NonNull String message) {
+        return showActionFeedback(owner, (Node) null, message);
     }
 
     /**
@@ -87,8 +88,9 @@ public final class SimplePopups {
      * was performed.
      *
      * @param owner Node next to which the popup will be shown
+     * @return
      */
-    public static void showActionFeedback(@NonNull Node owner, @Nullable Node graphic, @NonNull String message) {
+    public static EventStream<?> showActionFeedback(@NonNull Node owner, @Nullable Node graphic, @NonNull String message) {
 
         Popup popup = new Popup();
         Label label = new Label(message, graphic);
@@ -101,12 +103,17 @@ public final class SimplePopups {
         popup.getContent().addAll(pane);
 
         Animation fadeTransition = bounceFadeAnimation(pane);
-        fadeTransition.setOnFinished(e -> popup.hide());
+        EventSource<?> closeTick = new EventSource<>();
+        fadeTransition.setOnFinished(e -> {
+            popup.hide();
+            closeTick.push(null);
+        });
 
         popup.setOnShowing(e -> fadeTransition.play());
 
         Bounds screenBounds = owner.localToScreen(owner.getBoundsInLocal());
         popup.show(owner, screenBounds.getMaxX(), screenBounds.getMinY());
+        return closeTick;
     }
 
 
@@ -140,13 +147,6 @@ public final class SimplePopups {
         };
 
 
-    }
-
-    public static boolean confirmAction(String question) {
-        Alert licenseAlert = new Alert(AlertType.CONFIRMATION);
-
-        licenseAlert.setContentText(question);
-        return licenseAlert.showAndWait().map(it -> it == ButtonType.YES).orElse(false);
     }
 
     public static void showLicensePopup() {

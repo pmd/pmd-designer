@@ -4,9 +4,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app;
 
-import java.util.function.Supplier;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.value.Val;
 
@@ -19,6 +16,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.EventLogger;
 import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalDiskManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.PersistenceManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.RichTextMapper;
+import net.sourceforge.pmd.util.fxdesigner.app.services.TestCreatorService;
 import net.sourceforge.pmd.util.fxdesigner.model.VersionedXPathQuery;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 
@@ -59,7 +57,7 @@ public interface DesignerRoot {
      *  Requests to create a test case for the currently open rule.
      *  The test case should be deep copied first *by the sender*.
      */
-    AppServiceDescriptor<MessageChannel<@NonNull LiveTestCase>> TEST_CREATOR = new AppServiceDescriptor<>(MessageChannel.class);
+    AppServiceDescriptor<TestCreatorService> TEST_CREATOR = new AppServiceDescriptor<>(TestCreatorService.class);
 
     AppServiceDescriptor<MessageChannel<VersionedXPathQuery>> LATEST_XPATH = new AppServiceDescriptor<>(MessageChannel.class);
 
