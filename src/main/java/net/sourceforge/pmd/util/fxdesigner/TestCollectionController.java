@@ -17,6 +17,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCollection;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser;
+import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
 import net.sourceforge.pmd.util.fxdesigner.popups.TestExportWizardController;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ControlUtil;
@@ -24,7 +25,9 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.HelpfulPlaceholder;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.TestCaseListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ToggleGroup;
@@ -65,7 +68,11 @@ public class TestCollectionController extends AbstractController {
         testsListView.setCellFactory(c -> new TestCaseListCell(this));
         testsListView.setEditable(true);
         testsListView.setPlaceholder(
-            HelpfulPlaceholder.withMessage("There's no tests cases here")
+            HelpfulPlaceholder.withMessage("This rule has no tests yet")
+                              .withSuggestedAction("Import from file", () -> {
+                                  importTestsButton.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), true);
+                                  importTestsButton.fire();
+                              })
                               .withSuggestedAction("Add empty test case", addTestButton::fire)
                               .withSuggestedAction("Add from current source", () -> getService(DesignerRoot.TEST_CREATOR).getSourceFetchRequests().pushEvent(this, null))
                               .build()
@@ -80,10 +87,24 @@ public class TestCollectionController extends AbstractController {
             FileChooser chooser = new FileChooser();
             chooser.setTitle("Load source from file");
             File file = chooser.showOpenDialog(getMainStage());
+            // a hack to get it to focus visibly
+            importTestsButton.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), false);
 
-            TestCollection coll = TestXmlParser.parseXmlTests(file.toPath(), e -> logUserException(e, Category.TEST_LOADING_EXCEPTION));
-            // TODO what if there's already test cases?
-            getTestCollection().rebase(coll);
+            if (file == null) {
+                SimplePopups.showActionFeedback(importTestsButton, AlertType.INFORMATION, "No file chosen");
+                return;
+            }
+
+            try {
+                TestCollection coll = TestXmlParser.parseXmlTests(file.toPath());
+                // TODO what if there's already test cases?
+                getTestCollection().rebase(coll);
+                SimplePopups.showActionFeedback(importTestsButton, AlertType.CONFIRMATION,
+                                                "Imported " + coll.getStash().size() + " test cases");
+            } catch (Exception e) {
+                SimplePopups.showActionFeedback(importTestsButton, AlertType.ERROR, "Error while importing, see event log");
+                logUserException(e, Category.TEST_LOADING_EXCEPTION);
+            }
         });
 
         addTestButton.setOnAction(any -> getTestCollection().addTestCase(new LiveTestCase().unfreeze()));

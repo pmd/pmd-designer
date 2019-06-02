@@ -260,14 +260,31 @@
 .action-feedback {
   -fx-background-color: @app-base-color;
   -fx-background-radius: 4px;
-  * {
-    @col: darken(@selection-focus-color, 10%);
+
+
+  .setColor(@col) {
     -fx-text-fill: @col;
     -fx-fill: @col;
   }
 
+  &.confirmation * {
+    .setColor(@success-color);
+  }
+
+  &.error * {
+    .setColor(@error-color);
+  }
+
+  &.warning * {
+    .setColor(@warning-color);
+  }
+
+  &.information * {
+    .setColor(darken(@selection-focus-color, 10%));
+  }
+
   .label {
-    -fx-padding: 3 5 5 3;
+    -fx-padding: 3 5 3 5;
   }
 }
 

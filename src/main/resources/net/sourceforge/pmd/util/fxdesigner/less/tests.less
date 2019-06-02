@@ -26,8 +26,8 @@
   }
 }
 
-@normal-test-status-stack: green, orange, red, gray;
-@test-status-on-gray-stack: lighten(green, 60%), orange, red, gray;
+@normal-test-status-stack: @success-color, @warning-color, @error-color, gray;
+@test-status-on-gray-stack: lighten(@success-color, 60%), @warning-color, @error-color, gray;
 
 
 .test-statuses(@normal-test-status-stack);

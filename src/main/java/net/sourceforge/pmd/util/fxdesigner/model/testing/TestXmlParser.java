@@ -6,17 +6,14 @@ package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -44,7 +41,7 @@ import net.sourceforge.pmd.testframework.TestDescriptor;
 public class TestXmlParser {
 
 
-    private Map<TestDescriptor, Element> parseTests(Rule rule, Document doc, Consumer<Exception> errorHandler) {
+    private Map<TestDescriptor, Element> parseTests(Rule rule, Document doc) {
         Element root = doc.getDocumentElement();
         NodeList testCodes = root.getElementsByTagName("test-code");
 
@@ -53,13 +50,9 @@ public class TestXmlParser {
         for (int i = 0; i < testCodes.getLength(); i++) {
             Element testCode = (Element) testCodes.item(i);
 
-            try {
-                TestDescriptor descriptor = parseSingle(rule, testCode, root);
-                descriptor.setNumberInDocument(i);
-                tests.put(descriptor, testCode);
-            } catch (Exception e) {
-                errorHandler.accept(new RuntimeException("Exception while parsing test #" + i, e));
-            }
+            TestDescriptor descriptor = parseSingle(rule, testCode, root);
+            descriptor.setNumberInDocument(i);
+            tests.put(descriptor, testCode);
         }
         return tests;
     }
@@ -192,50 +185,38 @@ public class TestXmlParser {
     }
 
 
-    public static TestCollection parseXmlTests(String xml, Consumer<Exception> errorHandler) {
+    public static TestCollection parseXmlTests(String xml) throws Exception {
         ByteArrayInputStream bis = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
-        return parseXmlTests(bis, errorHandler);
+        return parseXmlTests(bis);
     }
 
 
-    public static TestCollection parseXmlTests(Path path, Consumer<Exception> errorHandler) {
+    public static TestCollection parseXmlTests(Path path) throws Exception {
         try (FileInputStream is = new FileInputStream(path.toFile())) {
-            return parseXmlTests(is, errorHandler);
-        } catch (IOException e) {
-            errorHandler.accept(e);
-            return new TestCollection(Collections.emptyList());
+            return parseXmlTests(is);
         }
     }
 
-    public static TestCollection parseXmlTests(InputStream is, Consumer<Exception> errorHandler) {
+    private static TestCollection parseXmlTests(InputStream is) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        try {
-            Schema schema = schemaFactory.newSchema(RuleTst.class.getResource("/rule-tests_1_0_0.xsd"));
-            dbf.setSchema(schema);
-            dbf.setNamespaceAware(true);
-            DocumentBuilder builder = getDocumentBuilder(dbf);
 
-            Document doc = builder.parse(is);
-            Rule rule = new AbstractRule() {
-                @Override
-                public void apply(List<? extends net.sourceforge.pmd.lang.ast.Node> list, RuleContext ruleContext) {
-                    // do nothing
-                }
-            };
-            Map<TestDescriptor, Element> testDescriptors = new TestXmlParser().parseTests(rule, doc, errorHandler);
-            List<LiveTestCase> tests = testDescriptors.entrySet().stream().map(e -> LiveTestCase.fromDescriptor(e.getKey(), e.getValue())).collect(Collectors.toList());
-            return new TestCollection(tests);
-        } catch (SAXException | ParserConfigurationException | IOException e) {
-            errorHandler.accept(e);
-            return new TestCollection(Collections.emptyList());
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                errorHandler.accept(e);
+        Schema schema = schemaFactory.newSchema(RuleTst.class.getResource("/rule-tests_1_0_0.xsd"));
+        dbf.setSchema(schema);
+        dbf.setNamespaceAware(true);
+        DocumentBuilder builder = getDocumentBuilder(dbf);
+
+        Document doc = builder.parse(is);
+        Rule rule = new AbstractRule() {
+            @Override
+            public void apply(List<? extends net.sourceforge.pmd.lang.ast.Node> list, RuleContext ruleContext) {
+                // do nothing
             }
-        }
+        };
+        Map<TestDescriptor, Element> testDescriptors = new TestXmlParser().parseTests(rule, doc);
+        List<LiveTestCase> tests = testDescriptors.entrySet().stream().map(e -> LiveTestCase.fromDescriptor(e.getKey(), e.getValue())).collect(Collectors.toList());
+        return new TestCollection(tests);
+
 
     }
 

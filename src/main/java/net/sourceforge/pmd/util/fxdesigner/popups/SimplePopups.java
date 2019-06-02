@@ -9,6 +9,7 @@ import static java.lang.Math.min;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -76,7 +77,7 @@ public final class SimplePopups {
 
         Node icon = iconLit == null ? null : new FontIcon(iconLit);
 
-        return showActionFeedback(owner, icon, message);
+        return showActionFeedback(owner, icon, message, type.name().toLowerCase(Locale.ROOT));
     }
 
     public static EventStream<?> showActionFeedback(@NonNull Node owner, @NonNull String message) {
@@ -90,7 +91,7 @@ public final class SimplePopups {
      * @param owner Node next to which the popup will be shown
      * @return
      */
-    public static EventStream<?> showActionFeedback(@NonNull Node owner, @Nullable Node graphic, @NonNull String message) {
+    public static EventStream<?> showActionFeedback(@NonNull Node owner, @Nullable Node graphic, @NonNull String message, String... cssClasses) {
 
         Popup popup = new Popup();
         Label label = new Label(message, graphic);
@@ -98,6 +99,7 @@ public final class SimplePopups {
 
         DesignerUtil.addCustomStyleSheets(pane, "designer");
         pane.getStyleClass().addAll("action-feedback");
+        pane.getStyleClass().addAll(cssClasses);
 
         pane.getChildren().addAll(label);
         popup.getContent().addAll(pane);

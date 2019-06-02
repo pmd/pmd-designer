@@ -67,7 +67,7 @@ class TestCaseParsingTest : FunSpec({
 
         """.trimIndent()
 
-        val tc = TestXmlParser.parseXmlTests(xmlTest) { throw AssertionError(it) }
+        val tc = TestXmlParser.parseXmlTests(xmlTest)
 
         tc.stash.size shouldBe 3
         tc.stash[0].also {
