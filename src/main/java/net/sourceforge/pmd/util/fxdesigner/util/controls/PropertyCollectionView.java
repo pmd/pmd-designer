@@ -85,11 +85,7 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
 
         Button addProperty = new Button("Add property");
 
-        AnchorPane.setLeftAnchor(addProperty, 0.);
-        AnchorPane.setRightAnchor(addProperty, 0.);
-        AnchorPane.setBottomAnchor(addProperty, 0.);
-        AnchorPane.setTopAnchor(addProperty, 0.);
-
+        ControlUtil.anchorFirmly(addProperty);
 
         addProperty.setOnAction(e -> {
             PropertyDescriptorSpec spec = new PropertyDescriptorSpec();

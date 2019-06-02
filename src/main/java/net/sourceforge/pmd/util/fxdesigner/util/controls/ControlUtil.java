@@ -17,6 +17,7 @@ import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
 
 import com.github.oowekyala.rxstring.ReactfxExtensions;
 import javafx.css.PseudoClass;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -26,11 +27,13 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.Skin;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.stage.Window;
 import javafx.util.Callback;
@@ -39,6 +42,13 @@ public final class ControlUtil {
 
     private ControlUtil() {
 
+    }
+
+    public static void anchorFirmly(Node node) {
+        AnchorPane.setLeftAnchor(node, 0.);
+        AnchorPane.setRightAnchor(node, 0.);
+        AnchorPane.setBottomAnchor(node, 0.);
+        AnchorPane.setTopAnchor(node, 0.);
     }
 
     /**
@@ -67,6 +77,30 @@ public final class ControlUtil {
             Val.wrap(view.itemsProperty())
                .flatMap(LiveList::sizeOf).map(it -> it == 0 ? fixedCellHeight : it * fixedCellHeight + 5)
         );
+    }
+
+    /**
+     * Make a list view fit precisely the height of its items.
+     *
+     * @param view            The listview to configure
+     * @param fixedCellHeight The cell height to use, a good default is 24
+     */
+    public static void makeTableViewFitToChildren(TableView<?> view, double fixedCellHeight) {
+        view.setFixedCellSize(fixedCellHeight);
+
+        subscribeOnSkin(view, skin -> {
+
+            Region header = (Region) skin.getNode().lookup(".nested-column-header");
+
+            view.maxHeightProperty().bind(
+                Val.wrap(view.itemsProperty())
+                   .flatMap(LiveList::sizeOf).map(it -> header.prefHeight(-1) + (it == 0 ? fixedCellHeight
+                                                                                         : it * fixedCellHeight + 5))
+            );
+
+            return view.maxHeightProperty()::unbind;
+        });
+
     }
 
     /**

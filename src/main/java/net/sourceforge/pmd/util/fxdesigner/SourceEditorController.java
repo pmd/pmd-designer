@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PopOverWrapper;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyMapView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ViolationCollectionView;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
@@ -121,6 +123,7 @@ public class SourceEditorController extends AbstractController {
     private NodeParentageCrumbBar focusNodeParentageCrumbBar;
 
     private final PopOverWrapper<LiveTestCase> violationsPopover;
+    private final PopOverWrapper<LiveTestCase> propertiesPopover;
 
     private Var<LanguageVersion> languageVersionUIProperty;
 
@@ -132,6 +135,7 @@ public class SourceEditorController extends AbstractController {
         designerRoot.registerService(DesignerRoot.AST_MANAGER, astManager);
 
         violationsPopover = new PopOverWrapper<>(this::rebindPopover);
+        propertiesPopover = new PopOverWrapper<>(this::rebindPropertiesPopover);
     }
 
     private PopOver rebindPopover(LiveTestCase testCase, PopOver existing) {
@@ -146,6 +150,25 @@ public class SourceEditorController extends AbstractController {
             } else {
                 ViolationCollectionView view = (ViolationCollectionView) existing.getUserData();
                 view.setItems(testCase.getExpectedViolations());
+                return existing;
+            }
+        }
+        return null;
+    }
+
+    private PopOver rebindPropertiesPopover(LiveTestCase testCase, PopOver existing) {
+        if (testCase == null && existing != null) {
+            existing.hide();
+            return existing;
+        }
+
+        if (testCase != null) {
+            if (existing == null) {
+                return PropertyMapView.makePopOver(testCase, getDesignerRoot());
+            } else {
+                PropertyMapView view = (PropertyMapView) existing.getUserData();
+                view.unbind();
+                view.bind(testCase);
                 return existing;
             }
         }
@@ -184,12 +207,21 @@ public class SourceEditorController extends AbstractController {
                       .subscribe(tick -> convertToTestCaseButton.fire());
 
 
+        propertiesMapButton.setOnAction(e -> propertiesPopover.showOrFocus(p -> p.show(propertiesMapButton)));
         violationsButton.setOnAction(e -> violationsPopover.showOrFocus(p -> p.show(violationsButton)));
 
         violationsButton.textProperty().bind(
             currentlyOpenTestCase.flatMap(it -> it.getExpectedViolations().sizeProperty())
                                  .map(it -> "Expected violations (" + it + ")")
                                  .orElseConst("Expected violations")
+        );
+
+        propertiesMapButton.textProperty().bind(
+            currentlyOpenTestCase.map(LiveTestCase::getProperties)
+                                 .flatMap(ReactfxUtil::observableMapVal)
+                                 .map(Map::size)
+                                 .map(it -> "Test properties (" + it + ")")
+                                 .orElseConst("Test properties")
         );
 
         DragAndDropUtil.registerAsNodeDragTarget(
@@ -205,7 +237,10 @@ public class SourceEditorController extends AbstractController {
                              .changes()
                              .subscribe(it -> handleTestOpenRequest(it.getOldValue(), it.getNewValue()));
 
-        currentlyOpenTestCase.values().subscribe(violationsPopover::rebind);
+        currentlyOpenTestCase.values().subscribe(test -> {
+            violationsPopover.rebind(test);
+            propertiesPopover.rebind(test);
+        });
 
     }
 

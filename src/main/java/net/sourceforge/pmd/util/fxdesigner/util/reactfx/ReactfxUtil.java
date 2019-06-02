@@ -17,6 +17,7 @@ import java.util.function.Function;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
+import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
 import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
@@ -26,6 +27,7 @@ import org.reactfx.value.Var;
 
 import com.github.oowekyala.rxstring.ReactfxExtensions;
 import com.github.oowekyala.rxstring.ReactfxExtensions.RebindSubscription;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
@@ -36,6 +38,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.Node;
+import javafx.util.Pair;
 
 /**
  * Extensions to ReactFX Val and EventStreams. Some can be deemed as too
@@ -111,6 +114,18 @@ public final class ReactfxUtil {
 
     public static <K, V> Val<Map<K, LiveList<V>>> groupBy(ObservableList<? extends V> base, Function<? super V, ? extends K> selector) {
         return new GroupByLiveList<>(base, selector);
+    }
+
+    // returned list does not reflect changes on the map
+    public static <K, V> LiveList<Pair<K, V>> observableMapList(ObservableMap<K, V> map) {
+        return new BaseObservableListDelegate<Pair<K, V>>(new LiveArrayList<>(map.entrySet()).map(it -> new Pair<>(it.getKey(), it.getValue()))) {
+            @Override
+            protected Subscription observeInputs() {
+                InvalidationListener invalidationListener = e -> {};
+                map.addListener(invalidationListener);
+                return () -> map.removeListener(invalidationListener);
+            }
+        };
     }
 
     public static <K, V> Val<Map<K, V>> observableMapVal(ObservableMap<K, V> map) {
