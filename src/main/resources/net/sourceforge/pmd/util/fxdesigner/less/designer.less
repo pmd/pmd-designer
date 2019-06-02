@@ -275,6 +275,26 @@
   -fx-show-delay: 150ms;
 }
 
+.menu-item, .menu {
+  &:hover, &:focused {
+    -fx-background-color: @selection-focus-color;
+  }
+}
+
+.menu-bar {
+
+  .menu .choice-box {
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+
+  }
+
+  .menu-button:hover .choice-box > .label {
+    -fx-text-fill: white;
+  }
+
+}
+
 @import "tabs";
 @import "scrolling";
 @import "tests";

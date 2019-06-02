@@ -304,6 +304,7 @@ public class SourceEditorController extends AbstractController {
 
         getService(DesignerRoot.APP_GLOBAL_LANGUAGE)
             .values()
+            .filter(Objects::nonNull)
             .subscribe(lang -> {
                 languageVersionChoicebox.setItems(lang.getVersions().stream().sorted().collect(Collectors.toCollection(LiveArrayList::new)));
                 languageVersionChoicebox.getSelectionModel().select(lang.getDefaultVersion());

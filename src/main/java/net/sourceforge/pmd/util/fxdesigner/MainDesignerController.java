@@ -36,6 +36,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox;
 
+import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.fxml.FXML;
 import javafx.scene.control.CustomMenuItem;
@@ -147,10 +148,14 @@ public class MainDesignerController extends AbstractController {
         SingleSelectionModel<Language> langSelector = languageChoicebox.getSelectionModel();
         Language restored = globalLanguage.getValue();
 
-        Var.fromVal(langSelector.selectedItemProperty(), langSelector::select)
-           .bindBidirectional(globalLanguage);
+        globalLanguage.bind(langSelector.selectedItemProperty());
 
         langSelector.select(restored);
+
+        Platform.runLater(() -> {
+            langSelector.clearSelection();
+            langSelector.select(restored);
+        });
 
     }
 

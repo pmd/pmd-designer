@@ -9,17 +9,20 @@
   Included by default in ToolbarTitledPane.
  */
 
-.flat(@selection-focus-color);
+// this is the default
+.flat(@selection-focus-color, white);
 .flat-toggle(derive(@fx-base, -5%), -fx-outer-border, @selection-color: @selection-focus-color);
 
+@dark-selection: derive(@selection-focus-color, -40%);
+
 // change the focus color when the background is already the default focus color
-.list-cell:selected {
-  .flat(whitesmoke);
+.list-cell:filled:selected {
+  .flat(whitesmoke, @selection-fill: @dark-selection);
   .flat-toggle(white, @selection-focus-color, @selection-color: @selection-focus-color);
 }
 
-.list-cell:focused {
-  .flat(whitesmoke);
+.list-view:focused .list-cell:selected:filled {
+  .flat(whitesmoke, @selection-fill: @fx-text-fill);
   .flat-toggle(white, gray, whitesmoke);
 }
 
@@ -30,7 +33,7 @@
   }
 }
 
-.flat(@selection-color) {
+.flat(@selection-color, @selection-fill) {
 
   .button, .choice-box, .toggle-button {
     -fx-background-color: transparent;
@@ -45,16 +48,23 @@
     -fx-padding: 3;
 
     &.choice-box {
+
+      &:hover > .label {
+        -fx-fill: @selection-fill;
+        -fx-text-fill: @selection-fill;
+      }
       .label {
-        -fx-padding: 0;
+        -fx-padding: 1;
       }
       .open-button {
-        -fx-padding: 0;
+        -fx-padding: 0 0 0 2;
       }
     }
 
     &:hover {
       -fx-background-color: @selection-color;
+      -fx-fill: @selection-fill;
+      -fx-text-fill: @selection-fill;
     }
 
     &.icon-button {
@@ -63,7 +73,7 @@
     }
   }
 
-  .label {
+  & > .label {
     -fx-background-color: transparent;
     -fx-font-size: @smaller-font-size;
 
@@ -119,6 +129,10 @@
       -fx-translate-x: -4;
     }
 
+    &:hover .ikonli-font-icon, &:hover .svg-icon {
+      -fx-fill: @selection-fill;
+    }
+
     .ikonli-font-icon, .svg-icon {
       -fx-fill: @fx-text-fill;
     }
@@ -127,7 +141,7 @@
       -fx-background-color: @selection-color;
     }
 
-    .label {
+    & > .label {
       -fx-background-color: transparent;
     }
   }
@@ -146,7 +160,7 @@
     }
 
     &:hover {
-      -fx-hover-base: @selection-color;
+      -fx-hover-base: @selection-color !important;
     }
   }
 }
