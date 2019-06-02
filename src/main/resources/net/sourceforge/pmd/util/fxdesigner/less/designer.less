@@ -257,6 +257,24 @@
 }
 
 
+.action-feedback {
+  -fx-background-color: @app-base-color;
+  -fx-background-radius: 4px;
+  * {
+    @col: darken(@selection-focus-color, 10%);
+    -fx-text-fill: @col;
+    -fx-fill: @col;
+  }
+
+  .label {
+    -fx-padding: 3 5 5 3;
+  }
+}
+
+.tooltip {
+  -fx-show-delay: 150ms;
+}
+
 @import "tabs";
 @import "scrolling";
 @import "tests";

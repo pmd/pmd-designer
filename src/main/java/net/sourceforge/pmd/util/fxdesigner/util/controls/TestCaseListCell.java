@@ -229,7 +229,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
 
         @Override
         public void handleNoCompilationUnit() {
-            testCase.setStatus(new TestResult(TestStatus.UNKNOWN, "No compilation unit"));
+            testCase.setStatus(new TestResult(TestStatus.UNKNOWN, "No source code"));
         }
 
 

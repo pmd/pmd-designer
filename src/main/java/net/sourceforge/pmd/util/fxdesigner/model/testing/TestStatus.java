@@ -14,7 +14,7 @@ public enum TestStatus {
     PASS("fas-check-circle", Color.GREEN),
     FAIL("fas-times-circle", Color.ORANGE),
     ERROR("fas-exclamation-circle", Color.DARKRED),
-    UNKNOWN("fas-circle", Color.GRAY);
+    UNKNOWN("fas-question-circle", Color.GRAY);
 
     public static final String STATUS_CLASS = "test-status";
 

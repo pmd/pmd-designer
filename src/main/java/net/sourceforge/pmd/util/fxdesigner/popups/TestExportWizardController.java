@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 
+import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.Subscription;
 
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
@@ -27,6 +28,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlS
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -101,6 +103,7 @@ public final class TestExportWizardController extends AbstractController {
             final ClipboardContent content = new ClipboardContent();
             content.putString(exportResultArea.getText());
             Clipboard.getSystemClipboard().setContent(content);
+            SimplePopups.showActionFeedback(copyResultButton, AlertType.CONFIRMATION, "Copied to clipboard");
         });
 
         saveToFileButton.setOnAction(e -> {
