@@ -29,11 +29,17 @@
                 <graphic>
                     <FontIcon iconLiteral="fas-plus"/>
                 </graphic>
+                <tooltip>
+                    <Tooltip text="New test case"/>
+                </tooltip>
             </Button>
             <Button fx:id="importTestsButton" styleClass="icon-button">
                 <graphic>
                     <FontIcon iconLiteral="fas-folder-open"/>
                 </graphic>
+                <tooltip>
+                    <Tooltip text="Import test file..."/>
+                </tooltip>
             </Button>
             <Button fx:id="exportTestsButton" mnemonicParsing="false" styleClass="icon-button">
                 <graphic>
@@ -46,7 +52,7 @@
                 <tooltip>
                     <Tooltip>
                         <text>
-                            <String fx:value="Export XPath to XML rule..."/>
+                            <String fx:value="Export as XML file..."/>
                         </text>
                     </Tooltip>
                 </tooltip>
