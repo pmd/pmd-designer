@@ -140,7 +140,7 @@ public class AuxclasspathSetupController implements Initializable {
     /** Displays the popup. */
     public void show(Stage parentStage, List<File> currentItems, Consumer<List<File>> onApply) {
 
-        FXMLLoader fxmlLoader = new FXMLLoader(DesignerUtil.getFxml("auxclasspath-setup-popup.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(DesignerUtil.getFxml("auxclasspath-setup-popup"));
 
         fxmlLoader.setControllerFactory(type -> {
             if (type == AuxclasspathSetupController.class) {

@@ -16,8 +16,9 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCollection;
-import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlDumper;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser;
+import net.sourceforge.pmd.util.fxdesigner.popups.TestExportWizardController;
+import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ControlUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.TestCaseListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
@@ -41,7 +42,7 @@ public class TestCollectionController extends AbstractController {
     @FXML
     private Button exportTestsButton; // TODO
 
-
+    private final SoftReferenceCache<TestExportWizardController> exportWizard;
     private ToggleGroup loadedToggleGroup = new ToggleGroup();
 
     private final ObservableXPathRuleBuilder builder;
@@ -49,6 +50,8 @@ public class TestCollectionController extends AbstractController {
     protected TestCollectionController(DesignerRoot root, ObservableXPathRuleBuilder builder) {
         super(root);
         this.builder = builder;
+
+        this.exportWizard = new SoftReferenceCache<>(() -> new TestExportWizardController(root));
     }
 
     public Val<LanguageVersion> getDefaultLanguageVersion() {
@@ -78,7 +81,10 @@ public class TestCollectionController extends AbstractController {
 
         addTestButton.setOnAction(any -> getTestCollection().addTestCase(new LiveTestCase().unfreeze()));
 
-        exportTestsButton.setOnAction(evt -> System.out.println(TestXmlDumper.dumpXmlTests(getTestCollection(), e -> logUserException(e, Category.TEST_LOADING_EXCEPTION))));
+        exportTestsButton.setOnAction(evt -> {
+            TestExportWizardController wizard = exportWizard.get();
+            wizard.showYourself(wizard.bindToTestCollection(getTestCollection()));
+        });
 
         getService(DesignerRoot.TEST_CREATOR)
             .messageStream(true, this)

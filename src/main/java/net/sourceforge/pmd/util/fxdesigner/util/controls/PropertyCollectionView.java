@@ -155,7 +155,7 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
     private PopOver detailsPopOver(PropertyDescriptorSpec spec) {
         EditPropertyDialogController wizard = new EditPropertyDialogController(root);
 
-        FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("edit-property-dialog.fxml"));
+        FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("edit-property-dialog"));
         loader.setController(wizard);
 
         Parent root;

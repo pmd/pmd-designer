@@ -8,7 +8,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
@@ -117,24 +116,22 @@ public class TestXmlDumper {
     }
 
 
-    public static String dumpXmlTests(TestCollection collection, Consumer<Exception> errorHandler) {
+    public static String dumpXmlTests(TestCollection collection) throws Exception {
         StringWriter out = new StringWriter();
-        dumpXmlTests(out, collection, errorHandler);
+        dumpXmlTests(out, collection);
         return out.toString();
     }
 
 
-    public static void dumpXmlTests(Path path, TestCollection collection, Consumer<Exception> errorHandler) {
+    public static void dumpXmlTests(Path path, TestCollection collection) throws Exception {
         try (OutputStream is = Files.newOutputStream(path);
              Writer out = new OutputStreamWriter(is)) {
 
-            dumpXmlTests(out, collection, errorHandler);
-        } catch (IOException e) {
-            errorHandler.accept(e);
+            dumpXmlTests(out, collection);
         }
     }
 
-    public static void dumpXmlTests(Writer out, TestCollection collection, Consumer<Exception> errorHandler) {
+    public static void dumpXmlTests(Writer out, TestCollection collection) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         try {
@@ -167,14 +164,8 @@ public class TestXmlDumper {
 
 
             transformer.transform(new DOMSource(doc), new StreamResult(out));
-        } catch (Exception e) {
-            errorHandler.accept(e);
         } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                errorHandler.accept(e);
-            }
+            out.close();
         }
 
     }

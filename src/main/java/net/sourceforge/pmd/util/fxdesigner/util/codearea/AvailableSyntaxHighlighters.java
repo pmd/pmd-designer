@@ -5,7 +5,10 @@
 package net.sourceforge.pmd.util.fxdesigner.util.codearea;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
+
+import org.fxmisc.richtext.model.StyleSpans;
 
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.ApexSyntaxHighlighter;
@@ -20,7 +23,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlS
  * @author Clément Fournier
  * @since 6.0.0
  */
-public enum AvailableSyntaxHighlighters {
+public enum AvailableSyntaxHighlighters implements SyntaxHighlighter {
     JAVA("java", new JavaSyntaxHighlighter()),
     APEX("apex", new ApexSyntaxHighlighter()),
     XML("xml", new XmlSyntaxHighlighter()),
@@ -39,6 +42,15 @@ public enum AvailableSyntaxHighlighters {
         this.engine = engine;
     }
 
+    @Override
+    public String getLanguageTerseName() {
+        return engine.getLanguageTerseName();
+    }
+
+    @Override
+    public StyleSpans<Collection<String>> computeHighlighting(String text) {
+        return engine.computeHighlighting(text);
+    }
 
     /**
      * Gets the highlighter for a language if available.

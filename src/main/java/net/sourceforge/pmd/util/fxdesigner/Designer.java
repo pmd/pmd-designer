@@ -108,7 +108,7 @@ public class Designer extends Application {
 
         System.out.print(stage.getTitle() + " initializing... ");
 
-        FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("designer.fxml"));
+        FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("designer"));
 
         MainDesignerController mainController = new MainDesignerController(owner);
 

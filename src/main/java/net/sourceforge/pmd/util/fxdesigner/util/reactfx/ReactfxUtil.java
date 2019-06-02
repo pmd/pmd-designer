@@ -79,6 +79,10 @@ public final class ReactfxUtil {
         );
     }
 
+    public static <E> EventStream<?> modificationTicks(ObservableList<? extends E> list, Function<? super E, ? extends EventStream<?>> tickProvider) {
+        return new ObservableTickList<>(list, tickProvider).quasiChanges();
+    }
+
     public static <T> Subscription subscribeDisposable(EventStream<T> stream, Function<T, Subscription> subscriber) {
         return subscribeDisposable(latestValue(stream), subscriber);
     }

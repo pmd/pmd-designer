@@ -140,6 +140,7 @@ public final class LogEntry implements Comparable<LogEntry> {
         XPATH_EVALUATION_EXCEPTION("XPath evaluation exception"),
 
         TEST_LOADING_EXCEPTION("XML test loader exception"),
+        TEST_EXPORT_EXCEPTION("XML test export exception"),
 
         // These are "flag" categories that signal that previous exceptions
         // thrown during code or XPath edition may be discarded as uninteresting

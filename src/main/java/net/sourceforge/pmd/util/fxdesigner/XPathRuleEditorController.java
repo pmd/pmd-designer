@@ -252,7 +252,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
         item.setOnAction(e -> {
             try {
                 Stage popup = new Stage();
-                FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("generate-xpath-from-stack-trace.fxml"));
+                FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("generate-xpath-from-stack-trace"));
                 Parent root = loader.load();
                 Button button = (Button) loader.getNamespace().get("generateButton");
                 TextArea area = (TextArea) loader.getNamespace().get("stackTraceArea");

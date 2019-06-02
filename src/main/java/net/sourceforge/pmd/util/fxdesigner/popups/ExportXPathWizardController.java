@@ -256,7 +256,7 @@ public final class ExportXPathWizardController implements Initializable {
         return new StageBuilder().withOwner(mainStage)
                                  .withModality(Modality.WINDOW_MODAL)
                                  .withStyle(StageStyle.DECORATED)
-                                 .withFxml(DesignerUtil.getFxml("xpath-export-wizard.fxml"), root, this)
+                                 .withFxml(DesignerUtil.getFxml("xpath-export-wizard"), root, this)
                                  .withTitle("Export XPath expression to XML rule")
                                  .newStage();
     }

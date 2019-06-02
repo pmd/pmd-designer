@@ -26,9 +26,9 @@ import javafx.collections.ObservableList;
 public final class ObservableTickList<E> extends BaseObservableListDelegate<E> {
 
 
-    private final Function<E, EventStream<?>> ticks;
+    private final Function<? super E, ? extends EventStream<?>> ticks;
 
-    public ObservableTickList(ObservableList<E> base, Function<E, EventStream<?>> ticks) {
+    public ObservableTickList(ObservableList<E> base, Function<? super E, ? extends EventStream<?>> ticks) {
         super(base);
         this.ticks = ticks;
     }

@@ -90,12 +90,12 @@ public final class DesignerUtil {
     /**
      * Gets the URL to an fxml file from its simple name.
      *
-     * @param simpleName Simple name of the file, i.e. with no directory prefixes (with extension)
+     * @param simpleName Simple name of the file, i.e. with no directory prefixes or extension
      *
      * @return A URL to an fxml file
      */
     public static URL getFxml(String simpleName) {
-        return DesignerUtil.class.getResource("/net/sourceforge/pmd/util/fxdesigner/fxml/" + simpleName);
+        return DesignerUtil.class.getResource("/net/sourceforge/pmd/util/fxdesigner/fxml/" + simpleName + ".fxml");
     }
 
     /**

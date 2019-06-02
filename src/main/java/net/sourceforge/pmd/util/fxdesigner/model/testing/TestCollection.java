@@ -7,11 +7,13 @@ package net.sourceforge.pmd.util.fxdesigner.model.testing;
 import java.util.List;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.reactfx.EventStream;
 import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
 
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 public class TestCollection implements SettingsOwner {
 
@@ -59,6 +61,11 @@ public class TestCollection implements SettingsOwner {
         } else {
             return null;
         }
+    }
+
+
+    public EventStream<?> modificationTicks() {
+        return ReactfxUtil.modificationTicks(getStash(), LiveTestCase::modificationTicks);
     }
 
 
