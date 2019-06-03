@@ -298,6 +298,16 @@
   }
 }
 
+.menu:disabled {
+  &, & > .label {
+    -fx-opacity: 1;
+  }
+
+  & > .label > .label-menu {
+    -fx-opacity: .60;
+  }
+}
+
 .menu-bar {
 
   .menu .choice-box {

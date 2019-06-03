@@ -13,6 +13,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.Label?>
 <AnchorPane prefHeight="750.0" prefWidth="1200.0" stylesheets="@../css/designer.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.pmd.util.fxdesigner.MainDesignerController">
     <children>
         <BorderPane prefHeight="600.0" prefWidth="900.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -56,6 +57,12 @@
                                         <MenuItem fx:id="licenseMenuItem" text="_License" />
                                         <MenuItem fx:id="aboutMenuItem" text="_About"/>
                                     </items>
+                                </Menu>
+
+                                <Menu disable="true">
+                                    <graphic>
+                                        <Label text="Language:" styleClass="label-menu" />
+                                    </graphic>
                                 </Menu>
 
                                 <Menu style="-fx-background: transparent !important;">

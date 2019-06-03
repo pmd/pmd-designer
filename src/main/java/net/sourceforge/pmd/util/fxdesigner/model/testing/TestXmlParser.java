@@ -173,7 +173,7 @@ public class TestXmlParser {
         live.setSource(code);
         live.setDescription(description);
         live.setLanguageVersion(version);
-        live.setIsIgnored(ignored);
+        live.setIgnored(ignored);
 
         List<String> lines = Arrays.asList(code.split("\\r?\\n"));
 

@@ -91,7 +91,7 @@ public class LiveTestCase implements SettingsOwner {
         return isIgnored;
     }
 
-    public void setIsIgnored(boolean b) {
+    public void setIgnored(boolean b) {
         isIgnored.setValue(b);
     }
 
