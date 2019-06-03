@@ -241,7 +241,7 @@ public class TestXmlParser {
         Document doc = builder.parse(is);
         Map<LiveTestCase, Element> testDescriptors = new TestXmlParser().parseTests(doc);
         List<LiveTestCase> tests = new ArrayList<>(testDescriptors.keySet());
-        return new TestCollection(tests);
+        return new TestCollection(null, tests);
 
 
     }

@@ -28,6 +28,7 @@ import org.reactfx.Guard;
 import org.reactfx.Subscription;
 import org.reactfx.SuspendableEventStream;
 import org.reactfx.collection.LiveArrayList;
+import org.reactfx.collection.LiveList;
 import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
@@ -41,6 +42,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManagerImpl;
 import net.sourceforge.pmd.util.fxdesigner.app.services.TestCreatorService;
+import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
@@ -230,6 +232,14 @@ public class SourceEditorController extends AbstractController {
                                  .map(Map::size)
                                  .map(it -> "Test properties (" + it + ")")
                                  .orElseConst("Test properties")
+        );
+
+        propertiesMapButton.disableProperty().bind(
+            currentlyOpenTestCase.flatMap(LiveTestCase::ruleProperty)
+                                 .map(ObservableRuleBuilder::getRuleProperties)
+                                 .flatMap(LiveList::sizeProperty)
+                                 .map(it -> it == 0)
+                                 .orElseConst(true)
         );
 
         DragAndDropUtil.registerAsNodeDragTarget(

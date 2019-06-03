@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner.util.reactfx;
 
 import org.reactfx.EventStream;
+import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 public final class ObservablePair<K, V> {
@@ -15,6 +16,11 @@ public final class ObservablePair<K, V> {
 
     public ObservablePair(K k, V v) {
         first.setValue(k);
+        second.setValue(v);
+    }
+
+    public ObservablePair(Val<K> k, V v) {
+        first.bind(k);
         second.setValue(v);
     }
 

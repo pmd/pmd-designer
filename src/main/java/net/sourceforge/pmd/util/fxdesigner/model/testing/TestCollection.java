@@ -11,6 +11,7 @@ import org.reactfx.EventStream;
 import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
 
+import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
@@ -19,15 +20,20 @@ public class TestCollection implements SettingsOwner {
 
 
     private LiveList<LiveTestCase> stash;
+    private final @Nullable ObservableRuleBuilder owner;
 
-    public TestCollection(List<LiveTestCase> tests) {
+    public TestCollection(@Nullable ObservableRuleBuilder owner, List<LiveTestCase> tests) {
         this.stash = new LiveArrayList<>(tests);
+        this.owner = owner;
+        if (owner != null) {
+            stash.forEach(it -> it.setRule(this.owner));
+        }
     }
 
     public void rebase(TestCollection testCases) {
         this.stash.setAll(testCases.stash);
+        stash.forEach(it -> it.setRule(owner));
     }
-
 
     @PersistentSequence
     public LiveList<LiveTestCase> getStash() {
@@ -39,6 +45,7 @@ public class TestCollection implements SettingsOwner {
      * it to the {@link #stash}.
      */
     public void addTestCase(LiveTestCase testCase) {
+        testCase.setRule(owner);
         if (!testCase.isFrozen()) {
             stash.forEach(LiveTestCase::freeze);
             stash.add(testCase);
@@ -68,5 +75,9 @@ public class TestCollection implements SettingsOwner {
         return ReactfxUtil.modificationTicks(getStash(), LiveTestCase::modificationTicks);
     }
 
+
+    public ObservableRuleBuilder getOwner() {
+        return owner;
+    }
 
 }

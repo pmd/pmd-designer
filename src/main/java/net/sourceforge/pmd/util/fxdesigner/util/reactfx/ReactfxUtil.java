@@ -116,16 +116,8 @@ public final class ReactfxUtil {
         return new GroupByLiveList<>(base, selector);
     }
 
-    // returned list does not reflect changes on the map
-    public static <K, V> LiveList<Pair<K, V>> observableMapList(ObservableMap<K, V> map) {
-        return new BaseObservableListDelegate<Pair<K, V>>(new LiveArrayList<>(map.entrySet()).map(it -> new Pair<>(it.getKey(), it.getValue()))) {
-            @Override
-            protected Subscription observeInputs() {
-                InvalidationListener invalidationListener = e -> notifyObservers();
-                map.addListener(invalidationListener);
-                return () -> map.removeListener(invalidationListener);
-            }
-        };
+    public static <E> LiveList<E> flattenList(Val<? extends ObservableList<? extends E>> base) {
+        return new FlatListVal<>(base);
     }
 
     public static <K, V> Val<Map<K, V>> observableMapVal(ObservableMap<K, V> map) {

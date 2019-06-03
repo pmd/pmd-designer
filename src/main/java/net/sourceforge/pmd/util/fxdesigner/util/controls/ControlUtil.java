@@ -14,6 +14,7 @@ import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import com.github.oowekyala.rxstring.ReactfxExtensions;
 import javafx.css.PseudoClass;
@@ -117,9 +118,9 @@ public final class ControlUtil {
 
     }
 
-    public static void registerDoubleClickListener(javafx.scene.Node node, Runnable action) {
-
-        node.addEventHandler(
+    public static Subscription registerDoubleClickListener(javafx.scene.Node node, Runnable action) {
+        return ReactfxUtil.addEventHandler(
+            node,
             MouseEvent.MOUSE_CLICKED,
             e -> {
                 if (e.getButton() == MouseButton.PRIMARY

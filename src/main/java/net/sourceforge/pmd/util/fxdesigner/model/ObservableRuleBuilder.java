@@ -59,7 +59,7 @@ public class ObservableRuleBuilder implements SettingsOwner {
     private final Var<Boolean> usesMultifile = Var.newSimpleVar(false);
     private final Var<Boolean> usesTypeResolution = Var.newSimpleVar(false);
 
-    private final TestCollection testCollection = new TestCollection(Collections.emptyList());
+    private final TestCollection testCollection = new TestCollection(this, Collections.emptyList());
 
     @PersistentProperty // CUSTOM?
     public Language getLanguage() {
@@ -110,7 +110,7 @@ public class ObservableRuleBuilder implements SettingsOwner {
 
 
     @PersistentSequence
-    public ObservableList<PropertyDescriptorSpec> getRuleProperties() {
+    public LiveList<PropertyDescriptorSpec> getRuleProperties() {
         return ruleProperties;
     }
 

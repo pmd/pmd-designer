@@ -23,10 +23,10 @@ import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
-import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 /**
  * Live editable version of a test case.
@@ -41,6 +41,7 @@ public class LiveTestCase implements SettingsOwner {
     private final Var<Boolean> isIgnored = Var.newSimpleVar(false);
 
 
+    private final Var<ObservableRuleBuilder> rule = Var.newSimpleVar(null);
     private final Var<TestResult> status = Var.newSimpleVar(new TestResult(TestStatus.UNKNOWN, null));
     private Consumer<LiveTestCase> commitHandler;
     private final Var<Boolean> frozen = Var.newSimpleVar(true);
@@ -121,6 +122,19 @@ public class LiveTestCase implements SettingsOwner {
         this.languageVersion.setValue(languageVersion);
     }
 
+
+    // not persisted
+    public ObservableRuleBuilder getRule() {
+        return rule.getValue();
+    }
+
+    public Var<ObservableRuleBuilder> ruleProperty() {
+        return rule;
+    }
+
+    public void setRule(ObservableRuleBuilder rule) {
+        this.rule.setValue(rule);
+    }
 
     public Val<Boolean> dirtyProperty() {
         return myUndoModel.undoAvailableProperty().map(it -> !it);
