@@ -160,6 +160,8 @@ public class SourceEditorController extends AbstractController {
     private PopOver rebindPropertiesPopover(LiveTestCase testCase, PopOver existing) {
         if (testCase == null && existing != null) {
             existing.hide();
+            PropertyMapView view = (PropertyMapView) existing.getUserData();
+            view.unbind();
             return existing;
         }
 
@@ -224,8 +226,7 @@ public class SourceEditorController extends AbstractController {
         );
 
         propertiesMapButton.textProperty().bind(
-            currentlyOpenTestCase.map(LiveTestCase::getProperties)
-                                 .flatMap(ReactfxUtil::observableMapVal)
+            currentlyOpenTestCase.flatMap(LiveTestCase::propertiesProperty)
                                  .map(Map::size)
                                  .map(it -> "Test properties (" + it + ")")
                                  .orElseConst("Test properties")
@@ -335,7 +336,8 @@ public class SourceEditorController extends AbstractController {
 
         Subscription sub = Subscription.multi(
             ReactfxUtil.rewireInit(newValue.sourceProperty(), astManager.sourceCodeProperty()),
-            ReactfxUtil.rewireInit(newValue.languageVersionProperty(), languageVersionUIProperty)
+            ReactfxUtil.rewireInit(newValue.languageVersionProperty(), languageVersionUIProperty),
+            () -> propertiesPopover.rebind(null)
         );
 
         newValue.addCommitHandler(t -> sub.unsubscribe());

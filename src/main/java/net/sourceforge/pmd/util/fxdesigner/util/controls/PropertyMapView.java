@@ -5,25 +5,25 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.tools.ValueExtractor;
 import org.kordamp.ikonli.javafx.FontIcon;
+import org.reactfx.Subscription;
 import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
-import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ObservablePair;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.beans.NamedArg;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableMap;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -34,7 +34,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import javafx.util.Pair;
 
 /**
  * @author Clément Fournier
@@ -45,9 +44,9 @@ public class PropertyMapView extends VBox implements ApplicationComponent {
     @NonNull
     private final DesignerRoot root;
     @NonNull
-    private final TableView<Pair<Var<String>, Var<String>>> view;
+    private final TableView<ObservablePair<String, String>> view;
 
-    private LiveTestCase bound;
+    private Subscription sub = Subscription.EMPTY;
 
 
     static {
@@ -86,7 +85,7 @@ public class PropertyMapView extends VBox implements ApplicationComponent {
         addmapping.setTooltip(new Tooltip("Add mapping"));
 
         addmapping.setOnAction(e -> {
-            Pair<Var<String>, Var<String>> spec = new Pair<>(Var.newSimpleVar("name"), Var.newSimpleVar("value"));
+            ObservablePair<String, String> spec = new ObservablePair<>("name", "value");
             view.getItems().add(spec);
         });
 
@@ -115,34 +114,34 @@ public class PropertyMapView extends VBox implements ApplicationComponent {
 
 
     public void bind(LiveTestCase testCase) {
-        bound = testCase;
-        view.setItems(ReactfxUtil.observableMapList(testCase.getProperties()).map(it -> new Pair<>(Var.newSimpleVar(it.getKey()), Var.newSimpleVar(it.getValue()))).stream().collect(Collectors.toCollection(LiveArrayList::new)));
+        LiveArrayList<ObservablePair<String, String>> items = testCase.getProperties().entrySet().stream().map(it -> new ObservablePair<>(it.getKey(), it.getValue())).collect(Collectors.toCollection(LiveArrayList::new));
+        view.setItems(items);
+        sub = ReactfxUtil.modificationTicks(items, ObservablePair::modificationTicks)
+                         .subscribe(tick -> testCase.setProperties(getItems()));
     }
 
     public void unbind() {
-        if (bound != null) {
-            bound.setProperties(getItems());
-            bound = null;
-        }
+        sub.unsubscribe();
+        sub = Subscription.EMPTY;
     }
 
-    public ObservableMap<String, String> getItems() {
-        ObservableMap<String, String> map = FXCollections.observableHashMap();
-        view.getItems().forEach(kv -> map.put(kv.getKey().getValue(), kv.getValue().getValue()));
-        return map;
+    public Map<String, String> getItems() {
+        return view.getItems()
+                   .stream()
+                   .collect(Collectors.toMap(ObservablePair::getFirst, ObservablePair::getSecond, (k, k2) -> k2));
     }
 
 
-    private static void initTableView(TableView<Pair<Var<String>, Var<String>>> view) {
+    private static void initTableView(@NonNull TableView<ObservablePair<String, String>> view) {
 
 
-        TableColumn<Pair<Var<String>, Var<String>>, String> name = new TableColumn<>("Property");
-        name.setCellValueFactory((cdf) -> cdf.getValue().getKey());
+        TableColumn<ObservablePair<String, String>, String> name = new TableColumn<>("Property");
+        name.setCellValueFactory((cdf) -> cdf.getValue().firstProperty());
         name.setCellFactory(TextFieldTableCell.forTableColumn());
 
 
-        TableColumn<Pair<Var<String>, Var<String>>, String> value = new TableColumn<>("Value");
-        value.setCellValueFactory((cdf) -> cdf.getValue().getValue());
+        TableColumn<ObservablePair<String, String>, String> value = new TableColumn<>("Value");
+        value.setCellValueFactory((cdf) -> cdf.getValue().secondProperty());
         value.setCellFactory(TextFieldTableCell.forTableColumn());
 
         view.setEditable(true);

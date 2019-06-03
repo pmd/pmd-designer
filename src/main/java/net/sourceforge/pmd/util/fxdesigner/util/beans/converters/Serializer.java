@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -80,9 +81,9 @@ public interface Serializer<T> {
      * Builds a new serializer that can serialize maps with key type {@code <T>}.
      *
      * @param emptyMapSupplier Supplier for a collection of the correct
-     *                          type, to which the deserialized elements
-     *                          are added.
-     * @param <M>               Map type to serialize
+     *                         type, to which the deserialized elements
+     *                         are added.
+     * @param <M>              Map type to serialize
      *
      * @return A new serializer
      */
@@ -105,6 +106,19 @@ public interface Serializer<T> {
                 return mapRoot;
             }
 
+            private @Nullable Element getChild(Element parent, int idx) {
+                NodeList children = parent.getChildNodes();
+                for (int i = 0; i < children.getLength(); i++) {
+                    Node item = children.item(i);
+                    if (item.getNodeType() == Node.ELEMENT_NODE) {
+                        if (idx-- == 0) {
+                            return ((Element) item);
+                        }
+                    }
+                }
+                return null;
+            }
+
             @Override
             public M fromXml(Element element) {
                 M result = emptyMapSupplier.get();
@@ -114,9 +128,11 @@ public interface Serializer<T> {
                     Node item = children.item(i);
                     if (item.getNodeType() == Element.ELEMENT_NODE) {
                         Element entry = (Element) item;
-                        Element key = (Element) entry.getFirstChild();
-                        Element value = (Element) entry.getLastChild();
-                        result.put(nullableKey.fromXml(key), nullableValue.fromXml(value));
+                        Element key = getChild(entry, 0);
+                        Element value = getChild(entry, 1);
+                        if (key != null && value != null) {
+                            result.put(nullableKey.fromXml(key), nullableValue.fromXml(value));
+                        }
                     }
                 }
 

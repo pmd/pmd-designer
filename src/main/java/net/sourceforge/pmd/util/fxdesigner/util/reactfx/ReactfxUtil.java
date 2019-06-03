@@ -121,7 +121,7 @@ public final class ReactfxUtil {
         return new BaseObservableListDelegate<Pair<K, V>>(new LiveArrayList<>(map.entrySet()).map(it -> new Pair<>(it.getKey(), it.getValue()))) {
             @Override
             protected Subscription observeInputs() {
-                InvalidationListener invalidationListener = e -> {};
+                InvalidationListener invalidationListener = e -> notifyObservers();
                 map.addListener(invalidationListener);
                 return () -> map.removeListener(invalidationListener);
             }
@@ -130,12 +130,10 @@ public final class ReactfxUtil {
 
     public static <K, V> Val<Map<K, V>> observableMapVal(ObservableMap<K, V> map) {
         return new ValBase<Map<K, V>>() {
-            EventSource<Map<K, V>> source = new EventSource<>();
 
             @Override
             protected Subscription connect() {
-
-                MapChangeListener<K, V> listener = ch -> source.push(new HashMap<>(map));
+                MapChangeListener<K, V> listener = ch -> notifyObservers(new HashMap<>(map));
                 map.addListener(listener);
                 return () -> map.removeListener(listener);
             }

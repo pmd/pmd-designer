@@ -4,6 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -26,9 +28,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.Pe
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableMap;
-
 /**
  * Live editable version of a test case.
  */
@@ -37,7 +36,7 @@ public class LiveTestCase implements SettingsOwner {
     private final Var<String> source = Var.newSimpleVar(""); // TODO defaults per language
     private final Var<String> description = Var.newSimpleVar("New test case");
     private final Var<LanguageVersion> languageVersion = Var.newSimpleVar(null);
-    private final ObservableMap<String, String> properties = FXCollections.observableHashMap();
+    private final Var<Map<String, String>> properties = Var.newSimpleVar(Collections.emptyMap());
     private final LiveList<LiveViolationRecord> expectedViolations = new LiveArrayList<>();
     private final Var<Boolean> isIgnored = Var.newSimpleVar(false);
 
@@ -133,13 +132,16 @@ public class LiveTestCase implements SettingsOwner {
         return expectedViolations;
     }
 
-    public ObservableMap<String, String> getProperties() {
+    public Map<String, String> getProperties() {
+        return properties.getValue();
+    }
+
+    public Var<Map<String, String>> propertiesProperty() {
         return properties;
     }
 
     public void setProperties(Map<String, String> stringMap) {
-        properties.clear();
-        properties.putAll(stringMap);
+        properties.setValue(stringMap);
     }
 
     public void addCommitHandler(@NonNull Consumer<LiveTestCase> liveTestCaseConsumer) {
@@ -150,12 +152,14 @@ public class LiveTestCase implements SettingsOwner {
     @PersistentProperty
     public Properties getPersistenceOnlyProps() {
         Properties props = new Properties();
-        properties.forEach(props::put);
+        properties.getValue().forEach(props::put);
         return props;
     }
 
     public void setPersistenceOnlyProps(Properties props) {
-        props.forEach((k, v) -> properties.put(k.toString(), v.toString()));
+        Map<String, String> p = new HashMap<>();
+        props.forEach((k, v) -> p.put(k.toString(), v.toString()));
+        properties.setValue(p);
     }
 
     /**
@@ -208,7 +212,7 @@ public class LiveTestCase implements SettingsOwner {
         LiveTestCase live = new LiveTestCase();
         live.setDescription(getDescription());
         live.expectedViolations.setAll(this.expectedViolations);
-        live.setProperties(this.properties);
+        live.setProperties(getProperties());
         live.setLanguageVersion(getLanguageVersion());
         live.setSource(getSource());
         live.setFrozen(isFrozen());
@@ -253,7 +257,7 @@ public class LiveTestCase implements SettingsOwner {
         )));
 
 
-        sink.feedFrom(ReactfxUtil.observableMapVal(properties).changes().map(it -> new TestCaseChange(
+        sink.feedFrom(properties.changes().map(it -> new TestCaseChange(
             this,
             null,
             null,

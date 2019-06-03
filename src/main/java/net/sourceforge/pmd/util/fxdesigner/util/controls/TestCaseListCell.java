@@ -181,7 +181,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         ASTManagerImpl manager = new ASTManagerImpl(collection.getDesignerRoot());
         manager.sourceCodeProperty().bind(testCase.sourceProperty());
         manager.languageVersionProperty().bind(testCase.languageVersionProperty().orElse(collection.getDefaultLanguageVersion()));
-        manager.ruleProperties().bind(ReactfxUtil.observableMapVal(testCase.getProperties()));
+        manager.ruleProperties().bind(testCase.propertiesProperty());
 
         return manager;
     }
