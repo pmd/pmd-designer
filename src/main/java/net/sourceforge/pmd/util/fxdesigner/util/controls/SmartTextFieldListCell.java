@@ -49,6 +49,7 @@ public abstract class SmartTextFieldListCell<T> extends ListCell<T> {
                 }
                 setGraphic(textField);
             } else {
+                textField = null;
                 Pair<Node, Subscription> nodeAndSub = getNonEditingGraphic(item);
 
                 setGraphic(nodeAndSub.getKey());
@@ -109,9 +110,7 @@ public abstract class SmartTextFieldListCell<T> extends ListCell<T> {
      */
     public final void doStartEdit() {
         super.startEdit();
-        if (textField == null) {
-            textField = getEditingGraphic(getItem());
-        }
+        textField = getEditingGraphic(getItem());
         textField.setText(extractEditable(getItem()).getValue());
 
         setGraphic(textField);
@@ -134,6 +133,13 @@ public abstract class SmartTextFieldListCell<T> extends ListCell<T> {
             }
             subscriber = nonEditingGraphic.getValue();
             setGraphic(nonEditingGraphic.getKey());
+            textField = null;
         }
+    }
+
+    @Override
+    public void commitEdit(T newValue) {
+        super.commitEdit(newValue);
+        textField = null;
     }
 }
