@@ -14,7 +14,9 @@ import org.controlsfx.tools.ValueExtractor;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.Subscription;
 import org.reactfx.value.Val;
+import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.properties.PropertyTypeId;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
@@ -37,16 +39,16 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 /**
  * @author Clément Fournier
  */
 public class PropertyCollectionView extends VBox implements ApplicationComponent {
 
-    private static final int LIST_CELL_HEIGHT = 24;
+    private static final int LIST_CELL_HEIGHT = 31;
     @NonNull
     private final DesignerRoot root;
     @NonNull
@@ -203,6 +205,7 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
     private static void initListView(ListView<PropertyDescriptorSpec> view) {
 
         ControlUtil.makeListViewFitToChildren(view, LIST_CELL_HEIGHT);
+        view.setEditable(true);
 
         Label placeholder = new Label("No properties yet");
         placeholder.getStyleClass().addAll("placeholder");
@@ -224,7 +227,7 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
         return popOver;
     }
 
-    private class PropertyDescriptorCell extends ListCell<PropertyDescriptorSpec> {
+    private class PropertyDescriptorCell extends SmartTextFieldListCell<PropertyDescriptorSpec> {
 
         private static final String DETAILS_BUTTON_CLASS = "my-details-button";
         private static final String DELETE_BUTTON_CLASS = "delete-property-button";
@@ -234,30 +237,35 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
             this.owner = owner;
         }
 
-        @Override
-        protected void updateItem(PropertyDescriptorSpec item, boolean empty) {
-            super.updateItem(item, empty);
 
-            if (empty || item == null) {
-                setText(null);
-                setGraphic(null);
-            } else {
-                setGraphic(buildGraphic(item));
-            }
+        @Override
+        protected Var<String> extractEditable(PropertyDescriptorSpec propertyDescriptorSpec) {
+            return propertyDescriptorSpec.nameProperty();
         }
 
 
-        private Node buildGraphic(PropertyDescriptorSpec spec) {
+        @Override
+        protected Pair<Node, Subscription> getNonEditingGraphic(PropertyDescriptorSpec spec) {
+
+            Subscription sub = Subscription.EMPTY;
 
             HBox hBox = new HBox();
+            hBox.setSpacing(10);
             Label label = new Label();
+
             label.textProperty().bind(spec.nameProperty()
                                           .filter(StringUtils::isNotBlank)
                                           .orElseConst("(no name)"));
 
-            Pane spacer = new Pane();
-            HBox.setHgrow(spacer, Priority.ALWAYS);
+            sub = sub.and(label.textProperty()::unbind);
+            sub = sub.and(ControlUtil.registerDoubleClickListener(label, this::doStartEdit));
 
+            Label typeLabel = new Label();
+            typeLabel.textProperty().bind(spec.typeIdProperty().map(PropertyTypeId::getStringId).map(it -> ": " + it));
+
+            sub = sub.and(typeLabel.textProperty()::unbind);
+
+            Pane spacer = ControlUtil.spacerPane();
 
             Button edit = new Button();
             edit.setGraphic(new FontIcon("fas-ellipsis-h"));
@@ -270,16 +278,21 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
                 myEditPopover.showOrFocus(p -> PopOverUtil.showAt(p, owner, this));
             });
 
+            sub = sub.and(() -> edit.setOnAction(null));
+
             Button delete = new Button();
             delete.setGraphic(new FontIcon("fas-trash-alt"));
             delete.getStyleClass().addAll(DELETE_BUTTON_CLASS, "icon-button");
             Tooltip.install(delete, new Tooltip("Remove property"));
             delete.setOnAction(e -> getItems().remove(spec));
 
-            hBox.getChildren().setAll(label, spacer, delete, edit);
+            sub = sub.and(() -> delete.setOnAction(null));
+
+
+            hBox.getChildren().setAll(label, typeLabel, spacer, delete, edit);
             hBox.setAlignment(Pos.CENTER_LEFT);
 
-            return hBox;
+            return new Pair<>(hBox, sub);
         }
 
     }

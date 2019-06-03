@@ -239,7 +239,7 @@ public class SourceEditorController extends AbstractController {
                                  .map(ObservableRuleBuilder::getRuleProperties)
                                  .flatMap(LiveList::sizeProperty)
                                  .map(it -> it == 0)
-                                 .orElseConst(true)
+                                 .orElseConst(false)
         );
 
         DragAndDropUtil.registerAsNodeDragTarget(

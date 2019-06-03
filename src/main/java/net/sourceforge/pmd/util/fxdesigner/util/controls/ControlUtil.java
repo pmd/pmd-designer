@@ -35,6 +35,9 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.stage.Window;
 import javafx.util.Callback;
@@ -116,6 +119,12 @@ public final class ControlUtil {
            .withDefaultEvent(field.getText())
             .subscribe(text -> field.pseudoClassStateChanged(PseudoClass.getPseudoClass("empty-input"), StringUtils.isBlank(text)));
 
+    }
+
+    public static Pane spacerPane() {
+        Pane spacer = new Pane();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        return spacer;
     }
 
     public static Subscription registerDoubleClickListener(javafx.scene.Node node, Runnable action) {

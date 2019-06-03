@@ -29,6 +29,10 @@ public abstract class SmartTextFieldListCell<T> extends ListCell<T> {
 
     private Subscription subscriber;
 
+    public SmartTextFieldListCell() {
+        setEditable(true);
+    }
+
     @Override
     public final void updateItem(T item, boolean empty) {
         super.updateItem(item, empty);
