@@ -17,6 +17,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.wellbehaved.event.EventPattern;
+import org.fxmisc.wellbehaved.event.InputMap;
+import org.fxmisc.wellbehaved.event.Nodes;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
@@ -29,6 +32,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
 
@@ -82,6 +86,15 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
                 e.consume();
             }
         });
+
+
+        // Make TAB 4 spaces
+        InputMap<KeyEvent> im = InputMap.consume(
+            EventPattern.keyPressed(KeyCode.TAB),
+            e -> replaceSelection("    ")
+        );
+
+        Nodes.addInputMap(this, im);
     }
 
 
