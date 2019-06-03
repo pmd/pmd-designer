@@ -40,7 +40,7 @@
                                 </DynamicWidthChoicebox>
                                 <Button fx:id="convertToTestCaseButton" text="Convert to test case">
                                     <tooltip>
-                                        <Tooltip text="Add a new test case for the contents of the area"/>
+                                        <Tooltip text="Add a new test case with the contents of the area"/>
                                     </tooltip>
                                 </Button>
                             </toolbarItems>

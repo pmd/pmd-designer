@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.controlsfx.control.PopOver;
 import org.reactfx.EventSource;
+import org.reactfx.Guard;
 import org.reactfx.Subscription;
 import org.reactfx.SuspendableEventStream;
 import org.reactfx.collection.LiveArrayList;
@@ -195,9 +196,15 @@ public class SourceEditorController extends AbstractController {
         TestCreatorService creatorService = getService(DesignerRoot.TEST_CREATOR);
         convertToTestCaseButton.setOnAction(
             e -> {
-                convertButtonVisibility.suspendWhile(() -> creatorService.getAdditionRequests().pushEvent(this, defaultTestCase.deepCopy()));
+                Guard guard = convertButtonVisibility.suspend();
+                creatorService.getAdditionRequests().pushEvent(this, defaultTestCase.deepCopy());
+                convertToTestCaseButton.setDisable(true);
                 SimplePopups.showActionFeedback(convertToTestCaseButton, AlertType.CONFIRMATION, "Test created")
-                            .subscribeForOne(done -> convertButtonVisibilitySource.push(false));
+                            .subscribeForOne(done -> {
+                                // only make the button invisible when the action is done
+                                guard.close();
+                                convertButtonVisibilitySource.push(false);
+                            });
 
             }
         );
@@ -281,7 +288,10 @@ public class SourceEditorController extends AbstractController {
                              .values().distinct()
                              .subscribe(this::toggleTestEditMode);
 
-        convertButtonVisibility.subscribe(visible -> convertToTestCaseButton.setVisible(visible));
+        convertButtonVisibility.subscribe(visible -> {
+            convertToTestCaseButton.setVisible(visible);
+            convertToTestCaseButton.setDisable(!visible);
+        });
 
     }
 
