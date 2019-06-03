@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -73,10 +74,16 @@ public class TestXmlDumper {
                                                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         if (!properties.isEmpty()) {
             properties.forEach((k, v) -> {
-                Element element = doc.createElementNS(NS, "rule-property");
-                element.setAttribute("name", k);
-                element.setTextContent(v);
-                testCode.appendChild(element);
+                boolean isDefault = Optional.ofNullable(descriptor.getRule())
+                                            .flatMap(it -> it.getProperty(k))
+                                            .map(it -> it.getValue().equals(v))
+                                            .orElse(false);
+                if (!isDefault) {
+                    Element element = doc.createElementNS(NS, "rule-property");
+                    element.setAttribute("name", k);
+                    element.setTextContent(v);
+                    testCode.appendChild(element);
+                }
             });
 
         }

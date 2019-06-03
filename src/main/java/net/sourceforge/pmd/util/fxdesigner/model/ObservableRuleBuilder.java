@@ -124,6 +124,10 @@ public class ObservableRuleBuilder implements SettingsOwner {
         return Var.fromVal(Val.constant(ruleProperties), this::setRuleProperties);
     }
 
+    public Optional<PropertyDescriptorSpec> getProperty(String name) {
+        return getRuleProperties().stream().filter(it -> it.getName().equals(name)).findFirst();
+    }
+
 
     public LanguageVersion getMinimumVersion() {
         return minimumVersion.getValue();
