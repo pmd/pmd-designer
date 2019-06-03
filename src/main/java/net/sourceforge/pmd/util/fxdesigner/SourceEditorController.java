@@ -274,6 +274,7 @@ public class SourceEditorController extends AbstractController {
 
         nodeEditionCodeArea.moveCaret(0, 0);
 
+        editorTitledPane.errorTypeProperty().setValue("Syntax error");
         initTreeView(astManager, astTreeView, editorTitledPane.errorMessageProperty());
 
         getDesignerRoot().registerService(DesignerRoot.RICH_TEXT_MAPPER, nodeEditionCodeArea);

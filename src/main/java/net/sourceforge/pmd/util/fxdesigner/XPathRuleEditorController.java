@@ -184,6 +184,8 @@ public final class XPathRuleEditorController extends AbstractController implemen
 
         propertiesPopover.rebind(getRuleBuilder());
         propertiesPopover.doFirstLoad(getMainStage());
+
+        expressionTitledPane.errorTypeProperty().setValue("XPath syntax error");
     }
 
     @Override
