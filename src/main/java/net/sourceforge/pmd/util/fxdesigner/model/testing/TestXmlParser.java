@@ -10,11 +10,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,6 +22,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,43 +31,39 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sourceforge.pmd.Rule;
-import net.sourceforge.pmd.RuleContext;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.lang.rule.AbstractRule;
-import net.sourceforge.pmd.testframework.RuleTst;
-import net.sourceforge.pmd.testframework.TestDescriptor;
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
 public class TestXmlParser {
 
 
-    private Map<TestDescriptor, Element> parseTests(Rule rule, Document doc) {
+    private Map<LiveTestCase, Element> parseTests(Document doc) {
         Element root = doc.getDocumentElement();
         NodeList testCodes = root.getElementsByTagName("test-code");
 
 
-        Map<TestDescriptor, Element> tests = new LinkedHashMap<>(testCodes.getLength());
+        Map<LiveTestCase, Element> tests = new LinkedHashMap<>(testCodes.getLength());
         for (int i = 0; i < testCodes.getLength(); i++) {
             Element testCode = (Element) testCodes.item(i);
 
-            TestDescriptor descriptor = parseSingle(rule, testCode, root);
-            descriptor.setNumberInDocument(i);
+            LiveTestCase descriptor = parseSingle(testCode, root);
             tests.put(descriptor, testCode);
         }
         return tests;
     }
 
-    private TestDescriptor parseSingle(Rule rule, Element testCode, Element root) {
-
-        boolean reinitializeRule = true;
-        Node reinitializeRuleAttribute = testCode.getAttributes().getNamedItem("reinitializeRule");
-        if (reinitializeRuleAttribute != null) {
-            String reinitializeRuleValue = reinitializeRuleAttribute.getNodeValue();
-            if ("false".equalsIgnoreCase(reinitializeRuleValue) || "0".equalsIgnoreCase(reinitializeRuleValue)) {
-                reinitializeRule = false;
-            }
-        }
+    private LiveTestCase parseSingle(Element testCode, Element root) {
+        //
+        //        boolean reinitializeRule = true;
+        //        Node reinitializeRuleAttribute = testCode.getAttributes().getNamedItem("reinitializeRule");
+        //        if (reinitializeRuleAttribute != null) {
+        //            String reinitializeRuleValue = reinitializeRuleAttribute.getNodeValue();
+        //            if ("false".equalsIgnoreCase(reinitializeRuleValue) || "0".equalsIgnoreCase(reinitializeRuleValue)) {
+        //                reinitializeRule = false;
+        //            }
+        //        }
 
         boolean isRegressionTest = true;
         Node regressionTestAttribute = testCode.getAttributes().getNamedItem("regressionTest");
@@ -76,15 +73,15 @@ public class TestXmlParser {
                 isRegressionTest = false;
             }
         }
-
-        boolean isUseAuxClasspath = true;
-        Node useAuxClasspathAttribute = testCode.getAttributes().getNamedItem("useAuxClasspath");
-        if (useAuxClasspathAttribute != null) {
-            String useAuxClasspathValue = useAuxClasspathAttribute.getNodeValue();
-            if ("false".equalsIgnoreCase(useAuxClasspathValue)) {
-                isUseAuxClasspath = false;
-            }
-        }
+        //
+        //        boolean isUseAuxClasspath = true;
+        //        Node useAuxClasspathAttribute = testCode.getAttributes().getNamedItem("useAuxClasspath");
+        //        if (useAuxClasspathAttribute != null) {
+        //            String useAuxClasspathValue = useAuxClasspathAttribute.getNodeValue();
+        //            if ("false".equalsIgnoreCase(useAuxClasspathValue)) {
+        //                isUseAuxClasspath = false;
+        //            }
+        //        }
 
         NodeList ruleProperties = testCode.getElementsByTagName("rule-property");
         Properties properties = new Properties();
@@ -140,8 +137,6 @@ public class TestXmlParser {
         String description = getNodeValue(testCode, "description", true);
         int expectedProblems = Integer.parseInt(getNodeValue(testCode, "expected-problems", true));
 
-        TestDescriptor descriptor;
-
         String languageVersionString = getNodeValue(testCode, "source-type", false);
         LanguageVersion languageVersion = null;
         if (languageVersionString != null) {
@@ -150,14 +145,51 @@ public class TestXmlParser {
                 throw new RuntimeException("Unknown LanguageVersion for test: " + languageVersionString);
             }
         }
-        descriptor = new TestDescriptor(code, description, expectedProblems, rule, languageVersion);
-        descriptor.setReinitializeRule(reinitializeRule);
-        descriptor.setRegressionTest(isRegressionTest);
-        descriptor.setUseAuxClasspath(isUseAuxClasspath);
-        descriptor.setExpectedMessages(messages);
-        descriptor.setExpectedLineNumbers(expectedLineNumbers);
-        descriptor.setProperties(properties);
-        return descriptor;
+
+        return fromDescriptor(
+            code,
+            description,
+            expectedProblems,
+            languageVersion,
+            !isRegressionTest,
+            messages,
+            expectedLineNumbers,
+            properties
+        );
+    }
+
+
+    private static LiveTestCase fromDescriptor(
+        String code,
+        String description,
+        int expectedProblems,
+        @Nullable LanguageVersion version,
+        boolean ignored,
+        List<String> messages,
+        List<Integer> lineNumbers,
+        Properties properties) {
+
+        LiveTestCase live = new LiveTestCase();
+        live.setSource(code);
+        live.setDescription(description);
+        live.setLanguageVersion(version);
+        live.setIsIgnored(ignored);
+
+        List<String> lines = Arrays.asList(code.split("\\r?\\n"));
+
+        for (int i = 0; i < expectedProblems; i++) {
+            String m = messages.size() > i ? messages.get(i) : null;
+            int line = lineNumbers.size() > i ? lineNumbers.get(i) : -1;
+
+            TextRange tr = line >= 0
+                           ? TextRange.fullLine(line, lines.get(line - 1).length())
+                           : null;
+
+            live.getExpectedViolations().add(new LiveViolationRecord(tr, m, false));
+        }
+
+        properties.forEach((k, v) -> live.getProperties().put(k.toString(), v.toString()));
+        return live;
     }
 
     private String getNodeValue(Element parentElm, String nodeName, boolean required) {
@@ -201,20 +233,14 @@ public class TestXmlParser {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-        Schema schema = schemaFactory.newSchema(RuleTst.class.getResource("/rule-tests_1_0_0.xsd"));
+        Schema schema = schemaFactory.newSchema(DesignerUtil.getResource("testschema/rule-tests_1_0_0.xsd"));
         dbf.setSchema(schema);
         dbf.setNamespaceAware(true);
         DocumentBuilder builder = getDocumentBuilder(dbf);
 
         Document doc = builder.parse(is);
-        Rule rule = new AbstractRule() {
-            @Override
-            public void apply(List<? extends net.sourceforge.pmd.lang.ast.Node> list, RuleContext ruleContext) {
-                // do nothing
-            }
-        };
-        Map<TestDescriptor, Element> testDescriptors = new TestXmlParser().parseTests(rule, doc);
-        List<LiveTestCase> tests = testDescriptors.entrySet().stream().map(e -> LiveTestCase.fromDescriptor(e.getKey(), e.getValue())).collect(Collectors.toList());
+        Map<LiveTestCase, Element> testDescriptors = new TestXmlParser().parseTests(doc);
+        List<LiveTestCase> tests = new ArrayList<>(testDescriptors.keySet());
         return new TestCollection(tests);
 
 

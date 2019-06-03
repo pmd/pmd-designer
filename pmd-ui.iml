@@ -42,14 +42,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: net.sourceforge.pmd:pmd-test:6.12.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.ant:ant:1.10.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.ant:ant-launcher:1.10.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.ant:ant-testutil:1.10.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: net.sourceforge.pmd:pmd-test:6.12.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.ant:ant:1.10.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.ant:ant-launcher:1.10.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.ant:ant-testutil:1.10.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-base:11" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-base:linux:11" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-controls:11" level="project" />
@@ -84,13 +76,11 @@
     <orderEntry type="library" name="Maven: org.ow2.asm:asm:7.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.5" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.saxon:saxon:dom:9.1.0.8" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: net.sourceforge.pmd:pmd-test:6.12.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.ant:ant:1.10.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.ant:ant-launcher:1.10.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.ant:ant-testutil:1.10.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-apex:6.12.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-apex-jorje:lib:6.12.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: cglib:cglib:3.2.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.ant:ant:1.9.4" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.ant:ant-launcher:1.9.4" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: ch.qos.logback:logback-classic:1.1.7" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: ch.qos.logback:logback-core:1.1.7" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />

@@ -37,7 +37,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sourceforge.pmd.testframework.RuleTst;
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 public class TestXmlDumper {
 
@@ -57,6 +57,11 @@ public class TestXmlDumper {
     }
 
     private void appendSingle(Element testCode, LiveTestCase descriptor, Document doc) {
+
+        if (descriptor.isIgnored()) {
+            testCode.setAttributeNS(NS, "regressionTest", "false");
+        }
+
 
         Element descriptionElt = doc.createElementNS(NS, "description");
         descriptionElt.setTextContent(descriptor.getDescription());
@@ -138,7 +143,7 @@ public class TestXmlDumper {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         try {
-            Schema schema = schemaFactory.newSchema(RuleTst.class.getResource("/rule-tests_1_0_0.xsd"));
+            Schema schema = schemaFactory.newSchema(DesignerUtil.getResource("testschema/rule-tests_1_0_0.xsd"));
             dbf.setSchema(schema);
             dbf.setNamespaceAware(true);
             DocumentBuilder builder = getDocumentBuilder(dbf);

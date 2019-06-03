@@ -4,8 +4,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -21,14 +19,11 @@ import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
-import org.w3c.dom.Element;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.testframework.TestDescriptor;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.collections.FXCollections;
@@ -44,6 +39,9 @@ public class LiveTestCase implements SettingsOwner {
     private final Var<LanguageVersion> languageVersion = Var.newSimpleVar(null);
     private final ObservableMap<String, String> properties = FXCollections.observableHashMap();
     private final LiveList<LiveViolationRecord> expectedViolations = new LiveArrayList<>();
+    private final Var<Boolean> isIgnored = Var.newSimpleVar(false);
+
+
     private final Var<TestResult> status = Var.newSimpleVar(new TestResult(TestStatus.UNKNOWN, null));
     private Consumer<LiveTestCase> commitHandler;
     private final Var<Boolean> frozen = Var.newSimpleVar(true);
@@ -82,6 +80,19 @@ public class LiveTestCase implements SettingsOwner {
 
     public void setSource(String source) {
         this.source.setValue(source);
+    }
+
+    @PersistentProperty
+    public boolean isIgnored() {
+        return isIgnored.getValue();
+    }
+
+    public Var<Boolean> isIgnoredProperty() {
+        return isIgnored;
+    }
+
+    public void setIsIgnored(boolean b) {
+        isIgnored.setValue(b);
     }
 
     @PersistentProperty
@@ -264,28 +275,4 @@ public class LiveTestCase implements SettingsOwner {
     }
 
 
-    public static LiveTestCase fromDescriptor(TestDescriptor descriptor, Element originalElement) {
-
-        LiveTestCase live = new LiveTestCase();
-        live.setSource(descriptor.getCode());
-        live.setDescription(descriptor.getDescription());
-
-        List<String> lines = Arrays.asList(descriptor.getCode().split("\\r?\\n"));
-        List<String> messages = descriptor.getExpectedMessages();
-        List<Integer> lineNumbers = descriptor.getExpectedLineNumbers();
-
-        for (int i = 0; i < descriptor.getNumberOfProblemsExpected(); i++) {
-            String m = messages.size() > i ? messages.get(i) : null;
-            int line = lineNumbers.size() > i ? lineNumbers.get(i) : -1;
-
-            TextRange tr = line >= 0
-                           ? TextRange.fullLine(line, lines.get(line - 1).length())
-                           : null;
-
-            live.getExpectedViolations().add(new LiveViolationRecord(tr, m, false));
-        }
-
-        descriptor.getProperties().forEach((k, v) -> live.getProperties().put(k.toString(), v.toString()));
-        return live;
-    }
 }
