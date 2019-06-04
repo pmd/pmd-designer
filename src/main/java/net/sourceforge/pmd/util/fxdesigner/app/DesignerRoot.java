@@ -6,6 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.app;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.value.Val;
+import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource.NodeSelectionEvent;
@@ -60,6 +61,8 @@ public interface DesignerRoot {
     AppServiceDescriptor<TestCreatorService> TEST_CREATOR = new AppServiceDescriptor<>(TestCreatorService.class);
 
     AppServiceDescriptor<MessageChannel<VersionedXPathQuery>> LATEST_XPATH = new AppServiceDescriptor<>(MessageChannel.class);
+
+    AppServiceDescriptor<Var<Boolean>> IS_NODE_BEING_DRAGGED = new AppServiceDescriptor<>(Var.class);
 
 
     /**

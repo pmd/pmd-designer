@@ -10,6 +10,8 @@ import java.util.Collection;
 import org.fxmisc.richtext.model.StyleSpan;
 import org.fxmisc.richtext.model.StyledDocument;
 
+import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 
 import javafx.scene.control.ListCell;
@@ -23,7 +25,18 @@ import javafx.scene.text.TextFlow;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class XpathViolationListCell extends ListCell<TextAwareNodeWrapper> {
+public class XpathViolationListCell extends ListCell<TextAwareNodeWrapper> implements ApplicationComponent {
+
+    private final DesignerRoot root;
+
+    public XpathViolationListCell(DesignerRoot root) {
+        this.root = root;
+    }
+
+    @Override
+    public DesignerRoot getDesignerRoot() {
+        return root;
+    }
 
     @Override
     protected void updateItem(TextAwareNodeWrapper item, boolean empty) {
@@ -36,7 +49,7 @@ public class XpathViolationListCell extends ListCell<TextAwareNodeWrapper> {
             // Use the first line of the rich text of the node
             setGraphic(richTextForNode(item));
 
-            DragAndDropUtil.registerAsNodeDragSource(this, item.getNode());
+            DragAndDropUtil.registerAsNodeDragSource(this, item.getNode(), getDesignerRoot());
         }
     }
 

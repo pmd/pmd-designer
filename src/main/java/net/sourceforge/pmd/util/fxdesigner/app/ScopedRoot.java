@@ -21,12 +21,13 @@ import javafx.stage.Stage;
 
 
 /**
- * Interface for the singleton of the app.
+ * A root instance that can override services independently of its parent,
+ * and otherwise delegates to it.
  *
  * @author Clément Fournier
- * @since 6.0.0
+ * @since 6.16.0
  */
-public final class ScopedRoot implements DesignerRoot {
+final class ScopedRoot implements DesignerRoot {
 
 
     private final Map<AppServiceDescriptor<?>, Object> services = new HashMap<>();

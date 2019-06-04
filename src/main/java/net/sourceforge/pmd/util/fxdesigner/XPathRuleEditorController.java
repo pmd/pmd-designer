@@ -154,7 +154,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
 
         expressionTitledPane.titleProperty().bind(xpathVersionUIProperty.map(v -> "XPath Expression (" + v + ")"));
 
-        xpathResultListView.setCellFactory(v -> new XpathViolationListCell());
+        xpathResultListView.setCellFactory(v -> new XpathViolationListCell(getDesignerRoot()));
 
         exportXpathToRuleButton.setOnAction(e -> showExportXPathToRuleWizard());
 

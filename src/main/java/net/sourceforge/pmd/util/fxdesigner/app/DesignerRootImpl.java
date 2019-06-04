@@ -63,6 +63,7 @@ public final class DesignerRootImpl implements DesignerRoot {
         registerService(LATEST_XPATH, new MessageChannel<>(Category.SELECTION_EVENT_TRACING));
         registerService(TEST_LOADER, new MessageChannel<>(Category.TEST_LOADING_EVENT));
         registerService(TEST_CREATOR, new TestCreatorService());
+        registerService(IS_NODE_BEING_DRAGGED, Var.newSimpleVar(false));
     }
 
 

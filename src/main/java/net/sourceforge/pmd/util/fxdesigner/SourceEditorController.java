@@ -240,8 +240,9 @@ public class SourceEditorController extends AbstractController {
                 LiveViolationRecord record = new LiveViolationRecord();
                 record.setRange(range);
                 record.setExactRange(true);
+                SimplePopups.showActionFeedback(violationsButton, AlertType.CONFIRMATION, "Violation added");
                 currentlyOpenTestCase.ifPresent(v -> v.getExpectedViolations().add(record));
-            });
+            }, getDesignerRoot());
 
         currentlyOpenTestCase.orElseConst(defaultTestCase)
                              .changes()

@@ -115,7 +115,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
             record.setRange(textRange);
             record.setExactRange(true);
             getItems().add(record);
-        });
+        }, getDesignerRoot());
 
         ControlUtil.makeListViewNeverScrollHorizontal(view);
 

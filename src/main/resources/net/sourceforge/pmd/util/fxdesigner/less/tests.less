@@ -40,7 +40,7 @@
   }
 }
 
-.button.node-drag-over {
+.button.node-drag-over, .button:node-drag-possible-target {
 
   @fxcolor: derive(@selection-focus-color, +10%);
   @darker: @darker-accent-border;
@@ -53,6 +53,7 @@
   -fx-background-color: -fx-shadow-highlight-color, linear-gradient(to bottom, derive(@darker, -20%), @darker), @grad;
 
   -fx-background-insets: 0 0 -1 0, 0, 1;
+  -fx-background-radius: 4, 3, 3;
 
   -fx-text-fill: white;
 }

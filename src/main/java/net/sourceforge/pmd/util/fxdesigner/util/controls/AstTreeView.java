@@ -80,7 +80,7 @@ public class AstTreeView extends SearchableTreeView<Node> implements NodeSelecti
                     .subscribe(baseSelectionEvents::push);
 
         //  * the currently selected cell is explicitly clicked
-        setCellFactory(tv -> new ASTTreeCell(n -> {
+        setCellFactory(tv -> new ASTTreeCell(getDesignerRoot(), n -> {
             ASTTreeItem selectedTreeItem = (ASTTreeItem) getSelectionModel().getSelectedItem();
 
             // only push an event if the node was already selected
