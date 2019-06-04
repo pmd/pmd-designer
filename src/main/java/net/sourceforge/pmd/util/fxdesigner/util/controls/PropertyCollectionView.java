@@ -226,6 +226,9 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
         popOver.titleProperty().bind(titleProperty.map(it -> "Properties of " + it));
         popOver.setHeaderAlwaysVisible(true);
         popOver.setPrefWidth(150);
+
+
+
         return popOver;
     }
 

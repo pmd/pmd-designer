@@ -25,6 +25,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.HelpfulPlaceholder;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.TestCaseListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
@@ -137,10 +138,22 @@ public class TestCollectionController extends AbstractController {
     }
 
     public void deleteTestCase(LiveTestCase tc) {
-        testsListView.getItems().remove(tc);
+        ObservableList<LiveTestCase> items = testsListView.getItems();
+        int idx = items.indexOf(tc);
 
-        if (!tc.isFrozen()) {
-            unloadTestCase();
+        if (idx >= 0) {
+            items.remove(idx);
+            if (!tc.isFrozen()) {
+                unloadTestCase();
+
+                if (!items.isEmpty()) {
+                    if (idx == 0) {
+                        loadTestCase(0);
+                    } else {
+                        loadTestCase(idx - 1);
+                    }
+                }
+            }
         }
     }
 
