@@ -33,13 +33,14 @@ import org.xml.sax.SAXParseException;
 
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
 public class TestXmlParser {
 
 
-    private Map<LiveTestCase, Element> parseTests(Document doc) {
+    private Map<LiveTestCase, Element> parseTests(Document doc, ObservableRuleBuilder owner) {
         Element root = doc.getDocumentElement();
         NodeList testCodes = root.getElementsByTagName("test-code");
 
@@ -48,13 +49,13 @@ public class TestXmlParser {
         for (int i = 0; i < testCodes.getLength(); i++) {
             Element testCode = (Element) testCodes.item(i);
 
-            LiveTestCase descriptor = parseSingle(testCode, root);
+            LiveTestCase descriptor = parseSingle(testCode, root, owner);
             tests.put(descriptor, testCode);
         }
         return tests;
     }
 
-    private LiveTestCase parseSingle(Element testCode, Element root) {
+    private LiveTestCase parseSingle(Element testCode, Element root, ObservableRuleBuilder owner) {
         //
         //        boolean reinitializeRule = true;
         //        Node reinitializeRuleAttribute = testCode.getAttributes().getNamedItem("reinitializeRule");
@@ -154,7 +155,8 @@ public class TestXmlParser {
             !isRegressionTest,
             messages,
             expectedLineNumbers,
-            properties
+            properties,
+            owner
         );
     }
 
@@ -167,9 +169,12 @@ public class TestXmlParser {
         boolean ignored,
         List<String> messages,
         List<Integer> lineNumbers,
-        Properties properties) {
+        Properties properties,
+        ObservableRuleBuilder owner
+    ) {
 
         LiveTestCase live = new LiveTestCase();
+        live.setRule(owner);
         live.setSource(code);
         live.setDescription(description);
         live.setLanguageVersion(version);
@@ -187,8 +192,7 @@ public class TestXmlParser {
 
             live.getExpectedViolations().add(new LiveViolationRecord(tr, m, false));
         }
-
-        properties.forEach((k, v) -> live.getProperties().put(k.toString(), v.toString()));
+        properties.forEach((k, v) -> live.setProperty(k.toString(), v.toString()));
         return live;
     }
 
@@ -217,19 +221,19 @@ public class TestXmlParser {
     }
 
 
-    public static TestCollection parseXmlTests(String xml) throws Exception {
+    public static TestCollection parseXmlTests(String xml, ObservableRuleBuilder owner) throws Exception {
         ByteArrayInputStream bis = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
-        return parseXmlTests(bis);
+        return parseXmlTests(bis, owner);
     }
 
 
-    public static TestCollection parseXmlTests(Path path) throws Exception {
+    public static TestCollection parseXmlTests(Path path, ObservableRuleBuilder owner) throws Exception {
         try (FileInputStream is = new FileInputStream(path.toFile())) {
-            return parseXmlTests(is);
+            return parseXmlTests(is, owner);
         }
     }
 
-    private static TestCollection parseXmlTests(InputStream is) throws Exception {
+    private static TestCollection parseXmlTests(InputStream is, ObservableRuleBuilder owner) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
@@ -239,7 +243,7 @@ public class TestXmlParser {
         DocumentBuilder builder = getDocumentBuilder(dbf);
 
         Document doc = builder.parse(is);
-        Map<LiveTestCase, Element> testDescriptors = new TestXmlParser().parseTests(doc);
+        Map<LiveTestCase, Element> testDescriptors = new TestXmlParser().parseTests(doc, owner);
         List<LiveTestCase> tests = new ArrayList<>(testDescriptors.keySet());
         return new TestCollection(null, tests);
 

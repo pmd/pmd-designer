@@ -40,8 +40,8 @@ public class ObservableRuleBuilder implements SettingsOwner {
     private final Var<Class<?>> clazz = Var.newSimpleVar(null);
 
     // doesn't contain the "xpath" and "version" properties for XPath rules
-    private LiveList<PropertyDescriptorSpec> ruleProperties = new LiveArrayList<>();
-    private LiveList<String> examples = new LiveArrayList<>();
+    private final LiveList<PropertyDescriptorSpec> ruleProperties = new LiveArrayList<>();
+    private final LiveList<String> examples = new LiveArrayList<>();
 
     private final Var<LanguageVersion> minimumVersion = Var.newSimpleVar(null);
     private final Var<LanguageVersion> maximumVersion = Var.newSimpleVar(null);

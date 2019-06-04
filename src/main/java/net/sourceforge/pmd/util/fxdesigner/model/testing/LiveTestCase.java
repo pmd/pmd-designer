@@ -7,15 +7,11 @@ package net.sourceforge.pmd.util.fxdesigner.model.testing;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.fxmisc.undo.UndoManager;
-import org.fxmisc.undo.UndoManagerFactory;
-import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
@@ -27,6 +23,9 @@ import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
+
+import javafx.collections.FXCollections;
 
 /**
  * Live editable version of a test case.
@@ -40,13 +39,14 @@ public class LiveTestCase implements SettingsOwner {
     private final LiveList<LiveViolationRecord> expectedViolations = new LiveArrayList<>();
     private final Var<Boolean> isIgnored = Var.newSimpleVar(false);
 
+    private final Var<PropertyMapModel> liveProperties;
 
     private final Var<ObservableRuleBuilder> rule = Var.newSimpleVar(null);
     private final Var<TestResult> status = Var.newSimpleVar(new TestResult(TestStatus.UNKNOWN, null));
     private Consumer<LiveTestCase> commitHandler;
     private final Var<Boolean> frozen = Var.newSimpleVar(true);
 
-    private final UndoManager<TestCaseChange> myUndoModel;
+
 
     public LiveTestCase() {
         this(t -> {});
@@ -55,19 +55,15 @@ public class LiveTestCase implements SettingsOwner {
     public LiveTestCase(Consumer<LiveTestCase> commitHandler) {
         this.commitHandler = t -> commitHandler.accept(t.freeze());
 
-        myUndoModel = UndoManagerFactory.unlimitedHistorySingleChangeUM(
-            changeStream(),
-            TestCaseChange::invert,
-            TestCaseChange::redo,
-            (a, b) -> Optional.of(a.mergeWith(b))
-        );
-
         freeze();
+
+        liveProperties = ReactfxUtil.defaultedVar(Val.constant(new PropertyMapModel(FXCollections.emptyObservableList())));
+
+        rule.values().subscribe(
+            r -> liveProperties.setValue(r == null ? null : new PropertyMapModel(r.getRuleProperties()))
+        );
     }
 
-    public UndoManager<TestCaseChange> getUndoManager() {
-        return myUndoModel;
-    }
 
     @PersistentProperty
     public String getSource() {
@@ -136,9 +132,6 @@ public class LiveTestCase implements SettingsOwner {
         this.rule.setValue(rule);
     }
 
-    public Val<Boolean> dirtyProperty() {
-        return myUndoModel.undoAvailableProperty().map(it -> !it);
-    }
 
 
     @PersistentSequence
@@ -146,12 +139,25 @@ public class LiveTestCase implements SettingsOwner {
         return expectedViolations;
     }
 
+
+    public PropertyMapModel getLiveProperties() {
+        return liveProperties.getValue();
+    }
+
+    public Val<PropertyMapModel> livePropertiesProperty() {
+        return liveProperties;
+    }
+
     public Map<String, String> getProperties() {
-        return properties.getValue();
+        return getLiveProperties().getNonDefault();
     }
 
     public Var<Map<String, String>> propertiesProperty() {
         return properties;
+    }
+
+    public void setProperty(String name, String value) {
+        getLiveProperties().setProperty(name, value);
     }
 
     public void setProperties(Map<String, String> stringMap) {
@@ -166,7 +172,7 @@ public class LiveTestCase implements SettingsOwner {
     @PersistentProperty
     public Properties getPersistenceOnlyProps() {
         Properties props = new Properties();
-        properties.getValue().forEach(props::put);
+        getLiveProperties().getNonDefault().forEach(props::put);
         return props;
     }
 
@@ -209,7 +215,6 @@ public class LiveTestCase implements SettingsOwner {
     LiveTestCase freeze() {
         if (!frozen.getValue()) {
             setFrozen(true);
-            getUndoManager().mark();
         }
         return this;
     }
@@ -226,10 +231,11 @@ public class LiveTestCase implements SettingsOwner {
         LiveTestCase live = new LiveTestCase();
         live.setDescription(getDescription());
         live.expectedViolations.setAll(this.expectedViolations);
-        live.setProperties(getProperties());
+        live.setRule(getRule());
         live.setLanguageVersion(getLanguageVersion());
         live.setSource(getSource());
         live.setFrozen(isFrozen());
+
         return live;
     }
 
@@ -247,49 +253,6 @@ public class LiveTestCase implements SettingsOwner {
 
     public void setStatus(TestStatus status) {
         statusProperty().setValue(new TestResult(status, null));
-    }
-
-
-    public EventStream<TestCaseChange> changeStream() {
-
-        EventSource<TestCaseChange> sink = new EventSource<>();
-
-        sink.feedFrom(sourceProperty().changes().map(it -> new TestCaseChange(
-            this,
-            it,
-            null,
-            null,
-            null
-        )));
-
-        sink.feedFrom(languageVersionProperty().changes().map(it -> new TestCaseChange(
-            this,
-            null,
-            it,
-            null,
-            null
-        )));
-
-
-        sink.feedFrom(properties.changes().map(it -> new TestCaseChange(
-            this,
-            null,
-            null,
-            it,
-            null
-
-        )));
-
-        sink.feedFrom(descriptionProperty().changes().map(it -> new TestCaseChange(
-            this,
-            null,
-            null,
-            null,
-            it
-        )));
-
-
-        return sink;
     }
 
 

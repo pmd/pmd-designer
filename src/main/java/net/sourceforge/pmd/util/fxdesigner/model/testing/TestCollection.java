@@ -32,6 +32,10 @@ public class TestCollection implements SettingsOwner {
 
     public void rebase(TestCollection testCases) {
         this.stash.setAll(testCases.stash);
+        initOwner();
+    }
+
+    public void initOwner() {
         stash.forEach(it -> it.setRule(owner));
     }
 

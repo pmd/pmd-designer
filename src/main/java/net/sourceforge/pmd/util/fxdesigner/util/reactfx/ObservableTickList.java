@@ -10,6 +10,7 @@ import java.util.function.Function;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
+import org.reactfx.collection.UnmodifiableByDefaultLiveList;
 
 import com.github.oowekyala.rxstring.ReactfxExtensions;
 import javafx.collections.ObservableList;
@@ -20,7 +21,7 @@ import javafx.collections.ObservableList;
  *
  * @param <E>
  */
-public final class ObservableTickList<E> extends BaseObservableListDelegate<E> {
+public final class ObservableTickList<E> extends BaseObservableListDelegate<E> implements UnmodifiableByDefaultLiveList<E> {
 
 
     private final Function<? super E, ? extends EventStream<?>> ticks;

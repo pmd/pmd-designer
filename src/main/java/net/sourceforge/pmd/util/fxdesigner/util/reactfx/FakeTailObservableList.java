@@ -6,6 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.reactfx;
 
 import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
+import org.reactfx.collection.UnmodifiableByDefaultLiveList;
 
 import javafx.collections.ObservableList;
 
@@ -15,7 +16,7 @@ import javafx.collections.ObservableList;
  *
  * @param <E>
  */
-public final class FakeTailObservableList<E> extends BaseObservableListDelegate<E> {
+public final class FakeTailObservableList<E> extends BaseObservableListDelegate<E> implements UnmodifiableByDefaultLiveList<E> {
 
     private final E tailElement;
 

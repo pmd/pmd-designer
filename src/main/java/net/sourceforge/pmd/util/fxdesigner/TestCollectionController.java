@@ -96,7 +96,7 @@ public class TestCollectionController extends AbstractController {
             }
 
             try {
-                TestCollection coll = TestXmlParser.parseXmlTests(file.toPath());
+                TestCollection coll = TestXmlParser.parseXmlTests(file.toPath(), builder);
                 // TODO what if there's already test cases?
                 getTestCollection().rebase(coll);
                 SimplePopups.showActionFeedback(importTestsButton, AlertType.CONFIRMATION,
@@ -124,6 +124,12 @@ public class TestCollectionController extends AbstractController {
             .messageStream(true, this)
             .subscribe(ltc -> getTestCollection().addTestCase(ltc.unfreeze()));
 
+    }
+
+    @Override
+    public void afterParentInit() {
+        super.afterParentInit();
+        getTestCollection().initOwner();
     }
 
     private TestCollection getTestCollection() {

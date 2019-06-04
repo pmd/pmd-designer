@@ -207,6 +207,8 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
         ControlUtil.makeListViewFitToChildren(view, LIST_CELL_HEIGHT);
         view.setEditable(true);
 
+        ControlUtil.makeListViewNeverScrollHorizontal(view);
+
         Label placeholder = new Label("No properties yet");
         placeholder.getStyleClass().addAll("placeholder");
         view.setPlaceholder(placeholder);

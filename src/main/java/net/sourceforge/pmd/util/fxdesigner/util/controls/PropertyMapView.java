@@ -7,7 +7,6 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -15,21 +14,15 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.tools.ValueExtractor;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.Subscription;
-import org.reactfx.collection.LiveArrayList;
-import org.reactfx.collection.LiveList;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
-import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
-import com.github.oowekyala.rxstring.ReactfxExtensions;
 import javafx.beans.NamedArg;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -53,7 +46,6 @@ public class PropertyMapView extends VBox implements ApplicationComponent {
     @NonNull
     private final ListView<Pair<PropertyDescriptorSpec, Var<String>>> view;
 
-    private Subscription sub = Subscription.EMPTY;
 
 
     static {
@@ -86,28 +78,11 @@ public class PropertyMapView extends VBox implements ApplicationComponent {
 
 
     public void bind(LiveTestCase testCase) {
-        ObservableList<PropertyDescriptorSpec> allProps = Optional.ofNullable(testCase.getRule()).<ObservableList<PropertyDescriptorSpec>>map(ObservableRuleBuilder::getRuleProperties).orElse(FXCollections.emptyObservableList());
-
-        LiveList<Pair<PropertyDescriptorSpec, Var<String>>> properties = LiveList.map(allProps, it -> new Pair<>(it, Var.newSimpleVar(testCase.getProperties().getOrDefault(it.getName(), it.getValue()))));
-
-        view.setItems(new LiveArrayList<>());
-
-        sub = ReactfxUtil.modificationTicks(view.getItems(), p -> p.getValue().values().distinct().or(p.getKey().nameProperty().values().distinct()))
-                         .subscribe(tick -> testCase.setProperties(getItems()))
-                         .and(
-                             ReactfxExtensions.dynamic(
-                                 properties,
-                                 (e, i) -> {
-                                     view.getItems().add(i, e);
-                                     return () -> view.getItems().remove(e);
-                                 }
-                             )
-                         );
+        view.setItems(testCase.getLiveProperties().asList());
     }
 
     public void unbind() {
-        sub.unsubscribe();
-        sub = Subscription.EMPTY;
+        view.setItems(FXCollections.emptyObservableList());
     }
 
     public Map<String, String> getItems() {

@@ -14,10 +14,11 @@ import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
-import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
 import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
@@ -27,7 +28,6 @@ import org.reactfx.value.Var;
 
 import com.github.oowekyala.rxstring.ReactfxExtensions;
 import com.github.oowekyala.rxstring.ReactfxExtensions.RebindSubscription;
-import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
@@ -38,7 +38,6 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.Node;
-import javafx.util.Pair;
 
 /**
  * Extensions to ReactFX Val and EventStreams. Some can be deemed as too
@@ -74,8 +73,8 @@ public final class ReactfxUtil {
      * Add a hook on the owner window. It's not possible to do this statically,
      * since at construction time the window might not be set.
      */
-    public static <T> Subscription subscribeDisposable(ObservableValue<? extends T> node,
-                                                       Function<? super T, Subscription> subscriber) {
+    public static <T> Subscription subscribeDisposable(ObservableValue<@Nullable ? extends T> node,
+                                                       Function<@NonNull ? super T, Subscription> subscriber) {
         return ReactfxExtensions.dynamic(
             LiveList.wrapVal(node),
             (w, i) -> subscriber.apply(w)
@@ -90,6 +89,13 @@ public final class ReactfxUtil {
         return subscribeDisposable(latestValue(stream), subscriber);
     }
 
+    public static <T> Var<T> defaultedVar(Val<? extends T> defaultValue) {
+        return new OrElseVar<>(defaultValue);
+    }
+
+    public static <T, S> LiveList<S> mapBothWays(ObservableList<T> base, Function<T, S> forward, Function<S, T> backward) {
+        return new MutableMappedList<>(base, forward, backward);
+    }
 
     //    public static <T extends Event> Subscription addEventHandler(Consumer<EventHandler<T>> addMethod, Consumer<EventHandler<T>> removeMethod,)
 
@@ -116,7 +122,7 @@ public final class ReactfxUtil {
         return new GroupByLiveList<>(base, selector);
     }
 
-    public static <E> LiveList<E> flattenList(Val<? extends ObservableList<? extends E>> base) {
+    public static <E> LiveList<E> flattenList(Val<? extends ObservableList<E>> base) {
         return new FlatListVal<>(base);
     }
 

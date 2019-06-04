@@ -91,31 +91,6 @@ public abstract class BaseObservableListDelegate<E> extends LiveListBase<E> {
     }
 
     @Override
-    public boolean addAll(E... elements) {
-        return base.addAll(elements);
-    }
-
-    @Override
-    public boolean setAll(E... elements) {
-        return base.setAll(elements);
-    }
-
-    @Override
-    public boolean setAll(Collection<? extends E> col) {
-        return base.setAll(col);
-    }
-
-    @Override
-    public boolean removeAll(E... elements) {
-        return base.removeAll(elements);
-    }
-
-    @Override
-    public boolean retainAll(E... elements) {
-        return base.retainAll(elements);
-    }
-
-    @Override
     public void remove(int from, int to) {
         base.remove(from, to);
     }

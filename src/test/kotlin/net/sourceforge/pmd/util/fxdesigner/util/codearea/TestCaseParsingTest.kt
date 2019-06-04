@@ -12,6 +12,7 @@ import io.kotlintest.matchers.haveSize
 import io.kotlintest.should
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.FunSpec
+import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser
 
 class TestCaseParsingTest : FunSpec({
@@ -67,7 +68,7 @@ class TestCaseParsingTest : FunSpec({
 
         """.trimIndent()
 
-        val tc = TestXmlParser.parseXmlTests(xmlTest)
+        val tc = TestXmlParser.parseXmlTests(xmlTest, ObservableRuleBuilder())
 
         tc.stash.size shouldBe 3
         tc.stash[0].also {
