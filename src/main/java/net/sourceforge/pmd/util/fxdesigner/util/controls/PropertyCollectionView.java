@@ -5,6 +5,8 @@
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +26,6 @@ import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
 import net.sourceforge.pmd.util.fxdesigner.popups.EditPropertyDialogController;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
-import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -93,7 +94,7 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
             PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
             spec.setName(getUniqueNewName());
             view.getItems().add(spec);
-            // TODO pop the edit view
+            fireEditLast();
         });
         footer.getChildren().addAll(addProperty);
         this.getChildren().addAll(view, footer);
@@ -121,13 +122,16 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
         PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
         spec.setName(name);
         view.getItems().add(spec);
+        fireEditLast();
+    }
 
-        Platform.runLater(
-            () -> {
-                Node node = getChildrenUnmodifiable().get(getChildrenUnmodifiable().size() - 1);
-                System.out.println(node);
-                ((Button) node.lookup("." + PropertyDescriptorCell.DETAILS_BUTTON_CLASS)).fire();
-            });
+    private void fireEditLast() {
+        view.getSelectionModel().select(view.getItems().size() - 1);
+        view.lookupAll(".list-cell").stream()
+            .map(it -> (PropertyDescriptorCell) it)
+            .max(Comparator.comparingInt(PropertyDescriptorCell::getIndex))
+            .map(it -> (Button) it.lookup("." + PropertyDescriptorCell.DETAILS_BUTTON_CLASS))
+            .ifPresent(Button::fire);
     }
 
     /**
@@ -289,7 +293,13 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
             delete.setGraphic(new FontIcon("fas-trash-alt"));
             delete.getStyleClass().addAll(DELETE_BUTTON_CLASS, "icon-button");
             Tooltip.install(delete, new Tooltip("Remove property"));
-            delete.setOnAction(e -> getItems().remove(spec));
+            delete.setOnAction(e -> {
+                getItems().remove(spec);
+                if (Objects.equals(myEditPopover.getIdentity(), spec)) {
+                    myEditPopover.rebind(null);
+                    myEditPopover.hide();
+                }
+            });
 
             sub = sub.and(() -> delete.setOnAction(null));
 
