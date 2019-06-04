@@ -90,12 +90,7 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
 
         ControlUtil.anchorFirmly(addProperty);
 
-        addProperty.setOnAction(e -> {
-            PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
-            spec.setName(getUniqueNewName());
-            view.getItems().add(spec);
-            fireEditLast();
-        });
+        addProperty.setOnAction(e -> addNewProperty(getUniqueNewName()));
         footer.getChildren().addAll(addProperty);
         this.getChildren().addAll(view, footer);
 
@@ -118,7 +113,7 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
     /**
      * Call this to pop the "new property" popup.
      */
-    public void onAddPropertyClicked(String name) {
+    public void addNewProperty(String name) {
         PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
         spec.setName(name);
         view.getItems().add(spec);
@@ -230,8 +225,7 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
         popOver.titleProperty().bind(titleProperty.map(it -> "Properties of " + it));
         popOver.setHeaderAlwaysVisible(true);
         popOver.setPrefWidth(150);
-
-
+        popOver.setUserData(view);
 
         return popOver;
     }

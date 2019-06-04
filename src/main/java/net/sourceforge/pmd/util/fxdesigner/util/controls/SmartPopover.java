@@ -31,6 +31,10 @@ public class SmartPopover extends PopOver {
         EventStreams.valuesOf(popOver.detachedProperty())
                     .subscribe(v -> popOver.pseudoClassStateChanged(PseudoClass.getPseudoClass("detached"), v));
         EventStreams.valuesOf(popOver.focusedProperty())
+                    // JavaFX lacks a focus model that works across several popups and stuff.
+                    // The only solution we have to avoid having duplicate carets or so, is
+                    // to *not* let a popover that openly has textfields or other controls
+                    // that steal focus *be detachable*
                     .subscribe(v -> popOver.pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), v));
 
     }

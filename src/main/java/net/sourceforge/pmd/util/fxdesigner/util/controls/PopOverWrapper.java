@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -106,6 +107,10 @@ public final class PopOverWrapper<T> {
         }
         PopOverWrapper<?> that = (PopOverWrapper<?>) o;
         return Objects.equals(identity, that.identity);
+    }
+
+    public Optional<Object> getUserData() {
+        return myPopover.getOpt().map(Window::getUserData);
     }
 
     @Override

@@ -372,9 +372,9 @@ public final class XPathRuleEditorController extends AbstractController implemen
         expressionTitledPane.errorMessageProperty().setValue(xpathError ? emptyResultsPlaceholder : "");
     }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void addProperty(String name) {
-        // TODO
+        propertiesPopover.showOrFocus(pop -> pop.show(showPropertiesButton));
+        propertiesPopover.getUserData().map(it -> (PropertyCollectionView) it).ifPresent(it -> it.addNewProperty(name));
     }
 
     @Override
