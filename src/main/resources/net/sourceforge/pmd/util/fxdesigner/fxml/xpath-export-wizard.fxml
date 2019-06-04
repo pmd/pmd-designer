@@ -4,11 +4,11 @@
 <?import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyCollectionView?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.RippleButton?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.RulePrioritySlider?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
@@ -158,22 +158,22 @@
                                            AnchorPane.rightAnchor="0.0"
                                            AnchorPane.topAnchor="0.0">
                             <toolbarItems>
-                                <Button fx:id="copyResultButton" styleClass="icon-button">
+                                <RippleButton fx:id="copyResultButton" styleClass="icon-button">
                                     <graphic>
                                         <FontIcon iconLiteral="fas-copy" />
                                     </graphic>
                                     <tooltip>
                                         <Tooltip text="Copy to clipboard" />
                                     </tooltip>
-                                </Button>
-                                <Button fx:id="resetMetadataButton" styleClass="icon-button">
+                                </RippleButton>
+                                <RippleButton fx:id="resetMetadataButton" styleClass="icon-button">
                                     <graphic>
                                         <FontIcon iconLiteral="fas-undo" />
                                     </graphic>
                                     <tooltip>
                                         <Tooltip text="Reset metadata (excluding properties)" />
                                     </tooltip>
-                                </Button>
+                                </RippleButton>
                             </toolbarItems>
                             <content>
                                 <SyntaxHighlightingCodeArea fx:id="exportResultArea"

@@ -10,6 +10,7 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.SVGPath?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.RippleButton?>
 <AnchorPane stylesheets="@../css/designer.css"
             xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -25,23 +26,23 @@
             AnchorPane.rightAnchor="0.0"
             AnchorPane.topAnchor="0.0">
         <toolbarItems>
-            <Button fx:id="addTestButton" styleClass="icon-button">
+            <RippleButton fx:id="addTestButton" styleClass="icon-button">
                 <graphic>
                     <FontIcon iconLiteral="fas-plus"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="New test case"/>
                 </tooltip>
-            </Button>
-            <Button fx:id="importTestsButton" styleClass="icon-button">
+            </RippleButton>
+            <RippleButton fx:id="importTestsButton" styleClass="icon-button">
                 <graphic>
                     <FontIcon iconLiteral="fas-folder-open"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="Import test file..."/>
                 </tooltip>
-            </Button>
-            <Button fx:id="exportTestsButton" mnemonicParsing="false" styleClass="icon-button">
+            </RippleButton>
+            <RippleButton fx:id="exportTestsButton" mnemonicParsing="false" styleClass="icon-button">
                 <graphic>
                     <!--Needs FA 5.1.0 -->
                     <!--<FontIcon iconLiteral="fas-file-export" />-->
@@ -56,7 +57,7 @@
                         </text>
                     </Tooltip>
                 </tooltip>
-            </Button>
+            </RippleButton>
         </toolbarItems>
         <content>
             <ListView fx:id="testsListView" stylesheets="@../css/flat.css"/>

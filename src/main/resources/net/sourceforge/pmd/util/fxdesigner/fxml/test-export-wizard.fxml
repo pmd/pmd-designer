@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.RippleButton?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea?>
-<?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
-
 <AnchorPane prefHeight="468.0" prefWidth="665.0" stylesheets="@../css/designer.css" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.pmd.util.fxdesigner.popups.TestExportWizardController">
     <children>
         <ToolbarTitledPane fx:id="titledPane" animated="false" collapsible="false" layoutY="5.0" title="Export to:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <toolbarItems>
-                <Button fx:id="copyResultButton" text="Clipboard">
+                <RippleButton fx:id="copyResultButton" text="Clipboard">
                     <tooltip>
                         <Tooltip text="Copy to clipboard" />
                     </tooltip>
-                </Button>
-                <Button fx:id="saveToFileButton" text="File...">
+                </RippleButton>
+                <RippleButton fx:id="saveToFileButton" text="File...">
                     <tooltip>
                         <Tooltip text="Pick a file as export target" />
                     </tooltip>
-                </Button>
+                </RippleButton>
             </toolbarItems>
             <content>
                 <SyntaxHighlightingCodeArea fx:id="exportResultArea" prefHeight="221.0" prefWidth="563.0" stylesheets="@../css/editor-theme.css" />

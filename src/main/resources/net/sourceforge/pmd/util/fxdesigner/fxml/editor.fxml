@@ -14,6 +14,7 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.RippleButton?>
 <BorderPane xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="net.sourceforge.pmd.util.fxdesigner.SourceEditorController">
@@ -38,11 +39,11 @@
                                         <Tooltip text="Selected language version"/>
                                     </tooltip>
                                 </DynamicWidthChoicebox>
-                                <Button fx:id="convertToTestCaseButton" text="Convert to test case">
+                                <RippleButton fx:id="convertToTestCaseButton" text="Convert to test case">
                                     <tooltip>
                                         <Tooltip text="Add a new test case with the contents of the area"/>
                                     </tooltip>
-                                </Button>
+                                </RippleButton>
                             </toolbarItems>
                             <content>
                                 <AnchorPane>
@@ -57,8 +58,8 @@
                                                        AnchorPane.rightAnchor="0.0"
                                                        AnchorPane.topAnchor="0.0">
                                         <toolbarItems>
-                                            <Button fx:id="violationsButton" text="Expected violations"/>
-                                            <Button fx:id="propertiesMapButton" text="Property mapping"/>
+                                            <RippleButton fx:id="violationsButton" text="Expected violations"/>
+                                            <RippleButton fx:id="propertiesMapButton" text="Property mapping"/>
                                         </toolbarItems>
                                         <content>
                                             <AnchorPane>

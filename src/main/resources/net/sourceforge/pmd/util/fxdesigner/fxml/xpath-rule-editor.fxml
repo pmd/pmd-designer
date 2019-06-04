@@ -12,6 +12,7 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.SVGPath?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.RippleButton?>
 <AnchorPane minHeight="0.0"
             minWidth="0.0"
             prefHeight="180.0"
@@ -57,7 +58,7 @@
                                         <!-- Populated in the controller -->
                                     </items>
                                 </MenuButton>
-                                <Button fx:id="exportXpathToRuleButton" mnemonicParsing="false" styleClass="icon-button">
+                                <RippleButton fx:id="exportXpathToRuleButton" mnemonicParsing="false" styleClass="icon-button">
                                     <graphic>
                                         <!--Needs FA 5.1.0 -->
                                         <!--<FontIcon iconLiteral="fas-file-export" />-->
@@ -72,15 +73,15 @@
                                             </text>
                                         </Tooltip>
                                     </tooltip>
-                                </Button>
+                                </RippleButton>
 
                                 <Separator orientation="VERTICAL"/>
 
-                                <Button fx:id="showPropertiesButton" mnemonicParsing="false" text="Properties...">
+                                <RippleButton fx:id="showPropertiesButton" mnemonicParsing="false" text="Properties">
                                     <tooltip>
                                         <Tooltip text="Inspect rule properties" />
                                     </tooltip>
-                                </Button>
+                                </RippleButton>
                             </toolbarItems>
                             <content>
                                 <SyntaxHighlightingCodeArea stylesheets="@../css/editor-theme.css" fx:id="xpathExpressionArea" />
