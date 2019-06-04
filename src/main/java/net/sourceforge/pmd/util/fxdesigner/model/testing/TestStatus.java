@@ -7,6 +7,7 @@ package net.sourceforge.pmd.util.fxdesigner.model.testing;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javafx.scene.paint.Color;
 
@@ -33,6 +34,10 @@ public enum TestStatus {
 
     public List<String> getStyleClass() {
         return Arrays.asList(STATUS_CLASS, "status-" + name().toLowerCase(Locale.ROOT));
+    }
+
+    public static List<String> allStyleClasses() {
+        return Arrays.stream(values()).flatMap(it -> it.getStyleClass().stream()).distinct().collect(Collectors.toList());
     }
 
     public String getIcon() {

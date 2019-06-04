@@ -5,32 +5,49 @@
 @import "constants";
 @import "scrolling";
 
-.test-statuses(@stack) {
+.test-statuses(@stack, @back) {
 
-  .test-status {
-    &.status-pass {
-      -fx-fill: extract(@stack, 1);
+  .foreach-l(@stack, {
+
+    @name: extract(@test-status-class-names, @i);
+    @col: extract(@stack, @i);
+
+    &.@{name} {
+
+      .status-label {
+        -fx-background-color: white;
+        -fx-background-radius: 12;
+      }
+
+      .test-status {
+        -fx-fill: @col;
+      }
+
+      &:loaded-test {
+        -fx-background-color: linear-gradient(to left, fade(@col, 60%) 0%, @back 30%);
+      }
     }
 
-    &.status-fail {
-      -fx-fill: extract(@stack, 2);
-    }
-
-    &.status-error {
-      -fx-fill: extract(@stack, 3);
-    }
-
-    &.status-unknown {
-      -fx-fill: extract(@stack, 4);
-    }
-  }
+  });
 }
 
+@test-status-class-names: status-pass, status-fail, status-error, status-unknown;
 @normal-test-status-stack: @success-color, @warning-color, @error-color, gray;
 @test-status-on-gray-stack: lighten(@success-color, 60%), @warning-color, @error-color, gray;
 
 
-.test-statuses(@normal-test-status-stack);
+
+.list-view:focused .list-cell:selected {
+  .test-statuses(@normal-test-status-stack, @selection-focus-color);
+}
+
+.list-cell:selected {
+  .test-statuses(@normal-test-status-stack, @selection-no-focus-color);
+}
+
+.list-cell {
+  .test-statuses(@normal-test-status-stack, -fx-background); // -fx-background changes when cell is odd/even
+}
 
 
 .list-cell:selected,
@@ -39,6 +56,16 @@
     -fx-fill: white;
   }
 }
+
+.list-cell.test-status:loaded-test {
+  .toggle-button.load-button:hover {
+    -fx-background-color: white;
+    .ikonli-font-icon {
+      -fx-fill: @fx-text-fill;
+    }
+  }
+}
+
 
 .button.node-drag-over, .button:node-drag-possible-target {
 

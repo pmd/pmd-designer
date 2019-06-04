@@ -30,6 +30,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -68,6 +69,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         FontIcon statusIcon = new FontIcon();
         Label statusLabel = new Label();
         statusLabel.setGraphic(statusIcon);
+        statusLabel.getStyleClass().addAll("status-label");
         // todo subscription
 
         Subscription sub = testCase.statusProperty()
@@ -76,6 +78,9 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
                                        TestResult st = ch.getNewValue();
                                        statusIcon.getStyleClass().setAll(st.getStatus().getStyleClass());
                                        statusIcon.setIconLiteral(st.getStatus().getIcon());
+
+                                       this.getStyleClass().removeAll(TestStatus.allStyleClasses());
+                                       this.getStyleClass().addAll(st.getStatus().getStyleClass());
 
                                        if (ch.getOldValue() != null
                                            && st.getStatus() != ch.getOldValue().getStatus()
@@ -131,6 +136,10 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
                 collection.unloadTestCase();
             }
         });
+
+        testCase.frozenProperty().values().distinct().subscribe(
+            it-> pseudoClassStateChanged(PseudoClass.getPseudoClass("loaded-test"), !it)
+        );
 
         sub = sub.and(() -> {
             collection.getLoadedToggleGroup().getToggles().removeAll(load);

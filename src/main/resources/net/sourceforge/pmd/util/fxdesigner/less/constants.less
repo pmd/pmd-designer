@@ -48,6 +48,7 @@
 @darker-accent-border: darken(@fx-base, 30%);
 
 @selection-focus-color: lighten(royalblue, 20%);
+@selection-no-focus-color: @darker-accent-focus;
 
 @error-color: #B6180C;   // crimson
 @warning-color: #FDAD20; // merigold
@@ -93,6 +94,16 @@
   &.depth-@{i} {
     @ruleset();
   }
+}
+
+.foreach-l(@list, @ruleset) {
+  .foreach(length(@list), @ruleset);
+}
+
+.foreach(@i, @ruleset) when (@i > 0) {
+  .foreach(@i - 1, @ruleset);
+
+  @ruleset();
 }
 
 .standard-border {
