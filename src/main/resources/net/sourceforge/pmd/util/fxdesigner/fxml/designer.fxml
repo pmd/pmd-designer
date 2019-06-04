@@ -59,7 +59,7 @@
                                     </items>
                                 </Menu>
 
-                                <Menu disable="true">
+                                <Menu disable="true" style="-fx-opacity: 1;">
                                     <graphic>
                                         <Label text="Language:" styleClass="label-menu" />
                                     </graphic>
