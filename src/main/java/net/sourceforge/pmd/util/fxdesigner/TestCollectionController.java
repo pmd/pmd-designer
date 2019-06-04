@@ -108,7 +108,7 @@ public class TestCollectionController extends AbstractController {
             }
         });
 
-        addTestButton.setOnAction(any -> getTestCollection().addTestCase(new LiveTestCase().unfreeze()));
+        addTestButton.setOnAction(any -> getTestCollection().addTestCase(new LiveTestCase(builder).unfreeze()));
 
         exportTestsButton.setOnAction(evt -> {
             TestExportWizardController wizard = exportWizard.get();

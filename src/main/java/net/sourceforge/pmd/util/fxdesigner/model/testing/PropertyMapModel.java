@@ -4,6 +4,15 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
+import static javafx.collections.FXCollections.emptyObservableList;
+import static javafx.collections.FXCollections.observableHashMap;
+import static javafx.collections.FXCollections.observableSet;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.defaultedVar;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.flattenList;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.mapBothWays;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.observableMapVal;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.withInvalidations;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,17 +21,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.EventStreams;
 import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
-import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import com.github.oowekyala.rxstring.ReactfxExtensions;
 import com.github.oowekyala.rxstring.ReactfxExtensions.RebindSubscription;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.util.Pair;
@@ -30,29 +38,31 @@ import javafx.util.Pair;
 public class PropertyMapModel {
 
     private final ObservableMap<PropertyDescriptorSpec, Var<String>> mapping;
-    private final Var<ObservableList<PropertyDescriptorSpec>> knownPropsImpl = Var.newSimpleVar(FXCollections.emptyObservableList());
+    private final Var<ObservableList<PropertyDescriptorSpec>> knownPropsImpl = Var.newSimpleVar(emptyObservableList());
 
-    private final ObservableList<PropertyDescriptorSpec> knownProps = ReactfxUtil.flattenList(knownPropsImpl);
+    private final ObservableList<PropertyDescriptorSpec> knownProps = flattenList(knownPropsImpl);
 
     // properties that have no PropertyDescriptorSpec...
     private final Map<String, String> orphanProperties = new HashMap<>();
 
-    public PropertyMapModel(ObservableList<PropertyDescriptorSpec> knownProps) {
-        Pair<ObservableMap<PropertyDescriptorSpec, Var<String>>, RebindSubscription<ObservableList<PropertyDescriptorSpec>>> mappingAndSub = localMapper(knownProps);
+    public PropertyMapModel(@Nullable ObservableList<PropertyDescriptorSpec> knownProps) {
+        ObservableList<PropertyDescriptorSpec> safe = defaultToEmpty(knownProps);
+        Pair<ObservableMap<PropertyDescriptorSpec, Var<String>>, RebindSubscription<ObservableList<PropertyDescriptorSpec>>> mappingAndSub = localMapper(safe);
         this.mapping = mappingAndSub.getKey();
 
         this.knownPropsImpl.setValue(knownProps);
 
-        knownPropsImpl.values().subscribe(ps -> mappingAndSub.getValue().rebind(ps));
+        knownPropsImpl.orElseConst(emptyObservableList()).values().subscribe(ps -> mappingAndSub.getValue().rebind(ps));
     }
 
-    public void setKnownProperties(ObservableList<PropertyDescriptorSpec> props) {
+    public void setKnownProperties(@Nullable ObservableList<PropertyDescriptorSpec> props) {
+        ObservableList<PropertyDescriptorSpec> safe = defaultToEmpty(props);
         getNonDefault().forEach((k, v) -> {
-            if (props.stream().noneMatch(it -> it.getName().equals(k))) {
+            if (safe.stream().noneMatch(it -> it.getName().equals(k))) {
                 orphanProperties.put(k, v);
             }
         });
-        knownPropsImpl.setValue(props);
+        knownPropsImpl.setValue(props); // we need to keep a null value in there for it to be replaced later on
         mapping.forEach((k, v) -> {
             String orphan = orphanProperties.get(k.getName());
             if (orphan != null) {
@@ -62,8 +72,13 @@ public class PropertyMapModel {
         });
     }
 
+    @NonNull
+    private ObservableList<PropertyDescriptorSpec> defaultToEmpty(@Nullable ObservableList<PropertyDescriptorSpec> props) {
+        return props == null ? emptyObservableList() : props;
+    }
+
     public LiveList<Pair<PropertyDescriptorSpec, Var<String>>> asList() {
-        return ReactfxUtil.mapBothWays(knownProps, it -> new Pair<>(it, mapping.computeIfAbsent(it, k -> ReactfxUtil.defaultedVar(k.valueProperty()))), Pair::getKey);
+        return mapBothWays(knownProps, it -> new Pair<>(it, mapping.computeIfAbsent(it, k -> defaultedVar(k.valueProperty()))), Pair::getKey);
     }
 
     public ObservableMap<PropertyDescriptorSpec, Var<String>> asMap() {
@@ -71,9 +86,9 @@ public class PropertyMapModel {
     }
 
     public Val<Map<String, String>> nonDefaultProperty() {
-        return ReactfxUtil.withInvalidations(
-            ReactfxUtil.observableMapVal(mapping),
-            map -> EventStreams.merge(map.values().stream().map(Val::values).collect(Collectors.toCollection(() -> FXCollections.observableSet(new HashSet<>()))))
+        return withInvalidations(
+            observableMapVal(mapping),
+            map -> EventStreams.merge(map.values().stream().map(Val::values).collect(Collectors.toCollection(() -> observableSet(new HashSet<>()))))
         ).map(this::computeNonDefault);
     }
 
@@ -108,10 +123,10 @@ public class PropertyMapModel {
 
     private static Pair<ObservableMap<PropertyDescriptorSpec, Var<String>>, RebindSubscription<ObservableList<PropertyDescriptorSpec>>> localMapper(ObservableList<PropertyDescriptorSpec> props) {
 
-        ObservableMap<PropertyDescriptorSpec, Var<String>> mapping = FXCollections.observableHashMap();
+        ObservableMap<PropertyDescriptorSpec, Var<String>> mapping = observableHashMap();
 
         RebindSubscription<ObservableList<PropertyDescriptorSpec>> lstSub = ReactfxExtensions.dynamicRecombine(props, (addedP, i) -> {
-            mapping.put(addedP, ReactfxUtil.defaultedVar(addedP.valueProperty()));
+            mapping.put(addedP, defaultedVar(addedP.valueProperty()));
             return makeDefault(addedP, mapping);
         });
 
@@ -126,7 +141,7 @@ public class PropertyMapModel {
                     return makeDefault(p, mapping);
                 } else {
                     mapping.remove(p);
-                    mapping.put(addedP, ReactfxUtil.defaultedVar(addedP.valueProperty()));
+                    mapping.put(addedP, defaultedVar(addedP.valueProperty()));
                     return makeDefault(addedP, mapping);
                 }
             }

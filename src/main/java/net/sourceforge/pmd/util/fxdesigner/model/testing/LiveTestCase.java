@@ -35,7 +35,7 @@ public class LiveTestCase implements SettingsOwner {
     private final LiveList<LiveViolationRecord> expectedViolations = new LiveArrayList<>();
     private final Var<Boolean> isIgnored = Var.newSimpleVar(false);
 
-    private final PropertyMapModel liveProperties = new PropertyMapModel(emptyObservableList());
+    private final PropertyMapModel liveProperties = new PropertyMapModel(null);
 
     private final Var<ObservableRuleBuilder> rule = Var.newSimpleVar(null);
     private final Var<TestResult> status = Var.newSimpleVar(new TestResult(TestStatus.UNKNOWN, null));
@@ -53,7 +53,7 @@ public class LiveTestCase implements SettingsOwner {
         rule.setValue(owner);
 
         rule.values().subscribe(
-            r -> liveProperties.setKnownProperties(r == null ? emptyObservableList() : r.getRuleProperties())
+            r -> liveProperties.setKnownProperties(r == null ? null : r.getRuleProperties())
         );
     }
 
