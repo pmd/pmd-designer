@@ -19,6 +19,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.MessageChannel;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.services.TestCreatorService;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.MutableTabPane;
@@ -121,7 +122,7 @@ public class RuleEditorsController extends AbstractController {
             });
 
         selectedEditorProperty().values().filter(Objects::nonNull)
-                                .subscribe(it -> getService(DesignerRoot.TEST_LOADER).pushEvent(this, it.selectedTestCaseProperty().getValue()));
+                                .subscribe(it -> getService(DesignerRoot.TEST_LOADER).pushEvent(this, it.selectedTestCaseProperty().getOpt().map(LiveTestCase::unfreeze).orElse(null)));
     }
 
     public DesignerRoot newScope() {

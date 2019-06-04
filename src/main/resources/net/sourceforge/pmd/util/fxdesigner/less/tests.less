@@ -12,7 +12,7 @@
     @name: extract(@test-status-class-names, @i);
     @col: extract(@stack, @i);
 
-    &.@{name} {
+    &.@{name}:filled {
 
       .status-label {
         -fx-background-color: white;
@@ -57,7 +57,7 @@
   }
 }
 
-.list-cell.test-status:loaded-test {
+.list-cell.test-status:filled:loaded-test {
   .toggle-button.load-button:hover {
     -fx-background-color: white;
     .ikonli-font-icon {
