@@ -61,7 +61,7 @@ public final class ReactfxUtil {
 
         @Override
         public void unsubscribe() {
-
+            // do nothing
         }
     };
 

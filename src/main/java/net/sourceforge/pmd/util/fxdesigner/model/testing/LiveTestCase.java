@@ -6,7 +6,6 @@ package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
 import static javafx.collections.FXCollections.emptyObservableList;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -33,7 +32,6 @@ public class LiveTestCase implements SettingsOwner {
     private final Var<String> source = Var.newSimpleVar(""); // TODO defaults per language
     private final Var<String> description = Var.newSimpleVar("New test case");
     private final Var<LanguageVersion> languageVersion = Var.newSimpleVar(null);
-    private final Var<Map<String, String>> properties = Var.newSimpleVar(Collections.emptyMap());
     private final LiveList<LiveViolationRecord> expectedViolations = new LiveArrayList<>();
     private final Var<Boolean> isIgnored = Var.newSimpleVar(false);
 

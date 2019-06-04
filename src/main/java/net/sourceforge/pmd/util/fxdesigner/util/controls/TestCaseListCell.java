@@ -62,6 +62,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         this.collection = testCollectionController;
     }
 
+    @Override
     protected Pair<Node, Subscription> getNonEditingGraphic(LiveTestCase testCase) {
         HBox hBox = new HBox();
         hBox.setSpacing(10);
@@ -138,7 +139,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         });
 
         testCase.frozenProperty().values().distinct().subscribe(
-            it-> pseudoClassStateChanged(PseudoClass.getPseudoClass("loaded-test"), !it)
+            it -> pseudoClassStateChanged(PseudoClass.getPseudoClass("loaded-test"), !it)
         );
 
         sub = sub.and(() -> {

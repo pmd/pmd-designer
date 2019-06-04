@@ -106,8 +106,8 @@ public class RuleEditorsController extends AbstractController {
 
         ReactfxUtil.subscribeDisposable(
             selectedEditorProperty(),
-            x -> // connect the currently selected rule to the global state of the app
-            {
+            // connect the currently selected rule to the global state of the app
+            x -> {
                 TestCreatorService localCreator = x.getService(DesignerRoot.TEST_CREATOR);
                 TestCreatorService globalCreator = getService(DesignerRoot.TEST_CREATOR);
                 return Subscription.multi(

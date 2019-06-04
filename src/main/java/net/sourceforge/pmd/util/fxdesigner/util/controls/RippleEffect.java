@@ -8,7 +8,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javafx.animation.FadeTransition;
@@ -21,7 +20,6 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Region;
@@ -76,12 +74,12 @@ public class RippleEffect {
                 lastRippleHeight = containerHeight.get();
                 rippleClip.setWidth(lastRippleWidth);
                 rippleClip.setHeight(lastRippleHeight);
-                // try block because of possible null of Background, fills ...
                 try {
                     rippleClip.setArcHeight(containerBackground.get().getFills().get(0).getRadii().getTopLeftHorizontalRadius());
                     rippleClip.setArcWidth(containerBackground.get().getFills().get(0).getRadii().getTopLeftHorizontalRadius());
                     circleRipple.setClip(rippleClip);
-                } catch (Exception e) {
+                } catch (Exception ignored) {
+                    // try block because of possible null of Background, fills ...
                 }
                 // Getting 45% of longest button's length, because we want edge of ripple effect always visible
                 double circleRippleRadius = Math.max(containerHeight.get(), containerWidth.get()) * 0.45;

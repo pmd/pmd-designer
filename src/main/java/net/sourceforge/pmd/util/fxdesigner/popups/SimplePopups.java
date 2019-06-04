@@ -137,7 +137,7 @@ public final class SimplePopups {
 
             private double map(double x) {
                 double t = x - .5; // translate
-                final double plateauWidth= .3;
+                final double plateauWidth = .3;
 
                 double plateau = x > .5 - plateauWidth && x < .5 + plateauWidth ? 1 : 0;
                 return (.25 - t * t) * 4 + plateau;

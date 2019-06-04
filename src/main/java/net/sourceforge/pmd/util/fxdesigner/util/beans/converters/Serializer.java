@@ -111,9 +111,10 @@ public interface Serializer<T> {
                 for (int i = 0; i < children.getLength(); i++) {
                     Node item = children.item(i);
                     if (item.getNodeType() == Node.ELEMENT_NODE) {
-                        if (idx-- == 0) {
-                            return ((Element) item);
+                        if (idx == 0) {
+                            return (Element) item;
                         }
+                        idx--;
                     }
                 }
                 return null;

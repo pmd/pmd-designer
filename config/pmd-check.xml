@@ -51,7 +51,7 @@
     <rule name="FxIdNamingConvention"
           language="java"
           since="6.5.0"
-          message="Injected FXML fields should be suffixed by their type, eg 'HelloButton'"
+          message="Injected FXML fields should be suffixed by their type, eg ''HelloButton'', here it''s ''{0}''"
           class="net.sourceforge.pmd.lang.rule.XPathRule">
         <description>
             Injected FXML fields should be suffixed by their type
@@ -71,7 +71,7 @@
                   [not(../../Type/@TypeImage = 'ToggleButton' and ends-with(@Image, 'Toggle'))]
                   [not(../../Type/@TypeImage = 'TextArea' or ends-with(../../Type/@TypeImage, 'CodeArea') and ends-with(@Image, 'Area'))]
                   [not(../../Type/@TypeImage = 'TableColumn' and ends-with(@Image, 'Column'))]
-                  [not(ends-with(../../Type/@TypeImage, 'ChoiceBox') and ends-with(@Image, 'Choicebox'))]
+                  [not(ends-with(../../Type/@TypeImage, 'Choicebox') and ends-with(@Image, 'Choicebox'))]
                   [not(ends-with(../../Type/@TypeImage, 'TitledPane') and ends-with(@Image, 'Pane'))]
                   (: This last clause allows variables to be named the same as their type, modulo Camel case :)
                   (: Ideally we would only allow this for our custom types, but there's currently no easy :)

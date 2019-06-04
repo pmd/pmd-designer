@@ -34,7 +34,7 @@ final class ScopedRoot implements DesignerRoot {
     private final DesignerRoot parent;
 
 
-    public ScopedRoot(DesignerRoot parent) {
+    ScopedRoot(DesignerRoot parent) {
         this.parent = parent;
     }
 

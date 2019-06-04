@@ -5,9 +5,9 @@
 package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -228,7 +228,7 @@ public class TestXmlParser {
 
 
     public static TestCollection parseXmlTests(Path path, ObservableRuleBuilder owner) throws Exception {
-        try (FileInputStream is = new FileInputStream(path.toFile())) {
+        try (InputStream is = Files.newInputStream(path)) {
             return parseXmlTests(is, owner);
         }
     }
