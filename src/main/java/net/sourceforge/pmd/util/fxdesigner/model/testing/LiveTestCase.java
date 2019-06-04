@@ -4,8 +4,9 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
+import static javafx.collections.FXCollections.emptyObservableList;
+
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -23,9 +24,6 @@ import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
-import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
-
-import javafx.collections.FXCollections;
 
 /**
  * Live editable version of a test case.
@@ -39,28 +37,25 @@ public class LiveTestCase implements SettingsOwner {
     private final LiveList<LiveViolationRecord> expectedViolations = new LiveArrayList<>();
     private final Var<Boolean> isIgnored = Var.newSimpleVar(false);
 
-    private final Var<PropertyMapModel> liveProperties;
+    private final PropertyMapModel liveProperties = new PropertyMapModel(emptyObservableList());
 
     private final Var<ObservableRuleBuilder> rule = Var.newSimpleVar(null);
     private final Var<TestResult> status = Var.newSimpleVar(new TestResult(TestStatus.UNKNOWN, null));
-    private Consumer<LiveTestCase> commitHandler;
+    private Consumer<LiveTestCase> commitHandler = t -> {};
     private final Var<Boolean> frozen = Var.newSimpleVar(true);
 
 
 
     public LiveTestCase() {
-        this(t -> {});
+        this(null);
     }
 
-    public LiveTestCase(Consumer<LiveTestCase> commitHandler) {
-        this.commitHandler = t -> commitHandler.accept(t.freeze());
-
+    public LiveTestCase(@Nullable ObservableRuleBuilder owner) {
         freeze();
-
-        liveProperties = ReactfxUtil.defaultedVar(Val.constant(new PropertyMapModel(FXCollections.emptyObservableList())));
+        rule.setValue(owner);
 
         rule.values().subscribe(
-            r -> liveProperties.setValue(r == null ? null : new PropertyMapModel(r.getRuleProperties()))
+            r -> liveProperties.setKnownProperties(r == null ? emptyObservableList() : r.getRuleProperties())
         );
     }
 
@@ -132,8 +127,6 @@ public class LiveTestCase implements SettingsOwner {
         this.rule.setValue(rule);
     }
 
-
-
     @PersistentSequence
     public LiveList<LiveViolationRecord> getExpectedViolations() {
         return expectedViolations;
@@ -141,27 +134,15 @@ public class LiveTestCase implements SettingsOwner {
 
 
     public PropertyMapModel getLiveProperties() {
-        return liveProperties.getValue();
-    }
-
-    public Val<PropertyMapModel> livePropertiesProperty() {
         return liveProperties;
     }
 
-    public Map<String, String> getProperties() {
-        return getLiveProperties().getNonDefault();
-    }
-
-    public Var<Map<String, String>> propertiesProperty() {
-        return properties;
+    public Val<Map<String, String>> nonDefaultProperties() {
+        return liveProperties.nonDefaultProperty();
     }
 
     public void setProperty(String name, String value) {
         getLiveProperties().setProperty(name, value);
-    }
-
-    public void setProperties(Map<String, String> stringMap) {
-        properties.setValue(stringMap);
     }
 
     public void addCommitHandler(@NonNull Consumer<LiveTestCase> liveTestCaseConsumer) {
@@ -177,16 +158,14 @@ public class LiveTestCase implements SettingsOwner {
     }
 
     public void setPersistenceOnlyProps(Properties props) {
-        Map<String, String> p = new HashMap<>();
-        props.forEach((k, v) -> p.put(k.toString(), v.toString()));
-        properties.setValue(p);
+        props.forEach((k, v) -> liveProperties.setProperty(k.toString(), v.toString()));
     }
 
     /**
      * Commits the changes.
      */
     public void commitChanges() {
-        commitHandler.accept(this);
+        commitHandler.accept(freeze());
     }
 
     public EventStream<?> modificationTicks() {
@@ -228,13 +207,13 @@ public class LiveTestCase implements SettingsOwner {
     }
 
     public LiveTestCase deepCopy() {
-        LiveTestCase live = new LiveTestCase();
+        LiveTestCase live = new LiveTestCase(getRule());
         live.setDescription(getDescription());
         live.expectedViolations.setAll(this.expectedViolations);
-        live.setRule(getRule());
         live.setLanguageVersion(getLanguageVersion());
         live.setSource(getSource());
         live.setFrozen(isFrozen());
+        liveProperties.getNonDefault().forEach(live.liveProperties::setProperty);
 
         return live;
     }

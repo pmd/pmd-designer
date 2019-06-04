@@ -69,6 +69,12 @@ public final class ReactfxUtil {
         return (RebindSubscription<T>) EMPTY_SUB;
     }
 
+
+    public static <I, O> RebindSubscription<O> map(RebindSubscription<I> base, Function<O, I> f) {
+        return RebindSubscription.make(base, o -> map(base.rebind(f.apply(o)), f));
+    }
+
+
     /**
      * Add a hook on the owner window. It's not possible to do this statically,
      * since at construction time the window might not be set.
@@ -141,6 +147,10 @@ public final class ReactfxUtil {
                 return new HashMap<>(map);
             }
         };
+    }
+
+    public static <T> Val<T> withInvalidations(Val<T> base, Function<T, EventStream<?>> otherInvalidations) {
+        return new InvalidatedVal<>(base, otherInvalidations);
     }
 
     /**

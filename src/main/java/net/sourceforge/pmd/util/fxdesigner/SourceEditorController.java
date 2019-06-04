@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -225,13 +224,6 @@ public class SourceEditorController extends AbstractController {
             currentlyOpenTestCase.flatMap(it -> it.getExpectedViolations().sizeProperty())
                                  .map(it -> "Expected violations (" + it + ")")
                                  .orElseConst("Expected violations")
-        );
-
-        propertiesMapButton.textProperty().bind(
-            currentlyOpenTestCase.flatMap(LiveTestCase::propertiesProperty)
-                                 .map(Map::size)
-                                 .map(it -> "Test properties (" + it + ")")
-                                 .orElseConst("Test properties")
         );
 
         propertiesMapButton.disableProperty().bind(

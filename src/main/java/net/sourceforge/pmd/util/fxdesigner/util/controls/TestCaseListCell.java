@@ -26,7 +26,6 @@ import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCaseUtil;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestResult;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestStatus;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
@@ -181,7 +180,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         ASTManagerImpl manager = new ASTManagerImpl(collection.getDesignerRoot());
         manager.sourceCodeProperty().bind(testCase.sourceProperty());
         manager.languageVersionProperty().bind(testCase.languageVersionProperty().orElse(collection.getDefaultLanguageVersion()));
-        manager.ruleProperties().bind(testCase.propertiesProperty());
+        manager.ruleProperties().bind(testCase.nonDefaultProperties());
 
         return manager;
     }
