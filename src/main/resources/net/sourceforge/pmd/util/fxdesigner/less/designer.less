@@ -293,13 +293,17 @@
 }
 
 .menu-item, .menu {
-  &:hover, &:focused {
+  &:hover, &:focused, &:showing {
     -fx-background-color: @selection-focus-color;
   }
 }
 
 .menu:disabled > .label > .label-menu {
     -fx-opacity: 1;
+}
+
+.menu:disabled:hover * {
+    -fx-background-color: transparent;
 }
 
 .menu-bar {
