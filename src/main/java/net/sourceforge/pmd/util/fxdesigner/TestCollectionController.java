@@ -26,7 +26,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.TestCaseListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
 import javafx.collections.ObservableList;
-import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -45,7 +44,7 @@ public class TestCollectionController extends AbstractController {
     @FXML
     public ListView<LiveTestCase> testsListView;
     @FXML
-    private Button importTestsButton;
+    private MenuItem importTestsButton;
     @FXML
     private MenuItem addTestButton;
     @FXML
@@ -76,10 +75,7 @@ public class TestCollectionController extends AbstractController {
         testsListView.setEditable(true);
         testsListView.setPlaceholder(
             HelpfulPlaceholder.withMessage("This rule has no tests yet")
-                              .withSuggestedAction("Import from file", () -> {
-                                  importTestsButton.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), true);
-                                  importTestsButton.fire();
-                              })
+                              .withSuggestedAction("Import from file", importTestsButton::fire)
                               .withSuggestedAction("Add empty test case", addTestButton::fire)
                               .withSuggestedAction("Add from current source", addFromSourceButton::fire)
                               .build()
@@ -124,11 +120,9 @@ public class TestCollectionController extends AbstractController {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Load source from file");
         File file = chooser.showOpenDialog(getMainStage());
-        // a hack to get it to focus visibly
-        importTestsButton.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), false);
 
         if (file == null) {
-            SimplePopups.showActionFeedback(importTestsButton, AlertType.INFORMATION, "No file chosen");
+            SimplePopups.showActionFeedback(addTestMenu, AlertType.INFORMATION, "No file chosen");
             return;
         }
 
@@ -136,10 +130,10 @@ public class TestCollectionController extends AbstractController {
             TestCollection coll = TestXmlParser.parseXmlTests(file.toPath(), builder);
             // TODO what if there's already test cases?
             getTestCollection().rebase(coll);
-            SimplePopups.showActionFeedback(importTestsButton, AlertType.CONFIRMATION,
+            SimplePopups.showActionFeedback(addTestMenu, AlertType.CONFIRMATION,
                                             "Imported " + coll.getStash().size() + " test cases");
         } catch (Exception e) {
-            SimplePopups.showActionFeedback(importTestsButton, AlertType.ERROR, "Error while importing, see event log");
+            SimplePopups.showActionFeedback(addTestMenu, AlertType.ERROR, "Error while importing, see event log");
             logUserException(e, Category.TEST_LOADING_EXCEPTION);
         }
     }

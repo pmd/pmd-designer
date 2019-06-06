@@ -33,7 +33,7 @@
                     <FontIcon iconLiteral="fas-plus"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="New test case..."/>
+                    <Tooltip text="Add test cases..."/>
                 </tooltip>
                 <items>
                     <CustomMenuItem fx:id="addTestButton" text="Empty">
@@ -42,12 +42,18 @@
                                 <tooltip>
                                     <Tooltip text="Start from scratch"/>
                                 </tooltip>
+                                <graphic>
+                                    <FontIcon iconLiteral="far-file"/>
+                                </graphic>
                             </Label>
                         </content>
                     </CustomMenuItem>
                     <CustomMenuItem fx:id="addFromSourceButton" text="With current source">
                         <content>
                             <Label text="With current source">
+                                <graphic>
+                                    <FontIcon iconLiteral="far-copy"/>
+                                </graphic>
                                 <tooltip>
                                     <Tooltip text="Duplicate currently open test case"/>
                                 </tooltip>
@@ -55,16 +61,18 @@
                         </content>
 
                     </CustomMenuItem>
+                    <CustomMenuItem fx:id="importTestsButton" text="With current source">
+                        <content>
+                            <Label text="Import XML file...">
+                                <graphic>
+                                    <FontIcon iconLiteral="far-folder-open"/>
+                                </graphic>
+                            </Label>
+                        </content>
+
+                    </CustomMenuItem>
                 </items>
             </MenuButton>
-            <RippleButton fx:id="importTestsButton" styleClass="icon-button">
-                <graphic>
-                    <FontIcon iconLiteral="fas-folder-open"/>
-                </graphic>
-                <tooltip>
-                    <Tooltip text="Import test file..."/>
-                </tooltip>
-            </RippleButton>
             <RippleButton fx:id="exportTestsButton" mnemonicParsing="false" styleClass="icon-button">
                 <graphic>
                     <!--Needs FA 5.1.0 -->
