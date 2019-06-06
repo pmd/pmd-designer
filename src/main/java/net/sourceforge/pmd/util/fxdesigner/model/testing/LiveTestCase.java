@@ -4,11 +4,10 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
-import static javafx.collections.FXCollections.emptyObservableList;
-
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -207,7 +206,7 @@ public class LiveTestCase implements SettingsOwner {
     public LiveTestCase deepCopy() {
         LiveTestCase live = new LiveTestCase(getRule());
         live.setDescription(getDescription());
-        live.expectedViolations.setAll(this.expectedViolations);
+        live.expectedViolations.setAll(this.expectedViolations.stream().map(LiveViolationRecord::deepCopy).collect(Collectors.toList()));
         live.setLanguageVersion(getLanguageVersion());
         live.setSource(getSource());
         live.setFrozen(isFrozen());

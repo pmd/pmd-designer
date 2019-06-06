@@ -21,6 +21,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.beans.NamedArg;
@@ -176,7 +177,8 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
 
-            Label lineLabel = new Label("(L. " + violation.getRange().startPos.line + ")");
+            TextRange range = violation.getRange();
+            Label lineLabel = new Label(range == null ? "(no line)" : "(L. " + range.startPos.line + ")");
             lineLabel.getStyleClass().addAll("line-label");
 
             Label messageLabel = new Label();

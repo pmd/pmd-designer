@@ -71,42 +71,42 @@ class TestCaseParsingTest : FunSpec({
         val tc = TestXmlParser.parseXmlTests(xmlTest, ObservableRuleBuilder())
 
         tc.stash.size shouldBe 3
-        tc.stash[0].also {
-            it.description shouldBe "simple failure case"
-            it.expectedViolations should haveSize(1)
+        tc.stash[0].apply {
+            description shouldBe "simple failure case"
+            expectedViolations should haveSize(1)
 
-            it.expectedViolations[0].also {
-                it.exactRange shouldBe false
-                it.message shouldBe null
-                (PmdCoordinatesSystem.TextPos2D(3, 0) in it.range) shouldBe true
+            expectedViolations[0].apply {
+                isExactRange shouldBe false
+                message shouldBe null
+                (PmdCoordinatesSystem.TextPos2D(3, 0) in range!!) shouldBe true
             }
 
         }
 
-        tc.stash[1].also {
-            it.description shouldBe "ok"
-            it.expectedViolations should haveSize(0)
+        tc.stash[1].apply {
+            description shouldBe "ok"
+            expectedViolations should haveSize(0)
         }
 
-        tc.stash[2].also {
-            it.description shouldBe "case with two initializers"
-            it.expectedViolations should haveSize(2)
+        tc.stash[2].apply {
+            description shouldBe "case with two initializers"
+            expectedViolations should haveSize(2)
 
-            it.expectedViolations[0].also {
-                it.exactRange shouldBe false
-                it.message shouldBe null
-                (PmdCoordinatesSystem.TextPos2D(3, 0) in it.range) shouldBe true
-                (PmdCoordinatesSystem.TextPos2D(3, 10) in it.range) shouldBe true
+            expectedViolations[0].apply {
+                isExactRange shouldBe false
+                message shouldBe null
+                (PmdCoordinatesSystem.TextPos2D(3, 0) in range!!) shouldBe true
+                (PmdCoordinatesSystem.TextPos2D(3, 10) in range!!) shouldBe true
             }
 
 
-            it.expectedViolations[1].also {
-                it.exactRange shouldBe false
-                it.message shouldBe null
-                (PmdCoordinatesSystem.TextPos2D(3, 10) in it.range) shouldBe true
+            expectedViolations[1].apply {
+                isExactRange shouldBe false
+                message shouldBe null
+                (PmdCoordinatesSystem.TextPos2D(3, 10) in range!!) shouldBe true
             }
 
-            it.source shouldBe """public class UseShortArrayExample {
+            source shouldBe """public class UseShortArrayExample {
                 void foo() {
                     int ar[] = new int[] { 1,2,3}, foo[] = new int[] { 4, 5, 6 };
                 }
