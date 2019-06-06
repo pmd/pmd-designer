@@ -38,11 +38,6 @@
                                         <Tooltip text="Selected language version"/>
                                     </tooltip>
                                 </DynamicWidthChoicebox>
-                                <RippleButton fx:id="convertToTestCaseButton" text="Convert to test case">
-                                    <tooltip>
-                                        <Tooltip text="Add a new test case with the contents of the area"/>
-                                    </tooltip>
-                                </RippleButton>
                             </toolbarItems>
                             <content>
                                 <AnchorPane>

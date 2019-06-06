@@ -31,11 +31,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
 
 public class TestCollectionController extends AbstractController {
 
+    @FXML
+    private MenuButton addTestMenu;
     @FXML
     private ToolbarTitledPane titledPane;
     @FXML
@@ -43,9 +47,11 @@ public class TestCollectionController extends AbstractController {
     @FXML
     private Button importTestsButton;
     @FXML
-    private Button addTestButton;
+    private MenuItem addTestButton;
     @FXML
-    private Button exportTestsButton; // TODO
+    private MenuItem addFromSourceButton;
+    @FXML
+    private Button exportTestsButton;
 
     private final SoftReferenceCache<TestExportWizardController> exportWizard;
     private ToggleGroup loadedToggleGroup = new ToggleGroup();
@@ -75,7 +81,7 @@ public class TestCollectionController extends AbstractController {
                                   importTestsButton.fire();
                               })
                               .withSuggestedAction("Add empty test case", addTestButton::fire)
-                              .withSuggestedAction("Add from current source", () -> getService(DesignerRoot.TEST_CREATOR).getSourceFetchRequests().pushEvent(this, null))
+                              .withSuggestedAction("Add from current source", addFromSourceButton::fire)
                               .build()
         );
 
@@ -84,31 +90,18 @@ public class TestCollectionController extends AbstractController {
         this.testsListView.setItems(getTestCollection().getStash());
 
 
-        importTestsButton.setOnAction(any -> {
-            FileChooser chooser = new FileChooser();
-            chooser.setTitle("Load source from file");
-            File file = chooser.showOpenDialog(getMainStage());
-            // a hack to get it to focus visibly
-            importTestsButton.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), false);
-
-            if (file == null) {
-                SimplePopups.showActionFeedback(importTestsButton, AlertType.INFORMATION, "No file chosen");
-                return;
-            }
-
-            try {
-                TestCollection coll = TestXmlParser.parseXmlTests(file.toPath(), builder);
-                // TODO what if there's already test cases?
-                getTestCollection().rebase(coll);
-                SimplePopups.showActionFeedback(importTestsButton, AlertType.CONFIRMATION,
-                                                "Imported " + coll.getStash().size() + " test cases");
-            } catch (Exception e) {
-                SimplePopups.showActionFeedback(importTestsButton, AlertType.ERROR, "Error while importing, see event log");
-                logUserException(e, Category.TEST_LOADING_EXCEPTION);
-            }
+        addFromSourceButton.setOnAction(e -> {
+            getService(DesignerRoot.TEST_CREATOR).getSourceFetchRequests().pushEvent(this, null);
+            testCreatedFeedback();
         });
 
-        addTestButton.setOnAction(any -> getTestCollection().addTestCase(new LiveTestCase(builder).unfreeze()));
+
+        addTestButton.setOnAction(any -> {
+            getTestCollection().addTestCase(new LiveTestCase(builder).unfreeze());
+            testCreatedFeedback();
+        });
+
+        importTestsButton.setOnAction(any -> importTestsFromFile());
 
         exportTestsButton.setOnAction(evt -> {
             TestExportWizardController wizard = exportWizard.get();
@@ -125,6 +118,34 @@ public class TestCollectionController extends AbstractController {
             .messageStream(true, this)
             .subscribe(ltc -> getTestCollection().addTestCase(ltc.unfreeze()));
 
+    }
+
+    private void importTestsFromFile() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Load source from file");
+        File file = chooser.showOpenDialog(getMainStage());
+        // a hack to get it to focus visibly
+        importTestsButton.pseudoClassStateChanged(PseudoClass.getPseudoClass("hover"), false);
+
+        if (file == null) {
+            SimplePopups.showActionFeedback(importTestsButton, AlertType.INFORMATION, "No file chosen");
+            return;
+        }
+
+        try {
+            TestCollection coll = TestXmlParser.parseXmlTests(file.toPath(), builder);
+            // TODO what if there's already test cases?
+            getTestCollection().rebase(coll);
+            SimplePopups.showActionFeedback(importTestsButton, AlertType.CONFIRMATION,
+                                            "Imported " + coll.getStash().size() + " test cases");
+        } catch (Exception e) {
+            SimplePopups.showActionFeedback(importTestsButton, AlertType.ERROR, "Error while importing, see event log");
+            logUserException(e, Category.TEST_LOADING_EXCEPTION);
+        }
+    }
+
+    private void testCreatedFeedback() {
+        SimplePopups.showActionFeedback(addTestMenu, AlertType.CONFIRMATION, "Test created");
     }
 
     @Override

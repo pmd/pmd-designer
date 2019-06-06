@@ -22,10 +22,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.controlsfx.control.PopOver;
-import org.reactfx.EventSource;
-import org.reactfx.Guard;
 import org.reactfx.Subscription;
-import org.reactfx.SuspendableEventStream;
 import org.reactfx.collection.LiveArrayList;
 import org.reactfx.collection.LiveList;
 import org.reactfx.value.SuspendableVar;
@@ -82,7 +79,8 @@ public class SourceEditorController extends AbstractController {
 
     /**
      * When no user-defined test case is loaded, then this is where
-     * source changes end up.
+     * source changes end up. It's persisted between runs, independently
+     * of other test cases.
      */
     private final LiveTestCase defaultTestCase = new LiveTestCase();
     /** Contains the loaded *user-defined* test case. */
@@ -99,8 +97,6 @@ public class SourceEditorController extends AbstractController {
         }
     }).orElseConst(SourceEditorController.class.getClassLoader());
 
-    @FXML
-    private Button convertToTestCaseButton;
     @FXML
     private DynamicWidthChoicebox<LanguageVersion> languageVersionChoicebox;
     @FXML
@@ -179,9 +175,6 @@ public class SourceEditorController extends AbstractController {
         return null;
     }
 
-    private EventSource<Boolean> convertButtonVisibilitySource = new EventSource<>();
-    private SuspendableEventStream<Boolean> convertButtonVisibility = convertButtonVisibilitySource.suppressible();
-
     @Override
     protected void beforeParentInit() {
 
@@ -197,25 +190,10 @@ public class SourceEditorController extends AbstractController {
         setText(getDefaultText());
 
         TestCreatorService creatorService = getService(DesignerRoot.TEST_CREATOR);
-        convertToTestCaseButton.setOnAction(
-            e -> {
-                Guard guard = convertButtonVisibility.suspend();
-                creatorService.getAdditionRequests().pushEvent(this, defaultTestCase.deepCopy());
-                convertToTestCaseButton.setDisable(true);
-                SimplePopups.showActionFeedback(convertToTestCaseButton, AlertType.CONFIRMATION, "Test created")
-                            .subscribeForOne(done -> {
-                                // only make the button invisible when the action is done
-                                guard.close();
-                                convertButtonVisibilitySource.push(false);
-                            });
-
-            }
-        );
 
         creatorService.getSourceFetchRequests()
                       .messageStream(true, this)
-                      .subscribe(tick -> convertToTestCaseButton.fire());
-
+                      .subscribe(tick -> creatorService.getAdditionRequests().pushEvent(this, currentlyOpenTestCase.getOrElse(defaultTestCase).deepCopy()));
 
         propertiesMapButton.setOnAction(e -> propertiesPopover.showOrFocus(p -> p.show(propertiesMapButton)));
         violationsButton.setOnAction(e -> violationsPopover.showOrFocus(p -> p.show(violationsButton)));
@@ -293,17 +271,10 @@ public class SourceEditorController extends AbstractController {
                              .values().distinct()
                              .subscribe(this::toggleTestEditMode);
 
-        convertButtonVisibility.subscribe(visible -> {
-            convertToTestCaseButton.setVisible(visible);
-            convertToTestCaseButton.setDisable(!visible);
-        });
-
     }
 
     private void toggleTestEditMode(boolean isTestCaseMode) {
         if (isTestCaseMode) {
-            convertButtonVisibilitySource.push(false);
-
             AnchorPane pane = emptyPane();
             editorTitledPane.setContent(pane);
 
@@ -313,7 +284,6 @@ public class SourceEditorController extends AbstractController {
             otherPane.getChildren().addAll(nodeEditionCodeArea);
             pane.getChildren().addAll(testCaseToolsTitledPane);
         } else {
-            convertButtonVisibilitySource.push(true);
             AnchorPane otherPane = emptyPane();
             editorTitledPane.setContent(otherPane);
             otherPane.getChildren().addAll(nodeEditionCodeArea);
