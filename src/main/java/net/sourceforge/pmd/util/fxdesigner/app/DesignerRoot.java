@@ -101,7 +101,7 @@ public interface DesignerRoot {
      * Returns true if the ctrl key is being pressed.
      * Vetoed by any other key press.
      */
-    Val<Boolean> isCtrlDownProperty();
+    Val<Boolean> isCtrlDownProperty(); // TODO this may also be extracted
 
 
     /**
@@ -113,7 +113,7 @@ public interface DesignerRoot {
 
 
     /**
-     * Returns a new designer root that delegates to
+     * Returns a new designer root that can delegates to
      * this one, can register services independently to
      * override them.
      */

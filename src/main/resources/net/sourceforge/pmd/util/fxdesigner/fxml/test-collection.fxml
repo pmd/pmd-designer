@@ -4,13 +4,13 @@
 
 <?import java.lang.String?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
-<?import net.sourceforge.pmd.util.fxdesigner.util.controls.ModifiedIcon?>
-<?import net.sourceforge.pmd.util.fxdesigner.util.controls.RippleButton?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.SVGPath?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.RippleButton?>
 <AnchorPane stylesheets="@../css/designer.css"
             xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -32,14 +32,6 @@
                 </graphic>
                 <tooltip>
                     <Tooltip text="New test case"/>
-                </tooltip>
-            </RippleButton>
-            <RippleButton fx:id="addFromSourceButton" styleClass="icon-button">
-                <graphic>
-                    <ModifiedIcon base="fas-plus" modifier="fas-code"/>
-                </graphic>
-                <tooltip>
-                    <Tooltip text="New test case from current code..."/>
                 </tooltip>
             </RippleButton>
             <RippleButton fx:id="importTestsButton" styleClass="icon-button">
