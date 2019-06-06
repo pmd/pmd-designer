@@ -14,6 +14,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
+import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.util.fxdesigner.TestCollectionController;
@@ -138,7 +139,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
             }
         });
 
-        testCase.frozenProperty().values().distinct().subscribe(
+        Val.wrap(load.selectedProperty()).values().distinct().subscribe(
             it -> pseudoClassStateChanged(PseudoClass.getPseudoClass("loaded-test"), !it)
         );
 
