@@ -128,8 +128,7 @@ public class TestCollectionController extends AbstractController {
 
         try {
             TestCollection coll = TestXmlParser.parseXmlTests(file.toPath(), builder);
-            // TODO what if there's already test cases?
-            getTestCollection().rebase(coll);
+            getTestCollection().addAll(coll);
             SimplePopups.showActionFeedback(addTestMenu, AlertType.CONFIRMATION,
                                             "Imported " + coll.getStash().size() + " test cases");
         } catch (Exception e) {
