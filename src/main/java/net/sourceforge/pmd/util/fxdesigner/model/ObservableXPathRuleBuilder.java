@@ -61,6 +61,19 @@ public class ObservableXPathRuleBuilder extends ObservableRuleBuilder {
     }
 
 
+    @Override
+    protected ObservableRuleBuilder newBuilder() {
+        return new ObservableXPathRuleBuilder();
+    }
+
+    @Override
+    public ObservableXPathRuleBuilder deepCopy() {
+        ObservableXPathRuleBuilder copy = ((ObservableXPathRuleBuilder) super.deepCopy());
+        copy.setXpathExpression(getXpathExpression());
+        copy.setXpathVersion(getXpathVersion());
+        return copy;
+    }
+
     /**
      * Pushes an event every time the rule needs to be re-evaluated.
      */

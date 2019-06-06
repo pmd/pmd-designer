@@ -74,6 +74,9 @@ public final class ReactfxUtil {
         return RebindSubscription.make(base, o -> map(base.rebind(f.apply(o)), f));
     }
 
+    public static Val<Boolean> isPresentProperty(Val<?> v) {
+        return v.map(it -> true).orElseConst(false);
+    }
 
     /**
      * Add a hook on the owner window. It's not possible to do this statically,

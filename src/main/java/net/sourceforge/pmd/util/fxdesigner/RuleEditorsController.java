@@ -64,6 +64,7 @@ public class RuleEditorsController extends AbstractController {
     protected void beforeParentInit() {
 
         mutableTabPane.setControllerSupplier(() -> new XPathRuleEditorController(newScope()));
+        mutableTabPane.setDeepCopyFunction(t -> new XPathRuleEditorController(newScope(), t.getRuleBuilder().deepCopy()));
 
         selectedEditorProperty().changes()
                                 .subscribe(ch -> {

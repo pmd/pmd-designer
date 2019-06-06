@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
@@ -22,6 +23,7 @@ import org.reactfx.value.Var;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.services.CloseableService;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
@@ -61,6 +63,7 @@ public final class MutableTabPane<T extends AbstractController & TitleOwner> ext
     private final String tabFxmlResource;
     /** Supplier of controllers for each tab. */
     private final Var<Supplier<T>> controllerSupplier = Var.newSimpleVar(() -> null);
+    private final Var<@Nullable Function<? super T, ? extends T>> deepCopyFun = Var.newSimpleVar(null);
 
 
     public MutableTabPane(@NamedArg("tabFxmlContent") String tabFxmlContent) {
@@ -119,6 +122,27 @@ public final class MutableTabPane<T extends AbstractController & TitleOwner> ext
         newTabButton.maxHeightProperty().bind(headersRegion.heightProperty());
         newTabButton.maxWidthProperty().bind(headersRegion.heightProperty());
 
+        // the copy tab button
+        Button copyButton = new Button();
+        copyButton.getStyleClass().addAll("icon-button", "duplicate-tab-button");
+        copyButton.setTooltip(new Tooltip("Duplicate current tab"));
+        copyButton.setGraphic(new FontIcon("far-copy"));
+        copyButton.onActionProperty().set(actionEvent -> {
+            T cur = currentFocusedController().getValue();
+            Function<? super T, ? extends T> copy = deepCopyFun.getValue();
+            if (cur == null || copy == null) {
+                addTabWithNewController();
+            } else {
+                addTabWithController(copy.apply(cur));
+            }
+        });
+        // bind bounds to a square that fits inside the header's region
+        copyButton.maxHeightProperty().bind(headersRegion.heightProperty());
+        copyButton.maxWidthProperty().bind(headersRegion.heightProperty());
+
+        copyButton.visibleProperty().bind(ReactfxUtil.isPresentProperty(deepCopyFun));
+        copyButton.managedProperty().bind(copyButton.visibleProperty());
+
         // Rightmost node, grows to fill the rest of the horizontal space
         Pane spring = new Pane();
         spring.setMouseTransparent(true);
@@ -131,7 +155,7 @@ public final class MutableTabPane<T extends AbstractController & TitleOwner> ext
         box.setPickOnBounds(false);
         box.prefHeightProperty().bind(headersRegion.heightProperty());
 
-        box.getChildren().addAll(headerSizePane, newTabButton, spring);
+        box.getChildren().addAll(headerSizePane, newTabButton, copyButton, spring);
 
         // Fits the HBox's size to the container
         AnchorPane.setTopAnchor(box, 0d);
@@ -193,6 +217,9 @@ public final class MutableTabPane<T extends AbstractController & TitleOwner> ext
         this.controllerSupplier.setValue(supplier);
     }
 
+    public void setDeepCopyFunction(Function<? super T, ? extends T> deepCopyFun) {
+        this.deepCopyFun.setValue(deepCopyFun);
+    }
 
     /** Retrieves the controller of a tab. */
     @SuppressWarnings("unchecked")
