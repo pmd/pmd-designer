@@ -21,7 +21,6 @@ import org.reactfx.util.Tuples;
 
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ContextMenuWithNoArrows;
 
-import javafx.application.Platform;
 import javafx.collections.ObservableSet;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
