@@ -42,6 +42,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
@@ -69,6 +70,8 @@ public class SourceEditorController extends AbstractController {
         }
     }).orElseConst(SourceEditorController.class.getClassLoader());
 
+    @FXML
+    private Button searchButton;
     @FXML
     private ToolbarTitledPane astTitledPane;
     @FXML
@@ -118,6 +121,8 @@ public class SourceEditorController extends AbstractController {
 
         // default text, will be overwritten by settings restore
         setText(getDefaultText());
+
+        searchButton.setOnAction(e -> astTreeView.focusSearchField());
     }
 
     @Override
