@@ -1,4 +1,4 @@
-/**
+/*
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
@@ -28,7 +28,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import javafx.beans.NamedArg;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 
 
 /**
@@ -37,7 +36,7 @@ import javafx.scene.control.TreeView;
  * @author Clément Fournier
  * @since 6.12.0
  */
-public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
+public class AstTreeView extends SearchableTreeView<Node> implements NodeSelectionSource {
 
 
     private final TreeViewWrapper<Node> myWrapper = new TreeViewWrapper<>(this);
@@ -45,7 +44,6 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
     private final EventSource<NodeSelectionEvent> baseSelectionEvents;
     private final SuspendableEventStream<NodeSelectionEvent> suppressibleSelectionEvents;
     private final DesignerRoot designerRoot;
-    private final Var<Boolean> highlightFocusParents = Var.newSimpleVar(true);
     private final Var<Function<Node, Collection<String>>> additionalStyleClasses =
         Var.newSimpleVar(n -> Collections.emptySet());
 
@@ -72,7 +70,6 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
 
         // this needs to be done even if the selection originates from this node
         EventStreams.changesOf(getSelectionModel().selectedItemProperty())
-                    .conditionOn(highlightFocusParents)
                     .subscribe(item -> highlightFocusNodeParents((ASTTreeItem) item.getOldValue(), (ASTTreeItem) item.getNewValue()));
 
         // push a node selection event whenever...
@@ -99,7 +96,7 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
                     .subscribe(fun -> {
                         TreeItem<Node> rootNode = getRoot();
                         if (rootNode != null && fun != null) {
-                            ((ASTTreeItem) rootNode).foreach(it -> it.setStyleClasses(fun.apply(it.getValue())));
+                            ((ASTTreeItem) rootNode).foreach(it -> ((ASTTreeItem) it).setStyleClasses(fun.apply(it.getValue())));
                         }
                     });
 
@@ -109,7 +106,7 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
         // fetch the selected item before setting the root
         ASTTreeItem selectedTreeItem = (ASTTreeItem) getSelectionModel().getSelectedItem();
 
-        setRoot(root == null ? null : ASTTreeItem.buildRoot(root));
+        setRealRoot(root == null ? null : ASTTreeItem.buildRoot(root));
 
         if (getDebugName().contains("old")) {
             // prevent the old treeview from shooting back selection recovery events
@@ -168,17 +165,6 @@ public class AstTreeView extends TreeView<Node> implements NodeSelectionSource {
         this.additionalStyleClasses.setValue(mapper);
     }
 
-    public Var<Boolean> highlightFocusParentsProperty() {
-        return highlightFocusParents;
-    }
-
-    public Boolean getHighlightFocusParents() {
-        return highlightFocusParents.getValue();
-    }
-
-    public void setHighlightFocusParents(boolean highlightFocusParents) {
-        this.highlightFocusParents.setValue(highlightFocusParents);
-    }
 
     private void highlightFocusNodeParents(ASTTreeItem oldSelection, ASTTreeItem newSelection) {
         if (oldSelection != null) {

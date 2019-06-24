@@ -1,4 +1,4 @@
-/**
+/*
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fxmisc.richtext.StyledTextArea;
 import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
@@ -113,6 +114,7 @@ public final class XPathAutocompleteProvider {
     }
 
 
+    @Nullable
     private Tuple2<Integer, String> getInsertionPointAndQuery(int searchPoint) {
         String input = myCodeArea.getText();
 
@@ -158,7 +160,7 @@ public final class XPathAutocompleteProvider {
                                entryLabel.setPrefHeight(5);
                                CustomMenuItem item = new CustomMenuItem(entryLabel, true);
                                item.setUserData(result);
-                               item.setOnAction(e -> applySuggestion(insertionIndex, input, result.getNodeName()));
+                               item.setOnAction(e -> applySuggestion(insertionIndex, input, result.getStringMatch()));
                                return item;
                            })
                            .collect(Collectors.toList());

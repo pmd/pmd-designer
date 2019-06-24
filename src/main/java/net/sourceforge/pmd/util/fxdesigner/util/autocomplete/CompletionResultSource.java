@@ -6,10 +6,13 @@ package net.sourceforge.pmd.util.fxdesigner.util.autocomplete;
 
 import java.util.stream.Stream;
 
+import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.matchers.MatchResult;
+
 
 /**
  * Language specific tool to suggest auto-completion results.
  */
+@FunctionalInterface
 public interface CompletionResultSource {
 
 
@@ -17,7 +20,7 @@ public interface CompletionResultSource {
      * Returns a stream of pre-built TextFlows sorted by relevance.
      * The stream will contain at most "limit" elements.
      */
-    Stream<CompletionResult> getSortedMatches(String input, int limit);
+    Stream<MatchResult<String>> getSortedMatches(String input, int limit);
 
 
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
@@ -15,15 +15,21 @@ import java.util.function.Function;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
+import org.reactfx.collection.LiveList;
 import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
 import org.reactfx.value.Val;
 import org.reactfx.value.ValBase;
 import org.reactfx.value.Var;
 
+import com.github.oowekyala.rxstring.ReactfxExtensions;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
+import javafx.scene.Node;
 
 /**
  * Extensions to ReactFX Val and EventStreams. Some can be deemed as too
@@ -38,6 +44,35 @@ public final class ReactfxUtil {
 
     }
 
+
+    /**
+     * Subscribe to the values of the given observable, with a function
+     * that needs unsubscription when the value changes.
+     */
+    public static <T> Subscription subscribeDisposable(ObservableValue<? extends T> obs,
+                                                       Function<? super T, Subscription> subscriber) {
+        return ReactfxExtensions.dynamic(
+            LiveList.wrapVal(obs),
+            (w, i) -> subscriber.apply(w)
+        );
+    }
+
+    public static <T> Subscription subscribeDisposable(EventStream<T> stream, Function<T, Subscription> subscriber) {
+        return subscribeDisposable(latestValue(stream), subscriber);
+    }
+
+
+    //    public static <T extends Event> Subscription addEventHandler(Consumer<EventHandler<T>> addMethod, Consumer<EventHandler<T>> removeMethod,)
+
+    public static <T extends Event> Subscription addEventHandler(Property<EventHandler<T>> addMethod, EventHandler<T> handler) {
+        addMethod.setValue(handler);
+        return () -> addMethod.setValue(null);
+    }
+
+    public static <T extends Event> Subscription addEventHandler(Node node, EventType<T> type, EventHandler<T> handler) {
+        node.addEventHandler(type, handler);
+        return () -> node.removeEventHandler(type, handler);
+    }
 
     static Function<Runnable, Timer> defaultTimerFactory(Duration duration) {
         return action -> FxTimer.create(duration, action);

@@ -1,4 +1,4 @@
-/**
+/*
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
@@ -9,124 +9,144 @@
   Included by default in ToolbarTitledPane.
  */
 
+.flat(@selection-focus-color);
+.flat-toggle(derive(@fx-base, -5%), -fx-outer-border, @selection-color: @selection-focus-color);
 
-.button, .choice-box, .toggle-button {
-  -fx-background-color: transparent;
+// change the focus color when the background is already the default focus color
+.list-cell:selected {
+  .flat(whitesmoke);
+  .flat-toggle(white, @selection-focus-color, @selection-color: @selection-focus-color);
+}
 
-  -fx-content-display: CENTER;
-  -fx-border-width: 1;
-  -fx-border-color: @darker-accent-border;
-  -fx-background-insets: 0;
-  -fx-border-insets: 0;
-  -fx-border-radius: 3;
+.list-cell:focused {
+  .flat(whitesmoke);
+  .flat-toggle(white, gray, whitesmoke);
+}
 
-  &:hover {
-    -fx-background-color: @selection-focus-color;
-  }
-
-  &.icon-button {
-    -fx-border-width: 0;
-    -fx-border-color: transparent;
+.property-collection-view {
+  .footer {
+    -fx-background-color: @darker-accent;
+    -fx-font-size: 13;
   }
 }
 
-.label {
-  -fx-background-color: transparent;
-  -fx-font-size: @smaller-font-size;
+.flat(@selection-color) {
 
-  // This is the title label of the pane
-  &.title-label {
-    -fx-padding: 0 0 0 6;
-    -fx-font-size: 10pt;
+  .button, .choice-box, .toggle-button {
+    -fx-background-color: transparent;
+
+    -fx-content-display: CENTER;
+    -fx-border-width: 1;
+    -fx-border-color: @darker-accent-border;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-border-radius: 3;
+
+    -fx-padding: 3;
+
+    &.choice-box {
+      .label {
+        -fx-padding: 0;
+      }
+      .open-button {
+        -fx-padding: 0;
+      }
+    }
+
+    &:hover {
+      -fx-background-color: @selection-color;
+    }
+
+    &.icon-button {
+      -fx-border-width: 0;
+      -fx-border-color: transparent;
+    }
   }
 
-  &.error-label {
-    .ikonli-font-icon {
-      -fx-fill: #d70000;
+  .label {
+    -fx-background-color: transparent;
+    -fx-font-size: @smaller-font-size;
+
+    // This is the title label of the pane
+    &.title-label {
+      -fx-padding: 0 0 0 6;
+      -fx-font-size: 10pt;
+    }
+
+    &.error-label {
+      .ikonli-font-icon {
+        -fx-fill: #d70000;
+      }
+    }
+  }
+
+  .separator {
+    //-fx-background-color: transparent;
+
+    -fx-padding: 4 2 4 2;
+
+    .line {
+      -fx-border-style: none solid none none;
+      -fx-border-width: 0.5px;
+      -fx-fill: @fx-text-fill;
+      -fx-border-color: @fx-text-fill;
+    }
+  }
+
+  .menu-bar {
+    -fx-background-color: transparent;
+  }
+
+
+  // This is used for buttons that have just an icon and no text
+  .icon-button {
+
+    -fx-background-color: transparent;
+
+    -fx-content-display: CENTER;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    .force-square(24);
+
+    &, * {
+      -fx-graphic-text-gap: 0;
+    }
+
+    &.menu-button .ikonli-font-icon {
+      // Fixes a bug where the cog icon is misplaced to the right
+      // Probably needs to be synced with icon size
+      -fx-translate-x: -4;
+    }
+
+    .ikonli-font-icon, .svg-icon {
+      -fx-fill: @fx-text-fill;
+    }
+
+    &.menu-button:showing, &:hover {
+      -fx-background-color: @selection-color;
+    }
+
+    .label {
+      -fx-background-color: transparent;
     }
   }
 }
 
-.separator {
-  //-fx-background-color: transparent;
-
-  -fx-padding: 4 2 4 2;
-
-  .line {
-    -fx-border-style: none solid none none;
-    -fx-border-width: 0.5px;
-    -fx-fill: @fx-text-fill;
-    -fx-border-color: @fx-text-fill;
-  }
-}
-
-.menu-bar {
-  -fx-background-color: transparent;
-}
-
-
-// This is used for buttons that have just an icon and no text
-.icon-button {
-
-  -fx-background-color: transparent;
-
-  -fx-content-display: CENTER;
-  -fx-border-width: 0;
-  -fx-background-insets: 0;
-  -fx-border-insets: 0;
-  .force-square(24);
-
-  &, * {
-    -fx-graphic-text-gap: 0;
-  }
-
-  &.menu-button .ikonli-font-icon {
-    // Fixes a bug where the cog icon is misplaced to the right
-    // Probably needs to be synced with icon size
-    -fx-translate-x: -4;
-  }
-
-  .ikonli-font-icon, .svg-icon {
-    -fx-fill: @fx-text-fill;
-  }
-
-  &.toggle-button:selected {
+.flat-toggle(@fxcolor, @darker, @selection-color) {
+  .toggle-button:selected {
 
     &, &:focused {
 
-      @grad: linear-gradient(to bottom, derive(-fx-color, -22%) 0%, derive(-fx-color, -13%) 20%, derive(-fx-color, -11%) 50%);
+      @grad: linear-gradient(to bottom, derive(@fxcolor, -30%) 0%, derive(@fxcolor, -18%) 20%, derive(@fxcolor, -16%) 50%);
 
-      -fx-background-color: -fx-shadow-highlight-color, linear-gradient(to bottom, derive(-fx-outer-border, -20%), -fx-outer-border), @grad;
+      -fx-background-color: -fx-shadow-highlight-color, linear-gradient(to bottom, derive(@darker, -20%), @darker), @grad;
 
       -fx-background-insets: 0 0 -1 0, 0, 1;
     }
 
     &:hover {
-      -fx-hover-base: @selection-focus-color;
+      -fx-hover-base: @selection-color;
     }
-  }
-
-  &.menu-button:showing, &:hover {
-    -fx-background-color: @selection-focus-color;
-  }
-
-  .label {
-    -fx-background-color: transparent;
-  }
-}
-
-&.toggle-button:selected {
-
-  &, &:focused {
-
-    @grad: linear-gradient(to bottom, derive(-fx-color, -30%) 0%, derive(-fx-color, -18%) 20%, derive(-fx-color, -16%) 50%);
-
-    -fx-background-color: -fx-shadow-highlight-color, linear-gradient(to bottom, derive(-fx-outer-border, -20%), -fx-outer-border), @grad;
-
-    -fx-background-insets: 0 0 -1 0, 0, 1;
-  }
-
-  &:hover {
-    -fx-hover-base: @selection-focus-color;
   }
 }
