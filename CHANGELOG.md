@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.16.0
+
+* Added the possibility to search the treeview. Press CTRL+F when it's focused, or click on the `Search` :mag_right: button and enter a search query. You can cycle through results with `CTRL+TAB` or `CTRL+F3`, and cycle back with `CTRL+SHIFT+TAB` or `CTRL+SHIFT+F3`.
+
+![TreeView search demo](https://user-images.githubusercontent.com/24524930/58752348-a3926600-84ad-11e9-9ef2-11920590b5e5.gif)
+
+* Fix some bugs with XPath autocompletion
+
 ## 6.14.0
 
 * Added the possibility to select a node directly from the code area.
