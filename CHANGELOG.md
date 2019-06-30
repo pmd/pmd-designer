@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.17.0
+
+
+
 ## 6.16.0
 
 * Added the possibility to search the treeview. Press CTRL+F when it's focused, or click on the `Search` :mag_right: button and enter a search query. You can cycle through results with `CTRL+TAB` or `CTRL+F3`, and cycle back with `CTRL+SHIFT+TAB` or `CTRL+SHIFT+F3`.
