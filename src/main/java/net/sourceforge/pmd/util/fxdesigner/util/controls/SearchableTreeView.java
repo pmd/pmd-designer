@@ -31,6 +31,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -56,15 +57,19 @@ public class SearchableTreeView<T> extends TreeView<T> {
         addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
             // CTRL + F should be normal
             if (evt.isControlDown() && evt.getCode() == KeyCode.F) {
-                if (openSearchField != null) {
-                    openSearchField.requestFocus();
-                } else {
-                    popSearchField();
-                }
+                focusSearchField();
                 evt.consume();
             }
         });
 
+    }
+
+    public void focusSearchField() {
+        if (openSearchField != null) {
+            openSearchField.requestFocus();
+        } else {
+            popSearchField();
+        }
     }
 
     public void setRealRoot(SearchableTreeItem<T> root) {
@@ -102,7 +107,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
         Var<Integer> numResults = Var.newSimpleVar(0);
 
-        Subscription subscription = bindSearchQuery(query.conditionOnShowing(pane), numResults);
+        Subscription subscription = bindSearchQuery(query.conditionOnShowing(pane), numResults, textField);
 
         label.textProperty().bind(
             numResults.map(n -> n == 0 ? "no match" : n == 1 ? "1 match" : n + " matches")
@@ -137,7 +142,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
     /**
      * Update the cells to search for anything.
      */
-    private Subscription bindSearchQuery(ObservableValue<String> query, Var<Integer> numResults) {
+    private Subscription bindSearchQuery(ObservableValue<String> query, Var<Integer> numResults, javafx.scene.Node eventSource) {
 
 
         Val<List<SearchableTreeItem<T>>> allItems = Val.wrap(rootProperty())
@@ -178,7 +183,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                                       }
                                   });
 
-                            sub = sub.and(subscribeKeyNav(newRes.size(), curIdx));
+                            sub = sub.and(subscribeKeyNav(newRes.size(), curIdx, eventSource));
                         }
                         refresh();
                         return sub;
@@ -191,10 +196,10 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
     }
 
-    private Subscription subscribeKeyNav(int numResults, Var<Integer> curIdx) {
+    private Subscription subscribeKeyNav(int numResults, Var<Integer> curIdx, Node eventSource) {
         // Make TAB or F3 cycle forward,
         // SHIFT+TAB or SHIFT+F3 cycle backwards
-        return EventStreams.eventsOf(this, KeyEvent.KEY_RELEASED)
+        return EventStreams.eventsOf(eventSource, KeyEvent.KEY_RELEASED)
                            .filter(it -> it.getCode() == KeyCode.F3 || it.getCode() == KeyCode.TAB)
                            .subscribe(ke -> {
                                int offset = ke.isShiftDown() ? -1 : +1;

@@ -98,6 +98,8 @@ public class SourceEditorController extends AbstractController {
     }).orElseConst(SourceEditorController.class.getClassLoader());
 
     @FXML
+    private Button searchButton;
+    @FXML
     private DynamicWidthChoicebox<LanguageVersion> languageVersionChoicebox;
     @FXML
     private ToolbarTitledPane testCaseToolsTitledPane;
@@ -188,6 +190,8 @@ public class SourceEditorController extends AbstractController {
 
         // default text, will be overwritten by settings restore
         setText(getDefaultText());
+
+        searchButton.setOnAction(e -> astTreeView.focusSearchField());
 
         TestCreatorService creatorService = getService(DesignerRoot.TEST_CREATOR);
 
