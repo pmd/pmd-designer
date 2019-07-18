@@ -28,7 +28,7 @@
             AnchorPane.rightAnchor="0.0"
             AnchorPane.topAnchor="0.0">
         <toolbarItems>
-            <MenuButton fx:id="addTestMenu" styleClass="icon-button,no-arrow">
+            <MenuButton fx:id="addTestMenuButton" styleClass="icon-button,no-arrow">
                 <graphic>
                     <FontIcon iconLiteral="fas-plus"/>
                 </graphic>

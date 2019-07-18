@@ -38,7 +38,7 @@ import javafx.stage.FileChooser;
 public class TestCollectionController extends AbstractController {
 
     @FXML
-    private MenuButton addTestMenu;
+    private MenuButton addTestMenuButton;
     @FXML
     private ToolbarTitledPane titledPane;
     @FXML
@@ -122,23 +122,23 @@ public class TestCollectionController extends AbstractController {
         File file = chooser.showOpenDialog(getMainStage());
 
         if (file == null) {
-            SimplePopups.showActionFeedback(addTestMenu, AlertType.INFORMATION, "No file chosen");
+            SimplePopups.showActionFeedback(addTestMenuButton, AlertType.INFORMATION, "No file chosen");
             return;
         }
 
         try {
             TestCollection coll = TestXmlParser.parseXmlTests(file.toPath(), builder);
             getTestCollection().addAll(coll);
-            SimplePopups.showActionFeedback(addTestMenu, AlertType.CONFIRMATION,
+            SimplePopups.showActionFeedback(addTestMenuButton, AlertType.CONFIRMATION,
                                             "Imported " + coll.getStash().size() + " test cases");
         } catch (Exception e) {
-            SimplePopups.showActionFeedback(addTestMenu, AlertType.ERROR, "Error while importing, see event log");
+            SimplePopups.showActionFeedback(addTestMenuButton, AlertType.ERROR, "Error while importing, see event log");
             logUserException(e, Category.TEST_LOADING_EXCEPTION);
         }
     }
 
     private void testCreatedFeedback() {
-        SimplePopups.showActionFeedback(addTestMenu, AlertType.CONFIRMATION, "Test created");
+        SimplePopups.showActionFeedback(addTestMenuButton, AlertType.CONFIRMATION, "Test created");
     }
 
     @Override

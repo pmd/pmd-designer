@@ -136,7 +136,7 @@ public class TestXmlDumper {
         }
     }
 
-    public static void dumpXmlTests(Writer out, TestCollection collection) throws Exception {
+    public static void dumpXmlTests(Writer outWriter, TestCollection collection) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         try {
@@ -168,9 +168,9 @@ public class TestXmlDumper {
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
 
-            transformer.transform(new DOMSource(doc), new StreamResult(out));
+            transformer.transform(new DOMSource(doc), new StreamResult(outWriter));
         } finally {
-            out.close();
+            outWriter.close();
         }
 
     }
