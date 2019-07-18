@@ -140,7 +140,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         });
 
         Val.wrap(load.selectedProperty()).values().distinct().subscribe(
-            it -> pseudoClassStateChanged(PseudoClass.getPseudoClass("loaded-test"), !it)
+            it -> pseudoClassStateChanged(PseudoClass.getPseudoClass("loaded-test"), it)
         );
 
         sub = sub.and(() -> {
