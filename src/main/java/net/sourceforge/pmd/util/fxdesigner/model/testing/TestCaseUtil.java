@@ -4,9 +4,9 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-
-import org.reactfx.collection.LiveList;
 
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem;
@@ -19,11 +19,13 @@ public final class TestCaseUtil {
         // util
     }
 
+    private static final Comparator<Node> LINE_COMP = Comparator.comparingInt(Node::getBeginLine);
+
     public static TestResult doTest(LiveTestCase testCase, List<Node> actual) {
 
         // TODO messages
 
-        LiveList<LiveViolationRecord> expected = testCase.getExpectedViolations();
+        List<LiveViolationRecord> expected = testCase.getExpectedViolations();
         if (actual.size() != expected.size()) {
             return new TestResult(TestStatus.FAIL,
                                   "Expected " + expected.size() + " violations, actual " + actual.size());
@@ -32,6 +34,13 @@ public final class TestCaseUtil {
         if (expected.stream().noneMatch(it -> it.getRange() != null)) {
             return new TestResult(TestStatus.PASS, null);
         }
+
+
+        actual = new ArrayList<>(actual);
+        actual.sort(LINE_COMP);
+
+        expected = new ArrayList<>(expected);
+        expected.sort(Comparator.naturalOrder());
 
         for (int i = 0; i < actual.size(); i++) {
             Node node = actual.get(i);

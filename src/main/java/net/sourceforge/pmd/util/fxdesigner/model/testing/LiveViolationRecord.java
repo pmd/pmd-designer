@@ -11,7 +11,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
-public class LiveViolationRecord implements SettingsOwner {
+public class LiveViolationRecord implements SettingsOwner, Comparable<LiveViolationRecord> {
 
     private final Var<@Nullable TextRange> range;
     private final Var<Boolean> exactRange;
@@ -31,6 +31,16 @@ public class LiveViolationRecord implements SettingsOwner {
         this.exactRange = Var.newSimpleVar(exactRange);
     }
 
+    @Override
+    public int compareTo(LiveViolationRecord o) {
+        TextRange mine = getRange();
+        TextRange theirs = o.getRange();
+        if (mine == null || theirs == null) {
+            return 0;
+        } else {
+            return Integer.compare(mine.startPos.line, theirs.startPos.line);
+        }
+    }
 
     @PersistentProperty
     @Nullable
