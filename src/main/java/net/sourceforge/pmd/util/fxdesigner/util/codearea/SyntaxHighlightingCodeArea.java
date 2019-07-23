@@ -9,13 +9,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.wellbehaved.event.EventPattern;
+import org.fxmisc.wellbehaved.event.InputMap;
+import org.fxmisc.wellbehaved.event.Nodes;
+import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.Subscription;
 import org.reactfx.value.Val;
@@ -27,6 +32,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
 
@@ -58,6 +64,7 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
     /** Read-only view on the current highlighting spans. Can be absent. */
     protected final Val<StyleSpans<Collection<String>>> syntaxHighlight = currentSyntaxHighlight;
 
+    private final EventSource<?> synchronousUpdateTicks = new EventSource<>();
 
     public SyntaxHighlightingCodeArea() {
         // captured in the closure
@@ -79,6 +86,15 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
                 e.consume();
             }
         });
+
+
+        // Make TAB 4 spaces
+        InputMap<KeyEvent> im = InputMap.consume(
+            EventPattern.keyPressed(KeyCode.TAB),
+            e -> replaceSelection("    ")
+        );
+
+        Nodes.addInputMap(this, im);
     }
 
 
@@ -94,16 +110,17 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
         syntaxHighlighter.ifPresent(previous -> getStyleClass().remove(previous.getLanguageTerseName()));
         syntaxAutoRefresh.ifPresent(Subscription::unsubscribe);
 
+        syntaxHighlighter.setValue(highlighter);
+
         if (highlighter == null) {
             syntaxAutoRefresh.setValue(null);
             this.setCurrentSyntaxHighlight(null);
             return;
         }
 
-        syntaxHighlighter.setValue(highlighter);
 
         getStyleClass().add(highlighter.getLanguageTerseName());
-        syntaxAutoRefresh.setValue(subscribeSyntaxHighlighting(defaultHighlightingTicks(), highlighter));
+        syntaxAutoRefresh.setValue(subscribeSyntaxHighlighting(defaultHighlightingTicks(), synchronousUpdateTicks, highlighter));
 
         try { // refresh the highlighting once.
             Task<StyleSpans<Collection<String>>> t = computeHighlightingAsync(Executors.newSingleThreadExecutor(), highlighter, getText());
@@ -126,15 +143,14 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
     }
 
 
-    private Subscription subscribeSyntaxHighlighting(EventStream<?> ticks, SyntaxHighlighter highlighter) {
-        // captured in the closure, shutdown when unsubscribing
+    private Subscription subscribeSyntaxHighlighting(EventStream<?> ticks, EventStream<?> canceller, SyntaxHighlighter highlighter) {
         // captured in the closure, shutdown when unsubscribing
         final ExecutorService executorService = Executors.newSingleThreadExecutor(
             r -> new Thread(r, "Code-area-" + this.hashCode() + "-"
                 + highlighter.getLanguageTerseName() + "-highlighter"));
         return ticks.successionEnds(TEXT_CHANGE_DELAY)
                     .supplyTask(() -> computeHighlightingAsync(executorService, highlighter, this.getText()))
-                    .awaitLatest(ticks)
+                    .awaitLatest(ticks.or(canceller))
                     .filterMap(t -> {
                         t.ifFailure(Throwable::printStackTrace);
                         return t.toOptional();
@@ -166,13 +182,17 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
      * Update the syntax highlighting to the specified value.
      * If null, syntax highlighting is stripped off.
      */
-    private void setCurrentSyntaxHighlight(final StyleSpans<Collection<String>> newSyntax) {
-        Optional<StyleSpans<Collection<String>>> oldSyntaxHighlight = currentSyntaxHighlight.getOpt();
+    private void setCurrentSyntaxHighlight(final @Nullable StyleSpans<Collection<String>> newSyntax) {
+        StyleSpans<Collection<String>> oldSyntaxHighlight = currentSyntaxHighlight.getValue();
         this.currentSyntaxHighlight.setValue(newSyntax);
 
         setStyleSpans(0, styleSyntaxHighlightChange(oldSyntaxHighlight, newSyntax));
     }
 
+    @Override
+    public void setStyleSpans(int from, @NonNull StyleSpans<? extends Collection<String>> styleSpans) {
+        super.setStyleSpans(from, styleSpans);
+    }
 
     /**
      * Given the old value of the highlighting spans, and a newly computed value,
@@ -181,9 +201,10 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
      * style layer in the game. Subclasses are free to override, to get a chance to
      * preserve additional style layers.
      */
-    protected StyleSpans<Collection<String>> styleSyntaxHighlightChange(final Optional<StyleSpans<Collection<String>>> oldSyntax,
-                                                                        final StyleSpans<Collection<String>> newSyntax) {
-        return newSyntax;
+    @NonNull
+    protected StyleSpans<Collection<String>> styleSyntaxHighlightChange(final @Nullable StyleSpans<Collection<String>> oldSyntax,
+                                                                        final @Nullable StyleSpans<Collection<String>> newSyntax) {
+        return newSyntax == null ? emptySpan() : newSyntax;
     }
 
 
@@ -194,6 +215,7 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
      * we want to overlay other spans on it.
      */
     protected void updateSyntaxHighlightingSynchronously() {
+        synchronousUpdateTicks.push(null);
         syntaxHighlighter.getOpt().map(h -> h.computeHighlighting(getText())).ifPresent(currentSyntaxHighlight::setValue);
     }
 

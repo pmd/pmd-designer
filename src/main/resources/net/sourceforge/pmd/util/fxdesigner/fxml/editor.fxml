@@ -5,18 +5,17 @@
 
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.RippleButton?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
 <BorderPane xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="net.sourceforge.pmd.util.fxdesigner.SourceEditorController">
@@ -36,25 +35,56 @@
                                            AnchorPane.rightAnchor="0.0"
                                            AnchorPane.topAnchor="0.0">
                             <toolbarItems>
-                                <MenuButton fx:id="languageSelectionMenuButton"
-                                            mnemonicParsing="false"
-                                            styleClass="no-arrow,icon-button">
-                                    <graphic>
-                                        <FontIcon iconLiteral="fas-cog"/>
-                                    </graphic>
-                                    <items>
-
-                                    </items>
-                                </MenuButton>
+                                <DynamicWidthChoicebox fx:id="languageVersionChoicebox">
+                                    <tooltip>
+                                        <Tooltip text="Selected language version"/>
+                                    </tooltip>
+                                </DynamicWidthChoicebox>
                             </toolbarItems>
                             <content>
-                                <NodeEditionCodeArea fx:id="nodeEditionCodeArea"
-                                                     stylesheets="@../css/editor-theme.css"
-                                                     BorderPane.alignment="CENTER">
-                                    <BorderPane.margin>
+                                <AnchorPane>
+
+                                    <padding>
                                         <Insets/>
-                                    </BorderPane.margin>
-                                </NodeEditionCodeArea>
+                                    </padding>
+                                    <ToolbarTitledPane fx:id="testCaseToolsTitledPane"
+                                                       title="Test case configuration: "
+                                                       AnchorPane.bottomAnchor="0.0"
+                                                       AnchorPane.leftAnchor="0.0"
+                                                       AnchorPane.rightAnchor="0.0"
+                                                       AnchorPane.topAnchor="0.0">
+                                        <toolbarItems>
+                                            <RippleButton fx:id="violationsButton" text="Expected violations">
+                                                <tooltip>
+                                                    <Tooltip
+                                                            text="Drag and drop nodes to register as expected violations"/>
+                                                </tooltip>
+                                            </RippleButton>
+                                            <RippleButton fx:id="propertiesMapButton" text="Property mapping">
+                                                <tooltip>
+                                                    <Tooltip text="Values of rule properties in this test case"/>
+                                                </tooltip>
+                                            </RippleButton>
+                                        </toolbarItems>
+                                        <content>
+                                            <AnchorPane>
+                                                <padding>
+                                                    <Insets/>
+                                                </padding>
+                                                <NodeEditionCodeArea fx:id="nodeEditionCodeArea"
+                                                                     stylesheets="@../css/editor-theme.css"
+                                                                     AnchorPane.bottomAnchor="0.0"
+                                                                     AnchorPane.leftAnchor="0.0"
+                                                                     AnchorPane.rightAnchor="0.0"
+                                                                     AnchorPane.topAnchor="0.0">
+                                                    <BorderPane.margin>
+                                                        <Insets/>
+                                                    </BorderPane.margin>
+                                                </NodeEditionCodeArea>
+                                            </AnchorPane>
+                                        </content>
+                                    </ToolbarTitledPane>
+                                </AnchorPane>
                             </content>
                         </ToolbarTitledPane>
                     </children>

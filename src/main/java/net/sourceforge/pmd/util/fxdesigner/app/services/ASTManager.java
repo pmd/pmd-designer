@@ -4,7 +4,11 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app.services;
 
+import java.util.Map;
+
+import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
+import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
@@ -23,7 +27,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 public interface ASTManager extends ApplicationComponent, SettingsOwner {
 
 
-    Val<String> sourceCodeProperty();
+    SuspendableVar<String> sourceCodeProperty();
 
 
     String getSourceCode();
@@ -42,5 +46,8 @@ public interface ASTManager extends ApplicationComponent, SettingsOwner {
 
 
     Val<ParseAbortedException> currentExceptionProperty();
+
+
+    Var<Map<String, String>> ruleProperties();
 
 }

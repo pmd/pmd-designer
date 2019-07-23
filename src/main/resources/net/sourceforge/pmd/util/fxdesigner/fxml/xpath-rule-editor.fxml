@@ -3,16 +3,16 @@
 <?import java.lang.String?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea?>
-<?import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.SVGPath?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.RippleButton?>
 <AnchorPane minHeight="0.0"
             minWidth="0.0"
             prefHeight="180.0"
@@ -22,36 +22,13 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="net.sourceforge.pmd.util.fxdesigner.XPathRuleEditorController">
     <children>
-        <SplitPane dividerPositions="0.2, 0.8"
+        <SplitPane dividerPositions="0.25,0.85"
                    AnchorPane.bottomAnchor="0.0"
                    AnchorPane.leftAnchor="0.0"
                    AnchorPane.rightAnchor="0.0"
                    AnchorPane.topAnchor="0.0">
             <items>
-                <AnchorPane>
-                    <children>
-                        <ToolbarTitledPane animated="false"
-                                    collapsible="false"
-                                    title="Properties"
-                                    AnchorPane.bottomAnchor="0.0"
-                                    AnchorPane.leftAnchor="0.0"
-                                    AnchorPane.rightAnchor="0.0"
-                                    AnchorPane.topAnchor="0.0">
-                            <content>
-                                <AnchorPane>
-                                    <PropertyTableView fx:id="propertyTableView"
-                                                       AnchorPane.bottomAnchor="0.0"
-                                                       AnchorPane.leftAnchor="0.0"
-                                                       AnchorPane.rightAnchor="0.0"
-                                                       AnchorPane.topAnchor="0.0" />
-                                    <padding>
-                                        <Insets bottom="-0.5" left="-0.5" right="-0.5" top="-0.5" />
-                                    </padding>
-                                </AnchorPane>
-                            </content>
-                        </ToolbarTitledPane>
-                    </children>
-                </AnchorPane>
+                <fx:include source="test-collection.fxml" fx:id="testCollection" />
                 <AnchorPane>
                     <children>
                         <ToolbarTitledPane fx:id="expressionTitledPane"
@@ -81,7 +58,7 @@
                                         <!-- Populated in the controller -->
                                     </items>
                                 </MenuButton>
-                                <Button fx:id="exportXpathToRuleButton" mnemonicParsing="false" styleClass="icon-button">
+                                <RippleButton fx:id="exportXpathToRuleButton" mnemonicParsing="false" styleClass="icon-button">
                                     <graphic>
                                         <!--Needs FA 5.1.0 -->
                                         <!--<FontIcon iconLiteral="fas-file-export" />-->
@@ -96,7 +73,15 @@
                                             </text>
                                         </Tooltip>
                                     </tooltip>
-                                </Button>
+                                </RippleButton>
+
+                                <Separator orientation="VERTICAL"/>
+
+                                <RippleButton fx:id="showPropertiesButton" mnemonicParsing="false" text="Properties">
+                                    <tooltip>
+                                        <Tooltip text="Inspect rule properties" />
+                                    </tooltip>
+                                </RippleButton>
                             </toolbarItems>
                             <content>
                                 <SyntaxHighlightingCodeArea stylesheets="@../css/editor-theme.css" fx:id="xpathExpressionArea" />

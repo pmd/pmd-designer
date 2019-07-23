@@ -111,7 +111,9 @@ class NodeStyleSpan {
 
         @Override
         public StyledDocument<Collection<String>, String, Collection<String>> getNodeRichText() {
-            return codeArea.subDocument(beginIndex, endIndex);
+            StyledDocument<Collection<String>, String, Collection<String>> richtText;
+            richtText = codeArea.subDocument(beginIndex, endIndex);
+            return richtText;
         }
 
 

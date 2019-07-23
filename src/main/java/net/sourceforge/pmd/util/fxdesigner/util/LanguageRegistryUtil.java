@@ -6,13 +6,15 @@ package net.sourceforge.pmd.util.fxdesigner.util;
 
 import static net.sourceforge.pmd.lang.LanguageRegistry.findAllVersions;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageRegistry;
@@ -61,18 +63,24 @@ public final class LanguageRegistryUtil {
         return null;
     }
 
+    private static boolean filterLanguageVersion(LanguageVersion lv) {
+        return !StringUtils.containsIgnoreCase(lv.getLanguage().getName(), "dummy")
+            && Optional.ofNullable(lv.getLanguageVersionHandler())
+                       .map(handler -> handler.getParser(handler.getDefaultParserOptions()))
+                       .filter(Parser::canParse)
+                       .isPresent();
+    }
+
     public static synchronized List<LanguageVersion> getSupportedLanguageVersions() {
         if (supportedLanguageVersions == null) {
-            List<LanguageVersion> languageVersions = new ArrayList<>();
-            for (LanguageVersion languageVersion : findAllVersions()) {
-                Optional.ofNullable(languageVersion.getLanguageVersionHandler())
-                        .map(handler -> handler.getParser(handler.getDefaultParserOptions()))
-                        .filter(Parser::canParse)
-                        .ifPresent(p -> languageVersions.add(languageVersion));
-            }
-            supportedLanguageVersions = languageVersions;
+            supportedLanguageVersions = findAllVersions().stream().filter(LanguageRegistryUtil::filterLanguageVersion).collect(Collectors.toList());
         }
         return supportedLanguageVersions;
+    }
+
+    @Nullable
+    public static LanguageVersion getLanguageVersionByName(String name) {
+        return getSupportedLanguageVersions().stream().filter(it -> it.getName().equals(name)).findFirst().orElse(null);
     }
 
     public static Stream<Language> getSupportedLanguages() {
@@ -85,4 +93,7 @@ public final class LanguageRegistryUtil {
                                       .get();
     }
 
+    public static Language findLanguageByName(String n) {
+        return getSupportedLanguages().filter(it -> it.getName().equals(n)).findFirst().orElse(LanguageRegistry.getDefaultLanguage());
+    }
 }

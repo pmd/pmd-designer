@@ -251,7 +251,7 @@ public final class EventLogController extends AbstractController {
 
 
     private Stage createStage(Stage mainStage) {
-        FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("event-log.fxml"));
+        FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("event-log"));
         loader.setController(this);
 
         final Stage dialog = new Stage();

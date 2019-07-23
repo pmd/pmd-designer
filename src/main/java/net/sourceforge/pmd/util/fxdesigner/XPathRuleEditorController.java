@@ -1,4 +1,4 @@
-/**
+/*
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
@@ -20,7 +20,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -28,23 +27,23 @@ import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 import org.reactfx.SuspendableEventStream;
 import org.reactfx.collection.LiveArrayList;
+import org.reactfx.util.FxTimer;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
-import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
+import net.sourceforge.pmd.util.fxdesigner.app.XPathUpdateSubscriber;
 import net.sourceforge.pmd.util.fxdesigner.app.services.CloseableService;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
-import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluationException;
-import net.sourceforge.pmd.util.fxdesigner.model.XPathEvaluator;
+import net.sourceforge.pmd.util.fxdesigner.model.VersionedXPathQuery;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.popups.ExportXPathWizardController;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
@@ -56,13 +55,13 @@ import net.sourceforge.pmd.util.fxdesigner.util.autocomplete.XPathCompletionSour
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XPathSyntaxHighlighter;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.HelpfulPlaceholder;
-import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.PopOverWrapper;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyCollectionView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.TitleOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.XpathViolationListCell;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -105,14 +104,18 @@ public final class XPathRuleEditorController extends AbstractController implemen
     private final ObservableXPathRuleBuilder ruleBuilder;
     private final Var<ObservableList<Node>> myXpathResults = Var.newSimpleVar(null);
     private final Var<List<Node>> currentResults = Var.newSimpleVar(Collections.emptyList());
+    private final PopOverWrapper<ObservableXPathRuleBuilder> propertiesPopover;
+
     @FXML
-    public ToolbarTitledPane expressionTitledPane;
+    public TestCollectionController testCollectionController;
     @FXML
-    public Button exportXpathToRuleButton;
+    private ToolbarTitledPane expressionTitledPane;
+    @FXML
+    private Button exportXpathToRuleButton;
+    @FXML
+    private Button showPropertiesButton;
     @FXML
     private MenuButton xpathVersionMenuButton;
-    @FXML
-    private PropertyTableView propertyTableView;
     @FXML
     private SyntaxHighlightingCodeArea xpathExpressionArea;
     @FXML
@@ -132,9 +135,15 @@ public final class XPathRuleEditorController extends AbstractController implemen
      */
     public XPathRuleEditorController(DesignerRoot root, ObservableXPathRuleBuilder ruleBuilder) {
         super(root);
+        this.testCollectionController = new TestCollectionController(root, ruleBuilder);
         this.ruleBuilder = ruleBuilder;
 
-        this.exportWizard = new SoftReferenceCache<>(() -> new ExportXPathWizardController(getDesignerRoot()));
+        if (ruleBuilder.getLanguage() == null) {
+            ruleBuilder.setLanguage(globalLanguageProperty().getValue());
+        }
+
+        this.exportWizard = new SoftReferenceCache<>(() -> new ExportXPathWizardController(root));
+        this.propertiesPopover = new PopOverWrapper<>((t, f) -> PropertyCollectionView.makePopOver(t, titleProperty(), root));
     }
 
     @Override
@@ -145,14 +154,22 @@ public final class XPathRuleEditorController extends AbstractController implemen
 
         expressionTitledPane.titleProperty().bind(xpathVersionUIProperty.map(v -> "XPath Expression (" + v + ")"));
 
-        xpathResultListView.setCellFactory(v -> new XpathViolationListCell());
+        xpathResultListView.setCellFactory(v -> new XpathViolationListCell(getDesignerRoot()));
 
         exportXpathToRuleButton.setOnAction(e -> showExportXPathToRuleWizard());
 
-        getRuleBuilder().modificationsTicks()
-                        .or(getService(DesignerRoot.AST_MANAGER).compilationUnitProperty().values())
-                        .successionEnds(XPATH_REFRESH_DELAY)
-                        .subscribe(tick -> refreshResults(getService(DesignerRoot.AST_MANAGER)));
+        // this is the source of xpath results
+        getRuleBuilder().modificationsTicks().successionEnds(XPATH_REFRESH_DELAY)
+                        .map(tick -> new VersionedXPathQuery(
+                                 getRuleBuilder().getXpathVersion(),
+                                 getRuleBuilder().getXpathExpression(),
+                                 getRuleBuilder().getRuleProperties()
+                             )
+                        )
+                        .subscribe(tick -> getService(DesignerRoot.LATEST_XPATH).pushEvent(this, tick));
+
+        new MyXpathSubscriber(getDesignerRoot()).init(getService(DesignerRoot.AST_MANAGER));
+
 
         selectionEvents = EventStreams.valuesOf(xpathResultListView.getSelectionModel().selectedItemProperty()).suppressible();
 
@@ -162,8 +179,56 @@ public final class XPathRuleEditorController extends AbstractController implemen
 
         violationsTitledPane.titleProperty().bind(currentResults.map(List::size).map(n -> "Matched nodes (" + n + ")"));
 
+
+        showPropertiesButton.setOnAction(e -> propertiesPopover.showOrFocus(p -> p.show(showPropertiesButton)));
+
+        propertiesPopover.rebind(getRuleBuilder());
+        propertiesPopover.doFirstLoad(getMainStage());
+
+        expressionTitledPane.errorTypeProperty().setValue("XPath syntax error");
     }
 
+    @Override
+    public void setFocusNode(Node node, DataHolder options) {
+        Optional<TextAwareNodeWrapper> firstResult = xpathResultListView.getItems().stream()
+                                                                        .filter(wrapper -> wrapper.getNode().equals(node))
+                                                                        .findFirst();
+
+        // with Java 9, Optional#ifPresentOrElse can be used
+        if (firstResult.isPresent()) {
+            selectionEvents.suspendWhile(() -> xpathResultListView.getSelectionModel().select(firstResult.get()));
+        } else {
+            xpathResultListView.getSelectionModel().clearSelection();
+        }
+    }
+
+    public Val<LiveTestCase> selectedTestCaseProperty() {
+        return testCollectionController.selectedTestCase();
+    }
+
+    @Override
+    public void afterParentInit() {
+        bindToParent();
+
+        // init autocompletion only after binding to mediator and settings restore
+        // otherwise the popup is shown on startup
+        Supplier<CompletionResultSource> suggestionMaker = () -> XPathCompletionSource.forLanguage(getRuleBuilder().getLanguage());
+        new XPathAutocompleteProvider(xpathExpressionArea, suggestionMaker).initialiseAutoCompletion();
+    }
+
+
+    // Binds the underlying rule parameters to the parent UI, disconnecting it from the wizard if need be
+    private void bindToParent() {
+        if (getRuleBuilder().getLanguage() == null) {
+            DesignerUtil.rewire(getRuleBuilder().languageProperty(),
+                                globalLanguageProperty());
+        }
+
+        ReactfxUtil.rewireInit(getRuleBuilder().xpathVersionProperty(), xpathVersionProperty());
+        ReactfxUtil.rewireInit(getRuleBuilder().xpathExpressionProperty(), xpathExpressionProperty());
+
+        xpathExpressionArea.setSyntaxHighlighter(new XPathSyntaxHighlighter());
+    }
 
     private void initialiseVersionSelection() {
         ToggleGroup xpathVersionToggleGroup = new ToggleGroup();
@@ -194,7 +259,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
         item.setOnAction(e -> {
             try {
                 Stage popup = new Stage();
-                FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("generate-xpath-from-stack-trace.fxml"));
+                FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("generate-xpath-from-stack-trace"));
                 Parent root = loader.load();
                 Button button = (Button) loader.getNamespace().get("generateButton");
                 TextArea area = (TextArea) loader.getNamespace().get("stackTraceArea");
@@ -231,89 +296,6 @@ public final class XPathRuleEditorController extends AbstractController implemen
     @Override
     public void close() {
         xpathExpressionArea.setSyntaxHighlighter(null);
-    }
-
-    @Override
-    public void afterParentInit() {
-        bindToParent();
-
-        // init autocompletion only after binding to mediator and settings restore
-        // otherwise the popup is shown on startup
-        Supplier<CompletionResultSource> suggestionMaker = () -> XPathCompletionSource.forLanguage(getRuleBuilder().getLanguage());
-        new XPathAutocompleteProvider(xpathExpressionArea, suggestionMaker).initialiseAutoCompletion();
-
-
-    }
-
-    // Binds the underlying rule parameters to the mediator UI, disconnecting it from the wizard if need be
-    private void bindToParent() {
-        DesignerUtil.rewire(getRuleBuilder().languageProperty(), getService(DesignerRoot.AST_MANAGER).languageVersionProperty().map(LanguageVersion::getLanguage));
-
-        ReactfxUtil.rewireInit(getRuleBuilder().xpathVersionProperty(), xpathVersionProperty());
-        ReactfxUtil.rewireInit(getRuleBuilder().xpathExpressionProperty(), xpathExpressionProperty());
-
-        DesignerUtil.rewireInit(getRuleBuilder().rulePropertiesProperty(),
-                                propertyTableView.rulePropertiesProperty(),
-                                propertyTableView::setRuleProperties);
-
-        xpathExpressionArea.setSyntaxHighlighter(new XPathSyntaxHighlighter());
-
-    }
-
-    @Override
-    public void setFocusNode(final Node node, DataHolder options) {
-        Optional<TextAwareNodeWrapper> firstResult = xpathResultListView.getItems().stream()
-                                                                        .filter(wrapper -> wrapper.getNode().equals(node))
-                                                                        .findFirst();
-
-        // with Java 9, Optional#ifPresentOrElse can be used
-        if (firstResult.isPresent()) {
-            selectionEvents.suspendWhile(() -> xpathResultListView.getSelectionModel().select(firstResult.get()));
-        } else {
-            xpathResultListView.getSelectionModel().clearSelection();
-        }
-    }
-
-    /**
-     * Evaluate the contents of the XPath expression area
-     * on the global compilation unit. This updates the xpath
-     * result panel, and can log XPath exceptions to the
-     * event log panel.
-     */
-    private void refreshResults(ASTManager manager) {
-
-        try {
-            String xpath = xpathExpressionProperty().getValue();
-            if (StringUtils.isBlank(xpath)) {
-                updateResults(false, false, Collections.emptyList(), "Type an XPath expression to show results");
-                return;
-            }
-
-            Node compilationUnit = manager.compilationUnitProperty().getValue();
-
-            if (compilationUnit == null) {
-                updateResults(false, true, Collections.emptyList(), "Compilation unit is invalid");
-                return;
-            }
-
-
-            LanguageVersion version = manager.languageVersionProperty().getValue();
-
-            ObservableList<Node> results
-                = FXCollections.observableArrayList(XPathEvaluator.evaluateQuery(compilationUnit,
-                                                                                 version,
-                                                                                 getRuleBuilder().getXpathVersion(),
-                                                                                 xpath,
-                                                                                 ruleBuilder.getRuleProperties()));
-
-            updateResults(false, false, results, NO_MATCH_MESSAGE);
-            // Notify that everything went OK so we can avoid logging very recent exceptions
-            raiseParsableXPathFlag();
-        } catch (XPathEvaluationException e) {
-            updateResults(true, false, Collections.emptyList(), sanitizeExceptionMessage(e));
-            logUserException(e, Category.XPATH_EVALUATION_EXCEPTION);
-        }
-
     }
 
 
@@ -382,12 +364,23 @@ public final class XPathRuleEditorController extends AbstractController implemen
 
         xpathResultListView.setPlaceholder(emptyLabel);
 
-        xpathResultListView.setItems(results.stream().map(getDesignerRoot().getService(DesignerRoot.RICH_TEXT_MAPPER)::wrapNode).collect(Collectors.toCollection(LiveArrayList::new)));
+        // we wait a bit to do that, so that the rich text is up to date
+        FxTimer.runLater(Duration.ofMillis(100), () -> xpathResultListView.setItems(results.stream().map(getDesignerRoot().getService(DesignerRoot.RICH_TEXT_MAPPER)::wrapNode).collect(Collectors.toCollection(LiveArrayList::new))));
+
         this.currentResults.setValue(results);
         // only show the error label here when it's an xpath error
         expressionTitledPane.errorMessageProperty().setValue(xpathError ? emptyResultsPlaceholder : "");
     }
 
+    private void addProperty(String name) {
+        propertiesPopover.showOrFocus(pop -> pop.show(showPropertiesButton));
+        propertiesPopover.getUserData().map(it -> (PropertyCollectionView) it).ifPresent(it -> it.addNewProperty(name));
+    }
+
+    @Override
+    public List<AbstractController> getChildren() {
+        return Collections.singletonList(testCollectionController);
+    }
 
     private javafx.scene.Node getErrorPlaceholder(String message) {
 
@@ -395,10 +388,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
             .map(
                 name ->
                     HelpfulPlaceholder.withMessage("Undeclared property in XPath expression: $" + name)
-                                      .withSuggestedAction(
-                                          "Add property",
-                                          () -> propertyTableView.onAddPropertyClicked(name)
-                                      )
+                                      .withSuggestedAction("Add property", () -> addProperty(name))
             )
             .orElseGet(() -> HelpfulPlaceholder.withMessage(message))
             .withLeftColumn(new FontIcon("fas-exclamation-triangle"))
@@ -415,4 +405,36 @@ public final class XPathRuleEditorController extends AbstractController implemen
         return matcher.matches() ? Optional.of(matcher.group(1)) : Optional.empty();
     }
 
+
+    private class MyXpathSubscriber extends XPathUpdateSubscriber {
+
+
+        MyXpathSubscriber(DesignerRoot root) {
+            super(root);
+        }
+
+        @Override
+        public void handleNoCompilationUnit() {
+            updateResults(false, true, Collections.emptyList(), "Compilation unit is invalid");
+        }
+
+        @Override
+        public void handleNoXPath() {
+            updateResults(false, false, Collections.emptyList(), "Type an XPath expression to show results");
+
+        }
+
+        @Override
+        public void handleXPathSuccess(List<Node> results) {
+            updateResults(false, false, results, NO_MATCH_MESSAGE);
+            // Notify that everything went OK so we can avoid logging very recent exceptions
+            raiseParsableXPathFlag();
+        }
+
+        @Override
+        public void handleXPathError(Exception e) {
+            updateResults(true, false, Collections.emptyList(), sanitizeExceptionMessage(e));
+            logUserException(e, Category.XPATH_EVALUATION_EXCEPTION);
+        }
+    }
 }

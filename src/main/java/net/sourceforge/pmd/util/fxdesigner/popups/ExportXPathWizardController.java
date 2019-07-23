@@ -36,8 +36,9 @@ import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.StageBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlSyntaxHighlighter;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.ControlUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.LanguageVersionRangeSlider;
-import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyTableView;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyCollectionView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.RulePrioritySlider;
 
 import com.github.oowekyala.rxstring.LiveTemplate;
@@ -57,8 +58,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -80,6 +79,9 @@ public final class ExportXPathWizardController implements Initializable {
     private final Var<String> xpathExpression = Var.newSimpleVar("");
     private final Var<String> xpathVersion = Var.newSimpleVar(DesignerUtil.defaultXPathVersion());
     private final Stage myPopupStage;
+    private final DesignerRoot root;
+    @FXML
+    private PropertyCollectionView propertyCollectionView;
     @FXML
     private Button resetMetadataButton;
     @FXML
@@ -99,13 +101,14 @@ public final class ExportXPathWizardController implements Initializable {
     @FXML
     private Accordion infoAccordion;
     @FXML
-    private PropertyTableView propertyTableView;
-    @FXML
     private LanguageVersionRangeSlider languageVersionRangeSlider;
 
 
     public ExportXPathWizardController(DesignerRoot root) {
+        this.root = root;
         this.myPopupStage = createStage(root.getMainStage());
+        propertyCollectionView.setOwnerStageFactory(myPopupStage);
+
     }
 
 
@@ -129,11 +132,7 @@ public final class ExportXPathWizardController implements Initializable {
         exportResultArea.setSyntaxHighlighter(new XmlSyntaxHighlighter());
         exportResultArea.setEditable(false);
 
-        copyResultButton.setOnAction(e -> {
-            final ClipboardContent content = new ClipboardContent();
-            content.putString(exportResultArea.getText());
-            Clipboard.getSystemClipboard().setContent(content);
-        });
+        ControlUtil.copyToClipboardButton(copyResultButton, exportResultArea::getText);
 
         resetMetadataButton.setOnAction(e -> {
             Alert alert = new Alert(AlertType.CONFIRMATION, "Wipe out the rule's metadata?",
@@ -235,7 +234,7 @@ public final class ExportXPathWizardController implements Initializable {
 
 
     private Var<ObservableList<PropertyDescriptorSpec>> rulePropertiesProperty() {
-        return Var.fromVal(propertyTableView.rulePropertiesProperty(), propertyTableView::setRuleProperties);
+        return Var.fromVal(propertyCollectionView.itemsProperty(), propertyCollectionView::setItems);
     }
 
 
@@ -252,7 +251,7 @@ public final class ExportXPathWizardController implements Initializable {
         return new StageBuilder().withOwner(mainStage)
                                  .withModality(Modality.WINDOW_MODAL)
                                  .withStyle(StageStyle.DECORATED)
-                                 .withFxml(DesignerUtil.getFxml("xpath-export-wizard.fxml"), this)
+                                 .withFxml(DesignerUtil.getFxml("xpath-export-wizard"), root, this)
                                  .withTitle("Export XPath expression to XML rule")
                                  .newStage();
     }

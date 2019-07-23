@@ -4,6 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.addCustomStyleSheets;
+
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -41,9 +43,11 @@ public final class ToolbarTitledPane extends TitledPane implements TitleOwner {
     private final ToolBar toolBar = new ToolBar();
     private final Var<String> title = Var.newSimpleVar("Title");
     private final Var<String> errorMessage = Var.newSimpleVar("");
+    private final Var<String> errorType = Var.newSimpleVar(null);
 
     public ToolbarTitledPane() {
 
+        addCustomStyleSheets(toolBar, "flat");
         getStyleClass().add("tool-bar-title");
         toolBar.getStylesheets().add(ResourceUtil.resolveResource("css/flat.css"));
 
@@ -90,7 +94,6 @@ public final class ToolbarTitledPane extends TitledPane implements TitleOwner {
                 );
             });
 
-
     }
 
     private Label buildTitleLabel() {
@@ -110,6 +113,7 @@ public final class ToolbarTitledPane extends TitledPane implements TitleOwner {
         errorLabel.tooltipProperty().bind(
             errorMessage.map(message -> StringUtils.isBlank(message) ? null : new Tooltip(message))
         );
+        errorLabel.textProperty().bind(errorType);
         errorLabel.visibleProperty().bind(errorMessage.map(StringUtils::isNotBlank));
         // makes the label zero-width when it's not visible
         errorLabel.managedProperty().bind(errorLabel.visibleProperty());
@@ -139,6 +143,9 @@ public final class ToolbarTitledPane extends TitledPane implements TitleOwner {
         this.title.setValue(title);
     }
 
+    public Var<String> errorTypeProperty() {
+        return errorType;
+    }
 
     /**
      * If non-blank, an error icon with this message as the tooltip

@@ -5,12 +5,12 @@
 package net.sourceforge.pmd.util.fxdesigner.model;
 
 import org.reactfx.EventStream;
-import org.reactfx.collection.LiveList;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.rule.XPathRule;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ObservableTickList;
 
 
 /**
@@ -61,14 +61,27 @@ public class ObservableXPathRuleBuilder extends ObservableRuleBuilder {
     }
 
 
+    @Override
+    protected ObservableRuleBuilder newBuilder() {
+        return new ObservableXPathRuleBuilder();
+    }
+
+    @Override
+    public ObservableXPathRuleBuilder deepCopy() {
+        ObservableXPathRuleBuilder copy = (ObservableXPathRuleBuilder) super.deepCopy();
+        copy.setXpathExpression(getXpathExpression());
+        copy.setXpathVersion(getXpathVersion());
+        return copy;
+    }
+
     /**
      * Pushes an event every time the rule needs to be re-evaluated.
      */
     public EventStream<?> modificationsTicks() {
         return languageProperty().values()
-                             .or(xpathVersion.values())
-                             .or(xpathExpression.values())
-                             .or(rulePropertiesProperty().values().flatMap(LiveList::changesOf));
+                                 .or(xpathVersion.values())
+                                 .or(xpathExpression.values())
+                                 .or(rulePropertiesProperty().values().flatMap(lst -> new ObservableTickList<>(lst, PropertyDescriptorSpec::modificationTicks).quasiChanges()));
     }
 
     // TODO: Once the xpath expression changes, we'll need to rebuild the rule

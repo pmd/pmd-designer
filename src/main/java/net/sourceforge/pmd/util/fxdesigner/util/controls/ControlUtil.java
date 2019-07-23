@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.reactfx.EventStreams;
@@ -12,18 +13,31 @@ import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 
+import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
+
 import com.github.oowekyala.rxstring.ReactfxExtensions;
 import javafx.css.PseudoClass;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.Skin;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.stage.Window;
 import javafx.util.Callback;
@@ -32,6 +46,13 @@ public final class ControlUtil {
 
     private ControlUtil() {
 
+    }
+
+    public static void anchorFirmly(Node node) {
+        AnchorPane.setLeftAnchor(node, 0.);
+        AnchorPane.setRightAnchor(node, 0.);
+        AnchorPane.setBottomAnchor(node, 0.);
+        AnchorPane.setTopAnchor(node, 0.);
     }
 
     /**
@@ -63,6 +84,30 @@ public final class ControlUtil {
     }
 
     /**
+     * Make a list view fit precisely the height of its items.
+     *
+     * @param view            The listview to configure
+     * @param fixedCellHeight The cell height to use, a good default is 24
+     */
+    public static void makeTableViewFitToChildren(TableView<?> view, double fixedCellHeight) {
+        view.setFixedCellSize(fixedCellHeight);
+
+        subscribeOnSkin(view, skin -> {
+
+            Region header = (Region) skin.getNode().lookup(".nested-column-header");
+
+            view.maxHeightProperty().bind(
+                Val.wrap(view.itemsProperty())
+                   .flatMap(LiveList::sizeOf).map(it -> header.prefHeight(-1) + (it == 0 ? fixedCellHeight
+                                                                                         : it * fixedCellHeight + 5))
+            );
+
+            return view.maxHeightProperty()::unbind;
+        });
+
+    }
+
+    /**
      * By default text fields don't show the prompt when the caret is
      * inside the field, even if the text is empty.
      */
@@ -76,9 +121,15 @@ public final class ControlUtil {
 
     }
 
-    public static void registerDoubleClickListener(javafx.scene.Node node, Runnable action) {
+    public static Pane spacerPane() {
+        Pane spacer = new Pane();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        return spacer;
+    }
 
-        node.addEventHandler(
+    public static Subscription registerDoubleClickListener(javafx.scene.Node node, Runnable action) {
+        return ReactfxUtil.addEventHandler(
+            node,
             MouseEvent.MOUSE_CLICKED,
             e -> {
                 if (e.getButton() == MouseButton.PRIMARY
@@ -160,5 +211,14 @@ public final class ControlUtil {
             LiveList.wrapVal(node.skinProperty()),
             (w, i) -> hook.apply(w)
         );
+    }
+
+    public static void copyToClipboardButton(Button button, Supplier<String> copiedText) {
+        button.setOnAction(e -> {
+            final ClipboardContent content = new ClipboardContent();
+            content.putString(copiedText.get());
+            Clipboard.getSystemClipboard().setContent(content);
+            SimplePopups.showActionFeedback(button, AlertType.CONFIRMATION, "Copied to clipboard");
+        });
     }
 }

@@ -157,6 +157,15 @@ public class PropertyDescriptorSpec implements SettingsOwner {
         return toXml();
     }
 
+    public PropertyDescriptorSpec deepCopy() {
+        PropertyDescriptorSpec spec = new PropertyDescriptorSpec();
+        spec.setName(getName());
+        spec.setValue(getValue());
+        spec.setDescription(getDescription());
+        spec.setTypeId(getTypeId());
+        return spec;
+    }
+
 
     /**
      * Builds the descriptor. May throw IllegalArgumentException.

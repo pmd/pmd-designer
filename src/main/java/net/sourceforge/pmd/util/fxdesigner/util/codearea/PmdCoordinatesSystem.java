@@ -4,11 +4,13 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.codearea;
 
+import static java.lang.Integer.parseInt;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static net.sourceforge.pmd.util.fxdesigner.util.AstTraversalUtil.parentIterator;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.toIterable;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,8 +26,8 @@ import net.sourceforge.pmd.lang.ast.Node;
  * Maps PMD's (line, column) coordinate system to and from the code
  * area's one-dimensional (absolute offset-based) system.
  *
- * @since 6.13.0
  * @author Clément Fournier
+ * @since 6.13.0
  */
 public final class PmdCoordinatesSystem {
 
@@ -204,8 +206,18 @@ public final class PmdCoordinatesSystem {
         return new TextRange(startPosition(node), endPosition(node));
     }
 
+    /**
+     * Returns a {@link TextPos2D} that uses its coordinates as begin
+     * and end offset of the [node] in the [area].
+     */
+    public static TextPos2D rtfxRangeOf(Node node, CodeArea area) {
+        return new TextPos2D(
+            getOffsetFromPmdPosition(area, node.getBeginLine(), node.getBeginColumn()),
+            getOffsetFromPmdPosition(area, node.getEndLine(), node.getEndColumn())
+        );
+    }
 
-    public static final class TextRange {
+    public static final class TextRange implements Serializable {
 
         public final TextPos2D startPos;
         public final TextPos2D endPos;
@@ -244,7 +256,17 @@ public final class PmdCoordinatesSystem {
 
         @Override
         public String toString() {
-            return "[" + startPos + ", " + endPos + ']';
+            return "[" + startPos + " - " + endPos + ']';
+        }
+
+        public static TextRange fullLine(int line, int lineLength) {
+            return new TextRange(new TextPos2D(line, 0), new TextPos2D(line, lineLength));
+        }
+
+        /** Compatible with {@link #toString()} */
+        public static TextRange fromString(String str) {
+            String[] split = str.split("-");
+            return new TextRange(TextPos2D.fromString(split[0]), TextPos2D.fromString(split[1]));
         }
     }
 
@@ -254,14 +276,12 @@ public final class PmdCoordinatesSystem {
      *
      * @author Clément Fournier
      */
-    public static final class TextPos2D implements Comparable<TextPos2D> {
-
-        public final int line;
-        public final int column;
-
+    public static final class TextPos2D implements Comparable<TextPos2D>, Serializable {
 
         public static final Comparator<TextPos2D> COMPARATOR =
             Comparator.<TextPos2D>comparingInt(o -> o.line).thenComparing(o -> o.column);
+        public final int line;
+        public final int column;
 
 
         public TextPos2D(int line, int column) {
@@ -297,6 +317,12 @@ public final class PmdCoordinatesSystem {
         @Override
         public int compareTo(TextPos2D o) {
             return COMPARATOR.compare(this, o);
+        }
+
+        /** Compatible with {@link #toString()} */
+        public static TextPos2D fromString(String str) {
+            String[] split = str.replaceAll("[^,\\d]", "").split(",");
+            return new TextPos2D(parseInt(split[0]), parseInt(split[1]));
         }
     }
 }

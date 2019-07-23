@@ -16,10 +16,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -30,6 +33,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.commons.lang3.reflect.Typed;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.w3c.dom.Element;
 
 /**
@@ -58,7 +62,7 @@ public class SerializerRegistrar {
 
 
     private static final SerializerRegistrar INSTANCE = new SerializerRegistrar();
-    private static final Pattern PARAM_TYPE_MATCHER = Pattern.compile("(\\w+(?:\\.\\w+)*)(<([^,]*)>)?((?:\\[])*)");
+    private static final Pattern PARAM_TYPE_MATCHER = Pattern.compile("(\\w+(?:[.$]\\w+)*)(<([^,]*)>)?((?:\\[])*)");
 
     // using a map of types obviously doesn't handle subtyping
     private final Map<Type, Serializer<?>> converters = new WeakHashMap<>();
@@ -92,7 +96,6 @@ public class SerializerRegistrar {
         register(stringConversion(Short::valueOf, b -> Short.toString(b)), Short.class, Short.TYPE);
         register(stringConversion(Byte::valueOf, b -> Byte.toString(b)), Byte.class, Byte.TYPE);
         register(stringConversion(s -> s.charAt(0), b -> Character.toString(b)), Character.class, Character.TYPE);
-
 
         registerMapped(Date.class, Long.TYPE, Date::getTime, Date::new);
         registerMapped(java.sql.Time.class, Long.TYPE, java.sql.Time::getTime, java.sql.Time::new);
@@ -140,7 +143,7 @@ public class SerializerRegistrar {
 
             @Override
             public Element toXml(TypedObject<?> typedObject, Supplier<Element> eltFactory) {
-                Serializer<Object> serializer = getSerializer(typedObject.getType());
+                Serializer<Object> serializer = (Serializer<Object>) getSerializer(typedObject.getType());
                 if (serializer == null) {
                     throw new IllegalStateException("No serializer registered for type " + typedObject.getType());
                 }
@@ -165,7 +168,7 @@ public class SerializerRegistrar {
                     throw new IllegalStateException("Unable to parse " + typeStr);
                 }
 
-                Serializer<Object> serializer = getSerializer(type);
+                Serializer<?> serializer = getSerializer(type);
                 if (serializer == null) {
                     throw new IllegalStateException("No serializer registered for type " + type);
                 }
@@ -216,9 +219,10 @@ public class SerializerRegistrar {
      * @return A serializer, or null if none can be found
      */
     @SuppressWarnings("unchecked")
-    public final Serializer<Object> getSerializer(Type genericType) {
+    @Nullable
+    public final Serializer<?> getSerializer(Type genericType) {
         if (converters.containsKey(genericType)) {
-            return (Serializer<Object>) converters.get(genericType);
+            return converters.get(genericType);
         }
 
         if (genericType instanceof Class) {
@@ -230,30 +234,58 @@ public class SerializerRegistrar {
         } else if (genericType instanceof ParameterizedType) {
             Class rawType = (Class) ((ParameterizedType) genericType).getRawType();
 
-
             Type[] actualTypeArguments = ((ParameterizedType) genericType).getActualTypeArguments();
 
-            if (actualTypeArguments.length != 1) {
-                return null;
-            }
-
-            Supplier<Collection<Object>> emptyCollSupplier = null;
-            if (rawType != null && Collection.class.isAssignableFrom(rawType)) {
-                if (List.class.isAssignableFrom(rawType)) {
-                    emptyCollSupplier = ArrayList::new;
-                } else if (Set.class.isAssignableFrom(rawType)) {
-                    emptyCollSupplier = HashSet::new;
+            if (actualTypeArguments.length == 1) {
+                Serializer<?> targSerializer = get1targSerializer(rawType, actualTypeArguments[0]);
+                if (targSerializer != null) {
+                    return targSerializer;
                 }
-            }
-
-            if (emptyCollSupplier != null) {
-                Serializer componentSerializer = getSerializer(actualTypeArguments[0]);
-                if (componentSerializer != null) {
-                    return (Serializer<Object>) componentSerializer.<Collection<Object>>toSeq(emptyCollSupplier);
+            } else if (actualTypeArguments.length == 2) {
+                Serializer<?> targSerializer = get2targSerializer(rawType, actualTypeArguments[0], actualTypeArguments[1]);
+                if (targSerializer != null) {
+                    return targSerializer;
                 }
             }
 
             return getSerializer(rawType);
+        }
+
+        return null;
+    }
+
+    // FIXME the deserializer doesn't handle maps bc of 2 type args
+
+    private Serializer<?> get2targSerializer(Class rawType, Type targ1, Type targ2) {
+        Serializer kSerializer = getSerializer(targ1);
+        Serializer vSerializer = getSerializer(targ2);
+        if (kSerializer != null && vSerializer != null) {
+            if (SortedMap.class.isAssignableFrom(rawType)) {
+                return kSerializer.toMap(TreeMap::new, vSerializer);
+            } else if (Map.class.isAssignableFrom(rawType)) {
+                return kSerializer.toMap(HashMap::new, vSerializer);
+            }
+        }
+
+        return null;
+    }
+
+    private Serializer<?> get1targSerializer(Class rawType, Type targ1) {
+
+        Supplier<Collection<Object>> emptyCollSupplier = null;
+        if (rawType != null && Collection.class.isAssignableFrom(rawType)) {
+            if (List.class.isAssignableFrom(rawType)) {
+                emptyCollSupplier = ArrayList::new;
+            } else if (Set.class.isAssignableFrom(rawType)) {
+                emptyCollSupplier = HashSet::new;
+            }
+        }
+
+        if (emptyCollSupplier != null) {
+            Serializer componentSerializer = getSerializer(targ1);
+            if (componentSerializer != null) {
+                return componentSerializer.<Collection<Object>>toSeq(emptyCollSupplier);
+            }
         }
 
         return null;
@@ -266,7 +298,7 @@ public class SerializerRegistrar {
 
     /**
      * Parses a string into a type. Returns null if it doesn't succeed.
-     * Only supports parameterized types with at most one type argument.
+     * FIXME Only supports parameterized types with at most one type argument.
      * Doesn't support wildcard types.
      *
      * TODO make a real parser someday

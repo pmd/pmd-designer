@@ -6,6 +6,9 @@ package net.sourceforge.pmd.util.fxdesigner.app;
 
 import java.util.function.Supplier;
 
+import org.reactfx.value.Val;
+
+import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
@@ -46,6 +49,14 @@ public interface ApplicationComponent {
 
     default LanguageVersion getGlobalLanguageVersion() {
         return getService(DesignerRoot.AST_MANAGER).languageVersionProperty().getValue();
+    }
+
+
+    /**
+     * The language is now global to the app.
+     */
+    default Val<Language> globalLanguageProperty() {
+        return getService(DesignerRoot.APP_GLOBAL_LANGUAGE);
     }
 
 

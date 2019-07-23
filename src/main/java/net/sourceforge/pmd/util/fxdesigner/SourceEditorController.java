@@ -5,11 +5,9 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import static java.util.Collections.emptyList;
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.mapToggleGroupToUserData;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExceptionMessage;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguageVersion;
-import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguageVersions;
-import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
+import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.latestValue;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,12 +16,20 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.controlsfx.control.PopOver;
+import org.reactfx.Subscription;
+import org.reactfx.collection.LiveArrayList;
+import org.reactfx.collection.LiveList;
+import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.ClasspathClassLoader;
@@ -31,21 +37,34 @@ import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManagerImpl;
+import net.sourceforge.pmd.util.fxdesigner.app.services.TestCreatorService;
+import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
+import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
+import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.DragAndDropUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeParentageCrumbBar;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.PopOverWrapper;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyMapView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.ViolationCollectionView;
+import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
-import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.AnchorPane;
 
 
 /**
@@ -58,6 +77,14 @@ import javafx.scene.control.ToggleGroup;
  */
 public class SourceEditorController extends AbstractController {
 
+    /**
+     * When no user-defined test case is loaded, then this is where
+     * source changes end up. It's persisted between runs, independently
+     * of other test cases.
+     */
+    private final LiveTestCase defaultTestCase = new LiveTestCase();
+    /** Contains the loaded *user-defined* test case. */
+    private final SuspendableVar<LiveTestCase> currentlyOpenTestCase = Var.suspendable(Var.newSimpleVar(null));
     private static final Duration AST_REFRESH_DELAY = Duration.ofMillis(100);
     private final ASTManager astManager;
     private final Var<List<File>> auxclasspathFiles = Var.newSimpleVar(emptyList());
@@ -73,6 +100,16 @@ public class SourceEditorController extends AbstractController {
     @FXML
     private Button searchButton;
     @FXML
+    private DynamicWidthChoicebox<LanguageVersion> languageVersionChoicebox;
+    @FXML
+    private ToolbarTitledPane testCaseToolsTitledPane;
+    @FXML
+    private Button violationsButton;
+    @FXML
+    private Button propertiesMapButton;
+
+
+    @FXML
     private ToolbarTitledPane astTitledPane;
     @FXML
     private ToolbarTitledPane editorTitledPane;
@@ -85,7 +122,8 @@ public class SourceEditorController extends AbstractController {
     @FXML
     private NodeParentageCrumbBar focusNodeParentageCrumbBar;
 
-
+    private final PopOverWrapper<LiveTestCase> violationsPopover;
+    private final PopOverWrapper<LiveTestCase> propertiesPopover;
 
     private Var<LanguageVersion> languageVersionUIProperty;
 
@@ -95,27 +133,58 @@ public class SourceEditorController extends AbstractController {
         this.astManager = new ASTManagerImpl(designerRoot);
 
         designerRoot.registerService(DesignerRoot.AST_MANAGER, astManager);
+
+        violationsPopover = new PopOverWrapper<>(this::rebindPopover);
+        propertiesPopover = new PopOverWrapper<>(this::rebindPropertiesPopover);
     }
 
+    private PopOver rebindPopover(LiveTestCase testCase, PopOver existing) {
+        if (testCase == null && existing != null) {
+            existing.hide();
+            return existing;
+        }
+
+        if (testCase != null) {
+            if (existing == null) {
+                return ViolationCollectionView.makePopOver(testCase, getDesignerRoot());
+            } else {
+                ViolationCollectionView view = (ViolationCollectionView) existing.getUserData();
+                view.setItems(testCase.getExpectedViolations());
+                return existing;
+            }
+        }
+        return null;
+    }
+
+    private PopOver rebindPropertiesPopover(LiveTestCase testCase, PopOver existing) {
+        if (testCase == null && existing != null) {
+            existing.hide();
+            PropertyMapView view = (PropertyMapView) existing.getUserData();
+            view.unbind();
+            return existing;
+        }
+
+        if (testCase != null) {
+            if (existing == null) {
+                return PropertyMapView.makePopOver(testCase, getDesignerRoot());
+            } else {
+                PropertyMapView view = (PropertyMapView) existing.getUserData();
+                view.unbind();
+                view.bind(testCase);
+                return existing;
+            }
+        }
+        return null;
+    }
 
     @Override
     protected void beforeParentInit() {
-        initializeLanguageSelector(); // languageVersionProperty() must be initialized
-
-        languageVersionProperty().values()
-                                 .filterMap(Objects::nonNull, LanguageVersion::getLanguage)
-                                 .distinct()
-                                 .subscribe(nodeEditionCodeArea::updateSyntaxHighlighter);
-
-        languageVersionProperty().values()
-                                 .filter(Objects::nonNull)
-                                 .map(LanguageVersion::getShortName)
-                                 .map(lang -> "Source Code (" + lang + ")")
-                                 .subscribe(editorTitledPane::setTitle);
 
         astManager.languageVersionProperty()
-                  .changes()
-                  .subscribe(c -> astTreeView.setAstRoot(null));
+                  .map(LanguageVersion::getLanguage)
+                  .values()
+                  .filter(Objects::nonNull)
+                  .subscribe(nodeEditionCodeArea::updateSyntaxHighlighter);
 
         ((ASTManagerImpl) astManager).classLoaderProperty().bind(auxclasspathClassLoader);
 
@@ -123,26 +192,132 @@ public class SourceEditorController extends AbstractController {
         setText(getDefaultText());
 
         searchButton.setOnAction(e -> astTreeView.focusSearchField());
+
+        TestCreatorService creatorService = getService(DesignerRoot.TEST_CREATOR);
+
+        creatorService.getSourceFetchRequests()
+                      .messageStream(true, this)
+                      .subscribe(tick -> creatorService.getAdditionRequests().pushEvent(this, currentlyOpenTestCase.getOrElse(defaultTestCase).deepCopy()));
+
+        propertiesMapButton.setOnAction(e -> propertiesPopover.showOrFocus(p -> p.show(propertiesMapButton)));
+        violationsButton.setOnAction(e -> violationsPopover.showOrFocus(p -> p.show(violationsButton)));
+
+        violationsButton.textProperty().bind(
+            currentlyOpenTestCase.flatMap(it -> it.getExpectedViolations().sizeProperty())
+                                 .map(it -> "Expected violations (" + it + ")")
+                                 .orElseConst("Expected violations")
+        );
+
+        propertiesMapButton.disableProperty().bind(
+            currentlyOpenTestCase.flatMap(LiveTestCase::ruleProperty)
+                                 .map(ObservableRuleBuilder::getRuleProperties)
+                                 .flatMap(LiveList::sizeProperty)
+                                 .map(it -> it == 0)
+                                 .orElseConst(false)
+        );
+
+        DragAndDropUtil.registerAsNodeDragTarget(
+            violationsButton,
+            range -> {
+                LiveViolationRecord record = new LiveViolationRecord();
+                record.setRange(range);
+                record.setExactRange(true);
+                SimplePopups.showActionFeedback(violationsButton, AlertType.CONFIRMATION, "Violation added");
+                currentlyOpenTestCase.ifPresent(v -> v.getExpectedViolations().add(record));
+            }, getDesignerRoot());
+
+        currentlyOpenTestCase.orElseConst(defaultTestCase)
+                             .changes()
+                             .subscribe(it -> handleTestOpenRequest(it.getOldValue(), it.getNewValue()));
+
+        currentlyOpenTestCase.values().subscribe(test -> {
+            violationsPopover.rebind(test);
+            propertiesPopover.rebind(test);
+        });
+
     }
 
     @Override
     public void afterParentInit() {
+        initializeLanguageSelector();
 
-        rewire(((ASTManagerImpl) astManager).languageVersionProperty(), languageVersionUIProperty);
+        // languageVersionUiProperty is initialised
 
-        nodeEditionCodeArea.replaceText(astManager.getSourceCode());
+        ((ASTManagerImpl) astManager).languageVersionProperty().bind(languageVersionUIProperty.orElse(globalLanguageProperty().map(Language::getDefaultVersion)));
 
-        nodeEditionCodeArea.plainTextChanges()
-                           .successionEnds(AST_REFRESH_DELAY)
-                           .map(it -> nodeEditionCodeArea.getText())
-                           .subscribe(((ASTManagerImpl) astManager)::setSourceCode);
+        handleTestOpenRequest(defaultTestCase, defaultTestCase);
+
+
+        Var<String> areaText = Var.fromVal(
+            latestValue(nodeEditionCodeArea.plainTextChanges()
+                                           .successionEnds(AST_REFRESH_DELAY)
+                                           .map(it -> nodeEditionCodeArea.getText())),
+            text -> nodeEditionCodeArea.replaceText(text)
+        );
+
+        areaText.bindBidirectional(astManager.sourceCodeProperty());
 
 
         nodeEditionCodeArea.moveCaret(0, 0);
 
+        editorTitledPane.errorTypeProperty().setValue("Syntax error");
         initTreeView(astManager, astTreeView, editorTitledPane.errorMessageProperty());
 
         getDesignerRoot().registerService(DesignerRoot.RICH_TEXT_MAPPER, nodeEditionCodeArea);
+
+        getService(DesignerRoot.TEST_LOADER)
+            .messageStream(true, this)
+            .subscribe(currentlyOpenTestCase::setValue);
+
+
+        // this is to hide the toolbar when we're not in test case mode
+        currentlyOpenTestCase.map(it -> true).orElseConst(false)
+                             .values().distinct()
+                             .subscribe(this::toggleTestEditMode);
+
+    }
+
+    private void toggleTestEditMode(boolean isTestCaseMode) {
+        if (isTestCaseMode) {
+            AnchorPane pane = emptyPane();
+            editorTitledPane.setContent(pane);
+
+            AnchorPane otherPane = emptyPane();
+            testCaseToolsTitledPane.setContent(otherPane);
+
+            otherPane.getChildren().addAll(nodeEditionCodeArea);
+            pane.getChildren().addAll(testCaseToolsTitledPane);
+        } else {
+            AnchorPane otherPane = emptyPane();
+            editorTitledPane.setContent(otherPane);
+            otherPane.getChildren().addAll(nodeEditionCodeArea);
+        }
+    }
+
+    private static AnchorPane emptyPane() {
+        AnchorPane pane = new AnchorPane();
+        pane.setPadding(Insets.EMPTY);
+        return pane;
+    }
+
+    private void handleTestOpenRequest(@NonNull LiveTestCase oldValue, @NonNull LiveTestCase newValue) {
+        oldValue.commitChanges();
+
+        if (!newValue.getSource().equals(nodeEditionCodeArea.getText())) {
+            nodeEditionCodeArea.replaceText(newValue.getSource());
+        }
+
+        if (newValue.getLanguageVersion() == null) {
+            newValue.setLanguageVersion(globalLanguageProperty().getValue().getDefaultVersion());
+        }
+
+        Subscription sub = Subscription.multi(
+            ReactfxUtil.rewireInit(newValue.sourceProperty(), astManager.sourceCodeProperty()),
+            ReactfxUtil.rewireInit(newValue.languageVersionProperty(), languageVersionUIProperty),
+            () -> propertiesPopover.rebind(null)
+        );
+
+        newValue.addCommitHandler(t -> sub.unsubscribe());
     }
 
 
@@ -175,29 +350,27 @@ public class SourceEditorController extends AbstractController {
     }
 
 
-
     private void initializeLanguageSelector() {
 
-        ToggleGroup languageToggleGroup = new ToggleGroup();
+        languageVersionChoicebox.setConverter(DesignerUtil.stringConverter(LanguageVersion::getName, LanguageRegistryUtil::getLanguageVersionByName));
 
-        getSupportedLanguageVersions()
-                    .stream()
-                    .sorted(LanguageVersion::compareTo)
-                    .map(lv -> {
-                        RadioMenuItem item = new RadioMenuItem(lv.getShortName());
-                        item.setUserData(lv);
-                        return item;
-                    })
-                    .forEach(item -> {
-                        languageToggleGroup.getToggles().add(item);
-                        languageSelectionMenuButton.getItems().add(item);
-                    });
+        getService(DesignerRoot.APP_GLOBAL_LANGUAGE)
+            .values()
+            .filter(Objects::nonNull)
+            .subscribe(lang -> {
+                languageVersionChoicebox.setItems(lang.getVersions().stream().sorted().collect(Collectors.toCollection(LiveArrayList::new)));
+                languageVersionChoicebox.getSelectionModel().select(lang.getDefaultVersion());
+                boolean disable = lang.getVersions().size() == 1;
 
-        languageVersionUIProperty = mapToggleGroupToUserData(languageToggleGroup, LanguageRegistryUtil::defaultLanguageVersion);
+                languageVersionChoicebox.setVisible(!disable);
+                languageVersionChoicebox.setManaged(!disable);
+            });
+
+
+        languageVersionUIProperty = Var.suspendable(languageVersionChoicebox.valueProperty());
         // this will be overwritten by property restore if needed
         languageVersionUIProperty.setValue(defaultLanguageVersion());
     }
-
 
 
     public void showAuxclasspathSetupPopup() {
@@ -258,13 +431,14 @@ public class SourceEditorController extends AbstractController {
 
     @Override
     public List<? extends SettingsOwner> getChildrenSettingsNodes() {
-        return Collections.singletonList(astManager);
+        return Collections.singletonList(defaultTestCase);
     }
 
     @Override
     public String getDebugName() {
         return "editor";
     }
+
 
     /**
      * Refreshes the AST and returns the new compilation unit if the parse didn't fail.

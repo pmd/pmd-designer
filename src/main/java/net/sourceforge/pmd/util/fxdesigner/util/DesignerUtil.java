@@ -90,12 +90,21 @@ public final class DesignerUtil {
     /**
      * Gets the URL to an fxml file from its simple name.
      *
-     * @param simpleName Simple name of the file, i.e. with no directory prefixes (with extension)
+     * @param simpleName Simple name of the file, i.e. with no directory prefixes or extension
      *
      * @return A URL to an fxml file
      */
     public static URL getFxml(String simpleName) {
-        return DesignerUtil.class.getResource("/net/sourceforge/pmd/util/fxdesigner/fxml/" + simpleName);
+        return getResource("fxml/" + simpleName + ".fxml");
+    }
+
+    /**
+     * Gets the URL to a file from its simple name.
+     *
+     * @return A URL to a file
+     */
+    public static URL getResource(String resRelativeToDesignerDir) {
+        return DesignerUtil.class.getResource("/net/sourceforge/pmd/util/fxdesigner/" + resRelativeToDesignerDir);
     }
 
     /**
@@ -106,7 +115,7 @@ public final class DesignerUtil {
      * @return A URL to a css file
      */
     public static URL getCss(String simpleName) {
-        return DesignerUtil.class.getResource("/net/sourceforge/pmd/util/fxdesigner/css/" + simpleName + ".css");
+        return getResource("css/" + simpleName + ".css");
     }
 
     public static void addCustomStyleSheets(Parent target, String... styleSheetSimpleName) {

@@ -2,6 +2,7 @@
   <configuration default="false" name="Designer (JRE 9)" type="Application" factoryName="Application">
     <option name="ALTERNATIVE_JRE_PATH" value="9.0" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
     <option name="MAIN_CLASS_NAME" value="net.sourceforge.pmd.util.fxdesigner.DesignerStarter" />
     <module name="pmd-ui" />
     <option name="PROGRAM_PARAMETERS" value="-v" />

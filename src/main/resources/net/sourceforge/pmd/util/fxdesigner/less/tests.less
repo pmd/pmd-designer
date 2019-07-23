@@ -1,0 +1,93 @@
+/*
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
+@import "constants";
+
+.test-statuses(@stack, @back) {
+
+  .foreach-l(@stack, {
+
+    @name: extract(@test-status-class-names, @i);
+    @col: extract(@stack, @i);
+
+    &.@{name}:filled {
+
+      .status-label {
+        -fx-background-color: white;
+        -fx-background-radius: 12;
+      }
+
+      .test-status {
+        -fx-fill: @col;
+      }
+
+      &:loaded-test {
+        -fx-background-color: linear-gradient(to left, fade(@col, 60%) 0%, @back 30%);
+      }
+    }
+
+  });
+}
+
+@test-status-class-names: status-pass, status-fail, status-error, status-unknown;
+@normal-test-status-stack: @success-color, @warning-color, @error-color, gray;
+@test-status-on-gray-stack: lighten(@success-color, 60%), @warning-color, @error-color, gray;
+
+
+
+.list-view:focused .list-cell:selected {
+  .test-statuses(@normal-test-status-stack, @selection-focus-color);
+}
+
+.list-cell:selected {
+  .test-statuses(@normal-test-status-stack, @selection-no-focus-color);
+}
+
+.list-cell {
+  .test-statuses(@normal-test-status-stack, -fx-background); // -fx-background changes when cell is odd/even
+}
+
+
+.list-cell:selected,
+.list-cell:focused {
+  .test-status {
+    -fx-fill: white;
+  }
+}
+
+.list-cell.test-status:filled:loaded-test {
+  .toggle-button.load-button:hover {
+    -fx-background-color: white;
+    .ikonli-font-icon {
+      -fx-fill: @fx-text-fill;
+    }
+  }
+}
+
+
+.button.node-drag-over, .button:node-drag-possible-target {
+
+  @fxcolor: derive(@selection-focus-color, +10%);
+  @darker: @darker-accent-border;
+  //-fx-border-color: @fxcolor;
+  //-fx-border-style: solid;
+  //-fx-border-width: 4;
+
+  @grad: linear-gradient(to bottom, derive(@fxcolor, -30%) 0%, derive(@fxcolor, -18%) 20%, derive(@fxcolor, -16%) 50%);
+
+  -fx-background-color: -fx-shadow-highlight-color, linear-gradient(to bottom, derive(@darker, -20%), @darker), @grad;
+
+  -fx-background-insets: 0 0 -1 0, 0, 1;
+  -fx-background-radius: 4, 3, 3;
+
+  -fx-text-fill: white;
+}
+
+
+.expected-violation-list-cell {
+  .line-label {
+    -fx-padding: 0 10 0 0;
+  }
+}
+

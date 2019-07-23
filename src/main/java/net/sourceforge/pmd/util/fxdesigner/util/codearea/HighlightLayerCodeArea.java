@@ -15,11 +15,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fxmisc.richtext.model.StyleSpans;
 
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea.LayerId;
 
+import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.scene.control.IndexRange;
 
@@ -95,20 +98,21 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
      * @param update Update to carry out
      */
     private void updateStyling(Runnable update) {
-        update.run();
-
-        try {
-            this.setStyleSpans(0, recomputePainting());
-        } catch (Exception e) {
-            // we ignore these particular exceptions because they're
-            // commonly thrown when the text is being edited while
-            // the layering algorithm runs, and it doesn't matter
-            if ("StyleSpan's length cannot be negative".equals(e.getMessage())
+        Platform.runLater(() -> {
+            update.run();
+            try {
+                this.setStyleSpans(0, recomputePainting());
+            } catch (Exception e) {
+                // we ignore these particular exceptions because they're
+                // commonly thrown when the text is being edited while
+                // the layering algorithm runs, and it doesn't matter
+                if ("StyleSpan's length cannot be negative".equals(e.getMessage())
                     || e.getMessage().contains("is not a valid range within")) {
-                return;
+                    return;
+                }
+                throw new RuntimeException("Unhandled error while recomputing the styling", e);
             }
-            throw new RuntimeException("Unhandled error while recomputing the styling", e);
-        }
+        });
     }
 
 
@@ -176,11 +180,12 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
      * parsing update.
      */
     @Override
-    protected final StyleSpans<Collection<String>> styleSyntaxHighlightChange(final Optional<StyleSpans<Collection<String>>> oldSyntax,
-                                                                              final StyleSpans<Collection<String>> newSyntax) {
+    @NonNull
+    protected final StyleSpans<Collection<String>> styleSyntaxHighlightChange(final @Nullable StyleSpans<Collection<String>> oldSyntax,
+                                                                              final @Nullable StyleSpans<Collection<String>> newSyntax) {
 
         StyleSpans<Collection<String>> currentSpans = getStyleSpans(new IndexRange(0, getLength()));
-        StyleSpans<Collection<String>> base = oldSyntax.map(s -> subtract(currentSpans, s)).orElse(currentSpans);
+        StyleSpans<Collection<String>> base = Optional.ofNullable(oldSyntax).map(s -> subtract(currentSpans, s)).orElse(currentSpans);
 
         return Optional.ofNullable(newSyntax)
                        .map(s -> base.overlay(s, SyntaxHighlightingCodeArea::additiveOverlay))

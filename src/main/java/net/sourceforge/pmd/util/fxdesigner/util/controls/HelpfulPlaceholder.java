@@ -81,6 +81,7 @@ public class HelpfulPlaceholder extends HBox {
         public PlaceHolderBuilder withSuggestedAction(String message, Runnable action) {
             Hyperlink hyperlink = new Hyperlink(message);
             hyperlink.setOnAction(e -> action.run());
+            myActions.add(hyperlink);
             return this;
         }
 

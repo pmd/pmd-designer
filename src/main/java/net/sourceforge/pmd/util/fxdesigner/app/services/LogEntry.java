@@ -139,6 +139,9 @@ public final class LogEntry implements Comparable<LogEntry> {
         SYMBOL_FACADE_EXCEPTION("Symbol façade exception"),
         XPATH_EVALUATION_EXCEPTION("XPath evaluation exception"),
 
+        TEST_LOADING_EXCEPTION("XML test loader exception"),
+        TEST_EXPORT_EXCEPTION("XML test export exception"),
+
         // These are "flag" categories that signal that previous exceptions
         // thrown during code or XPath edition may be discarded as uninteresting
         // When in developer mode they're pushed to the event log too
@@ -150,7 +153,9 @@ public final class LogEntry implements Comparable<LogEntry> {
         INTERNAL("Internal event", CategoryType.INTERNAL),
         SERVICE_REGISTERING("Service registered", CategoryType.INTERNAL),
         RESOURCE_MANAGEMENT("Resource manager", CategoryType.INTERNAL),
-        SELECTION_EVENT_TRACING("Selection event", CategoryType.INTERNAL);
+        SELECTION_EVENT_TRACING("Selection event", CategoryType.INTERNAL),
+        XPATH_EVENT_FORWARDING("XPath update", CategoryType.INTERNAL),
+        TEST_LOADING_EVENT("Test loading request", CategoryType.INTERNAL);
 
         public final String name;
         private final CategoryType type;

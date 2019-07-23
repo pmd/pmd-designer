@@ -118,7 +118,7 @@ public abstract class AbstractController implements Initializable, SettingsOwner
     }
 
 
-    protected List<? extends AbstractController> getChildren() {
+    public List<AbstractController> getChildren() {
         return Collections.emptyList();
     }
 }

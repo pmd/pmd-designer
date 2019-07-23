@@ -101,7 +101,7 @@ public class XmlInterfaceImpl extends XmlInterface {
             TypedObject<?> value = serializer.fromXml(getChildrenByTagName(propertyElement, SCHEMA_PROPERTY_VALUE).get(0));
             owner.addProperty(name, value.getObject(), value.getType());
         } catch (Exception e) {
-            new RuntimeException(e).printStackTrace();
+            new RuntimeException("Cannot parse property ", e).printStackTrace();
         }
     }
 

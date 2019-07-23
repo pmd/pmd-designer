@@ -9,6 +9,7 @@ import static net.sourceforge.pmd.util.fxdesigner.util.DumpUtil.dumpToSubtreeTes
 import java.util.function.Consumer;
 
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.SearchableTreeView.SearchableTreeCell;
 
 import javafx.scene.control.ContextMenu;
@@ -30,10 +31,12 @@ import javafx.scene.input.MouseEvent;
  */
 public class ASTTreeCell extends SearchableTreeCell<Node> {
 
+    private final DesignerRoot root;
     private final Consumer<Node> onNodeItemSelected;
 
 
-    public ASTTreeCell(Consumer<Node> clickHandler) {
+    public ASTTreeCell(DesignerRoot root, Consumer<Node> clickHandler) {
+        this.root = root;
         this.onNodeItemSelected = clickHandler;
     }
 
@@ -61,6 +64,8 @@ public class ASTTreeCell extends SearchableTreeCell<Node> {
     @Override
     public void commonUpdate(Node item) {
         setContextMenu(buildContextMenu(item));
+
+        DragAndDropUtil.registerAsNodeDragSource(this, item, root);
 
         // Reclicking the selected node in the ast will scroll back to the node in the editor
         this.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {

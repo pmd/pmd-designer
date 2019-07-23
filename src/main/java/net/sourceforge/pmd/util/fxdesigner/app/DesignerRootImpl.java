@@ -17,6 +17,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.GlobalDiskManagerImpl;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.services.OnDiskPersistenceManager;
+import net.sourceforge.pmd.util.fxdesigner.app.services.TestCreatorService;
 
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -59,6 +60,10 @@ public final class DesignerRootImpl implements DesignerRoot {
 
         registerService(PERSISTENCE_MANAGER, new OnDiskPersistenceManager(this, params.getPersistedInputFile(), params.getPersistedOutputFile()));
         registerService(NODE_SELECTION_CHANNEL, new MessageChannel<>(Category.SELECTION_EVENT_TRACING));
+        registerService(LATEST_XPATH, new MessageChannel<>(Category.SELECTION_EVENT_TRACING));
+        registerService(TEST_LOADER, new MessageChannel<>(Category.TEST_LOADING_EVENT));
+        registerService(TEST_CREATOR, new TestCreatorService());
+        registerService(IS_NODE_BEING_DRAGGED, Var.newSimpleVar(false));
     }
 
 

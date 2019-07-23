@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -72,6 +74,74 @@ public interface Serializer<T> {
         return
             this.<List<T>>toSeq(ArrayList::new)
                 .map(l -> l.toArray(emptyArray), Arrays::asList).nullable();
+    }
+
+
+    /**
+     * Builds a new serializer that can serialize maps with key type {@code <T>}.
+     *
+     * @param emptyMapSupplier Supplier for a collection of the correct
+     *                         type, to which the deserialized elements
+     *                         are added.
+     * @param <M>              Map type to serialize
+     *
+     * @return A new serializer
+     */
+    default <V, M extends Map<T, V>> Serializer<M> toMap(Supplier<M> emptyMapSupplier, Serializer<V> valueSerializer) {
+
+        Serializer<T> nullableKey = nullable();
+        Serializer<V> nullableValue = valueSerializer.nullable();
+
+        class MyDecorator implements Serializer<M> {
+
+            @Override
+            public Element toXml(M c, Supplier<Element> eltFactory) {
+                Element mapRoot = eltFactory.get();
+                c.forEach((t, v) -> {
+                    Element entry = eltFactory.get();
+                    entry.appendChild(nullableKey.toXml(t, eltFactory));
+                    entry.appendChild(nullableValue.toXml(v, eltFactory));
+                    mapRoot.appendChild(entry);
+                });
+                return mapRoot;
+            }
+
+            private @Nullable Element getChild(Element parent, int idx) {
+                NodeList children = parent.getChildNodes();
+                for (int i = 0; i < children.getLength(); i++) {
+                    Node item = children.item(i);
+                    if (item.getNodeType() == Node.ELEMENT_NODE) {
+                        if (idx == 0) {
+                            return (Element) item;
+                        }
+                        idx--;
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public M fromXml(Element element) {
+                M result = emptyMapSupplier.get();
+
+                NodeList children = element.getChildNodes();
+                for (int i = 0; i < children.getLength(); i++) {
+                    Node item = children.item(i);
+                    if (item.getNodeType() == Element.ELEMENT_NODE) {
+                        Element entry = (Element) item;
+                        Element key = getChild(entry, 0);
+                        Element value = getChild(entry, 1);
+                        if (key != null && value != null) {
+                            result.put(nullableKey.fromXml(key), nullableValue.fromXml(value));
+                        }
+                    }
+                }
+
+                return result;
+            }
+        }
+
+        return new MyDecorator().nullable();
     }
 
 

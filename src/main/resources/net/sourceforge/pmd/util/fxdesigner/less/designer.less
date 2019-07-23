@@ -17,32 +17,6 @@
 
 }
 
-@removal-color-stack: fade(red, 15), fade(yellow, 15), fade(yellow, 5),;
-
-
-.removal-level-mixin(@selection-color) {
-  .tree-cell {
-    &.removal-level {
-      @foreach-i: {
-        @color: extract(@removal-color-stack, @i + 1);
-        -fx-background-color: @color; &:focused {
-          -fx-background-color: linear-gradient(to right, @color 0%, @selection-color 50%);
-        }
-      };
-
-      .make-depth-classes(length(@removal-color-stack) - 1, @foreach-i);
-    }
-  }
-}
-
-.ast-tree-view {
-  .removal-level-mixin(@darker-accent-border);
-
-  &:focused {
-    .removal-level-mixin(@selection-focus-color);
-  }
-}
-
 .tree-cell.ast-parent {
 
   @foreach-i: { -fx-background-color: linear-gradient(to right, fade(@selection-focus-color, percentage(1- (@i / 5))) 0%, darken(white, 5%) 10%); };
@@ -257,7 +231,85 @@
 }
 
 
-@import "tabs";
-@import "scrolling";
-@import "popover";
-//@import "flat";
+.action-feedback {
+  -fx-background-color: lighten(@app-base-color, 5%);
+  -fx-background-radius: 4px;
+
+
+  .setColor(@col) {
+    -fx-text-fill: @col;
+    -fx-fill: @col;
+  }
+
+  &.confirmation * {
+    .setColor(@success-color);
+  }
+
+  &.error * {
+    .setColor(@error-color);
+  }
+
+  &.warning * {
+    .setColor(@warning-color);
+  }
+
+  &.information * {
+    .setColor(darken(@selection-focus-color, 10%));
+  }
+
+  .label {
+    -fx-padding: 3 5 3 5;
+  }
+}
+
+.tooltip {
+  -fx-show-delay: 150ms;
+}
+
+.menu-item, .menu {
+  &:hover, &:focused, &:showing {
+    -fx-background-color: @selection-focus-color;
+  }
+}
+
+.menu-item > .label > .ikonli-font-icon {
+    -fx-fill: @fx-text-fill;
+}
+
+.menu-item:hover > .label > .ikonli-font-icon {
+    -fx-fill: white;
+}
+
+.menu:disabled > .label > .label-menu {
+    -fx-opacity: 1;
+}
+
+.menu:disabled:hover * {
+    -fx-background-color: transparent;
+}
+
+.menu-bar {
+
+  .menu .choice-box {
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+
+  }
+
+  .menu-button:hover .choice-box > .label {
+    -fx-text-fill: white;
+  }
+
+}
+
+.list-cell > .text-field {
+  -fx-pref-height: 20;
+  -fx-padding: 2 4 2 6;
+}
+
+// For some reason including the Less files for these stylesheets
+// makes the compilation of this file run out of memory
+@import "../css/tabs.css";
+@import "../css/scrolling.css";
+@import "../css/tests.css";
+@import "../css/popover.css";
