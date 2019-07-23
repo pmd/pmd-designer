@@ -36,7 +36,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox;
 
-import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.fxml.FXML;
@@ -140,8 +139,8 @@ public class MainDesignerController extends AbstractController {
         saveMenuItem.setOnAction(e -> getService(DesignerRoot.PERSISTENCE_MANAGER).persistSettings(this));
         fileMenu.setOnShowing(e -> onFileMenuShowing());
         aboutMenuItem.setOnAction(e -> SimplePopups.showAboutPopup(getDesignerRoot()));
-        docMenuItem.setOnAction(e-> getService(DesignerRoot.HOST_SERVICES).showDocument(DesignerUtil.DESIGNER_DOC_URL));
-        reportIssueMenuItem.setOnAction(e-> getService(DesignerRoot.HOST_SERVICES).showDocument(DesignerUtil.DESIGNER_NEW_ISSUE_URL));
+        docMenuItem.setOnAction(e -> getService(DesignerRoot.HOST_SERVICES).showDocument(DesignerUtil.DESIGNER_DOC_URL));
+        reportIssueMenuItem.setOnAction(e -> getService(DesignerRoot.HOST_SERVICES).showDocument(DesignerUtil.DESIGNER_NEW_ISSUE_URL));
         setupAuxclasspathMenuItem.setOnAction(e -> sourceEditorController.showAuxclasspathSetupPopup());
 
         openEventLogMenuItem.setOnAction(e -> {
