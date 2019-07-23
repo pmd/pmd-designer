@@ -36,6 +36,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox;
 
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.fxml.FXML;
@@ -61,26 +62,32 @@ import javafx.stage.FileChooser;
 public class MainDesignerController extends AbstractController {
 
 
-
     /* Menu bar */
+    // help
     @FXML
     private MenuItem aboutMenuItem;
+    @FXML
+    private MenuItem reportIssueMenuItem;
+    @FXML
+    private MenuItem docMenuItem;
+    @FXML
+    private MenuItem licenseMenuItem;
+
+    // view
     @FXML
     private MenuItem setupAuxclasspathMenuItem;
     @FXML
     public MenuItem openEventLogMenuItem;
+
+    // file
+    @FXML
+    private Menu fileMenu;
     @FXML
     private MenuItem openFileMenuItem;
     @FXML
     private MenuItem saveMenuItem;
     @FXML
-    private MenuItem licenseMenuItem;
-    @FXML
     private Menu openRecentMenu;
-    @FXML
-    private Menu fileMenu;
-
-    private final Var<Language> globalLanguage = Var.newSimpleVar(LanguageRegistry.getDefaultLanguage());
 
     /* Bottom panel */
     @FXML
@@ -102,6 +109,8 @@ public class MainDesignerController extends AbstractController {
     @FXML
     private ScopesPanelController scopesPanelController;
 
+
+    private final Var<Language> globalLanguage = Var.newSimpleVar(LanguageRegistry.getDefaultLanguage());
 
     // we cache it but if it's not used the FXML is not created, etc
     private final SoftReferenceCache<EventLogController> eventLogController;
@@ -131,6 +140,8 @@ public class MainDesignerController extends AbstractController {
         saveMenuItem.setOnAction(e -> getService(DesignerRoot.PERSISTENCE_MANAGER).persistSettings(this));
         fileMenu.setOnShowing(e -> onFileMenuShowing());
         aboutMenuItem.setOnAction(e -> SimplePopups.showAboutPopup(getDesignerRoot()));
+        docMenuItem.setOnAction(e-> getService(DesignerRoot.HOST_SERVICES).showDocument(DesignerUtil.DESIGNER_DOC_URL));
+        reportIssueMenuItem.setOnAction(e-> getService(DesignerRoot.HOST_SERVICES).showDocument(DesignerUtil.DESIGNER_NEW_ISSUE_URL));
         setupAuxclasspathMenuItem.setOnAction(e -> sourceEditorController.showAuxclasspathSetupPopup());
 
         openEventLogMenuItem.setOnAction(e -> {

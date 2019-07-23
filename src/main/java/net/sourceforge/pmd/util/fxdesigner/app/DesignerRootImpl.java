@@ -19,6 +19,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.services.OnDiskPersistenceManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.TestCreatorService;
 
+import javafx.application.HostServices;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
@@ -41,7 +42,7 @@ public final class DesignerRootImpl implements DesignerRoot {
     private final Map<AppServiceDescriptor<?>, Object> services = new HashMap<>();
 
 
-    public DesignerRootImpl(Stage mainStage, DesignerParams params) {
+    public DesignerRootImpl(Stage mainStage, DesignerParams params, HostServices hostServices) {
         this.mainStage = mainStage;
         this.developerMode = params.isDeveloperMode();
 
@@ -58,6 +59,7 @@ public final class DesignerRootImpl implements DesignerRoot {
 
         params.processDefaults(diskManager.defaultAppStateFile());
 
+        registerService(HOST_SERVICES, hostServices);
         registerService(PERSISTENCE_MANAGER, new OnDiskPersistenceManager(this, params.getPersistedInputFile(), params.getPersistedOutputFile()));
         registerService(NODE_SELECTION_CHANNEL, new MessageChannel<>(Category.SELECTION_EVENT_TRACING));
         registerService(LATEST_XPATH, new MessageChannel<>(Category.SELECTION_EVENT_TRACING));

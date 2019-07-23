@@ -21,6 +21,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.TestCreatorService;
 import net.sourceforge.pmd.util.fxdesigner.model.VersionedXPathQuery;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 
+import javafx.application.HostServices;
 import javafx.stage.Stage;
 
 
@@ -32,6 +33,9 @@ import javafx.stage.Stage;
 public interface DesignerRoot {
 
     // Those are shared by all the app
+
+    /** JavaFX host services. */
+    AppServiceDescriptor<HostServices> HOST_SERVICES = new AppServiceDescriptor<>(HostServices.class);
 
     /** Manages settings persistence. */
     AppServiceDescriptor<PersistenceManager> PERSISTENCE_MANAGER = new AppServiceDescriptor<>(PersistenceManager.class);

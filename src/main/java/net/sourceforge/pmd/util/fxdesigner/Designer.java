@@ -89,7 +89,7 @@ public class Designer extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         DesignerParams params = getParameters() == null ? new DesignerParams() : new DesignerParams(getParameters());
-        start(stage, new DesignerRootImpl(stage, params));
+        start(stage, new DesignerRootImpl(stage, params, getHostServices()));
     }
 
 
