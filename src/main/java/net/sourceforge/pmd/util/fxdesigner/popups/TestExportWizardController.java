@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.Subscription;
 
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
@@ -43,6 +44,8 @@ import javafx.stage.Stage;
 public final class TestExportWizardController extends AbstractController {
 
     private final Stage myPopupStage;
+    @Nullable
+    private String originalFile;
 
     @FXML
     private ToolbarTitledPane titledPane;
@@ -74,6 +77,8 @@ public final class TestExportWizardController extends AbstractController {
                 String xml = TestXmlDumper.dumpXmlTests(testCollection);
                 titledPane.errorMessageProperty().setValue(null);
                 exportResultArea.replaceText(xml);
+                File origin = testCollection.getOrigin();
+                originalFile = origin != null ? origin.getAbsolutePath() : null;
             } catch (Exception e) {
                 reportDumpException(e);
             }
@@ -103,6 +108,7 @@ public final class TestExportWizardController extends AbstractController {
 
             FileChooser chooser = new FileChooser();
             chooser.setTitle("Write XML to a file");
+            chooser.setInitialFileName(originalFile);
             File file = chooser.showSaveDialog(myPopupStage);
 
             if (file != null) {

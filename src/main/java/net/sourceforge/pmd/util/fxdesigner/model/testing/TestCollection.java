@@ -4,6 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
+import java.io.File;
 import java.util.List;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -13,6 +14,7 @@ import org.reactfx.collection.LiveList;
 
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
+import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
@@ -21,6 +23,8 @@ public class TestCollection implements SettingsOwner {
 
     private LiveList<LiveTestCase> stash;
     private final @Nullable ObservableRuleBuilder owner;
+    @Nullable
+    private File origin;
 
     public TestCollection(@Nullable ObservableRuleBuilder owner, List<LiveTestCase> tests) {
         this.stash = new LiveArrayList<>(tests);
@@ -59,6 +63,16 @@ public class TestCollection implements SettingsOwner {
             stash.forEach(LiveTestCase::freeze);
             stash.add(testCase);
         }
+    }
+
+    @Nullable
+    @PersistentProperty
+    public File getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(File origin) {
+        this.origin = origin;
     }
 
     @Nullable

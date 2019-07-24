@@ -118,6 +118,8 @@ public class TestCollectionController extends AbstractController {
 
     private void importTestsFromFile() {
         FileChooser chooser = new FileChooser();
+        File origin = getTestCollection().getOrigin();
+        chooser.setInitialFileName(origin == null ? null : origin.getAbsolutePath());
         chooser.setTitle("Load source from file");
         File file = chooser.showOpenDialog(getMainStage());
 
@@ -129,6 +131,7 @@ public class TestCollectionController extends AbstractController {
         try {
             TestCollection coll = TestXmlParser.parseXmlTests(file.toPath(), builder);
             getTestCollection().addAll(coll);
+            getTestCollection().setOrigin(file);
             SimplePopups.showActionFeedback(addTestMenuButton, AlertType.CONFIRMATION,
                                             "Imported " + coll.getStash().size() + " test cases");
         } catch (Exception e) {
