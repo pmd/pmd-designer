@@ -2,7 +2,7 @@
 
 ## 6.17.0
 
-* Added test case edition features. Usage is [documented on the wiki](https://github.com/pmd/pmd-designer/wiki/Testing_rules)
+* Added test case edition features. Usage is [documented on the wiki](https://github.com/pmd/pmd-designer/wiki/Testing_rules). Preview:
 
 ![testing-designer](https://user-images.githubusercontent.com/24524930/61461094-504a7900-a970-11e9-822e-30cc121b568c.gif)
 
