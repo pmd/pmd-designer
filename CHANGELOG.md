@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.19.0
+
+* Fix some internal issues
+  * When no language modules are on the classpath, the app will open files with the "plain text" language.
+  * Version stamping not working
+
+
 ## 6.17.0
 
 * Added test case edition features. Usage is [documented on the wiki](https://github.com/pmd/pmd-designer/wiki/Testing_rules). Preview:
