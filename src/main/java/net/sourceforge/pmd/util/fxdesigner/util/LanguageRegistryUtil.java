@@ -42,19 +42,34 @@ public final class LanguageRegistryUtil {
         return defaultLanguage().getDefaultVersion();
     }
 
+
+    // TODO need a notion of dialect in core + language services
+    public static boolean isXmlDialect(Language language) {
+        switch (language.getTerseName()) {
+        case "xml":
+        case "pom":
+        case "wsql":
+        case "fxml":
+        case "xsl":
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    public static Language plainTextLanguage() {
+        Language fallback = LanguageRegistry.findLanguageByTerseName(PlainTextLanguage.TERSE_NAME);
+        if (fallback != null) {
+            return fallback;
+        } else {
+            throw new AssertionError("No plain text language?");
+        }
+    }
+
     @NonNull
     public static Language defaultLanguage() {
         Language defaultLanguage = LanguageRegistry.getLanguage(DEFAULT_LANGUAGE_NAME);
-        if (defaultLanguage != null) {
-            return defaultLanguage;
-        } else {
-            Language fallback = LanguageRegistry.findLanguageByTerseName(PlainTextLanguage.TERSE_NAME);
-            if (fallback != null) {
-                return fallback;
-            } else {
-                throw new AssertionError("No registered languages, expecting at least the plain text language");
-            }
-        }
+        return defaultLanguage != null ? defaultLanguage : plainTextLanguage();
     }
 
     private static Map<String, LanguageVersion> getExtensionsToLanguageMap() {

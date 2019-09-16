@@ -5,8 +5,11 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import static net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups.showLicensePopup;
-import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguageVersion;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguage;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getLanguageVersionFromExtension;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguages;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.isXmlDialect;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.plainTextLanguage;
 
 import java.io.File;
 import java.io.IOException;
@@ -111,7 +114,7 @@ public class MainDesignerController extends AbstractController {
     private ScopesPanelController scopesPanelController;
 
 
-    private final Var<Language> globalLanguage = Var.newSimpleVar(LanguageRegistryUtil.defaultLanguage());
+    private final Var<Language> globalLanguage = Var.newSimpleVar(defaultLanguage());
 
     // we cache it but if it's not used the FXML is not created, etc
     private final SoftReferenceCache<EventLogController> eventLogController;
@@ -125,7 +128,7 @@ public class MainDesignerController extends AbstractController {
         super(designerRoot);
         eventLogController = new SoftReferenceCache<>(() -> new EventLogController(designerRoot));
 
-        designerRoot.registerService(DesignerRoot.APP_GLOBAL_LANGUAGE, globalLanguage.orElseConst(LanguageRegistryUtil.defaultLanguage()));
+        designerRoot.registerService(DesignerRoot.APP_GLOBAL_LANGUAGE, globalLanguage.orElseConst(defaultLanguage()));
     }
 
 
@@ -158,7 +161,7 @@ public class MainDesignerController extends AbstractController {
         languageChoicebox.setConverter(DesignerUtil.stringConverter(Language::getName, LanguageRegistryUtil::findLanguageByName));
 
         SingleSelectionModel<Language> langSelector = languageChoicebox.getSelectionModel();
-        @NonNull Language restored = globalLanguage.getOrElse(LanguageRegistryUtil.defaultLanguage());
+        @NonNull Language restored = globalLanguage.getOrElse(defaultLanguage());
 
         globalLanguage.bind(langSelector.selectedItemProperty());
 
@@ -204,17 +207,30 @@ public class MainDesignerController extends AbstractController {
             try {
                 String source = IOUtils.toString(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8);
                 sourceEditorController.setText(source);
-                LanguageVersion guess = LanguageRegistryUtil.getLanguageVersionFromExtension(file.getName());
+                LanguageVersion guess = getLanguageVersionFromExtension(file.getName());
                 if (guess == null) {
-                    sourceEditorController.setLanguageVersion(defaultLanguageVersion());
+
+                    if (!isXmlDialect(getGlobalLanguage())) {
+                        // if we're a xml language, assume the file is some xml dialect too,
+                        //   otherwise go back to plain text
+                        sourceEditorController.setLanguageVersion(plainTextLanguage().getDefaultVersion());
+                    }
+
+                    if (getSupportedLanguages().count() > 1) {
+                        SimplePopups.showActionFeedback(
+                            languageChoicebox,
+                            AlertType.INFORMATION,
+                            "Pick a language?"
+                        );
+                    }
+                } else if (guess != sourceEditorController.getLanguageVersion()) {
+                    // guess the language from the extension
+                    sourceEditorController.setLanguageVersion(guess);
                     SimplePopups.showActionFeedback(
                         languageChoicebox,
-                        AlertType.INFORMATION,
-                        "Select a language"
+                        AlertType.CONFIRMATION,
+                        "Set language to " + guess.getLanguage().getName()
                     );
-                }
-                if (guess != null) { // guess the language from the extension
-                    sourceEditorController.setLanguageVersion(guess);
                 }
 
                 recentFiles.push(file);

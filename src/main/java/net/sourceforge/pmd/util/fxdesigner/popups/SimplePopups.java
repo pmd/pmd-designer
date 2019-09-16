@@ -114,7 +114,7 @@ public final class SimplePopups {
         popup.setOnShowing(e -> fadeTransition.play());
 
         Bounds screenBounds = owner.localToScreen(owner.getBoundsInLocal());
-        popup.show(owner, screenBounds.getMaxX(), screenBounds.getMinY());
+        popup.show(owner, screenBounds.getMaxX() + 20, screenBounds.getMinY());
         return closeTick;
     }
 
