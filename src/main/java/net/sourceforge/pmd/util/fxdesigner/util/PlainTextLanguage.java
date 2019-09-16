@@ -7,7 +7,6 @@ package net.sourceforge.pmd.util.fxdesigner.util;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -37,11 +36,6 @@ public final class PlainTextLanguage extends BaseLanguageModule {
     public PlainTextLanguage() {
         super("Plain text", "Plain text", "text", null);
         addVersion("default", new TextLvh(), true);
-    }
-
-    @Override
-    public List<String> getExtensions() {
-        return super.getExtensions();
     }
 
     private static class TextLvh extends AbstractLanguageVersionHandler {

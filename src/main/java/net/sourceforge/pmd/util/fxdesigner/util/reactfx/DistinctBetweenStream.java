@@ -16,9 +16,11 @@ import org.reactfx.util.Timer;
  * An event stream that prunes distinct events only if they occur in during
  * some user specified period. E.g.
  *
+ * <pre>{@code
  * input:           ---------A--A-------A--B--B------
  * timer (3 units): ---------|>>>|>>>|--|>>|>>|>>>|--
  * output:          ---------A----------A--B---------
+ * }</pre>
  *
  * Ie, once the timer expires the latest event can be reemitted again.
  *
@@ -26,7 +28,7 @@ import org.reactfx.util.Timer;
  */
 public final class DistinctBetweenStream<I> extends EventStreamBase<I> {
 
-    static final Object NONE = new Object();
+    private static final Object NONE = new Object();
     private final EventStream<I> input;
     private final Timer timer;
     private Object previous = NONE;
