@@ -73,6 +73,9 @@
 
         <pmd.build-tools.version>3</pmd.build-tools.version>
         <pmd.check.version>6.16.0</pmd.check.version>
+
+        <jflex-output>${project.build.directory}/generated-sources/jflex</jflex-output>
+
     </properties>
 
     <build>
@@ -90,6 +93,24 @@
         </resources>
 
         <plugins>
+
+            <plugin>
+                <groupId>de.jflex</groupId>
+                <artifactId>jflex-maven-plugin</artifactId>
+                <version>1.7.0</version>
+                <executions>
+                    <execution>
+                        <id>lexer-gen</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${jflex-output}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
 
             <!-- Kotlin compiler for test-compile -->
             <!-- The kotlin plugin has to run before the java plugin-->
@@ -138,6 +159,19 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>add-generated-sources</id>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${jflex-output}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- Compiles Less files into CSS files. Currently compatible with Less 1.7.0 -->

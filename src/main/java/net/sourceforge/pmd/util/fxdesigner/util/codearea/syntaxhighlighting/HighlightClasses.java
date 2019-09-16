@@ -29,13 +29,16 @@ public enum HighlightClasses {
     STRING("string", Constants.LITERAL),
     URI("uri", "string", Constants.LITERAL),
     CHAR("char", Constants.LITERAL),
+    SYMBOL("symbol", Constants.LITERAL),
     NULL("null", Constants.LITERAL),
     NUMBER("number", Constants.LITERAL),
 
     KEYWORD(Constants.KEYWORD),
+    THIS("this", Constants.KEYWORD),
     ANNOTATION("annotation"),
 
     IDENTIFIER(Constants.IDENTIFIER),
+    INTERPOLATED_IDENTIFIER("interpolated-identifier", Constants.IDENTIFIER),
     CLASS_IDENTIFIER("class-identifier", Constants.IDENTIFIER),
 
     // XPath specific
@@ -50,7 +53,14 @@ public enum HighlightClasses {
     XML_PROLOG("xml-prolog", Constants.XML),
     XML_LT_GT("lt-gt", Constants.XML, Constants.PUNCTUATION),
     XML_TAG_NAME("tag-name", Constants.XML, Constants.IDENTIFIER),
-    XML_ATTRIBUTE_NAME("attribute-name", Constants.XML, Constants.IDENTIFIER);
+    XML_ATTRIBUTE_NAME("attribute-name", Constants.XML, Constants.IDENTIFIER),
+
+    TEXT,
+    WHITESPACE,
+    BAD_CHAR,
+
+
+    ;
 
 
     /** Name of the css class. */
