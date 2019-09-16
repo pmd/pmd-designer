@@ -29,6 +29,7 @@ import net.sourceforge.pmd.lang.Parser;
  */
 public final class LanguageRegistryUtil {
 
+    private static final String DEFAULT_LANGUAGE_NAME = "Java";
     private static List<LanguageVersion> supportedLanguageVersions;
     private static Map<String, LanguageVersion> extensionsToLanguage;
 
@@ -43,11 +44,16 @@ public final class LanguageRegistryUtil {
 
     @NonNull
     public static Language defaultLanguage() {
-        Language defaultLanguage = LanguageRegistry.getDefaultLanguage();
-        if (defaultLanguage == null) {
-            throw new AssertionError("No registered languages, expecting at least the plain text language");
-        } else {
+        Language defaultLanguage = LanguageRegistry.getLanguage(DEFAULT_LANGUAGE_NAME);
+        if (defaultLanguage != null) {
             return defaultLanguage;
+        } else {
+            Language fallback = LanguageRegistry.findLanguageByTerseName(PlainTextLanguage.TERSE_NAME);
+            if (fallback != null) {
+                return fallback;
+            } else {
+                throw new AssertionError("No registered languages, expecting at least the plain text language");
+            }
         }
     }
 

@@ -106,7 +106,7 @@ public class Designer extends Application {
 
         Logger.getLogger(Attribute.class.getName()).setLevel(Level.OFF);
 
-        System.out.print(stage.getTitle() + " initializing... ");
+        System.out.println(stage.getTitle() + " initializing... ");
 
         FXMLLoader loader = new FXMLLoader(DesignerUtil.getFxml("designer"));
 
@@ -136,13 +136,19 @@ public class Designer extends Application {
 
         stage.setScene(scene);
 
+        try {
+            stage.show();
+        } catch (Throwable t) { // NOPMD AvoidCatchingThrowable
+            System.err.println("Panic!");
+            throw t;
+        }
+
         if (!owner.isDeveloperMode()) {
             // only close after initialization succeeded.
             // but before stage.show to reduce unwanted noise
             System.err.close();
         }
 
-        stage.show();
 
         long initTime = System.currentTimeMillis() - initStartTimeMillis;
 
