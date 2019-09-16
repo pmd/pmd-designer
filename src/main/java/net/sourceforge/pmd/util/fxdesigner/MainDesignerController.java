@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import static net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups.showLicensePopup;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguageVersion;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguages;
 
 import java.io.File;
@@ -19,11 +20,11 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.reactfx.Subscription;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -39,6 +40,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox;
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -109,7 +111,7 @@ public class MainDesignerController extends AbstractController {
     private ScopesPanelController scopesPanelController;
 
 
-    private final Var<Language> globalLanguage = Var.newSimpleVar(LanguageRegistry.getDefaultLanguage());
+    private final Var<Language> globalLanguage = Var.newSimpleVar(LanguageRegistryUtil.defaultLanguage());
 
     // we cache it but if it's not used the FXML is not created, etc
     private final SoftReferenceCache<EventLogController> eventLogController;
@@ -123,7 +125,7 @@ public class MainDesignerController extends AbstractController {
         super(designerRoot);
         eventLogController = new SoftReferenceCache<>(() -> new EventLogController(designerRoot));
 
-        designerRoot.registerService(DesignerRoot.APP_GLOBAL_LANGUAGE, globalLanguage);
+        designerRoot.registerService(DesignerRoot.APP_GLOBAL_LANGUAGE, globalLanguage.orElseConst(LanguageRegistryUtil.defaultLanguage()));
     }
 
 
@@ -156,7 +158,7 @@ public class MainDesignerController extends AbstractController {
         languageChoicebox.setConverter(DesignerUtil.stringConverter(Language::getName, LanguageRegistryUtil::findLanguageByName));
 
         SingleSelectionModel<Language> langSelector = languageChoicebox.getSelectionModel();
-        Language restored = globalLanguage.getValue();
+        @NonNull Language restored = globalLanguage.getOrElse(LanguageRegistryUtil.defaultLanguage());
 
         globalLanguage.bind(langSelector.selectedItemProperty());
 
@@ -203,6 +205,14 @@ public class MainDesignerController extends AbstractController {
                 String source = IOUtils.toString(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8);
                 sourceEditorController.setText(source);
                 LanguageVersion guess = LanguageRegistryUtil.getLanguageVersionFromExtension(file.getName());
+                if (guess == null) {
+                    sourceEditorController.setLanguageVersion(defaultLanguageVersion());
+                    SimplePopups.showActionFeedback(
+                        languageChoicebox,
+                        AlertType.INFORMATION,
+                        "Select a language"
+                    );
+                }
                 if (guess != null) { // guess the language from the extension
                     sourceEditorController.setLanguageVersion(guess);
                 }

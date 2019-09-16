@@ -120,11 +120,12 @@ public final class SimplePopups {
 
 
     private static Animation bounceFadeAnimation(Node owner) {
+        final int BOUNCE_DURATION_MS = 2000;
 
         return new Transition() {
 
             {
-                setCycleDuration(Duration.millis(1500));
+                setCycleDuration(Duration.millis(BOUNCE_DURATION_MS));
                 setInterpolator(Interpolator.EASE_OUT);
             }
 

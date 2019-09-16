@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import net.sourceforge.pmd.lang.Language;
@@ -35,9 +36,19 @@ public final class LanguageRegistryUtil {
 
     }
 
+    @NonNull
     public static LanguageVersion defaultLanguageVersion() {
+        return defaultLanguage().getDefaultVersion();
+    }
+
+    @NonNull
+    public static Language defaultLanguage() {
         Language defaultLanguage = LanguageRegistry.getDefaultLanguage();
-        return defaultLanguage == null ? null : defaultLanguage.getDefaultVersion();
+        if (defaultLanguage == null) {
+            throw new AssertionError("No registered languages, expecting at least the plain text language");
+        } else {
+            return defaultLanguage;
+        }
     }
 
     private static Map<String, LanguageVersion> getExtensionsToLanguageMap() {
@@ -51,6 +62,7 @@ public final class LanguageRegistryUtil {
         return result;
     }
 
+    @Nullable
     public static synchronized LanguageVersion getLanguageVersionFromExtension(String filename) {
         if (extensionsToLanguage == null) {
             extensionsToLanguage = getExtensionsToLanguageMap();
@@ -78,22 +90,30 @@ public final class LanguageRegistryUtil {
         return supportedLanguageVersions;
     }
 
-    @Nullable
+    @NonNull
     public static LanguageVersion getLanguageVersionByName(String name) {
-        return getSupportedLanguageVersions().stream().filter(it -> it.getName().equals(name)).findFirst().orElse(null);
+        return getSupportedLanguageVersions().stream()
+                                             .filter(it -> it.getName().equals(name))
+                                             .findFirst()
+                                             .orElse(defaultLanguageVersion());
     }
 
+    @NonNull
     public static Stream<Language> getSupportedLanguages() {
         return getSupportedLanguageVersions().stream().map(LanguageVersion::getLanguage).distinct();
     }
 
+    @NonNull
     public static Language findLanguageByShortName(String shortName) {
         return getSupportedLanguages().filter(it -> it.getShortName().equals(shortName))
                                       .findFirst()
-                                      .get();
+                                      .orElse(defaultLanguage());
     }
 
+    @NonNull
     public static Language findLanguageByName(String n) {
-        return getSupportedLanguages().filter(it -> it.getName().equals(n)).findFirst().orElse(LanguageRegistry.getDefaultLanguage());
+        return getSupportedLanguages().filter(it -> it.getName().equals(n))
+                                      .findFirst()
+                                      .orElse(defaultLanguage());
     }
 }
