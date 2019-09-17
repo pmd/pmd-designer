@@ -174,38 +174,6 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
     }
 
 
-    /**
-     * Attempts to preserve the other layers when syntax highlighting changes. The result
-     * misplaces some style classes, which is undesirable, but covered up by the subsequent
-     * parsing update.
-     */
-    @Override
-    @NonNull
-    protected final StyleSpans<Collection<String>> styleSyntaxHighlightChange(final @Nullable StyleSpans<Collection<String>> oldSyntax,
-                                                                              final @Nullable StyleSpans<Collection<String>> newSyntax) {
-
-        StyleSpans<Collection<String>> currentSpans = getStyleSpans(new IndexRange(0, getLength()));
-        StyleSpans<Collection<String>> base = Optional.ofNullable(oldSyntax).map(s -> subtract(currentSpans, s)).orElse(currentSpans);
-
-        return Optional.ofNullable(newSyntax)
-                       .map(s -> base.overlay(s, SyntaxHighlightingCodeArea::additiveOverlay))
-                       .orElse(base)
-                       .subView(0, getLength());
-    }
-
-
-    /** Subtracts the second argument from the first. */
-    private static StyleSpans<Collection<String>> subtract(StyleSpans<Collection<String>> base, StyleSpans<Collection<String>> diff) {
-        return base.overlay(diff, (style1, style2) -> {
-            if (style2.isEmpty()) {
-                return style1;
-            }
-            Set<String> styles = new HashSet<>(style1);
-            styles.removeAll(style2);
-            return styles;
-        });
-    }
-
     /** Identifier for a highlighting layer. */
     public interface LayerId {
         /**
