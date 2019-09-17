@@ -96,7 +96,7 @@ public final class PlainTextLanguage extends BaseLanguageModule {
         }
     }
 
-    private static class PlainTextFile extends AbstractNode implements RootNode {
+    public static class PlainTextFile extends AbstractNode implements RootNode {
 
         PlainTextFile(String fileText) {
             super(0);
