@@ -1,4 +1,4 @@
-/**
+/*
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
@@ -42,8 +42,8 @@ public final class JavaSyntaxHighlighter extends SimpleRegexSyntaxHighlighter {
         "float", "implements", "instanceof", "interface", "long",
         "native", "protected", "while", "assert", "short", "super",
         "switch", "synchronized", "transient", "try", "volatile",
-        "do", "strictfp", "goto", "const", "open", 
-        "module", "requires", "transitive", "exports", 
+        "do", "strictfp", "goto", "const", "open",
+        "module", "requires", "transitive", "exports",
         "opens", "to", "uses", "provides", "var", "with",
         };
 

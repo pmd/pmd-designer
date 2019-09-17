@@ -1,4 +1,4 @@
-/**
+/*
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
@@ -87,7 +87,7 @@ public class SerializerRegistrar {
     private void registerStandard() {
 
         register(stringConversion(Function.identity(), Function.identity()), String.class);
-        
+
         register(stringConversion(Integer::valueOf, i -> Integer.toString(i)), Integer.class, Integer.TYPE);
         register(stringConversion(Double::valueOf, d -> Double.toString(d)), Double.class, Double.TYPE);
         register(stringConversion(Boolean::valueOf, b -> Boolean.toString(b)), Boolean.class, Boolean.TYPE);
