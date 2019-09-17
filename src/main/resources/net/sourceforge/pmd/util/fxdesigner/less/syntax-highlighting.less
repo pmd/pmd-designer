@@ -33,6 +33,10 @@
   &.keyword {
     -fx-fill: #B58900;
     /* -fx-font-weight: bold; */
+
+    &.operator, &.modifier {
+      -fx-fill: #938263;
+    }
   }
 
   &.punctuation {
@@ -54,7 +58,7 @@
 
   /* Java specific */
 
-  &.java {
+  &.java, &.scala {
     &.class-identifier {
       -fx-fill: #B05A65;
     }

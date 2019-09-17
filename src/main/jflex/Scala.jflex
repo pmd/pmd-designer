@@ -86,7 +86,7 @@ import static net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighti
         }
 
         yypushback(yylength() - 1 - (isEscape ? 1 : 0));
-        return process(HighlightClasses.STRING);
+        return process(INTERPOLATED_IDENTIFIER);
     }
 
 %}
@@ -98,9 +98,12 @@ import static net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighti
 %xstate INSIDE_MULTI_LINE_INTERPOLATED_STRING
 %xstate INJ_COMMON_STATE
 
-keyword = "abstract" | "case" | "catch" | "def" | "do" | "else" | "extends" | "final" | "finally" | "for" | "forSome" |
-        "if" | "implicit" | "lazy" | "match" | "new" | "override" | "private" | "protected" | "requires" | "return" |
-        "sealed" | "super" | "throw" | "try" | "val" | "var" | "while" | "with" | "yield"
+keyword =  "case" | "catch" | "def" | "do" | "else" | "extends" | "finally" | "for" |
+           "if" | "match" | "new" | "requires" | "return" |
+           "super" | "throw" | "try" | "val" | "var" | "while" | "with" | "yield" | "trait" | "class" | "enum" |
+           "object" | "package" | "import"
+
+modifier = "abstract" | "final" | "forSome" | "implicit" | "lazy" | "override" | "private" | "protected" | "sealed"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////      integers and floats     /////////////////////////////////////////////////////////////////////
@@ -128,7 +131,8 @@ fractionPart = {digits} {exponentPart}?
 /////////////////////      identifiers      ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-identifier = {plainid} | "`" {stringLiteralExtra} "`"
+identifier = {plainid} | {backtick_ident}
+backtick_ident =  "`" {stringLiteralExtra} "`"
 
 special = \u0021 | \u0023
           | [\u0025-\u0026]
@@ -212,7 +216,7 @@ XML_BEGIN = "<" ("_" | [:jletter:]) | "<!--" | "<?" ("_" | [:jletter:]) | "<![CD
 
 {END_OF_LINE_COMMENT}                   { return process(SINGLEL_COMMENT); }
 {SH_COMMENT}                            { return process(SINGLEL_COMMENT); }
-
+"/*" ~ "*/"                             { return process(MULTIL_COMMENT); }
 
 {INTERPOLATED_STRING_ID} / ({INTERPOLATED_STRING_BEGIN} | {INTERPOLATED_MULTI_LINE_STRING_BEGIN}) {
   yybegin(WAIT_FOR_INTERPOLATED_STRING);
@@ -266,8 +270,6 @@ XML_BEGIN = "<" ("_" | [:jletter:]) | "<!--" | "<?" ("_" | [:jletter:]) | "<![CD
 
 
 
-"/*" ("*"? [^\/])* "*/"                  { return process(MULTIL_COMMENT); }
-
 {STRING_LITERAL}                         { return process(STRING);  }
 {MULTI_LINE_STRING}                      { return process(STRING);  }
 {WRONG_STRING}                           { return process(BAD_CHAR);  }
@@ -293,21 +295,26 @@ XML_BEGIN = "<" ("_" | [:jletter:]) | "<!--" | "<?" ("_" | [:jletter:]) | "<![CD
 
 
 {keyword}                               {   return process(KEYWORD); }
+{modifier}                              {   return process(MODIFIER); }
 "false" | "true"                        {   return process(BOOLEAN); }
 "null"                                  {   return process(NULL); }
 "this"                                  {   return process(THIS); }
 
-  "*" | "?" | "_" | ":" | "="
-| "=>" | "\\u21D2" | "\u21D2"
-| "<-" | "\\u2190" | "\u2190"
-| "<:" | ">:" | "<%" | "#" | "@"
+  "*" | "?" | ":"
+//| "<:" | ">:" | "<%" | "#"
 | "&" | "|" | "+" | "-" | "~"
 | "!" | "." | ";" | "," | "[" | "]"     {   return process(PUNCTUATION); }
 
+"=" | "=>" | "\\u21D2" | "\u21D2"
+"_" | "<-" | "\\u2190" | "\u2190"       {   return process(OPERATOR); }
 
+"@" {identifier} ("." {identifier})*    {   return process(ANNOTATION); }
+
+[:uppercase:]{idrest}                   {   return process(CLASS_IDENTIFIER); }
+{varid}                                 {   return process(IDENTIFIER); }
+{op} | {backtick_ident}                 {   return process(OPERATOR); }
 {identifier}                            {   return process(IDENTIFIER); }
-{integerLiteral} / "." {identifier}
-                                        {   return process(NUMBER);  }
+{integerLiteral} / "." {identifier}     {   return process(NUMBER);  }
   {doubleLiteral}
 | {floatingLiteral}
 | {longLiteral}

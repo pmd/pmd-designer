@@ -35,6 +35,9 @@ public enum HighlightClasses {
 
     KEYWORD(Constants.KEYWORD),
     THIS("this", Constants.KEYWORD),
+    MODIFIER("modifier", Constants.KEYWORD),
+    OPERATOR("operator", Constants.KEYWORD),
+
     ANNOTATION("annotation"),
 
     IDENTIFIER(Constants.IDENTIFIER),
