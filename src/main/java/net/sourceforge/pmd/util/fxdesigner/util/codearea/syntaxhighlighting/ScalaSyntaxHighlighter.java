@@ -9,6 +9,7 @@
 package net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting;
 
 import java.io.StringReader;
+import java.util.Set;
 
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.LexerBasedHighlighter;
 
@@ -26,7 +27,7 @@ public final class ScalaSyntaxHighlighter extends LexerBasedHighlighter {
     }
 
     @Override
-    protected JflexLexer newLexer(String text) {
-        return new ScalaLexer(new StringReader(text));
+    protected JflexLexer newLexer(String text, Set<String> baseClasses) {
+        return new ScalaLexer(new StringReader(text), baseClasses);
     }
 }

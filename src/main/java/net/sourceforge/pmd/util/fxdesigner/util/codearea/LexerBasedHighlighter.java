@@ -5,15 +5,15 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.codearea;
 
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.setOf;
+
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
-
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.HighlightClasses;
 
 
 /**
@@ -31,23 +31,17 @@ public abstract class LexerBasedHighlighter implements SyntaxHighlighter {
         this.languageName = languageName;
     }
 
-    protected abstract JflexLexer newLexer(String text);
-
+    protected abstract JflexLexer newLexer(String text, Set<String> baseClasses);
 
     @Override
     public StyleSpans<Collection<String>> computeHighlighting(String text) {
         StyleSpansBuilder<Collection<String>> builder = new StyleSpansBuilder<>();
 
-        JflexLexer lexer = newLexer(text);
+        JflexLexer lexer = newLexer(text, setOf(languageName, "code"));
         try {
-            HighlightClasses classes = lexer.nextSpan();
+            Set<String> classes = lexer.nextSpan();
             while (classes != null) {
-                HashSet<String> css = new HashSet<>(classes.css.size() + 2);
-                css.addAll(classes.css);
-                css.add("code");
-                css.add(languageName);
-                builder.add(css, lexer.yylength());
-
+                builder.add(classes, lexer.yylength());
                 classes = lexer.nextSpan();
             }
         } catch (IOException ignored) {
@@ -67,7 +61,7 @@ public abstract class LexerBasedHighlighter implements SyntaxHighlighter {
     public interface JflexLexer {
 
         @Nullable
-        HighlightClasses nextSpan() throws IOException;
+        Set<String> nextSpan() throws IOException;
 
 
         int yylength();

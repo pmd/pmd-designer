@@ -2,6 +2,8 @@ package net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -14,11 +16,18 @@ import static net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighti
 %class      ScalaLexer
 %implements JflexLexer
 %function   nextSpan
-%type	    HighlightClasses
+%type	    Set<String>
 %unicode
+
+%ctorarg Set<String> baseClasses
+
+%init{
+this.baseClasses = baseClasses;
+%init}
 
 %{
 
+    private final Set<String> baseClasses;
 
     private class InterpolationLevel extends MutableInt {
 
@@ -50,13 +59,13 @@ import static net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighti
       return !nestedString.isEmpty();
     }
 
-    private HighlightClasses processOutsideString() {
+    private Set<String> processOutsideString() {
       if (shouldProcessBracesForInterpolated()) nestedString.pop();
       yybegin(COMMON_STATE);
       return process(STRING);
     }
 
-    private HighlightClasses process(HighlightClasses type){
+    private Set<String> process(HighlightClasses type){
       if ((type == IDENTIFIER || type == THIS)) {
         if (haveIdInString) {
           haveIdInString = false;
@@ -71,10 +80,20 @@ import static net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighti
         yybegin(COMMON_STATE);
       }
 
-      return type;
+      return toCss(type);
     }
 
-    private HighlightClasses processInsideString(boolean isInsideMultiline) {
+    private Set<String> toCss(HighlightClasses type) {
+        Set<String> css = new HashSet<>(type.css); // TODO persistent collections
+        css.addAll(baseClasses);
+        if ((yystate() == COMMON_STATE || yystate() == YYINITIAL || yycharat(0) == '}' && yylength() == 1)
+            && !nestedString.isEmpty()) {
+            css.addAll(HighlightClasses.INJECTED_LANG.css);
+        }
+        return css;
+    }
+
+    private Set<String> processInsideString(boolean isInsideMultiline) {
         boolean isEscape = yycharat(1) == '$';
         if (!isEscape) {
             if (isInsideMultiline) {
@@ -210,7 +229,7 @@ XML_BEGIN = "<" ("_" | [:jletter:]) | "<!--" | "<?" ("_" | [:jletter:]) | "<![CD
 
 {XML_BEGIN}                             {   yybegin(COMMON_STATE);
                                             yypushback(yylength());
-                                            return PUNCTUATION;
+                                            return process(PUNCTUATION);
                                         }
 }
 

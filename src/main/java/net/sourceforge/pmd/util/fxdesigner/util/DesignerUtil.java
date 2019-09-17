@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -69,6 +70,22 @@ public final class DesignerUtil {
     private DesignerUtil() {
 
     }
+
+
+    public static <T> Set<T> setOf(T... ts) {
+        LinkedHashSet<T> set = new LinkedHashSet<>(ts.length);
+        Collections.addAll(set, ts);
+        return set;
+    }
+
+    public static <T> Set<T> setOf(T ts) {
+        return Collections.singleton(ts);
+    }
+
+    public static <T> Set<T> setOf() {
+        return Collections.emptySet();
+    }
+
 
     /**
      * Was added in java 9...

@@ -60,7 +60,9 @@ public enum HighlightClasses {
 
     TEXT,
     WHITESPACE,
-    BAD_CHAR;
+    BAD_CHAR,
+
+    INJECTED_LANG("injected");
 
 
     /** Name of the css class. */
