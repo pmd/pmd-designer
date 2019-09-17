@@ -39,10 +39,37 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/kotlin" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/jflex" isTestSource="false" generated="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: net.sourceforge.pmd:pmd-core:6.12.0" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm:7.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-apex:6.12.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-apex-jorje:lib:6.12.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-java:6.12.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.sourceforge.pmd:pmd-scala:6.12.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.scala-lang:scala-library:2.12.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.scala-lang:scala-compiler:2.12.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.scala-lang:scala-reflect:2.12.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.scala-lang.modules:scala-xml_2.12:1.0.6" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-javascript:6.12.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-jsp:6.12.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-plsql:6.12.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-visualforce:6.12.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-vm:6.12.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-xml:6.12.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: net.sourceforge.pmd:pmd-lang-test:6.12.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.2.61" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.2.61" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.61" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.61" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-test-junit:1.2.61" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-test-annotations-common:1.2.61" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-test:1.2.61" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-test-common:1.2.61" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-reflect:1.2.50" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-base:11" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-base:linux:11" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-controls:11" level="project" />
@@ -98,6 +125,11 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: aopalliance:aopalliance:1.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: javax.inject:javax.inject:1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-java:6.12.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.sourceforge.pmd:pmd-scala:6.12.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.scala-lang:scala-library:2.12.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.scala-lang:scala-compiler:2.12.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.scala-lang:scala-reflect:2.12.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.scala-lang.modules:scala-xml_2.12:1.0.6" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-javascript:6.12.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.mozilla:rhino:1.7.7.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-jsp:6.12.0" level="project" />

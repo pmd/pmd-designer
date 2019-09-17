@@ -27,6 +27,7 @@ public class ObservableXPathRuleBuilder extends ObservableRuleBuilder {
 
     public ObservableXPathRuleBuilder() {
         setClazz(XPathRule.class);
+        setLanguage(null); // this will be set by the constructor of the controller
     }
 
     @PersistentProperty
