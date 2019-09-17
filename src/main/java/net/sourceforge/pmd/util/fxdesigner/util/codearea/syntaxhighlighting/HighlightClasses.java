@@ -60,10 +60,7 @@ public enum HighlightClasses {
 
     TEXT,
     WHITESPACE,
-    BAD_CHAR,
-
-
-    ;
+    BAD_CHAR;
 
 
     /** Name of the css class. */

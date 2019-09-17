@@ -248,6 +248,7 @@
                     <linkXRef>true</linkXRef>
                     <minimumTokens>100</minimumTokens>
                     <targetJdk>1.${java.version}</targetJdk>
+                    <excludeRoots>${jflex-output}</excludeRoots>
                     <rulesets>
                         <ruleset>config/pmd-check.xml</ruleset>
                     </rulesets>
