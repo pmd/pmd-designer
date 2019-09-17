@@ -136,16 +136,11 @@ public class Designer extends Application {
 
         stage.setScene(scene);
 
-        try {
-            stage.show();
-        } catch (Throwable t) { // NOPMD AvoidCatchingThrowable
-            System.err.println("Panic!");
-            throw t;
-        }
+        stage.show();
 
         if (!owner.isDeveloperMode()) {
             // only close after initialization succeeded.
-            // but before stage.show to reduce unwanted noise
+            // so that fatal errors thrown by stage.show are not hidden
             System.err.close();
         }
 
