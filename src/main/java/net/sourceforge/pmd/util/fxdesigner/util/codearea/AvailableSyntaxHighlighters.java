@@ -27,6 +27,9 @@ import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlS
 public enum AvailableSyntaxHighlighters implements SyntaxHighlighter {
     JAVA("java", new JavaSyntaxHighlighter()),
     SCALA("scala", new ScalaSyntaxHighlighter()),
+    // for the future
+    // uses the same lexer, we'll update if kotlin is upgraded to full support one day
+    KOTLIN("kotlin", new ScalaSyntaxHighlighter()),
     APEX("apex", new ApexSyntaxHighlighter()),
     XML("xml", new XmlSyntaxHighlighter()),
     XSL("xsl", new XmlSyntaxHighlighter()),
