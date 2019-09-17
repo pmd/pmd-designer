@@ -63,11 +63,13 @@ public final class PmdCoordinatesSystem {
      * Returns the absolute offset of the given pair (line, column) as computed by
      * a PMD parser in the code area.
      *
-     * CodeArea counts a tab as 1 column width but displays it as 8 columns width.
+     * <ul>
+     * <li>CodeArea counts a tab as 1 column width but displays it as 8 columns width.
      * PMD counts it correctly as 8 columns, so the position must be offset.
-     *
-     * Also, PMD lines start at 1 but paragraph nums start at 0 in the code area,
+     * <li>PMD lines start at 1 but paragraph nums start at 0 in the code area,
      * same for columns.
+     * <li>PMD's end column is inclusive and not exclusive.
+     * </ul>
      */
     public static int getOffsetFromPmdPosition(CodeArea codeArea, int line, int column) {
         int parIdx = getRtfxParIndexFromPmdLine(line);

@@ -86,7 +86,7 @@ import static net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighti
         }
 
         yypushback(yylength() - 1 - (isEscape ? 1 : 0));
-        return process(INTERPOLATED_IDENTIFIER);
+        return process(isEscape ? STRING : INTERPOLATED_IDENTIFIER);
     }
 
 %}
@@ -251,8 +251,8 @@ XML_BEGIN = "<" ("_" | [:jletter:]) | "<!--" | "<?" ("_" | [:jletter:]) | "<![CD
   {INTERPOLATED_STRING_PART}            { return process(STRING); }
   "$"{identifier}                       { return processInsideString(false); }
   \"                                    { return processOutsideString(); }
-  "$" / "{"                             { yybegin(COMMON_STATE); return process(STRING); }
-  [\r\n]                                { yybegin(COMMON_STATE); return process(BAD_CHAR); }
+  "$" / "{"                             { yybegin(COMMON_STATE); return process(OPERATOR); }
+  \R                                    { yybegin(COMMON_STATE); return process(BAD_CHAR); }
   [^]                                   { return process(BAD_CHAR); }
 }
 
@@ -263,7 +263,7 @@ XML_BEGIN = "<" ("_" | [:jletter:]) | "<!--" | "<?" ("_" | [:jletter:]) | "<![CD
   "$"{identifier}                       { return processInsideString(true); }
   \"\"\" (\")+                          { yypushback(yylength() - 1); return process(STRING); }
   \"\"\"                                { return processOutsideString(); }
-  "$" / "{"                             { yybegin(COMMON_STATE); return process(STRING); }
+  "$" / "{"                             { yybegin(COMMON_STATE); return process(OPERATOR); }
   \" / [^\"]                            { return process(STRING); }
   [^]                                   { return process(BAD_CHAR); }
 }
