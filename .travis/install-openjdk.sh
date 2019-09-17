@@ -1,5 +1,11 @@
-OPENJDK_ARCHIVE=OpenJDK11U-x64_linux_11.0.3_7.tar.gz
-DOWNLOAD_URL=https://pmd-code.org/${OPENJDK_ARCHIVE}
+#
+# AdoptOpenJDK Builds from:
+# https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/tag/jdk-11.0.4%2B11
+#
+
+DOWNLOAD_URL=https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jdk_x64_linux_hotspot_11.0.4_11.tar.gz
+OPENJDK_ARCHIVE=$(basename $DOWNLOAD_URL)
+
 LOCAL_DIR=${HOME}/.cache/openjdk
 TARGET_DIR=${HOME}/openjdk11
 
