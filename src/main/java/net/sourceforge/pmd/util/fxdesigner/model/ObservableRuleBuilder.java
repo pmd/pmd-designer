@@ -63,10 +63,6 @@ public class ObservableRuleBuilder implements SettingsOwner {
 
     private final TestCollection testCollection = new TestCollection(this, Collections.emptyList());
 
-    public ObservableRuleBuilder() {
-
-    }
-
     @PersistentProperty // CUSTOM?
     public Language getLanguage() {
         return language.getValue();
