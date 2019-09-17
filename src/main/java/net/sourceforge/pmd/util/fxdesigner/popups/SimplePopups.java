@@ -47,6 +47,7 @@ import javafx.util.Duration;
 public final class SimplePopups {
 
     private static final String LICENSE_FILE_PATH = "/net/sourceforge/pmd/util/fxdesigner/LICENSE";
+    private static final int DEFAULT_XOFFSET = 20;
 
 
     private SimplePopups() {
@@ -55,7 +56,21 @@ public final class SimplePopups {
 
 
     public static EventStream<?> showActionFeedback(@NonNull Node owner, AlertType type, @NonNull String message) {
+        Node icon = getIconLiteral(type);
+        return showActionFeedback(owner, icon, message, DEFAULT_XOFFSET, false, type.name().toLowerCase(Locale.ROOT));
+    }
 
+    public static EventStream<?> showStickyNotification(@NonNull Node owner, AlertType type, @NonNull String message) {
+        return showStickyNotification(owner, type, message, DEFAULT_XOFFSET);
+    }
+
+    public static EventStream<?> showStickyNotification(@NonNull Node owner, AlertType type, @NonNull String message, double offsetX) {
+        Node icon = getIconLiteral(type);
+        return showActionFeedback(owner, icon, message, offsetX, true, type.name().toLowerCase(Locale.ROOT));
+    }
+
+    @Nullable
+    private static Node getIconLiteral(AlertType type) {
         @Nullable String iconLit;
         switch (type) {
         case ERROR:
@@ -75,14 +90,9 @@ public final class SimplePopups {
             break;
         }
 
-        Node icon = iconLit == null ? null : new FontIcon(iconLit);
-
-        return showActionFeedback(owner, icon, message, type.name().toLowerCase(Locale.ROOT));
+        return iconLit == null ? null : new FontIcon(iconLit);
     }
 
-    public static EventStream<?> showActionFeedback(@NonNull Node owner, @NonNull String message) {
-        return showActionFeedback(owner, (Node) null, message);
-    }
 
     /**
      * Show a transient popup with a message, to let the user know an action
@@ -91,7 +101,12 @@ public final class SimplePopups {
      * @param owner Node next to which the popup will be shown
      * @return
      */
-    public static EventStream<?> showActionFeedback(@NonNull Node owner, @Nullable Node graphic, @NonNull String message, String... cssClasses) {
+    public static EventStream<?> showActionFeedback(@NonNull Node owner,
+                                                    @Nullable Node graphic,
+                                                    @NonNull String message,
+                                                    double offsetX,
+                                                    boolean stick,
+                                                    String... cssClasses) {
 
         Popup popup = new Popup();
         Label label = new Label(message, graphic);
@@ -104,28 +119,47 @@ public final class SimplePopups {
         pane.getChildren().addAll(label);
         popup.getContent().addAll(pane);
 
-        Animation fadeTransition = bounceFadeAnimation(pane);
+        Animation fadeTransition = stick ? fadeInAnimation(pane) : bounceFadeAnimation(pane);
         EventSource<?> closeTick = new EventSource<>();
-        fadeTransition.setOnFinished(e -> {
-            popup.hide();
-            closeTick.push(null);
-        });
+        if (stick) {
+            pane.setOnMouseClicked(evt -> {
+                popup.hide();
+                closeTick.push(null);
+            });
+        } else {
+            fadeTransition.setOnFinished(e -> {
+                popup.hide();
+                closeTick.push(null);
+            });
+        }
 
         popup.setOnShowing(e -> fadeTransition.play());
 
         Bounds screenBounds = owner.localToScreen(owner.getBoundsInLocal());
-        popup.show(owner, screenBounds.getMaxX() + 20, screenBounds.getMinY());
+        popup.show(owner, screenBounds.getMaxX() + offsetX, screenBounds.getMinY());
         return closeTick;
     }
 
 
     private static Animation bounceFadeAnimation(Node owner) {
-        final int BOUNCE_DURATION_MS = 2000;
+        return bounceFadeAnimation(owner, 2000, .3, 1);
+    }
+
+    private static Animation fadeInAnimation(Node owner) {
+        return bounceFadeAnimation(owner, 2000, .3, .5);
+    }
+
+    private static Animation bounceFadeAnimation(final Node owner,
+                                                 final int durationMs,
+                                                 final double plateauWidth,
+                                                 final double end) {
+        assert plateauWidth >= 0 && plateauWidth <= 1;
+        assert end >= 0 && end <= 1;
 
         return new Transition() {
 
             {
-                setCycleDuration(Duration.millis(BOUNCE_DURATION_MS));
+                setCycleDuration(Duration.millis(durationMs));
                 setInterpolator(Interpolator.EASE_OUT);
             }
 
@@ -137,8 +171,10 @@ public final class SimplePopups {
             }
 
             private double map(double x) {
+                if (x > end) {
+                    x = end;
+                }
                 double t = x - .5; // translate
-                final double plateauWidth = .3;
 
                 double plateau = x > .5 - plateauWidth && x < .5 + plateauWidth ? 1 : 0;
                 return (.25 - t * t) * 4 + plateau;
@@ -148,8 +184,6 @@ public final class SimplePopups {
                 return min(1, max(0, i));
             }
         };
-
-
     }
 
     public static void showLicensePopup() {

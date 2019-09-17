@@ -157,6 +157,11 @@ public class MainDesignerController extends AbstractController {
             getLogger().numNewLogEntriesProperty().map(i -> "Event _Log (" + (i > 0 ? i : "no") + " new)")
         );
 
+        initLanguageChoicebox();
+
+    }
+
+    private void initLanguageChoicebox() {
         languageChoicebox.getItems().addAll(getSupportedLanguages().sorted().collect(Collectors.toList()));
         languageChoicebox.setConverter(DesignerUtil.stringConverter(Language::getName, LanguageRegistryUtil::findLanguageByName));
 
@@ -169,9 +174,8 @@ public class MainDesignerController extends AbstractController {
 
         Platform.runLater(() -> {
             langSelector.clearSelection();
-            langSelector.select(restored);
+            langSelector.select(restored); // trigger listener
         });
-
     }
 
 
@@ -187,6 +191,14 @@ public class MainDesignerController extends AbstractController {
             metricResultsTab.setText("Metrics\t(" + (n == 0 ? "none" : n) + ")");
             metricResultsTab.setDisable(n == 0);
         });
+
+        if (languageChoicebox.getItems().size() == 1
+            && languageChoicebox.getItems().get(0) == LanguageRegistryUtil.plainTextLanguage()) {
+
+            Platform.runLater(() -> SimplePopups.showStickyNotification(languageChoicebox, AlertType.ERROR,
+                                                                        "No pmd language modules on classpath!",
+                                                                        100));
+        }
     }
 
 
