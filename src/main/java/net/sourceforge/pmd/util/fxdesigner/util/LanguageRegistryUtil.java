@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import net.sourceforge.pmd.lang.Language;
@@ -28,6 +29,7 @@ import net.sourceforge.pmd.lang.Parser;
  */
 public final class LanguageRegistryUtil {
 
+    private static final String DEFAULT_LANGUAGE_NAME = "Java";
     private static List<LanguageVersion> supportedLanguageVersions;
     private static Map<String, LanguageVersion> extensionsToLanguage;
 
@@ -35,9 +37,39 @@ public final class LanguageRegistryUtil {
 
     }
 
+    @NonNull
     public static LanguageVersion defaultLanguageVersion() {
-        Language defaultLanguage = LanguageRegistry.getDefaultLanguage();
-        return defaultLanguage == null ? null : defaultLanguage.getDefaultVersion();
+        return defaultLanguage().getDefaultVersion();
+    }
+
+
+    // TODO need a notion of dialect in core + language services
+    public static boolean isXmlDialect(Language language) {
+        switch (language.getTerseName()) {
+        case "xml":
+        case "pom":
+        case "wsql":
+        case "fxml":
+        case "xsl":
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    public static Language plainTextLanguage() {
+        Language fallback = LanguageRegistry.findLanguageByTerseName(PlainTextLanguage.TERSE_NAME);
+        if (fallback != null) {
+            return fallback;
+        } else {
+            throw new AssertionError("No plain text language?");
+        }
+    }
+
+    @NonNull
+    public static Language defaultLanguage() {
+        Language defaultLanguage = LanguageRegistry.getLanguage(DEFAULT_LANGUAGE_NAME);
+        return defaultLanguage != null ? defaultLanguage : plainTextLanguage();
     }
 
     private static Map<String, LanguageVersion> getExtensionsToLanguageMap() {
@@ -51,6 +83,7 @@ public final class LanguageRegistryUtil {
         return result;
     }
 
+    @Nullable
     public static synchronized LanguageVersion getLanguageVersionFromExtension(String filename) {
         if (extensionsToLanguage == null) {
             extensionsToLanguage = getExtensionsToLanguageMap();
@@ -78,22 +111,30 @@ public final class LanguageRegistryUtil {
         return supportedLanguageVersions;
     }
 
-    @Nullable
+    @NonNull
     public static LanguageVersion getLanguageVersionByName(String name) {
-        return getSupportedLanguageVersions().stream().filter(it -> it.getName().equals(name)).findFirst().orElse(null);
+        return getSupportedLanguageVersions().stream()
+                                             .filter(it -> it.getName().equals(name))
+                                             .findFirst()
+                                             .orElse(defaultLanguageVersion());
     }
 
+    @NonNull
     public static Stream<Language> getSupportedLanguages() {
         return getSupportedLanguageVersions().stream().map(LanguageVersion::getLanguage).distinct();
     }
 
+    @NonNull
     public static Language findLanguageByShortName(String shortName) {
         return getSupportedLanguages().filter(it -> it.getShortName().equals(shortName))
                                       .findFirst()
-                                      .get();
+                                      .orElse(defaultLanguage());
     }
 
+    @NonNull
     public static Language findLanguageByName(String n) {
-        return getSupportedLanguages().filter(it -> it.getName().equals(n)).findFirst().orElse(LanguageRegistry.getDefaultLanguage());
+        return getSupportedLanguages().filter(it -> it.getName().equals(n))
+                                      .findFirst()
+                                      .orElse(defaultLanguage());
     }
 }

@@ -5,7 +5,11 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import static net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups.showLicensePopup;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguage;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getLanguageVersionFromExtension;
 import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguages;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.isXmlDialect;
+import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.plainTextLanguage;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,11 +23,11 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.reactfx.Subscription;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -39,6 +43,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox;
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -109,7 +114,7 @@ public class MainDesignerController extends AbstractController {
     private ScopesPanelController scopesPanelController;
 
 
-    private final Var<Language> globalLanguage = Var.newSimpleVar(LanguageRegistry.getDefaultLanguage());
+    private final Var<Language> globalLanguage = Var.newSimpleVar(defaultLanguage());
 
     // we cache it but if it's not used the FXML is not created, etc
     private final SoftReferenceCache<EventLogController> eventLogController;
@@ -123,7 +128,7 @@ public class MainDesignerController extends AbstractController {
         super(designerRoot);
         eventLogController = new SoftReferenceCache<>(() -> new EventLogController(designerRoot));
 
-        designerRoot.registerService(DesignerRoot.APP_GLOBAL_LANGUAGE, globalLanguage);
+        designerRoot.registerService(DesignerRoot.APP_GLOBAL_LANGUAGE, globalLanguage.orElseConst(defaultLanguage()));
     }
 
 
@@ -152,11 +157,16 @@ public class MainDesignerController extends AbstractController {
             getLogger().numNewLogEntriesProperty().map(i -> "Event _Log (" + (i > 0 ? i : "no") + " new)")
         );
 
+        initLanguageChoicebox();
+
+    }
+
+    private void initLanguageChoicebox() {
         languageChoicebox.getItems().addAll(getSupportedLanguages().sorted().collect(Collectors.toList()));
         languageChoicebox.setConverter(DesignerUtil.stringConverter(Language::getName, LanguageRegistryUtil::findLanguageByName));
 
         SingleSelectionModel<Language> langSelector = languageChoicebox.getSelectionModel();
-        Language restored = globalLanguage.getValue();
+        @NonNull Language restored = globalLanguage.getOrElse(defaultLanguage());
 
         globalLanguage.bind(langSelector.selectedItemProperty());
 
@@ -164,9 +174,8 @@ public class MainDesignerController extends AbstractController {
 
         Platform.runLater(() -> {
             langSelector.clearSelection();
-            langSelector.select(restored);
+            langSelector.select(restored); // trigger listener
         });
-
     }
 
 
@@ -182,6 +191,14 @@ public class MainDesignerController extends AbstractController {
             metricResultsTab.setText("Metrics\t(" + (n == 0 ? "none" : n) + ")");
             metricResultsTab.setDisable(n == 0);
         });
+
+        if (languageChoicebox.getItems().size() == 1
+            && languageChoicebox.getItems().get(0) == LanguageRegistryUtil.plainTextLanguage()) {
+
+            Platform.runLater(() -> SimplePopups.showStickyNotification(languageChoicebox, AlertType.ERROR,
+                                                                        "No pmd language modules on classpath!",
+                                                                        100));
+        }
     }
 
 
@@ -202,9 +219,30 @@ public class MainDesignerController extends AbstractController {
             try {
                 String source = IOUtils.toString(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8);
                 sourceEditorController.setText(source);
-                LanguageVersion guess = LanguageRegistryUtil.getLanguageVersionFromExtension(file.getName());
-                if (guess != null) { // guess the language from the extension
+                LanguageVersion guess = getLanguageVersionFromExtension(file.getName());
+                if (guess == null) {
+
+                    if (!isXmlDialect(getGlobalLanguage())) {
+                        // if we're a xml language, assume the file is some xml dialect too,
+                        //   otherwise go back to plain text
+                        sourceEditorController.setLanguageVersion(plainTextLanguage().getDefaultVersion());
+                    }
+
+                    if (getSupportedLanguages().count() > 1) {
+                        SimplePopups.showActionFeedback(
+                            languageChoicebox,
+                            AlertType.INFORMATION,
+                            "Pick a language?"
+                        );
+                    }
+                } else if (guess != sourceEditorController.getLanguageVersion()) {
+                    // guess the language from the extension
                     sourceEditorController.setLanguageVersion(guess);
+                    SimplePopups.showActionFeedback(
+                        languageChoicebox,
+                        AlertType.CONFIRMATION,
+                        "Set language to " + guess.getLanguage().getName()
+                    );
                 }
 
                 recentFiles.push(file);

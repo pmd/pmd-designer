@@ -6,6 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.app;
 
 import java.util.function.Supplier;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.Language;
@@ -55,7 +56,7 @@ public interface ApplicationComponent {
     /**
      * The language is now global to the app.
      */
-    default Val<Language> globalLanguageProperty() {
+    default Val<@NonNull Language> globalLanguageProperty() {
         return getService(DesignerRoot.APP_GLOBAL_LANGUAGE);
     }
 

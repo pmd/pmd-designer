@@ -17,11 +17,11 @@ import org.reactfx.value.Var;
 import net.sourceforge.pmd.Rule;
 import net.sourceforge.pmd.RulePriority;
 import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.rules.RuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCollection;
+import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
@@ -37,7 +37,7 @@ import javafx.collections.ObservableList;
  */
 public class ObservableRuleBuilder implements SettingsOwner {
 
-    private final Var<Language> language = Var.newSimpleVar(LanguageRegistry.getDefaultLanguage());
+    private final Var<Language> language = Var.newSimpleVar(LanguageRegistryUtil.defaultLanguage());
     private final Var<String> name = Var.newSimpleVar(null);
     private final Var<Class<?>> clazz = Var.newSimpleVar(null);
 
@@ -62,6 +62,7 @@ public class ObservableRuleBuilder implements SettingsOwner {
     private final Var<Boolean> usesTypeResolution = Var.newSimpleVar(false);
 
     private final TestCollection testCollection = new TestCollection(this, Collections.emptyList());
+
 
     @PersistentProperty // CUSTOM?
     public Language getLanguage() {
