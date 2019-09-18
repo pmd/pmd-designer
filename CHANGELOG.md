@@ -2,10 +2,12 @@
 
 ## 6.19.0
 
+* Add scala syntax highlighter
+* When no language modules are on the classpath, the app will still run normally, opening files with a "plain text" language and displaying a warning.
 * Fix some internal issues
-  * When no language modules are on the classpath, the app will open files with the "plain text" language.
   * Version stamping not working
 
+See https://github.com/pmd/pmd-designer/milestone/7
 
 ## 6.17.0
 
