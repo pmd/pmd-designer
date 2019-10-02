@@ -38,10 +38,9 @@ import javafx.fxml.FXML;
  * the form of rule builders).
  *
  * <p>Each {@link XPathRuleEditorController} has its own {@link DesignerRoot}
- * with scopes some services down to it ({@link DesignerRoot#LATEST_XPATH} for now).
+ * with scopes some services down to it (see {@link #newScope()}).
  * This allows keeping several rule editors independent, this class being
  * the bridge between the selected one and the static top of the app.
- *
  *
  * @author Clément Fournier
  */
