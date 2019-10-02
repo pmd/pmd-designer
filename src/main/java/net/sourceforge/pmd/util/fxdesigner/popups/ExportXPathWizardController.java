@@ -292,6 +292,7 @@ public final class ExportXPathWizardController implements Initializable {
             .appendIndent(2).appendLine("<property name=\"xpath\">")
             .appendIndent(3).appendLine("<value>")
             .appendLine("<![CDATA[")
+            .withDefaultEscape(s -> s) // stop escaping
             .bind(ObservableXPathRuleBuilder::xpathExpressionProperty).endLine()
             .appendLine("]]>")
             .appendIndent(3).appendLine("</value>")
