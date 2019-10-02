@@ -4,6 +4,7 @@
 
 * Add scala syntax highlighter
 * When no language modules are on the classpath, the app will still run normally, opening files with a "plain text" language and displaying a warning.
+* Fix [#27](https://github.com/pmd/pmd-designer/issues/27): Rule export escapes special characters in rules unnecessarily
 * Fix some internal issues
   * Version stamping not working
 
