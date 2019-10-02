@@ -8,9 +8,9 @@
 
 The Rule Designer is a graphical tool that helps PMD users develop their custom
 rules. Main features:
-* [AST inspection](https://github.com/pmd/pmd-designer/wiki#ast-inspection): inspect AST structure for any language, including XPath attributes
-* [XPath rule design](https://github.com/pmd/pmd-designer/wiki#xpath-rule-design): integrated XPath editor, and rule metadata editor
-* [Rule test edition](https://github.com/pmd/pmd-designer/wiki/Testing_rules): create or edit rule test files for the [PMD testing framework](https://pmd.github.io/latest/pmd_userdocs_extending_testing.html)
+* [AST inspection](https://pmd.github.io/latest/pmd_userdocs_extending_designer_reference.html#ast-inspection): inspect AST structure for any language, including XPath attributes
+* [XPath rule design](https://pmd.github.io/latest/pmd_userdocs_extending_designer_reference.html#xpath-rule-design): integrated XPath editor, and rule metadata editor
+* [Rule test edition](https://pmd.github.io/latest/pmd_userdocs_extending_designer_reference.html#testing-a-rule): create or edit rule test files for the [PMD testing framework](https://pmd.github.io/latest/pmd_userdocs_extending_testing.html)
 
 
 ![testing-designer](https://user-images.githubusercontent.com/24524930/61461094-504a7900-a970-11e9-822e-30cc121b568c.gif)
@@ -34,7 +34,7 @@ PMD distribution.
 
 ## Usage
 
-### [Usage documentation is on the wiki](https://github.com/pmd/pmd-designer/wiki)
+### [Usage documentation is on the website](https://pmd.github.io/latest/pmd_userdocs_extending_designer_reference.html)
 
 ## Building from source/ contributing
 
