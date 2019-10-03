@@ -64,6 +64,11 @@ public final class PlainTextLanguage extends BaseLanguageModule {
             return RV_FACTORY;
         }
 
+        @SuppressWarnings({"PMD.MissingOverride", "rawtypes"})
+        public List getProcessingStages() {
+            return Collections.emptyList();
+        }
+
         @Override
         public Parser getParser(ParserOptions parserOptions) {
             return new Parser() {
