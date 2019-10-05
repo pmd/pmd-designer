@@ -55,7 +55,7 @@
 
     <properties>
         <pmd.core.version>6.12.0</pmd.core.version>
-        <openjfx.version>11</openjfx.version>
+        <openjfx.version>11.0.2</openjfx.version>
         <java.version>8</java.version>
         <kotlin.version>1.2.61</kotlin.version>
 
