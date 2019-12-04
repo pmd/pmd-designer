@@ -44,18 +44,18 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-base:11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-base:linux:11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-controls:11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-controls:linux:11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-fxml:11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-fxml:linux:11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-graphics:11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-graphics:linux:11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-media:11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-media:linux:11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-web:11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-web:linux:11" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-base:11.0.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-base:linux:11.0.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-controls:11.0.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-controls:linux:11.0.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-fxml:11.0.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-fxml:linux:11.0.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-graphics:11.0.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-graphics:linux:11.0.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-media:11.0.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-media:linux:11.0.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-web:11.0.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-web:linux:11.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.fxmisc.richtext:richtextfx:0.9.2" level="project" />
     <orderEntry type="library" name="Maven: org.reactfx:reactfx:2.0-M5" level="project" />
     <orderEntry type="library" name="Maven: org.fxmisc.undo:undofx:2.1.0" level="project" />

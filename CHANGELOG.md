@@ -1,8 +1,13 @@
 # Changelog
 
-## 6.20.0
 
-See https://github.com/pmd/pmd-designer/milestone/8
+
+## 6.21.0
+
+See https://github.com/pmd/pmd-designer/milestone/9
+
+Thanks to @atrosinenko for contributing a syntax highlighter for Modelica.
+
 
 ## 6.19.0
 
