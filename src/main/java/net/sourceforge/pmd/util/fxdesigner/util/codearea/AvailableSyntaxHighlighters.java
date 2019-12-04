@@ -13,6 +13,7 @@ import org.fxmisc.richtext.model.StyleSpans;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.ApexSyntaxHighlighter;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.JavaSyntaxHighlighter;
+import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.ModelicaSyntaxHighlighter;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.ScalaSyntaxHighlighter;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XPathSyntaxHighlighter;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlSyntaxHighlighter;
@@ -35,7 +36,8 @@ public enum AvailableSyntaxHighlighters implements SyntaxHighlighter {
     XSL("xsl", new XmlSyntaxHighlighter()),
     WSDL("wsdl", new XmlSyntaxHighlighter()),
     POM("pom", new XmlSyntaxHighlighter()),
-    XPATH("xpath", new XPathSyntaxHighlighter());
+    XPATH("xpath", new XPathSyntaxHighlighter()),
+    MODELICA("modelica", new ModelicaSyntaxHighlighter());
 
 
     private final String language;
