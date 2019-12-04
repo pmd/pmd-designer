@@ -28,7 +28,7 @@ If the `bin` directory of your PMD distribution is on your shell's path, then yo
 
 ### Updating
 
-The latest version of the designer currently **works with PMD 6.12.0 and above**.
+The latest version of the designer currently **works with PMD 6.20.0 and above**.
 You can simply replace `pmd-ui-6.X.Y.jar` with the [latest build](https://github.com/pmd/pmd-designer/releases/tag/6.16.0) in the installation folder of your
 PMD distribution.
 

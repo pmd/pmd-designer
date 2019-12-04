@@ -4,9 +4,12 @@
 
 ## 6.21.0
 
-See https://github.com/pmd/pmd-designer/milestone/9
+* **Bump required pmd-core version to 6.20.0.** The previous minimal pmd-core version was 6.12.0.
+* Add Modelica syntax highlighter, thanks to @atrosinenko
 
-Thanks to @atrosinenko for contributing a syntax highlighter for Modelica.
+
+
+See https://github.com/pmd/pmd-designer/milestone/9
 
 
 ## 6.19.0
