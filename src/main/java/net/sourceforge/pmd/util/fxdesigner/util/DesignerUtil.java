@@ -307,7 +307,8 @@ public final class DesignerUtil {
 
 
     public static RelatedNodesSelector getDefaultRelatedNodesSelector() {
-        return node -> node instanceof ScopedNode ? getNameOccurrences((ScopedNode) node) : Collections.emptyList();
+        return node -> node instanceof ScopedNode ? getNameOccurrences((ScopedNode) node)
+                                                  : Collections.emptyList();
     }
 
     private static List<Node> getNameOccurrences(ScopedNode node) {

@@ -315,13 +315,11 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         // editor is only restyled if the selection has changed
         Platform.runLater(() -> styleNodes(node == null ? emptyList() : singleton(node), StyleLayerIds.FOCUS, true));
 
-        Platform.runLater(() -> relatedNodesSelector.ifPresent(selector -> {
-            List<Node> nodes = selector.getHighlightedNodesWhenSelecting(node);
-            highlightRelatedNodes(Objects.requireNonNull(nodes,
-                                                         "RelatedNodesSelection for language "
-                                                             + globalLanguageProperty().getValue().getName()
-                                                             + " returned null"));
-        }));
+        if (node == null) {
+            highlightRelatedNodes(emptyList());
+        } else {
+            Platform.runLater(() -> highlightRelatedNodes(relatedNodesSelector.getValue().getHighlightedNodesWhenSelecting(node)));
+        }
     }
 
 
