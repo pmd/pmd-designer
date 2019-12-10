@@ -73,7 +73,7 @@
                                                     <Insets/>
                                                 </padding>
                                                 <VirtualizedScrollPane
-                                                        fx:id="codeAreaContainer"
+                                                        fx:id="codeAreaParent"
                                                         AnchorPane.bottomAnchor="0.0"
                                                         AnchorPane.leftAnchor="0.0"
                                                         AnchorPane.rightAnchor="0.0"

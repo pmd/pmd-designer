@@ -121,7 +121,7 @@ public class SourceEditorController extends AbstractController {
     @FXML
     private NodeEditionCodeArea nodeEditionCodeArea;
     @FXML
-    private Parent codeAreaContainer;
+    private Parent codeAreaParent;
     @FXML
     private NodeParentageCrumbBar focusNodeParentageCrumbBar;
 
@@ -288,12 +288,12 @@ public class SourceEditorController extends AbstractController {
             AnchorPane otherPane = emptyPane();
             testCaseToolsTitledPane.setContent(otherPane);
 
-            otherPane.getChildren().addAll(codeAreaContainer);
+            otherPane.getChildren().addAll(codeAreaParent);
             pane.getChildren().addAll(testCaseToolsTitledPane);
         } else {
             AnchorPane otherPane = emptyPane();
             editorTitledPane.setContent(otherPane);
-            otherPane.getChildren().addAll(codeAreaContainer);
+            otherPane.getChildren().addAll(codeAreaParent);
         }
     }
 
