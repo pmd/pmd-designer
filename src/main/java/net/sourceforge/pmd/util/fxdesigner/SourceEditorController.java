@@ -61,6 +61,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
@@ -119,6 +120,8 @@ public class SourceEditorController extends AbstractController {
     private AstTreeView astTreeView;
     @FXML
     private NodeEditionCodeArea nodeEditionCodeArea;
+    @FXML
+    private Parent codeAreaParent;
     @FXML
     private NodeParentageCrumbBar focusNodeParentageCrumbBar;
 
@@ -285,12 +288,12 @@ public class SourceEditorController extends AbstractController {
             AnchorPane otherPane = emptyPane();
             testCaseToolsTitledPane.setContent(otherPane);
 
-            otherPane.getChildren().addAll(nodeEditionCodeArea);
+            otherPane.getChildren().addAll(codeAreaParent);
             pane.getChildren().addAll(testCaseToolsTitledPane);
         } else {
             AnchorPane otherPane = emptyPane();
             editorTitledPane.setContent(otherPane);
-            otherPane.getChildren().addAll(nodeEditionCodeArea);
+            otherPane.getChildren().addAll(codeAreaParent);
         }
     }
 
