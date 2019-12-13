@@ -38,6 +38,7 @@ import net.sourceforge.pmd.lang.symboltable.NameDeclaration;
 import net.sourceforge.pmd.lang.symboltable.NameOccurrence;
 import net.sourceforge.pmd.lang.symboltable.Scope;
 import net.sourceforge.pmd.lang.symboltable.ScopedNode;
+import net.sourceforge.pmd.util.designerbindings.RelatedNodesSelector;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 
 import com.sun.javafx.fxml.builder.ProxyBuilder;
@@ -305,7 +306,12 @@ public final class DesignerUtil {
     }
 
 
-    public static List<NameOccurrence> getNameOccurrences(ScopedNode node) {
+    public static RelatedNodesSelector getDefaultRelatedNodesSelector() {
+        return node -> node instanceof ScopedNode ? getNameOccurrences((ScopedNode) node)
+                                                  : Collections.emptyList();
+    }
+
+    private static List<Node> getNameOccurrences(ScopedNode node) {
 
         // For MethodNameDeclaration the scope is the method scope, which is not the scope it is declared
         // in but the scope it declares! That means that getDeclarations().get(declaration) returns null
@@ -336,6 +342,7 @@ public final class DesignerUtil {
 
                              return usages;
                          })
+                         .map(it -> it.stream().<Node>map(NameOccurrence::getLocation).collect(Collectors.toList()))
                          .orElse(Collections.emptyList());
     }
 

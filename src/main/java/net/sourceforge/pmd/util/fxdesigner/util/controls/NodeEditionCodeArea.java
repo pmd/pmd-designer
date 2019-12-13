@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.IntFunction;
-import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -34,9 +33,11 @@ import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.Language;
+import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.lang.LanguageVersionHandler;
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.lang.symboltable.NameOccurrence;
-import net.sourceforge.pmd.lang.symboltable.ScopedNode;
+import net.sourceforge.pmd.util.designerbindings.DesignerBindings;
+import net.sourceforge.pmd.util.designerbindings.RelatedNodesSelector;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
@@ -84,28 +85,37 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     private final Var<Node> currentFocusNode = Var.newSimpleVar(null);
     private final Var<List<Node>> currentRuleResults = Var.newSimpleVar(Collections.emptyList());
     private final Var<List<Node>> currentErrorNodes = Var.newSimpleVar(Collections.emptyList());
-    private final Var<List<NameOccurrence>> currentNameOccurrences = Var.newSimpleVar(Collections.emptyList());
+    private final Var<List<Node>> currentRelatedNodes = Var.newSimpleVar(Collections.emptyList());
     private final DesignerRoot designerRoot;
     private final EventSource<NodeSelectionEvent> selectionEvts = new EventSource<>();
 
-
+    private final Val<RelatedNodesSelector> relatedNodesSelector;
 
     /** Only provided for scenebuilder, not used at runtime. */
     public NodeEditionCodeArea() {
         super(StyleLayerIds.class);
-        designerRoot = null;
+        this.designerRoot = null;
+        this.relatedNodesSelector = null;
     }
 
     public NodeEditionCodeArea(@NamedArg("designerRoot") DesignerRoot root) {
         super(StyleLayerIds.class);
 
         this.designerRoot = root;
+        this.relatedNodesSelector =
+            root.getService(DesignerRoot.AST_MANAGER)
+                .languageVersionProperty()
+                .map(LanguageVersion::getLanguageVersionHandler)
+                .map(LanguageVersionHandler::getDesignerBindings)
+                .map(DesignerBindings::getRelatedNodesSelector)
+                .orElseConst(DesignerUtil.getDefaultRelatedNodesSelector());
+
 
         setParagraphGraphicFactory(defaultLineNumberFactory());
 
         currentRuleResultsProperty().values().subscribe(this::highlightXPathResults);
         currentErrorNodesProperty().values().subscribe(this::highlightErrorNodes);
-        currentNameOccurrences.values().subscribe(this::highlightNameOccurrences);
+        currentRelatedNodesProperty().values().subscribe(this::highlightRelatedNodes);
 
         initNodeSelectionHandling(designerRoot, selectionEvts, true);
 
@@ -251,8 +261,8 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     }
 
 
-    public Var<List<NameOccurrence>> currentNameOccurrencesProperty() {
-        return currentNameOccurrences;
+    public Var<List<Node>> currentRelatedNodesProperty() {
+        return currentRelatedNodes;
     }
 
 
@@ -263,8 +273,8 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
 
     /** Highlights name occurrences (secondary highlight). */
-    private void highlightNameOccurrences(Collection<? extends NameOccurrence> occs) {
-        styleNodes(occs.stream().map(NameOccurrence::getLocation).collect(Collectors.toList()), StyleLayerIds.NAME_OCCURRENCE, true);
+    private void highlightRelatedNodes(Collection<? extends Node> occs) {
+        styleNodes(occs, StyleLayerIds.NAME_OCCURRENCE, true);
     }
 
 
@@ -305,9 +315,10 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         // editor is only restyled if the selection has changed
         Platform.runLater(() -> styleNodes(node == null ? emptyList() : singleton(node), StyleLayerIds.FOCUS, true));
 
-        if (node instanceof ScopedNode) {
-            // not null as well
-            Platform.runLater(() -> highlightNameOccurrences(DesignerUtil.getNameOccurrences((ScopedNode) node)));
+        if (node == null) {
+            highlightRelatedNodes(emptyList());
+        } else {
+            Platform.runLater(() -> highlightRelatedNodes(relatedNodesSelector.getValue().getHighlightedNodesWhenSelecting(node)));
         }
     }
 
