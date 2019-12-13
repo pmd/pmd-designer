@@ -6,8 +6,8 @@
 
 * **Bump required pmd-core version to 6.20.0.** The previous minimal pmd-core version was 6.12.0.
 * Add Modelica syntax highlighter, thanks to @atrosinenko
-
-
+* Add scrollbars to code area (fixes #22)
+* Internal improvements (refs #33)
 
 See https://github.com/pmd/pmd-designer/milestone/9
 
