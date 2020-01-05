@@ -33,9 +33,9 @@ import org.xml.sax.SAXException;
 
 import net.sourceforge.pmd.RulePriority;
 import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.properties.PropertyTypeId;
+import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.Serializer;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.SerializerRegistrar;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
@@ -54,8 +54,8 @@ public final class SettingsPersistenceUtil {
     static {
         SerializerRegistrar.getInstance().registerMapped(RulePriority.class, Integer.class, RulePriority::getPriority, RulePriority::valueOf);
         SerializerRegistrar.getInstance().registerMapped(PropertyTypeId.class, String.class, PropertyTypeId::getStringId, PropertyTypeId::lookupMnemonic);
-        SerializerRegistrar.getInstance().registerMapped(LanguageVersion.class, String.class, LanguageVersion::getTerseName, LanguageRegistry::findLanguageVersionByTerseName);
-        SerializerRegistrar.getInstance().registerMapped(Language.class, String.class, Language::getTerseName, LanguageRegistry::findLanguageByTerseName);
+        SerializerRegistrar.getInstance().registerMapped(LanguageVersion.class, String.class, LanguageVersion::getTerseName, AuxLanguageRegistry::findLanguageVersionByTerseName);
+        SerializerRegistrar.getInstance().registerMapped(Language.class, String.class, Language::getTerseName, AuxLanguageRegistry::findLanguageByTerseName);
         SerializerRegistrar.getInstance().registerMapped(TextRange.class, String.class, TextRange::toString, TextRange::fromString);
         Serializer<Properties> propertiesSerializer =
             SerializerRegistrar.getInstance().getSerializer(new TypeLiteral<Map<String, String>>() { })

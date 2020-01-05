@@ -9,7 +9,7 @@ import static com.github.oowekyala.rxstring.ItemRenderer.indented;
 import static com.github.oowekyala.rxstring.ItemRenderer.surrounded;
 import static com.github.oowekyala.rxstring.ItemRenderer.wrapped;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.stringConverter;
-import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguageVersions;
+import static net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry.getSupportedLanguageVersions;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewireInit;
 
 import java.net.URL;
@@ -31,8 +31,8 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableXPathRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
+import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.StageBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlSyntaxHighlighter;
@@ -178,7 +178,7 @@ public final class ExportXPathWizardController implements Initializable {
                                                                           .distinct()
                                                                           .collect(Collectors.toList()));
 
-        languageChoiceBox.setConverter(stringConverter(Language::getShortName, LanguageRegistryUtil::findLanguageByShortName));
+        languageChoiceBox.setConverter(stringConverter(Language::getShortName, AuxLanguageRegistry::findLanguageByShortName));
     }
 
 

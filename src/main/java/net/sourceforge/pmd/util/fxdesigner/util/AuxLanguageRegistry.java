@@ -4,8 +4,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util;
 
-import static net.sourceforge.pmd.lang.LanguageRegistry.findAllVersions;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,21 +25,29 @@ import net.sourceforge.pmd.lang.Parser;
  *
  * @author Clément Fournier
  */
-public final class LanguageRegistryUtil {
+public final class AuxLanguageRegistry {
 
     private static final String DEFAULT_LANGUAGE_NAME = "Java";
     private static List<LanguageVersion> supportedLanguageVersions;
     private static Map<String, LanguageVersion> extensionsToLanguage;
 
-    private LanguageRegistryUtil() {
+    private AuxLanguageRegistry() {
 
+    }
+
+    public static LanguageVersion findLanguageVersionByTerseName(String string) {
+        String[] split = string.split(" ");
+        Language lang = findLanguageByTerseName(split[0]);
+        if (lang == null) {
+            return null;
+        }
+        return lang.getVersion(split[1]);
     }
 
     @NonNull
     public static LanguageVersion defaultLanguageVersion() {
         return defaultLanguage().getDefaultVersion();
     }
-
 
     // TODO need a notion of dialect in core + language services
     public static boolean isXmlDialect(Language language) {
@@ -58,17 +64,12 @@ public final class LanguageRegistryUtil {
     }
 
     public static Language plainTextLanguage() {
-        Language fallback = LanguageRegistry.findLanguageByTerseName(PlainTextLanguage.TERSE_NAME);
-        if (fallback != null) {
-            return fallback;
-        } else {
-            throw new AssertionError("No plain text language?");
-        }
+        return PlainTextLanguage.INSTANCE;
     }
 
     @NonNull
     public static Language defaultLanguage() {
-        Language defaultLanguage = LanguageRegistry.getLanguage(DEFAULT_LANGUAGE_NAME);
+        Language defaultLanguage = findLanguageByName(DEFAULT_LANGUAGE_NAME);
         return defaultLanguage != null ? defaultLanguage : plainTextLanguage();
     }
 
@@ -106,7 +107,9 @@ public final class LanguageRegistryUtil {
 
     public static synchronized List<LanguageVersion> getSupportedLanguageVersions() {
         if (supportedLanguageVersions == null) {
-            supportedLanguageVersions = findAllVersions().stream().filter(LanguageRegistryUtil::filterLanguageVersion).collect(Collectors.toList());
+            supportedLanguageVersions = getSupportedLanguages().flatMap(it -> it.getVersions().stream())
+                                                               .filter(AuxLanguageRegistry::filterLanguageVersion)
+                                                               .collect(Collectors.toList());
         }
         return supportedLanguageVersions;
     }
@@ -121,7 +124,7 @@ public final class LanguageRegistryUtil {
 
     @NonNull
     public static Stream<Language> getSupportedLanguages() {
-        return getSupportedLanguageVersions().stream().map(LanguageVersion::getLanguage).distinct();
+        return Stream.concat(Stream.of(PlainTextLanguage.INSTANCE), LanguageRegistry.getLanguages().stream());
     }
 
     @NonNull
@@ -131,10 +134,24 @@ public final class LanguageRegistryUtil {
                                       .orElse(defaultLanguage());
     }
 
-    @NonNull
+    @Nullable
     public static Language findLanguageByName(String n) {
         return getSupportedLanguages().filter(it -> it.getName().equals(n))
                                       .findFirst()
-                                      .orElse(defaultLanguage());
+                                      .orElse(null);
     }
+
+    @NonNull
+    public static Language findLanguageByNameOrDefault(String n) {
+        Language lang = findLanguageByName(n);
+        return lang == null ? defaultLanguage() : lang;
+    }
+
+    @Nullable
+    public static Language findLanguageByTerseName(String name) {
+        return getSupportedLanguages().filter(it -> it.getTerseName().equals(name))
+                                      .findFirst()
+                                      .orElse(null);
+    }
+
 }

@@ -9,14 +9,14 @@ import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.kotlintest.specs.FunSpec
 import net.sourceforge.pmd.lang.ast.test.matchNode
-import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil
+import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry
 import net.sourceforge.pmd.util.fxdesigner.util.PlainTextLanguage.PlainTextFile
 import java.io.StringReader
 
 class PlainTextLanguagTest : FunSpec({
 
     test("Test plain text lang is here") {
-        LanguageRegistryUtil.plainTextLanguage() shouldNotBe null
+        AuxLanguageRegistry.plainTextLanguage() shouldNotBe null
     }
 
     test("Test plain text language parsing") {
@@ -51,7 +51,7 @@ class PlainTextLanguagTest : FunSpec({
 })
 
 private fun String.parse(): PlainTextFile {
-    val lang = LanguageRegistryUtil.plainTextLanguage()
+    val lang = AuxLanguageRegistry.plainTextLanguage()
 
     lang.defaultVersion shouldNotBe null
 

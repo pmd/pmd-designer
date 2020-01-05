@@ -31,10 +31,10 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
 public class TestXmlParser {
@@ -141,7 +141,7 @@ public class TestXmlParser {
         String languageVersionString = getNodeValue(testCode, "source-type", false);
         LanguageVersion languageVersion = null;
         if (languageVersionString != null) {
-            languageVersion = LanguageRegistry.findLanguageVersionByTerseName(languageVersionString);
+            languageVersion = AuxLanguageRegistry.findLanguageVersionByTerseName(languageVersionString);
             if (languageVersion == null) {
                 throw new RuntimeException("Unknown LanguageVersion for test: " + languageVersionString);
             }

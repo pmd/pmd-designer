@@ -17,6 +17,7 @@ import net.sourceforge.pmd.RuleContext;
 import net.sourceforge.pmd.RuleViolation;
 import net.sourceforge.pmd.lang.AbstractLanguageVersionHandler;
 import net.sourceforge.pmd.lang.BaseLanguageModule;
+import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.Parser;
 import net.sourceforge.pmd.lang.ParserOptions;
 import net.sourceforge.pmd.lang.TokenManager;
@@ -35,9 +36,11 @@ import net.sourceforge.pmd.lang.rule.RuleViolationFactory;
  */
 public final class PlainTextLanguage extends BaseLanguageModule {
 
+    public static final Language INSTANCE = new PlainTextLanguage();
+
     static final String TERSE_NAME = "text";
 
-    public PlainTextLanguage() {
+    private PlainTextLanguage() {
         super("Plain text", "Plain text", TERSE_NAME, RchainVisitor.class, "plain-text-file-goo-extension");
         addVersion("default", new TextLvh(), true);
     }

@@ -5,11 +5,11 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import static net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups.showLicensePopup;
-import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.defaultLanguage;
-import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getLanguageVersionFromExtension;
-import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.getSupportedLanguages;
-import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.isXmlDialect;
-import static net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil.plainTextLanguage;
+import static net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry.defaultLanguage;
+import static net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry.getLanguageVersionFromExtension;
+import static net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry.getSupportedLanguages;
+import static net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry.isXmlDialect;
+import static net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry.plainTextLanguage;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +33,8 @@ import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.popups.EventLogController;
 import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
+import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LimitedSizeStack;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
@@ -163,7 +163,7 @@ public class MainDesignerController extends AbstractController {
 
     private void initLanguageChoicebox() {
         languageChoicebox.getItems().addAll(getSupportedLanguages().sorted().collect(Collectors.toList()));
-        languageChoicebox.setConverter(DesignerUtil.stringConverter(Language::getName, LanguageRegistryUtil::findLanguageByName));
+        languageChoicebox.setConverter(DesignerUtil.stringConverter(Language::getName, AuxLanguageRegistry::findLanguageByNameOrDefault));
 
         SingleSelectionModel<Language> langSelector = languageChoicebox.getSelectionModel();
         @NonNull Language restored = globalLanguage.getOrElse(defaultLanguage());
@@ -193,7 +193,7 @@ public class MainDesignerController extends AbstractController {
         });
 
         if (languageChoicebox.getItems().size() == 1
-            && languageChoicebox.getItems().get(0) == LanguageRegistryUtil.plainTextLanguage()) {
+            && languageChoicebox.getItems().get(0) == AuxLanguageRegistry.plainTextLanguage()) {
 
             Platform.runLater(() -> SimplePopups.showStickyNotification(languageChoicebox, AlertType.ERROR,
                                                                         "No pmd language modules on classpath!",

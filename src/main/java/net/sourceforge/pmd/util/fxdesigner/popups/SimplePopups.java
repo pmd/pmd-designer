@@ -23,8 +23,8 @@ import net.sourceforge.pmd.PMDVersion;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.util.fxdesigner.Designer;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
 
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
@@ -218,7 +218,7 @@ public final class SimplePopups {
                 + "Designer settings dir:\t\t"
                 + root.getService(DesignerRoot.DISK_MANAGER).getSettingsDirectory() + "\n"
                 + "Available languages:\t\t"
-                + LanguageRegistryUtil.getSupportedLanguages().map(Language::getTerseName).collect(Collectors.toList())
+                + AuxLanguageRegistry.getSupportedLanguages().map(Language::getTerseName).collect(Collectors.toList())
                 + "\n";
 
         textArea.setText(sb);

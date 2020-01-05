@@ -14,14 +14,12 @@ import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.Rule;
 import net.sourceforge.pmd.RulePriority;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.rules.RuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCollection;
-import net.sourceforge.pmd.util.fxdesigner.util.LanguageRegistryUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentSequence;
@@ -37,7 +35,7 @@ import javafx.collections.ObservableList;
  */
 public class ObservableRuleBuilder implements SettingsOwner {
 
-    private final Var<Language> language = Var.newSimpleVar(LanguageRegistryUtil.defaultLanguage());
+    private final Var<Language> language = Var.newSimpleVar(AuxLanguageRegistry.defaultLanguage());
     private final Var<String> name = Var.newSimpleVar(null);
     private final Var<Class<?>> clazz = Var.newSimpleVar(null);
 
@@ -57,9 +55,6 @@ public class ObservableRuleBuilder implements SettingsOwner {
 
     private final Var<RulePriority> priority = Var.newSimpleVar(RulePriority.MEDIUM);
     private final Var<Boolean> deprecated = Var.newSimpleVar(false);
-    private final Var<Boolean> usesDfa = Var.newSimpleVar(false);
-    private final Var<Boolean> usesMultifile = Var.newSimpleVar(false);
-    private final Var<Boolean> usesTypeResolution = Var.newSimpleVar(false);
 
     private final TestCollection testCollection = new TestCollection(this, Collections.emptyList());
 
@@ -275,21 +270,6 @@ public class ObservableRuleBuilder implements SettingsOwner {
     }
 
 
-    /**
-     * Returns true if the parameters of the rule are consistent and the rule can be built.
-     *
-     * @return whether the rule can be built
-     */
-    public boolean canBuild() {
-        try {
-            build();
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-
     public ObservableRuleBuilder deepCopy() {
         ObservableRuleBuilder copy = newBuilder();
         copy.setName(getName());
@@ -315,45 +295,6 @@ public class ObservableRuleBuilder implements SettingsOwner {
 
     protected ObservableRuleBuilder newBuilder() {
         return new ObservableRuleBuilder();
-    }
-
-    /**
-     * Builds the rule.
-     *
-     * @return the built rule.
-     *
-     * @throws IllegalArgumentException if parameters are incorrect
-     */
-    public Optional<Rule> build() throws IllegalArgumentException {
-
-        try {
-            RuleBuilder builder = new RuleBuilder(name.getValue(),
-                                                  clazz.getValue().getCanonicalName(),
-                                                  language.getValue().getTerseName());
-
-            builder.minimumLanguageVersion(minimumVersion.getValue().getTerseName());
-            builder.maximumLanguageVersion(maximumVersion.getValue().getTerseName());
-
-            builder.message(message.getValue());
-            builder.since(since.getValue());
-            builder.externalInfoUrl(externalInfoUrl.getValue());
-            builder.description(description.getValue());
-            builder.priority(priority.getValue().getPriority());
-
-            builder.setDeprecated(deprecated.getValue());
-            builder.usesDFA(usesDfa.getValue());
-            builder.usesTyperesolution(usesTypeResolution.getValue());
-            builder.usesMultifile(usesMultifile.getValue());
-
-            ruleProperties.stream().map(PropertyDescriptorSpec::build).forEach(builder::defineProperty);
-            examples.forEach(builder::addExample);
-
-            return Optional.of(builder.build());
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
-
     }
 
 }
