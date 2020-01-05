@@ -42,8 +42,22 @@
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/jflex" isTestSource="false" generated="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: net.sourceforge.pmd:pmd-core:6.20.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-apex:6.20.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-apex-jorje:lib:6.20.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-java:6.20.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.sourceforge.pmd:pmd-scala:6.20.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-javascript:6.20.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-jsp:6.20.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-plsql:6.20.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-visualforce:6.20.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-vm:6.20.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-xml:6.20.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: net.sourceforge.pmd:pmd-lang-test:6.20.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.github.oowekyala.treeutils:tree-matchers:2.0.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.github.oowekyala.treeutils:tree-printers:2.0.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-base:11.0.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-base:linux:11.0.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openjfx:javafx-controls:11.0.2" level="project" />
