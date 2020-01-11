@@ -4,18 +4,19 @@
 
 package net.sourceforge.pmd.util.fxdesigner.popups;
 
-import java.io.File;
+import java.io.StringWriter;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.fxmisc.richtext.LineNumberFactory;
 import org.reactfx.Subscription;
 
+import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
-import net.sourceforge.pmd.util.fxdesigner.model.testing.TestCollection;
-import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlDumper;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.StageBuilder;
+import net.sourceforge.pmd.util.fxdesigner.util.XmlDumpUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighlighters;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.syntaxhighlighting.XmlSyntaxHighlighter;
@@ -33,11 +34,9 @@ import javafx.stage.Stage;
  *
  * @author Clément Fournier
  */
-public final class TestExportWizardController extends AbstractController {
+public final class TreeExportWizardController extends AbstractController {
 
     private final Stage myPopupStage;
-    @Nullable
-    private String originalFile;
     @FXML
     private ToolbarTitledPane titledPane;
     @FXML
@@ -48,32 +47,35 @@ public final class TestExportWizardController extends AbstractController {
     private SyntaxHighlightingCodeArea exportResultArea;
 
 
-    public TestExportWizardController(DesignerRoot root) {
+    public TreeExportWizardController(DesignerRoot root) {
         super(root);
         this.myPopupStage = createStage(root.getMainStage());
+
+        exportResultArea.setParagraphGraphicFactory(LineNumberFactory.get(exportResultArea));
     }
 
     private Stage createStage(Stage mainStage) {
         return new StageBuilder().withOwner(mainStage)
-                                 .withFxml(DesignerUtil.getFxml("test-export-wizard"), getDesignerRoot(), this)
+                                 .withFxml(DesignerUtil.getFxml("tree-export-wizard"), getDesignerRoot(), this)
                                  .withModality(Modality.WINDOW_MODAL)
-                                 .withTitle("Export test cases")
+                                 .withTitle("Export tree to XML")
                                  .newStage();
     }
 
 
-    public Subscription bindToTestCollection(TestCollection testCollection) {
-        return testCollection.modificationTicks().subscribe(it -> {
-            try {
-                String xml = TestXmlDumper.dumpXmlTests(testCollection);
-                titledPane.errorMessageProperty().setValue(null);
-                exportResultArea.replaceText(xml);
-                File origin = testCollection.getOrigin();
-                originalFile = origin != null ? origin.getAbsolutePath() : null;
-            } catch (Exception e) {
-                reportDumpException(e);
-            }
-        });
+    public Subscription bindToTree(ASTManager testCollection) {
+        return testCollection.compilationUnitProperty().changes().subscribe(it -> update(it.getNewValue()));
+    }
+
+    private void update(Node value) {
+        try {
+            StringWriter write = new StringWriter();
+            XmlDumpUtil.appendXml(write, value);
+            titledPane.errorMessageProperty().setValue(null);
+            exportResultArea.replaceText(write.toString());
+        } catch (Exception e) {
+            reportDumpException(e);
+        }
     }
 
     /** Set the given subscription as close handler and show. */
@@ -81,6 +83,7 @@ public final class TestExportWizardController extends AbstractController {
         myPopupStage.setOnCloseRequest(e -> parentBinding.unsubscribe());
         exportResultArea.setSyntaxHighlighter(new XmlSyntaxHighlighter());
         myPopupStage.show();
+        update(getService(DesignerRoot.AST_MANAGER).compilationUnitProperty().getValue());
     }
 
     private void reportDumpException(Throwable e) {
@@ -92,8 +95,8 @@ public final class TestExportWizardController extends AbstractController {
     protected void beforeParentInit() {
         exportResultArea.setSyntaxHighlighter(AvailableSyntaxHighlighters.XML);
 
-
         ControlUtil.copyToClipboardButton(copyResultButton, exportResultArea::getText);
         ControlUtil.saveToFileButton(saveToFileButton, myPopupStage, exportResultArea::getText, this);
     }
+
 }

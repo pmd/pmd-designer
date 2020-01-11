@@ -2,6 +2,14 @@
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
+/*
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
+/*
+ * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
+ */
+
 package net.sourceforge.pmd.util.fxdesigner.util;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.toIterable;
@@ -27,7 +35,6 @@ import net.sourceforge.pmd.lang.ast.xpath.Attribute;
 
 public final class XmlDumpUtil {
 
-
     private XmlDumpUtil() {
 
     }
@@ -51,17 +58,12 @@ public final class XmlDumpUtil {
         transformer.transform(source, new StreamResult(writer));
     }
 
-    // returns null if the value is unsupported
     private static Document toXml(Node node) throws ParserConfigurationException {
-        try {
-            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            final DocumentBuilder db = dbf.newDocumentBuilder();
-            final Document document = db.newDocument();
-            appendElement(node, document, document);
-            return document;
-        } catch (final ParserConfigurationException pce) {
-            throw pce;
-        }
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        final DocumentBuilder db = dbf.newDocumentBuilder();
+        final Document document = db.newDocument();
+        appendElement(node, document, document);
+        return document;
     }
 
     static void appendElement(final Node node, Document doc, final org.w3c.dom.Node parentNode) {

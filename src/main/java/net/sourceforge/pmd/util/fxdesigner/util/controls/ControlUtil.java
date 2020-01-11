@@ -4,6 +4,13 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.file.Files;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -13,6 +20,8 @@ import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 
+import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
+import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
@@ -39,6 +48,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
 
@@ -219,6 +230,28 @@ public final class ControlUtil {
             content.putString(copiedText.get());
             Clipboard.getSystemClipboard().setContent(content);
             SimplePopups.showActionFeedback(button, AlertType.CONFIRMATION, "Copied to clipboard");
+        });
+    }
+
+    public static void saveToFileButton(Button button, Stage popupStage, Supplier<String> content, ApplicationComponent owner) {
+        button.setOnAction(e -> {
+
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Write to a file");
+            File file = chooser.showSaveDialog(popupStage);
+
+            if (file != null) {
+
+                try (OutputStream is = Files.newOutputStream(file.toPath());
+                     Writer out = new BufferedWriter(new OutputStreamWriter(is))) {
+
+                    out.write(content.get());
+                    SimplePopups.showActionFeedback(button, AlertType.CONFIRMATION, "File saved");
+
+                } catch (IOException ex) {
+                    owner.logUserException(ex, Category.TEST_EXPORT_EXCEPTION);
+                }
+            }
         });
     }
 }

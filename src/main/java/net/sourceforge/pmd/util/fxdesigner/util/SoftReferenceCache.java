@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner.util;
 
 import java.lang.ref.SoftReference;
+import java.util.function.Consumer;
 
 
 /**
@@ -43,6 +44,10 @@ public class SoftReferenceCache<T> {
         }
 
         return ref.get();
+    }
+
+    public void apply(Consumer<T> f) {
+        f.accept(get());
     }
 
 

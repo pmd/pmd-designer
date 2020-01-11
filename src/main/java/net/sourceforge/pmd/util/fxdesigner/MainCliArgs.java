@@ -19,7 +19,7 @@ final class MainCliArgs {
     String dumpXml;
 
     @Parameter(names = {"--verbose", "-v"},
-               arity = 1,
+               arity = 0,
                description = "Whether to launch the app in verbose mode. "
                    + "This enables logging of exception stack traces and "
                    + "very verbose tracing in the event log of the app.")
