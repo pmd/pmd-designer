@@ -9,15 +9,6 @@ import com.beust.jcommander.Parameter;
 final class MainCliArgs {
 
 
-    static final String HL_AST_DUMP = "--hl-ast-dump";
-    @Parameter(names = {HL_AST_DUMP},
-               arity = 1,
-               description = "Headless XML dump of an AST. "
-                   + "The argument to this option is the language to use. "
-                   + "The content to parse is received from standard input,"
-                   + "and output to standard output.")
-    String dumpXml;
-
     @Parameter(names = {"--verbose", "-v"},
                arity = 0,
                description = "Whether to launch the app in verbose mode. "
