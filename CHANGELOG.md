@@ -4,8 +4,9 @@
 
 ## 6.21.0
 
-* **Bump required pmd-core version to 6.20.0.** The previous minimal pmd-core version was 6.12.0.
+* **Bump required pmd-core version to 6.21.0.** The previous minimal pmd-core version was 6.12.0.
 * Add Modelica syntax highlighter, thanks to @atrosinenko
+* Add GUI to export trees to XML or text format. This integrates the new experimental TreeRenderer API
 * Add scrollbars to code area (fixes #22)
 * Internal improvements (refs #33)
 
