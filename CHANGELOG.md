@@ -5,10 +5,12 @@
 ## 6.21.0
 
 * **Bump required pmd-core version to 6.21.0.** The previous minimal pmd-core version was 6.12.0.
-* Add Modelica syntax highlighter, thanks to @atrosinenko
+* Add Modelica syntax highlighter, thanks to [Anatoly Trosinenko](https://github.com/atrosinenko)
 * Add GUI to export trees to XML or text format. This integrates the new experimental TreeRenderer API
-* Add scrollbars to code area (fixes #22)
-* Internal improvements (refs #33)
+* Add scrollbars to code area (fixes [#22](https://github.com/pmd/pmd-designer/issues/22))
+* Internal improvements (refs [#33](https://github.com/pmd/pmd-designer/issues/33))
+* Plain text language is not loaded through the language registry anymore (see revision da47f3758)
+
 
 See https://github.com/pmd/pmd-designer/milestone/9
 
