@@ -4,11 +4,12 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
-import static net.sourceforge.pmd.util.fxdesigner.util.DumpUtil.dumpToSubtreeTest;
-
 import java.util.function.Consumer;
 
+import org.kordamp.ikonli.javafx.FontIcon;
+
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.SearchableTreeView.SearchableTreeCell;
 
@@ -17,8 +18,6 @@ import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
@@ -29,7 +28,7 @@ import javafx.scene.input.MouseEvent;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class ASTTreeCell extends SearchableTreeCell<Node> {
+public class ASTTreeCell extends SearchableTreeCell<Node> implements ApplicationComponent {
 
     private final DesignerRoot root;
     private final Consumer<Node> onNodeItemSelected;
@@ -40,20 +39,22 @@ public class ASTTreeCell extends SearchableTreeCell<Node> {
         this.onNodeItemSelected = clickHandler;
     }
 
+    @Override
+    public DesignerRoot getDesignerRoot() {
+        return root;
+    }
 
     private ContextMenu buildContextMenu(Node item) {
         ContextMenu contextMenu = new ContextMenuWithNoArrows();
-        CustomMenuItem menuItem = new CustomMenuItem(new Label("Copy subtree test to clipboard..."));
+        CustomMenuItem menuItem = new CustomMenuItem(new Label("Export subtree...",
+                                                               new FontIcon("fas-external-link-alt")));
 
-        Tooltip tooltip = new Tooltip("Creates a node spec using the Kotlin AST matcher DSL, and dumps it to the clipboard");
+        Tooltip tooltip = new Tooltip("Export subtree to a text format");
         Tooltip.install(menuItem.getContent(), tooltip);
 
-        menuItem.setOnAction(e -> {
-            Clipboard clipboard = Clipboard.getSystemClipboard();
-            ClipboardContent content = new ClipboardContent();
-            content.putString(dumpToSubtreeTest(item)); // item is captured in the closure
-            clipboard.setContent(content);
-        });
+        menuItem.setOnAction(
+            e -> getService(DesignerRoot.TREE_EXPORT_WIZARD).apply(x -> x.showYourself(x.bindToNode(item)))
+        );
 
         contextMenu.getItems().add(menuItem);
 

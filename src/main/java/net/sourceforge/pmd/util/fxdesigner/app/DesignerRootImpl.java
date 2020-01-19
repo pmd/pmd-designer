@@ -18,6 +18,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.app.services.OnDiskPersistenceManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.TestCreatorService;
+import net.sourceforge.pmd.util.fxdesigner.model.export.TreeRendererRegistry;
 
 import javafx.application.HostServices;
 import javafx.scene.input.KeyCode;
@@ -65,6 +66,7 @@ public final class DesignerRootImpl implements DesignerRoot {
         registerService(LATEST_XPATH, new MessageChannel<>(Category.SELECTION_EVENT_TRACING));
         registerService(TEST_LOADER, new MessageChannel<>(Category.TEST_LOADING_EVENT));
         registerService(TEST_CREATOR, new TestCreatorService());
+        registerService(TREE_RENDERER_REGISTRY, new TreeRendererRegistry(this));
         registerService(IS_NODE_BEING_DRAGGED, Var.newSimpleVar(false));
     }
 

@@ -100,7 +100,6 @@ public class SourceEditorController extends AbstractController {
         }
     }).orElseConst(SourceEditorController.class.getClassLoader());
 
-    private final SoftReferenceCache<TreeExportWizardController> exportWizard;
     @FXML
     private Button searchButton;
     @FXML
@@ -141,10 +140,10 @@ public class SourceEditorController extends AbstractController {
         this.astManager = new ASTManagerImpl(designerRoot);
 
         designerRoot.registerService(DesignerRoot.AST_MANAGER, astManager);
+        designerRoot.registerService(DesignerRoot.TREE_EXPORT_WIZARD, new SoftReferenceCache<>(() -> new TreeExportWizardController(designerRoot)));
 
         violationsPopover = new PopOverWrapper<>(this::rebindPopover);
         propertiesPopover = new PopOverWrapper<>(this::rebindPropertiesPopover);
-        this.exportWizard = new SoftReferenceCache<>(() -> new TreeExportWizardController(designerRoot));
     }
 
     private PopOver rebindPopover(LiveTestCase testCase, PopOver existing) {
@@ -202,7 +201,7 @@ public class SourceEditorController extends AbstractController {
 
         searchButton.setOnAction(e -> astTreeView.focusSearchField());
         exportTreeButton.setOnAction(
-            e -> exportWizard.apply(x -> x.showYourself(x.bindToTree(getService(DesignerRoot.AST_MANAGER))))
+            e -> getService(DesignerRoot.TREE_EXPORT_WIZARD).apply(x -> x.showYourself(x.bindToTree(getService(DesignerRoot.AST_MANAGER))))
         );
 
         TestCreatorService creatorService = getService(DesignerRoot.TEST_CREATOR);

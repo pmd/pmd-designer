@@ -19,6 +19,7 @@ import org.reactfx.value.Var;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
+import net.sourceforge.pmd.util.fxdesigner.model.export.LiveTreeRenderer;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 
 import javafx.beans.NamedArg;
@@ -81,6 +82,10 @@ public class PropertyMapView extends VBox implements ApplicationComponent {
         view.setItems(testCase.getLiveProperties().asList());
     }
 
+    public void bind(LiveTreeRenderer descriptor) {
+        view.setItems(descriptor.getLiveProperties().asList());
+    }
+
     public void unbind() {
         view.setItems(FXCollections.emptyObservableList());
     }
@@ -111,11 +116,28 @@ public class PropertyMapView extends VBox implements ApplicationComponent {
         view.bind(testCase);
 
         PopOver popOver = new SmartPopover(view);
-        popOver.setTitle("Properties for this test case");
+        setHeader(view, popOver, "Properties for this test case");
+        return popOver;
+    }
+
+    /**
+     * Makes the property popover for a rule.
+     */
+    public static PopOver makePopOver(LiveTreeRenderer renderer, DesignerRoot designerRoot) {
+        PropertyMapView view = new PropertyMapView(designerRoot);
+
+        view.bind(renderer);
+
+        PopOver popOver = new SmartPopover(view);
+        setHeader(view, popOver, "Options for this renderer");
+        return popOver;
+    }
+
+    private static void setHeader(PropertyMapView view, PopOver popOver, String s) {
+        popOver.setTitle(s);
         popOver.setHeaderAlwaysVisible(true);
         popOver.setPrefWidth(150);
         popOver.setUserData(view);
-        return popOver;
     }
 
     private class PropertyMappingListCell extends SmartTextFieldListCell<Pair<PropertyDescriptorSpec, Var<String>>> {
