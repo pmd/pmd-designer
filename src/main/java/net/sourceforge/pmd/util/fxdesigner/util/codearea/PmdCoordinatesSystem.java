@@ -134,11 +134,11 @@ public final class PmdCoordinatesSystem {
     private static Node binarySearchInChildren(Node parent, TextPos2D target) {
 
         int low = 0;
-        int high = parent.jjtGetNumChildren() - 1;
+        int high = parent.getNumChildren() - 1;
 
         while (low <= high) {
             int mid = (low + high) / 2;
-            Node child = parent.jjtGetChild(mid);
+            Node child = parent.getChild(mid);
             int cmp = startPosition(child).compareTo(target);
 
             if (cmp < 0) {

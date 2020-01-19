@@ -192,7 +192,7 @@ public class NodeParentageCrumbBar extends BreadCrumbBar<Node> implements NodeSe
                 @SuppressWarnings("unchecked")
                 TreeItem<Node> userData = (TreeItem<Node>) child.getUserData();
                 userData.setValue(cur);
-                cur = cur.jjtGetParent();
+                cur = cur.getParent();
             }
         }
     }
@@ -208,7 +208,7 @@ public class NodeParentageCrumbBar extends BreadCrumbBar<Node> implements NodeSe
     private void setDeepestNode(Node node, Function<Node, Double> widthEstimator) {
         TreeItem<Node> deepest = new TreeItem<>(node);
         TreeItem<Node> current = deepest;
-        Node parent = node.jjtGetParent();
+        Node parent = node.getParent();
         double pathLength = widthEstimator.apply(node);
 
         final double maxPathLength = getWidth() * 0.9;
@@ -218,7 +218,7 @@ public class NodeParentageCrumbBar extends BreadCrumbBar<Node> implements NodeSe
             newItem.getChildren().add(current);
             current = newItem;
             pathLength += widthEstimator.apply(parent);
-            parent = current.getValue().jjtGetParent();
+            parent = current.getValue().getParent();
         }
 
         if (pathLength >= maxPathLength

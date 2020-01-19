@@ -127,9 +127,9 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> {
     /** Builds an ASTTreeItem recursively from a node. */
     private static ASTTreeItem buildRootImpl(Node n, MutableInt idx) {
         ASTTreeItem item = new ASTTreeItem(n, idx.getAndIncrement());
-        if (n.jjtGetNumChildren() > 0) {
-            for (int i = 0; i < n.jjtGetNumChildren(); i++) {
-                item.getChildren().add(buildRootImpl(n.jjtGetChild(i), idx));
+        if (n.getNumChildren() > 0) {
+            for (int i = 0; i < n.getNumChildren(); i++) {
+                item.getChildren().add(buildRootImpl(n.getChild(i), idx));
             }
         }
         return item;
