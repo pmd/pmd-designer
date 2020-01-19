@@ -9,6 +9,7 @@ import java.util.Map;
 
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.util.TextTreeRenderer;
 import net.sourceforge.pmd.util.treeexport.TreeRenderers;
 
 import javafx.collections.FXCollections;
@@ -22,6 +23,8 @@ public class TreeRendererRegistry implements ApplicationComponent {
 
     public TreeRendererRegistry(DesignerRoot root) {
         this.root = root;
+
+        TreeRenderers.register(TextTreeRenderer.DESCRIPTOR);
 
         TreeRenderers.registeredRenderers().forEach(it -> registry.put(it.id(), new LiveTreeRenderer(root, it)));
     }
