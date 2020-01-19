@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import org.fxmisc.flowless.VirtualizedScrollPane?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.codearea.SyntaxHighlightingCodeArea?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.RippleButton?>
+<?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="468.0" prefWidth="665.0" stylesheets="@../css/designer.css" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.pmd.util.fxdesigner.popups.TreeExportWizardController">
+    <children>
+        <ToolbarTitledPane fx:id="titledPane" animated="false" collapsible="false" layoutY="5.0" title="Export to:" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <toolbarItems>
+                <DynamicWidthChoicebox fx:id="rendererChoicebox">
+                    <tooltip>
+                        <Tooltip text="Pick an export format" />
+                    </tooltip>
+                </DynamicWidthChoicebox>
+
+                <RippleButton fx:id="propertiesMapButton" text="Options">
+                    <tooltip>
+                        <Tooltip text="Set the options of this renderer" />
+                    </tooltip>
+                </RippleButton>
+
+                <Separator orientation="VERTICAL"/>
+
+                <RippleButton fx:id="copyResultButton" text="Clipboard">
+                    <tooltip>
+                        <Tooltip text="Copy to clipboard" />
+                    </tooltip>
+                </RippleButton>
+                <RippleButton fx:id="saveToFileButton" text="File...">
+                    <tooltip>
+                        <Tooltip text="Pick a file as export target" />
+                    </tooltip>
+                </RippleButton>
+            </toolbarItems>
+            <content>
+                <AnchorPane>
+                    <padding>
+                        <Insets/>
+                    </padding>
+                    <VirtualizedScrollPane
+                            AnchorPane.bottomAnchor="0.0"
+                            AnchorPane.leftAnchor="0.0"
+                            AnchorPane.rightAnchor="0.0"
+                            AnchorPane.topAnchor="0.0">
+                        <content>
+                            <SyntaxHighlightingCodeArea fx:id="exportResultArea" prefHeight="221.0" prefWidth="563.0" stylesheets="@../css/editor-theme.css" />
+                        </content>
+                    </VirtualizedScrollPane>
+                </AnchorPane>
+
+            </content>
+        </ToolbarTitledPane>
+    </children>
+</AnchorPane>

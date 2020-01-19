@@ -19,7 +19,10 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.PersistenceManager;
 import net.sourceforge.pmd.util.fxdesigner.app.services.RichTextMapper;
 import net.sourceforge.pmd.util.fxdesigner.app.services.TestCreatorService;
 import net.sourceforge.pmd.util.fxdesigner.model.VersionedXPathQuery;
+import net.sourceforge.pmd.util.fxdesigner.model.export.TreeRendererRegistry;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
+import net.sourceforge.pmd.util.fxdesigner.popups.TreeExportWizardController;
+import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 
 import javafx.application.HostServices;
 import javafx.stage.Stage;
@@ -67,6 +70,10 @@ public interface DesignerRoot {
     AppServiceDescriptor<MessageChannel<VersionedXPathQuery>> LATEST_XPATH = new AppServiceDescriptor<>(MessageChannel.class);
 
     AppServiceDescriptor<Var<Boolean>> IS_NODE_BEING_DRAGGED = new AppServiceDescriptor<>(Var.class);
+
+
+    AppServiceDescriptor<SoftReferenceCache<TreeExportWizardController>> TREE_EXPORT_WIZARD = new AppServiceDescriptor<>(SoftReferenceCache.class);
+    AppServiceDescriptor<TreeRendererRegistry> TREE_RENDERER_REGISTRY = new AppServiceDescriptor<>(TreeRendererRegistry.class);
 
 
     /**

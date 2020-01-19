@@ -4,13 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.popups;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.file.Files;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.Subscription;
@@ -29,9 +23,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.ControlUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -46,7 +38,6 @@ public final class TestExportWizardController extends AbstractController {
     private final Stage myPopupStage;
     @Nullable
     private String originalFile;
-
     @FXML
     private ToolbarTitledPane titledPane;
     @FXML
@@ -93,7 +84,7 @@ public final class TestExportWizardController extends AbstractController {
     }
 
     private void reportDumpException(Throwable e) {
-        logUserException(e, Category.TEST_LOADING_EXCEPTION);
+        logUserException(e, Category.TEST_EXPORT_EXCEPTION);
         titledPane.errorMessageProperty().setValue(e.getMessage());
     }
 
@@ -103,26 +94,6 @@ public final class TestExportWizardController extends AbstractController {
 
 
         ControlUtil.copyToClipboardButton(copyResultButton, exportResultArea::getText);
-
-        saveToFileButton.setOnAction(e -> {
-
-            FileChooser chooser = new FileChooser();
-            chooser.setTitle("Write XML to a file");
-            chooser.setInitialFileName(originalFile);
-            File file = chooser.showSaveDialog(myPopupStage);
-
-            if (file != null) {
-
-                try (OutputStream is = Files.newOutputStream(file.toPath());
-                     Writer out = new BufferedWriter(new OutputStreamWriter(is))) {
-
-                    out.write(exportResultArea.getText());
-                    SimplePopups.showActionFeedback(saveToFileButton, AlertType.CONFIRMATION, "File saved");
-
-                } catch (IOException ex) {
-                    logUserException(ex, Category.TEST_EXPORT_EXCEPTION);
-                }
-            }
-        });
+        ControlUtil.saveToFileButton(saveToFileButton, myPopupStage, exportResultArea::getText, this);
     }
 }
