@@ -25,7 +25,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.ControlUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PopOverWrapper;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyMapView;
-import net.sourceforge.pmd.util.fxdesigner.util.controls.RippleButton;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
@@ -45,7 +44,7 @@ public final class TreeExportWizardController extends AbstractController {
     private final Stage myPopupStage;
     private final PopOverWrapper<LiveTreeRenderer> propertiesPopover;
     @FXML
-    private RippleButton propertiesMapButton;
+    private Button propertiesMapButton;
     @FXML
     private DynamicWidthChoicebox<LiveTreeRenderer> rendererChoicebox;
     @FXML
@@ -116,7 +115,7 @@ public final class TreeExportWizardController extends AbstractController {
         exportResultArea.setSyntaxHighlighter(AvailableSyntaxHighlighters.XML);
 
         ControlUtil.copyToClipboardButton(copyResultButton, exportResultArea::getText);
-        ControlUtil.saveToFileButton(saveToFileButton, myPopupStage, exportResultArea::getText, this);
+        ControlUtil.saveToFileButton(saveToFileButton, myPopupStage, exportResultArea::getText, this, () -> null);
 
 
         TreeRendererRegistry rendererRegistry = getService(DesignerRoot.TREE_RENDERER_REGISTRY);

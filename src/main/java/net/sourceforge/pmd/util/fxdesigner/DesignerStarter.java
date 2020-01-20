@@ -94,6 +94,7 @@ public final class DesignerStarter {
         return sb.toString();
     }
 
+    @SuppressWarnings("PMD.AvoidCatchingThrowable")
     private static void launchGui(String[] args) {
         String message = null;
         if (!isJavaFxAvailable()) {

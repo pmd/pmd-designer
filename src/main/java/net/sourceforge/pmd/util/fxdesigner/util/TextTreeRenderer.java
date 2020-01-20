@@ -19,13 +19,13 @@ public class TextTreeRenderer implements TreeRenderer {
 
     public static final TreeRendererDescriptor DESCRIPTOR = new TreeRendererDescriptor() {
 
-        private final PropertyDescriptor<Boolean> ONLY_ASCII =
+        private final PropertyDescriptor<Boolean> onlyAscii =
             PropertyFactory.booleanProperty("onlyAsciiChars")
                            .defaultValue(false)
                            .desc("Use only ASCII characters in the structure")
                            .build();
 
-        private final PropertyDescriptor<Integer> MAX_LEVEL =
+        private final PropertyDescriptor<Integer> maxLevel =
             PropertyFactory.intProperty("maxLevel")
                            .defaultValue(-1)
                            .desc("Max level on which to recurse. Negative means unbounded")
@@ -46,8 +46,8 @@ public class TextTreeRenderer implements TreeRenderer {
                 }
             };
 
-            bundle.definePropertyDescriptor(ONLY_ASCII);
-            bundle.definePropertyDescriptor(MAX_LEVEL);
+            bundle.definePropertyDescriptor(onlyAscii);
+            bundle.definePropertyDescriptor(maxLevel);
 
             return bundle;
         }
@@ -65,9 +65,9 @@ public class TextTreeRenderer implements TreeRenderer {
         @Override
         public TreeRenderer produceRenderer(PropertySource properties) {
 
-            Strings str = properties.getProperty(ONLY_ASCII) ? ASCII : UNICODE;
+            Strings str = properties.getProperty(onlyAscii) ? ASCII : UNICODE;
 
-            return new TextTreeRenderer(str, properties.getProperty(MAX_LEVEL));
+            return new TextTreeRenderer(str, properties.getProperty(maxLevel));
         }
     };
 
@@ -103,7 +103,7 @@ public class TextTreeRenderer implements TreeRenderer {
 
 
     protected void appendIndent(Appendable out, String prefix, boolean isTail) throws IOException {
-        out.append(prefix).append((isTail) ? str.tailFork : str.fork);
+        out.append(prefix).append(isTail ? str.tailFork : str.fork);
     }
 
 

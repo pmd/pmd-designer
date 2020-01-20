@@ -233,10 +233,11 @@ public final class ControlUtil {
         });
     }
 
-    public static void saveToFileButton(Button button, Stage popupStage, Supplier<String> content, ApplicationComponent owner) {
+    public static void saveToFileButton(Button button, Stage popupStage, Supplier<String> content, ApplicationComponent owner, Supplier<String> initialFileName) {
         button.setOnAction(e -> {
 
             FileChooser chooser = new FileChooser();
+            chooser.setInitialFileName(initialFileName.get());
             chooser.setTitle("Write to a file");
             File file = chooser.showSaveDialog(popupStage);
 

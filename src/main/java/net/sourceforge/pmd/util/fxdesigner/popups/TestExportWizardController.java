@@ -94,6 +94,6 @@ public final class TestExportWizardController extends AbstractController {
 
 
         ControlUtil.copyToClipboardButton(copyResultButton, exportResultArea::getText);
-        ControlUtil.saveToFileButton(saveToFileButton, myPopupStage, exportResultArea::getText, this);
+        ControlUtil.saveToFileButton(saveToFileButton, myPopupStage, exportResultArea::getText, this, () -> originalFile);
     }
 }
