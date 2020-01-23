@@ -84,12 +84,16 @@ public final class PopOverWrapper<T> {
     public void doFirstLoad(Stage stage) {
         myPopover.ifPresent(pop -> {
             pop.setOpacity(0);
+            pop.setAnimated(false);
             pop.show(stage, 40000, 40000);
 
             EventStreams.eventsOf(pop, WindowEvent.WINDOW_HIDDEN)
                         .subscribeForOne(e -> pop.setOpacity(1));
 
-            Platform.runLater(pop::hide);
+            Platform.runLater(() -> {
+                pop.hide();
+                pop.setAnimated(true);
+            });
         });
     }
 

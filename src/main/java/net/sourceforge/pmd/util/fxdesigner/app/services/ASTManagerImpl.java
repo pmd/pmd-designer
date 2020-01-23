@@ -96,6 +96,8 @@ public class ASTManagerImpl implements ASTManager {
                       } catch (ParseAbortedException e) {
                           updated = null;
                           currentException.setValue(e);
+                      } catch (LinkageError e) {
+                          updated = null;
                       }
 
                       compilationUnit.setValue(updated);

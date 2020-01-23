@@ -199,6 +199,7 @@ public final class MutableTabPane<T extends AbstractController & TitleOwner> ext
 
     public void addTabWithController(T controller) {
         Tab tab = tabMaker().apply(Objects.requireNonNull(controller));
+        Objects.requireNonNull(tab, "Null tab?");
         addTabAndFocus(tab);
     }
 
