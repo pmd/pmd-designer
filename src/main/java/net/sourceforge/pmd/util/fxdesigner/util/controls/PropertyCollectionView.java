@@ -61,6 +61,35 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
         ValueExtractor.addObservableValueExtractor(c -> c instanceof ListCell, c -> ((ListCell) c).itemProperty());
     }
 
+    /*
+     Note: nesting a popover within a popover is error-prone: JavaFX
+     doesn't support a proper focus model for PopupWindows (used by PopOver)
+
+     This means, multiple open popovers maintain independent focus models
+     and react to every event of the stage. Ie there's no stage that has
+     primary focus. Eg if you focus a textfield in a popover and carry
+     on editing somewhere else in the main stage, both places will see
+     the update.
+
+     This also means that when eg here, you click the "add property" button,
+     the button doesn't lose focus in its popover. When editing something in
+     the new popover, this will send an event to the edited text field AND
+     to the "add property" button.
+
+     This is why the action handlers explicitly request focus on some
+     innocuous control (eg listview) after they're done processing.
+
+     This is also why we can't let the edit popover hover around in
+     detached mode.
+
+
+     See:
+
+     https://github.com/openjdk/jfx/blob/be22e8535cb3f98069c0a0216b056cfe8ef037e8/modules/javafx.graphics/src/main/java/javafx/stage/PopupWindow.java#L531-L535
+
+
+     */
+
 
     // for scenebuilder
     @SuppressWarnings("ConstantConditions") // suppress nullability issue
@@ -89,7 +118,10 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
 
         ControlUtil.anchorFirmly(addProperty);
 
-        addProperty.setOnAction(e -> addNewProperty(getUniqueNewName()));
+        addProperty.setOnAction(e -> {
+            addNewProperty(getUniqueNewName());
+            view.requestFocus();
+        });
         footer.getChildren().addAll(addProperty);
         this.getChildren().addAll(view, footer);
 
@@ -277,6 +309,7 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
             edit.setOnAction(e -> {
                 myEditPopover.rebind(spec);
                 myEditPopover.showOrFocus(p -> PopOverUtil.showAt(p, owner, this));
+                view.requestFocus();
             });
 
             sub = sub.and(() -> edit.setOnAction(null));
@@ -291,6 +324,7 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
                     myEditPopover.rebind(null);
                     myEditPopover.hide();
                 }
+                view.requestFocus();
             });
 
             sub = sub.and(() -> delete.setOnAction(null));
