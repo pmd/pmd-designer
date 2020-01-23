@@ -7,7 +7,6 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -175,7 +174,6 @@ public class PropertyCollectionView extends VBox implements ApplicationComponent
             // create it
             return detailsPopOver(newSpec);
         }
-        Optional.ofNullable(pop.getOnHiding()).ifPresent(it -> it.handle(null));
 
         pop.titleProperty().bind(newSpec.nameProperty()
                                         .filter(StringUtils::isNotBlank)

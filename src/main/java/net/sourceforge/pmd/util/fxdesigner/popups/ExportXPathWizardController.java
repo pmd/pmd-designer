@@ -8,7 +8,6 @@ import static com.github.oowekyala.rxstring.ItemRenderer.asString;
 import static com.github.oowekyala.rxstring.ItemRenderer.indented;
 import static com.github.oowekyala.rxstring.ItemRenderer.surrounded;
 import static com.github.oowekyala.rxstring.ItemRenderer.wrapped;
-import static net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry.getSupportedLanguageVersions;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.stringConverter;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewireInit;
 
@@ -173,10 +172,7 @@ public final class ExportXPathWizardController implements Initializable {
 
 
     private void initialiseLanguageChoiceBox() {
-        languageChoiceBox.getItems().addAll(getSupportedLanguageVersions().stream()
-                                                                          .map(LanguageVersion::getLanguage)
-                                                                          .distinct()
-                                                                          .collect(Collectors.toList()));
+        languageChoiceBox.getItems().setAll(AuxLanguageRegistry.getSupportedLanguages().collect(Collectors.toList()));
 
         languageChoiceBox.setConverter(stringConverter(Language::getShortName, AuxLanguageRegistry::findLanguageByShortName));
     }
@@ -286,6 +282,7 @@ public final class ExportXPathWizardController implements Initializable {
                             .append("<property name=\"").bind(PropertyDescriptorSpec::nameProperty)
                             .append("\" type=\"").bind(PropertyDescriptorSpec::typeIdProperty, PropertyTypeId::getStringId)
                             .append("\" value=\"").bind(PropertyDescriptorSpec::valueProperty)
+                            .append("\" description=\"").bind(PropertyDescriptorSpec::descriptionProperty)
                             .appendLine("\"/>")
             )
             .appendIndent(2).append("<property name=\"version\" value=\"").bind(ObservableXPathRuleBuilder::xpathVersionProperty).appendLine("\"/>")
