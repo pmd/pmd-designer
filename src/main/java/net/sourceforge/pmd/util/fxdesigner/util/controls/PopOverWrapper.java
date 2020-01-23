@@ -19,6 +19,7 @@ import org.reactfx.value.Var;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
@@ -34,6 +35,7 @@ public final class PopOverWrapper<T> {
     private final Var<PopOver> myPopover = Var.newSimpleVar(null);
     private BiFunction<T, PopOver, PopOver> rebinder;
     private T identity;
+    private EventHandler<WindowEvent> userOnHiding = we -> {};
 
     public PopOverWrapper(BiFunction<T, @Nullable PopOver, @Nullable PopOver> rebinder) {
         this.identity = null;
@@ -56,7 +58,12 @@ public final class PopOverWrapper<T> {
     }
 
     public void rebind(T identity) {
-        preload(() -> rebinder.apply(identity, myPopover.getValue()));
+        if (identity != this.identity) {
+            this.identity = identity;
+            this.userOnHiding.handle(null);
+            this.userOnHiding = we -> {};
+            preload(() -> rebinder.apply(identity, myPopover.getValue()));
+        }
     }
 
     private void preload(Supplier<PopOver> supplier) {
@@ -68,6 +75,14 @@ public final class PopOverWrapper<T> {
             myPopover.setValue(null);
             return;
         }
+
+        this.userOnHiding = popOver.getOnHiding();
+
+        popOver.setOnHiding(we -> {
+            this.identity = null;
+            this.userOnHiding.handle(we);
+        });
+
         popOver.getRoot().getStylesheets().addAll(DesignerUtil.getCss("popover").toString());
         popOver.getRoot().applyCss();
         myPopover.setValue(popOver);

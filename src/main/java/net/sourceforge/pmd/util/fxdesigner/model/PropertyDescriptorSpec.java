@@ -147,8 +147,8 @@ public class PropertyDescriptorSpec implements SettingsOwner {
      * @return An xml string
      */
     public String toXml() {
-        return String.format("<property name=\"%s\" type=\"%s\" value=\"%s\" />",
-                             getName(), getTypeId().getStringId(), getValue());
+        return String.format("<property name=\"%s\" type=\"%s\" value=\"%s\" description=\"%s\"/>",
+                             getName(), getTypeId().getStringId(), getValue(), getDescription());
     }
 
 
