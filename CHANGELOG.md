@@ -8,6 +8,7 @@
 * Add Modelica syntax highlighter, thanks to [Anatoly Trosinenko](https://github.com/atrosinenko)
 * Add GUI to export trees to XML or text format. This integrates the new experimental TreeRenderer API. (refs [#37](https://github.com/pmd/pmd-designer/pull/37))
 * Add scrollbars to code area (fixes [#22](https://github.com/pmd/pmd-designer/issues/22))
+* Fix popover focus issues (fixes [#38](https://github.com/pmd/pmd-designer/issues/38))
 * Internal improvements (refs [#33](https://github.com/pmd/pmd-designer/issues/33))
 * Plain text language is not loaded through the language registry anymore (see revision da47f3758)
 
