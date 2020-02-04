@@ -63,7 +63,7 @@
 
         <surefire.version>3.0.0-M3</surefire.version>
         <checkstyle.version>3.1.0</checkstyle.version>
-        <pmd.plugin.version>3.11.0</pmd.plugin.version>
+        <pmd.plugin.version>3.13.0</pmd.plugin.version>
         <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
         <source.plugin.version>3.0.1</source.plugin.version>
         <jar.plugin.version>3.1.0</jar.plugin.version>
@@ -72,7 +72,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <pmd.build-tools.version>6-SNAPSHOT</pmd.build-tools.version>
-        <pmd.check.version>6.16.0</pmd.check.version>
+        <pmd.check.version>6.21.0</pmd.check.version>
 
         <jflex-output>${project.build.directory}/generated-sources/jflex</jflex-output>
 
