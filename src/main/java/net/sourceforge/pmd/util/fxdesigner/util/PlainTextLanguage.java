@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 
@@ -22,6 +21,7 @@ import net.sourceforge.pmd.lang.Parser;
 import net.sourceforge.pmd.lang.ParserOptions;
 import net.sourceforge.pmd.lang.TokenManager;
 import net.sourceforge.pmd.lang.ast.AbstractNode;
+import net.sourceforge.pmd.lang.ast.AstProcessingStage;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.ast.ParseException;
 import net.sourceforge.pmd.lang.ast.RootNode;
@@ -45,6 +45,7 @@ public final class PlainTextLanguage extends BaseLanguageModule {
         addVersion("default", new TextLvh(), true);
     }
 
+    @SuppressWarnings({"PMD.MissingOverride"})
     private static class TextLvh extends AbstractLanguageVersionHandler {
 
         private static final RuleViolationFactory RV_FACTORY = new AbstractRuleViolationFactory() {
@@ -64,8 +65,8 @@ public final class PlainTextLanguage extends BaseLanguageModule {
             return RV_FACTORY;
         }
 
-        @SuppressWarnings({"PMD.MissingOverride", "rawtypes"})
-        public List getProcessingStages() {
+        @Override
+        public List<? extends AstProcessingStage<?>> getProcessingStages() {
             return Collections.emptyList();
         }
 
@@ -83,22 +84,12 @@ public final class PlainTextLanguage extends BaseLanguageModule {
                 }
 
                 @Override
-                public boolean canParse() {
-                    return true;
-                }
-
-                @Override
                 public Node parse(String s, Reader reader) throws ParseException {
                     try {
                         return new PlainTextFile(IOUtils.toString(reader));
                     } catch (IOException e) {
                         throw new ParseException(e);
                     }
-                }
-
-                @Override
-                public Map<Integer, String> getSuppressMap() {
-                    return Collections.emptyMap();
                 }
             };
         }

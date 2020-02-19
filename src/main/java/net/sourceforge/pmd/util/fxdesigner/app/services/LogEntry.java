@@ -137,6 +137,7 @@ public final class LogEntry implements Comparable<LogEntry> {
         TYPERESOLUTION_EXCEPTION("Type resolution exception"),
         QNAME_RESOLUTION_EXCEPTION("Qualified name resolution exception"),
         SYMBOL_FACADE_EXCEPTION("Symbol façade exception"),
+        PROCESSING_EXCEPTION("Exception during AST processing"),
         XPATH_EVALUATION_EXCEPTION("XPath evaluation exception"),
 
         TEST_LOADING_EXCEPTION("XML test loader exception"),

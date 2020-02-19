@@ -9,7 +9,9 @@ import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStre
 
 import java.io.StringReader;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,7 +26,10 @@ import org.reactfx.value.Var;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.LanguageVersionHandler;
 import net.sourceforge.pmd.lang.Parser;
+import net.sourceforge.pmd.lang.ast.AstAnalysisContext;
+import net.sourceforge.pmd.lang.ast.AstProcessingStage;
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.lang.ast.RootNode;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -186,33 +191,28 @@ public class ASTManagerImpl implements ASTManager {
                                              LanguageVersion version,
                                              ClassLoader classLoader) throws ParseAbortedException {
 
-        LanguageVersionHandler languageVersionHandler = version.getLanguageVersionHandler();
-        Parser parser = languageVersionHandler.getParser(languageVersionHandler.getDefaultParserOptions());
+        LanguageVersionHandler handler = version.getLanguageVersionHandler();
+        Parser parser = handler.getParser(handler.getDefaultParserOptions());
 
-        Node node;
+        RootNode node;
         try {
-            node = parser.parse(null, new StringReader(source));
+            node = (RootNode) parser.parse(null, new StringReader(source));
         } catch (Exception e) {
             component.logUserException(e, Category.PARSE_EXCEPTION);
             throw new ParseAbortedException(e);
         }
 
-
-        try {
-            languageVersionHandler.getSymbolFacade().start(node);
-        } catch (Exception e) {
-            component.logUserException(e, Category.SYMBOL_FACADE_EXCEPTION);
-        }
-        try {
-            languageVersionHandler.getQualifiedNameResolutionFacade(classLoader).start(node);
-        } catch (Exception e) {
-            component.logUserException(e, Category.QNAME_RESOLUTION_EXCEPTION);
-        }
-
-        try {
-            languageVersionHandler.getTypeResolutionFacade(classLoader).start(node);
-        } catch (Exception e) {
-            component.logUserException(e, Category.TYPERESOLUTION_EXCEPTION);
+        AstAnalysisContext ctx = getCtx(version, classLoader);
+        List<AstProcessingStage<?>> processingStages = new ArrayList<>(handler.getProcessingStages());
+        processingStages.sort(AstProcessingStage::compare);
+        for (AstProcessingStage<?> stage : processingStages) {
+            try {
+                stage.processAST(node, ctx);
+            } catch (Throwable e) {
+                e = new RuntimeException("Exception while processing " + stage, e);
+                component.logUserException(e, Category.PROCESSING_EXCEPTION);
+                break;
+            }
         }
 
         // Notify that the parse went OK so we can avoid logging very recent exceptions
@@ -220,6 +220,21 @@ public class ASTManagerImpl implements ASTManager {
         component.raiseParsableSourceFlag(() -> "Param hash: " + Objects.hash(source, version, classLoader));
 
         return Optional.of(node);
+    }
+
+    @NonNull
+    private static AstAnalysisContext getCtx(LanguageVersion version, ClassLoader classLoader) {
+        return new AstAnalysisContext() {
+            @Override
+            public ClassLoader getTypeResolutionClassLoader() {
+                return classLoader;
+            }
+
+            @Override
+            public LanguageVersion getLanguageVersion() {
+                return version;
+            }
+        };
     }
 
 

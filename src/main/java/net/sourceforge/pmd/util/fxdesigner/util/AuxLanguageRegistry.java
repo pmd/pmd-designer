@@ -7,7 +7,6 @@ package net.sourceforge.pmd.util.fxdesigner.util;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,7 +17,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.lang.Parser;
 
 /**
  * Utilities to extend the functionality of {@link LanguageRegistry}.
@@ -98,11 +96,7 @@ public final class AuxLanguageRegistry {
     }
 
     private static boolean filterLanguageVersion(LanguageVersion lv) {
-        return !StringUtils.containsIgnoreCase(lv.getLanguage().getName(), "dummy")
-            && Optional.ofNullable(lv.getLanguageVersionHandler())
-                       .map(handler -> handler.getParser(handler.getDefaultParserOptions()))
-                       .filter(Parser::canParse)
-                       .isPresent();
+        return !StringUtils.containsIgnoreCase(lv.getLanguage().getName(), "dummy");
     }
 
     public static synchronized List<LanguageVersion> getSupportedLanguageVersions() {
