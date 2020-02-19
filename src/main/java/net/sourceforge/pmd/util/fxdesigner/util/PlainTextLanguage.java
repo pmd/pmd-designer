@@ -133,7 +133,7 @@ public final class PlainTextLanguage extends BaseLanguageModule {
 
         @Override
         public String toString() {
-            return "Plain text file (" + endLine + "lines)";
+            return "Plain text file (" + endLine + " lines)";
         }
     }
 
