@@ -60,8 +60,7 @@ public final class PopOverWrapper<T> {
     public void rebind(T identity) {
         if (identity != this.identity) {
             this.identity = identity;
-            this.userOnHiding.handle(null);
-            this.userOnHiding = we -> {};
+            handleHiding(null);
             preload(() -> rebinder.apply(identity, myPopover.getValue()));
         }
     }
@@ -80,12 +79,18 @@ public final class PopOverWrapper<T> {
 
         popOver.setOnHiding(we -> {
             this.identity = null;
-            this.userOnHiding.handle(we);
+            handleHiding(we);
         });
 
         popOver.getRoot().getStylesheets().addAll(DesignerUtil.getCss("popover").toString());
         popOver.getRoot().applyCss();
         myPopover.setValue(popOver);
+    }
+
+    private void handleHiding(WindowEvent we) {
+        EventHandler<WindowEvent> userOnHiding = this.userOnHiding;
+        this.userOnHiding = weee -> {};
+        userOnHiding.handle(we);
     }
 
     /**
