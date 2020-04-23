@@ -192,6 +192,7 @@ public class SourceEditorController extends AbstractController {
                   .map(LanguageVersion::getLanguage)
                   .values()
                   .filter(Objects::nonNull)
+                  .distinct()
                   .subscribe(nodeEditionCodeArea::updateSyntaxHighlighter);
 
         ((ASTManagerImpl) astManager).classLoaderProperty().bind(auxclasspathClassLoader);

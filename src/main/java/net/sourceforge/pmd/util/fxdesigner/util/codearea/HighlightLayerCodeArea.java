@@ -148,6 +148,8 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
                                                                   .map(UniformStyleCollection::toSpans)
                                                                   .collect(Collectors.toList());
 
+        ensureSyntaxUpToDate();
+
         if (allSpans.isEmpty()) {
             return syntaxHighlight.getOrElse(emptySpan());
         }
