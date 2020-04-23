@@ -15,11 +15,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fxmisc.richtext.model.StyleSpans;
 
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.util.fxdesigner.util.RichRunnable;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea.LayerId;
 
 import javafx.application.Platform;
@@ -74,18 +76,22 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
     // to highlight errors that are not bound to a node, eg parsing errors
     // We'll need to abstract away NodeStyleSpan
     public void styleNodes(Collection<? extends Node> nodes, K layerId, boolean resetLayer) {
+        updateStyling(styleNodesUpdate(nodes, layerId, resetLayer));
+    }
+
+
+    public RichRunnable styleNodesUpdate(Collection<? extends Node> nodes, K layerId, boolean resetLayer) {
         Objects.requireNonNull(nodes, "Pass an empty collection to represent absence, not null!");
 
         if (nodes.isEmpty() && resetLayer) {
-            clearStyleLayer(layerId);
-            return;
+            return layersById.get(layerId)::clearStyles;
         }
 
         List<NodeStyleSpan> wrappedNodes = nodes.stream().map(n -> NodeStyleSpan.fromNode(n, this)).collect(Collectors.toList());
 
         UniformStyleCollection collection = new UniformStyleCollection(Collections.singleton(layerId.getStyleClass()), wrappedNodes);
 
-        updateStyling(() -> layersById.get(layerId).styleNodes(resetLayer, collection));
+        return () -> layersById.get(layerId).styleNodes(resetLayer, collection);
     }
 
 
@@ -97,7 +103,7 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
      *
      * @param update Update to carry out
      */
-    private void updateStyling(Runnable update) {
+    public void updateStyling(Runnable update) {
         Platform.runLater(() -> {
             update.run();
             try {
@@ -107,7 +113,7 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
                 // commonly thrown when the text is being edited while
                 // the layering algorithm runs, and it doesn't matter
                 if ("StyleSpan's length cannot be negative".equals(e.getMessage())
-                    || e.getMessage().contains("is not a valid range within")) {
+                    || StringUtils.contains(e.getMessage(), "is not a valid range within")) {
                     return;
                 }
                 throw new RuntimeException("Unhandled error while recomputing the styling", e);
