@@ -19,7 +19,6 @@ import net.sourceforge.pmd.lang.BaseLanguageModule;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.Parser;
 import net.sourceforge.pmd.lang.ParserOptions;
-import net.sourceforge.pmd.lang.TokenManager;
 import net.sourceforge.pmd.lang.ast.AbstractNode;
 import net.sourceforge.pmd.lang.ast.AstProcessingStage;
 import net.sourceforge.pmd.lang.ast.Node;
@@ -76,11 +75,6 @@ public final class PlainTextLanguage extends BaseLanguageModule {
                 @Override
                 public ParserOptions getParserOptions() {
                     return parserOptions;
-                }
-
-                @Override
-                public TokenManager getTokenManager(String s, Reader reader) {
-                    return null;
                 }
 
                 @Override
