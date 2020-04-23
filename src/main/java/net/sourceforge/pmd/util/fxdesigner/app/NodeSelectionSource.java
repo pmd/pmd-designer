@@ -19,8 +19,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.Te
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
-import javafx.application.Platform;
-
 
 /**
  * A control or controller that somehow displays nodes in a form that the user can select.
@@ -64,7 +62,6 @@ public interface NodeSelectionSource extends ApplicationComponent {
      * @param mySelectionEvents     Stream of nodes that should push an event each time the user selects a node
      *                              from this control. The whole app will sync to this new selection.
      * @param alwaysHandleSelection Whether the component should handle selection events that originated from itself.
-     *
      * @return A Val reflecting the current global selection for the app.
      * Note that that Val is lazy and so if you don't subscribe to it or
      * {@linkplain Val#pin() pin it} you won't see updates!
@@ -77,7 +74,7 @@ public interface NodeSelectionSource extends ApplicationComponent {
         EventStream<NodeSelectionEvent> selection = channel.messageStream(alwaysHandleSelection, this);
         selection.subscribe(evt -> {
             try {
-                Platform.runLater(() -> setFocusNode(evt.selected, evt.options));
+                setFocusNode(evt.selected, evt.options);
             } catch (Exception e) {
                 logInternalException(e);
                 printShortStackTrace(e);

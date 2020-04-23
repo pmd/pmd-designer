@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.function.IntFunction;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.dataflow.qual.Pure;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.event.MouseOverTextEvent;
 import org.reactfx.EventSource;
@@ -46,6 +47,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.RichRunnable;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighlighters;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;
@@ -113,9 +115,9 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
         setParagraphGraphicFactory(defaultLineNumberFactory());
 
-        currentRuleResultsProperty().values().subscribe(this::highlightXPathResults);
-        currentErrorNodesProperty().values().subscribe(this::highlightErrorNodes);
-        currentRelatedNodesProperty().values().subscribe(this::highlightRelatedNodes);
+        currentRuleResultsProperty().values().map(this::highlightXPathResults).subscribe(this::updateStyling);
+        currentErrorNodesProperty().values().map(this::highlightErrorNodes).subscribe(this::updateStyling);
+        currentRelatedNodesProperty().values().map(this::highlightRelatedNodes).subscribe(this::updateStyling);
 
         initNodeSelectionHandling(designerRoot, selectionEvts, true);
 
@@ -168,8 +170,8 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         try {
             visibleLength = lastVisibleParToAllParIndex() - firstVisibleParToAllParIndex();
         } catch (AssertionError e) {
-            // may be thrown when many selection events occur in quick succession?
-            // Something like, the paragraphs
+            // May be thrown when many selection events occur in quick succession?
+            // The error is "dead code", probably a corner case in RichTextFX
             return;
         }
 
@@ -271,28 +273,40 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     }
 
 
-    /** Highlights xpath results (xpath highlight). */
-    private void highlightXPathResults(Collection<? extends Node> nodes) {
-        styleNodes(nodes, StyleLayerIds.XPATH_RESULT, true);
+    /**
+     * Highlights xpath results (xpath highlight).
+     */
+    @Pure
+    private RichRunnable highlightXPathResults(Collection<? extends Node> nodes) {
+        return styleNodesUpdate(nodes, StyleLayerIds.XPATH_RESULT, true);
     }
 
 
-    /** Highlights name occurrences (secondary highlight). */
-    private void highlightRelatedNodes(Collection<? extends Node> occs) {
-        styleNodes(occs, StyleLayerIds.NAME_OCCURRENCE, true);
+    /**
+     * Highlights name occurrences (secondary highlight).
+     */
+    @Pure
+    private RichRunnable highlightRelatedNodes(Collection<? extends Node> occs) {
+        return styleNodesUpdate(occs, StyleLayerIds.NAME_OCCURRENCE, true);
     }
 
 
-    /** Highlights nodes that are in error (secondary highlight). */
-    private void highlightErrorNodes(Collection<? extends Node> nodes) {
-        styleNodes(nodes, StyleLayerIds.ERROR, true);
+    /**
+     * Highlights nodes that are in error (secondary highlight).
+     */
+    @Pure
+    private RichRunnable highlightErrorNodes(Collection<? extends Node> nodes) {
+        RichRunnable r = styleNodesUpdate(nodes, StyleLayerIds.ERROR, true);
         if (!nodes.isEmpty()) {
-            scrollToNode(nodes.iterator().next(), true);
+            r = r.andThen(() -> scrollToNode(nodes.iterator().next(), true));
         }
+        return r;
     }
 
 
-    /** Moves the caret to a position and makes the view follow it. */
+    /**
+     * Moves the caret to a position and makes the view follow it.
+     */
     public void moveCaret(int line, int column) {
         moveTo(line, column);
         requestFollowCaret();
@@ -301,32 +315,34 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
     @Override
     public void setFocusNode(final Node node, DataHolder options) {
-
-
-        boolean changed = !Objects.equals(node, currentFocusNode.getValue());
-        if (changed) {
-
-            currentFocusNode.setValue(node);
-
-            // editor is only restyled if the selection has changed
-            Platform.runLater(() -> styleNodes(
-                node == null ? emptyList() : singleton(node), StyleLayerIds.FOCUS, true));
-
-            if (node == null) {
-                highlightRelatedNodes(emptyList());
-            } else {
-                Platform.runLater(() -> highlightRelatedNodes(relatedNodesSelector.getValue().getHighlightedNodesWhenSelecting(node)));
-            }
-        }
-
         // editor must not be scrolled when finding a new selection in a
         // tree that is being edited
-        // Editor must be scrolled after styling
         if (node != null && !options.hasData(SELECTION_RECOVERY)) {
             // don't randomly jump to top of eg ClassOrInterfaceBody
             // when selecting from a caret position
-            Platform.runLater(() -> scrollToNode(node, !options.hasData(CARET_POSITION)));
+            scrollToNode(node, !options.hasData(CARET_POSITION));
         }
+
+
+        RichRunnable update = () -> {};
+        if (Objects.equals(node, currentFocusNode.getValue())) {
+            return;
+        }
+
+        currentFocusNode.setValue(node);
+
+        // editor is only restyled if the selection has changed
+        update = update.andThen(styleNodesUpdate(
+            node == null ? emptyList() : singleton(node), StyleLayerIds.FOCUS, true));
+
+        if (node == null) {
+            update = update.andThen(highlightRelatedNodes(emptyList()));
+        } else {
+            update = update.andThen(highlightRelatedNodes(relatedNodesSelector.getValue().getHighlightedNodesWhenSelecting(node)));
+        }
+
+        Runnable finalUpdate = update;
+        Platform.runLater(() -> updateStyling(finalUpdate));
     }
 
 
