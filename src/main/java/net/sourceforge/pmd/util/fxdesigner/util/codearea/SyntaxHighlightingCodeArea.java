@@ -173,9 +173,18 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
         return task;
     }
 
-    /** Removes the current syntax highlighting span. */
+
+    /**
+     * Removes the current syntax highlighting span.
+     */
     protected void clearSyntaxHighlighting() {
         setCurrentSyntaxHighlight(null);
+    }
+
+    protected void ensureSyntaxUpToDate() {
+        if (!syntaxHighlighter.isPresent()) {
+            clearSyntaxHighlighting();
+        }
     }
 
     /**

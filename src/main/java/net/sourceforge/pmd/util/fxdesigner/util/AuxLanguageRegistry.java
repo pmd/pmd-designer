@@ -41,7 +41,8 @@ public final class AuxLanguageRegistry {
         if (lang == null) {
             return null;
         }
-        return lang.getVersion(split[1]);
+        return split.length == 1 ? lang.getDefaultVersion()
+                                 : lang.getVersion(split[1]);
     }
 
     @NonNull

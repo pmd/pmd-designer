@@ -72,6 +72,9 @@ public final class PmdCoordinatesSystem {
      * </ul>
      */
     public static int getOffsetFromPmdPosition(CodeArea codeArea, int line, int column) {
+        line = max(line, 1);
+        column = max(column, 1);
+
         int parIdx = getRtfxParIndexFromPmdLine(line);
         int raw = codeArea.getAbsolutePosition(parIdx, getRtfxColumnIndexFromPmdColumn(codeArea, parIdx, column));
         return clip(raw, 0, codeArea.getLength() - 1);
