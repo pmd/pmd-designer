@@ -164,7 +164,14 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
             return;
         }
 
-        int visibleLength = lastVisibleParToAllParIndex() - firstVisibleParToAllParIndex();
+        int visibleLength;
+        try {
+            visibleLength = lastVisibleParToAllParIndex() - firstVisibleParToAllParIndex();
+        } catch (AssertionError e) {
+            // may be thrown when many selection events occur in quick succession?
+            // Something like, the paragraphs
+            return;
+        }
 
         boolean fitsViewPort = node.getEndLine() - node.getBeginLine() <= visibleLength;
         int rtfxLine = getRtfxParIndexFromPmdLine(node.getBeginLine());
@@ -174,15 +181,13 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         boolean isEndVisible = rtfxEndLine <= lastVisibleParToAllParIndex();
 
 
+        if (!isStartVisible && scrollToTop) {
+            showParagraphAtTop(max(rtfxLine - 2, 0));
+        }
         if (fitsViewPort) {
-            if (!isStartVisible && scrollToTop) {
-                showParagraphAtTop(max(rtfxLine - 2, 0));
-            }
             if (!isEndVisible) {
                 showParagraphAtBottom(min(rtfxEndLine, getParagraphs().size()));
             }
-        } else if (!isStartVisible && scrollToTop) {
-            showParagraphAtTop(max(rtfxLine - 2, 0));
         }
     }
 
@@ -298,27 +303,29 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     public void setFocusNode(final Node node, DataHolder options) {
 
 
+        boolean changed = !Objects.equals(node, currentFocusNode.getValue());
+        if (changed) {
+
+            currentFocusNode.setValue(node);
+
+            // editor is only restyled if the selection has changed
+            Platform.runLater(() -> styleNodes(
+                node == null ? emptyList() : singleton(node), StyleLayerIds.FOCUS, true));
+
+            if (node == null) {
+                highlightRelatedNodes(emptyList());
+            } else {
+                Platform.runLater(() -> highlightRelatedNodes(relatedNodesSelector.getValue().getHighlightedNodesWhenSelecting(node)));
+            }
+        }
+
         // editor must not be scrolled when finding a new selection in a
         // tree that is being edited
+        // Editor must be scrolled after styling
         if (node != null && !options.hasData(SELECTION_RECOVERY)) {
             // don't randomly jump to top of eg ClassOrInterfaceBody
             // when selecting from a caret position
-            scrollToNode(node, !options.hasData(CARET_POSITION));
-        }
-
-        if (Objects.equals(node, currentFocusNode.getValue())) {
-            return;
-        }
-
-        currentFocusNode.setValue(node);
-
-        // editor is only restyled if the selection has changed
-        Platform.runLater(() -> styleNodes(node == null ? emptyList() : singleton(node), StyleLayerIds.FOCUS, true));
-
-        if (node == null) {
-            highlightRelatedNodes(emptyList());
-        } else {
-            Platform.runLater(() -> highlightRelatedNodes(relatedNodesSelector.getValue().getHighlightedNodesWhenSelecting(node)));
+            Platform.runLater(() -> scrollToNode(node, !options.hasData(CARET_POSITION)));
         }
     }
 

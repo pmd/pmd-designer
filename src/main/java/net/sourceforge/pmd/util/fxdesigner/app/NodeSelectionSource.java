@@ -19,6 +19,8 @@ import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.Te
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
+import javafx.application.Platform;
+
 
 /**
  * A control or controller that somehow displays nodes in a form that the user can select.
@@ -75,7 +77,7 @@ public interface NodeSelectionSource extends ApplicationComponent {
         EventStream<NodeSelectionEvent> selection = channel.messageStream(alwaysHandleSelection, this);
         selection.subscribe(evt -> {
             try {
-                setFocusNode(evt.selected, evt.options);
+                Platform.runLater(() -> setFocusNode(evt.selected, evt.options));
             } catch (Exception e) {
                 logInternalException(e);
                 printShortStackTrace(e);
