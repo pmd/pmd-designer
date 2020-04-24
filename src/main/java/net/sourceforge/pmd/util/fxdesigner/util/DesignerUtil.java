@@ -27,12 +27,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.reactfx.Subscription;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.lang.ast.xpath.Attribute;
 import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
 import net.sourceforge.pmd.lang.symboltable.NameDeclaration;
 import net.sourceforge.pmd.lang.symboltable.NameOccurrence;
@@ -433,5 +435,15 @@ public final class DesignerUtil {
                 return null; //use default
             }
         };
+    }
+
+
+    public static String attrToXpathString(Attribute attr) {
+        String stringValue = attr.getStringValue();
+        Object v = attr.getValue();
+        if (v instanceof String || v instanceof Enum) {
+            stringValue = "\"" + StringEscapeUtils.escapeJava(stringValue) + "\"";
+        }
+        return String.valueOf(stringValue);
     }
 }

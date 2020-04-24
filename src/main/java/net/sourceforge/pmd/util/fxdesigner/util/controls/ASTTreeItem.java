@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.reactfx.value.Var;
 
@@ -23,6 +22,7 @@ import net.sourceforge.pmd.util.designerbindings.DesignerBindings;
 import net.sourceforge.pmd.util.designerbindings.DesignerBindings.DefaultDesignerBindings;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.SearchableTreeView.SearchableTreeItem;
 
 import javafx.scene.control.TreeItem;
@@ -180,14 +180,9 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> implements Appli
         if (attr == null || attr.getStringValue() == null) {
             return node.getXPathNodeName();
         } else {
-            String stringValue = attr.getStringValue();
-            Object v = attr.getValue();
-            if (v instanceof String || v instanceof Enum) {
-                stringValue = "\"" + StringEscapeUtils.escapeJava(stringValue) + "\"";
-            }
-            return node.getXPathNodeName()
-                + " [@" + attr.getName() + " = " + stringValue + "]";
+            return node.getXPathNodeName() + " [@" + attr.getName() + " = " + DesignerUtil.attrToXpathString(attr) + "]";
         }
     }
+
 
 }

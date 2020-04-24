@@ -5,7 +5,6 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,8 +24,9 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.Pe
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
 
 /**
@@ -36,10 +36,18 @@ import javafx.scene.control.ToggleButton;
  */
 public class NodeDetailPaneController extends AbstractController implements NodeSelectionSource {
 
-    /** List of attribute names that are ignored if {@link #isHideCommonAttributes()} is true. */
+    /**
+     * List of attribute names that are ignored if {@link #isHideCommonAttributes()} is true.
+     */
     private static final List<String> IGNORABLE_ATTRIBUTES =
         Arrays.asList("BeginLine", "EndLine", "BeginColumn", "EndColumn", "FindBoundary", "SingleLine");
 
+    @FXML
+    private TableView<Attribute> xpathAttributesTreeView;
+    @FXML
+    private TableColumn<Attribute, String> attrValueColumn;
+    @FXML
+    private TableColumn<Attribute, String> attrNameColumn;
     @FXML
     private ToggleButton hideCommonAttributesToggle;
     @FXML
@@ -52,7 +60,7 @@ public class NodeDetailPaneController extends AbstractController implements Node
 
     @Override
     protected void beforeParentInit() {
-        xpathAttributesListView.setPlaceholder(new Label("No available attributes"));
+//        xpathAttributesListView.setPlaceholder(new Label("No available attributes"));
 
         Val<Node> currentSelection = initNodeSelectionHandling(getDesignerRoot(), EventStreams.never(), false);
 
@@ -64,22 +72,25 @@ public class NodeDetailPaneController extends AbstractController implements Node
             .distinct()
             .subscribe(show -> setFocusNode(currentSelection.getValue(), new DataHolder()));
 
+
+        attrValueColumn.setCellValueFactory(param -> Val.constant(DesignerUtil.attrToXpathString(param.getValue())));
+        attrNameColumn.setCellValueFactory(param -> Val.constant("@" + param.getValue().getName()));
     }
 
     @Override
     public void setFocusNode(final Node node, DataHolder options) {
-        xpathAttributesListView.setItems(getAttributes(node));
+        xpathAttributesTreeView.setItems(getAttributes(node));
     }
 
     /**
      * Gets the XPath attributes of the node for display within a listview.
      */
-    private ObservableList<String> getAttributes(Node node) {
+    private ObservableList<Attribute> getAttributes(Node node) {
         if (node == null) {
             return FXCollections.emptyObservableList();
         }
 
-        ObservableList<String> result = FXCollections.observableArrayList();
+        ObservableList<Attribute> result = FXCollections.observableArrayList();
         Iterator<Attribute> attributeAxisIterator = node.getXPathAttributesIterator();
         while (attributeAxisIterator.hasNext()) {
             Attribute attribute = attributeAxisIterator.next();
@@ -88,8 +99,7 @@ public class NodeDetailPaneController extends AbstractController implements Node
 
                 try {
                     // TODO the display should be handled in a ListCell
-                    result.add(attribute.getName() + " = "
-                                   + ((attribute.getValue() != null) ? attribute.getStringValue() : "null"));
+                    result.add(attribute);
                 } catch (Exception ignored) {
                     // some attributes throw eg numberformat exceptions
                 }
@@ -97,9 +107,6 @@ public class NodeDetailPaneController extends AbstractController implements Node
             }
         }
 
-        DesignerUtil.getResolvedType(node).map(t -> "typeIs() = " + t).ifPresent(result::add);
-
-        Collections.sort(result);
         return result;
     }
 
