@@ -11,6 +11,8 @@ import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.lang.LanguageVersionHandler;
+import net.sourceforge.pmd.util.designerbindings.DesignerBindings;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
 import net.sourceforge.pmd.util.fxdesigner.app.services.EventLogger;
@@ -58,6 +60,14 @@ public interface ApplicationComponent {
      */
     default Val<@NonNull Language> globalLanguageProperty() {
         return getService(DesignerRoot.APP_GLOBAL_LANGUAGE);
+    }
+
+
+    default Val<DesignerBindings> languageBindingsProperty() {
+        return getService(DesignerRoot.AST_MANAGER)
+            .languageVersionProperty()
+            .map(LanguageVersion::getLanguageVersionHandler)
+            .map(LanguageVersionHandler::getDesignerBindings);
     }
 
 

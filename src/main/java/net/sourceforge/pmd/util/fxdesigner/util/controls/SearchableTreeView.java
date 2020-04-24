@@ -292,6 +292,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                     setText(null);
                 } else {
                     setGraphic(null);
+                    // todo would be nicer if the treeview had colors
                     setText(realItemProperty().getValue().getSearchableText());
                 }
 

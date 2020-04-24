@@ -34,8 +34,6 @@ import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.lang.LanguageVersionHandler;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.designerbindings.DesignerBindings;
 import net.sourceforge.pmd.util.designerbindings.RelatedNodesSelector;
@@ -105,10 +103,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
         this.designerRoot = root;
         this.relatedNodesSelector =
-            root.getService(DesignerRoot.AST_MANAGER)
-                .languageVersionProperty()
-                .map(LanguageVersion::getLanguageVersionHandler)
-                .map(LanguageVersionHandler::getDesignerBindings)
+            languageBindingsProperty()
                 .map(DesignerBindings::getRelatedNodesSelector)
                 .orElseConst(DesignerUtil.getDefaultRelatedNodesSelector());
 
