@@ -5,7 +5,6 @@
 package net.sourceforge.pmd.util.fxdesigner.util;
 
 import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -398,26 +397,6 @@ public final class DesignerUtil {
         System.out.print(builder);
     }
 
-    /**
-     * Attempts to retrieve the type of a java TypeNode reflectively.
-     */
-    public static Optional<Class<?>> getResolvedType(Node node) {
-        // TODO maybe put some equivalent to TypeNode inside pmd-core
-
-        try {
-            return Optional.of(node.getClass().getMethod("getType"))
-                           .filter(m -> m.getReturnType() == Class.class)
-                           .map(m -> {
-                               try {
-                                   return m.invoke(node);
-                               } catch (IllegalAccessException | InvocationTargetException e) {
-                                   return null;
-                               }
-                           }).map(type -> (Class<?>) type);
-        } catch (NoSuchMethodException e) {
-            return Optional.empty();
-        }
-    }
 
     public static BuilderFactory customBuilderFactory(@NonNull DesignerRoot owner) {
         return type -> {
@@ -443,6 +422,8 @@ public final class DesignerUtil {
         Object v = attr.getValue();
         if (v instanceof String || v instanceof Enum) {
             stringValue = "\"" + StringEscapeUtils.escapeJava(stringValue) + "\"";
+        } else if (v instanceof Boolean) {
+            stringValue = v + "()";
         }
         return String.valueOf(stringValue);
     }

@@ -5,15 +5,20 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
 import org.reactfx.EventStreams;
+import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.ast.xpath.Attribute;
+import net.sourceforge.pmd.util.designerbindings.DesignerBindings;
+import net.sourceforge.pmd.util.designerbindings.DesignerBindings.AdditionalInfo;
+import net.sourceforge.pmd.util.designerbindings.DesignerBindings.DefaultDesignerBindings;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
@@ -24,6 +29,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.Pe
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -51,7 +57,7 @@ public class NodeDetailPaneController extends AbstractController implements Node
     @FXML
     private ToggleButton hideCommonAttributesToggle;
     @FXML
-    private ListView<String> xpathAttributesListView;
+    private ListView<String> additionalInfoListView;
 
 
     protected NodeDetailPaneController(DesignerRoot root) {
@@ -60,7 +66,7 @@ public class NodeDetailPaneController extends AbstractController implements Node
 
     @Override
     protected void beforeParentInit() {
-//        xpathAttributesListView.setPlaceholder(new Label("No available attributes"));
+        additionalInfoListView.setPlaceholder(new Label("No additional info"));
 
         Val<Node> currentSelection = initNodeSelectionHandling(getDesignerRoot(), EventStreams.never(), false);
 
@@ -80,6 +86,14 @@ public class NodeDetailPaneController extends AbstractController implements Node
     @Override
     public void setFocusNode(final Node node, DataHolder options) {
         xpathAttributesTreeView.setItems(getAttributes(node));
+        if (node == null) {
+            additionalInfoListView.setItems(FXCollections.emptyObservableList());
+            return;
+        }
+        DesignerBindings bindings = languageBindingsProperty().getOrElse(DefaultDesignerBindings.getInstance());
+        ObservableList<AdditionalInfo> additionalInfo = FXCollections.observableArrayList(bindings.getAdditionalInfo(node));
+        additionalInfo.sort(Comparator.comparing(AdditionalInfo::getSortKey));
+        additionalInfoListView.setItems(LiveList.map(additionalInfo, AdditionalInfo::getDisplayString));
     }
 
     /**
@@ -87,6 +101,7 @@ public class NodeDetailPaneController extends AbstractController implements Node
      */
     private ObservableList<Attribute> getAttributes(Node node) {
         if (node == null) {
+            xpathAttributesTreeView.setPlaceholder(new Label("Select a node to show its attributes"));
             return FXCollections.emptyObservableList();
         }
 
@@ -107,6 +122,7 @@ public class NodeDetailPaneController extends AbstractController implements Node
             }
         }
 
+        xpathAttributesTreeView.setPlaceholder(new Label("No available attributes"));
         return result;
     }
 
