@@ -311,6 +311,11 @@
   -fx-padding: 2 4 2 6;
 }
 
+.attribute-name.deprecated-attr > .text {
+  -fx-strikethrough: true;
+  -fx-background-color: red;
+}
+
 // For some reason including the Less files for these stylesheets
 // makes the compilation of this file run out of memory
 @import "../css/tabs.css";

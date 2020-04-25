@@ -32,7 +32,7 @@
 
         <SplitPane orientation="VERTICAL" dividerPositions=".95">
 
-            <TableView fx:id="xpathAttributesTreeView">
+            <TableView fx:id="xpathAttributesTableView">
                 <columns>
                     <TableColumn fx:id="attrNameColumn" editable="false" sortType="ASCENDING" prefWidth="100"
                                  text="Name"/>

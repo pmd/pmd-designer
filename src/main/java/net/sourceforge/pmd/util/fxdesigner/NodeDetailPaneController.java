@@ -25,6 +25,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.AttributeNameTableCell;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,6 +35,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 
 /**
  * The "Attributes" pane.
@@ -49,7 +51,7 @@ public class NodeDetailPaneController extends AbstractController implements Node
         Arrays.asList("BeginLine", "EndLine", "BeginColumn", "EndColumn", "FindBoundary", "SingleLine");
 
     @FXML
-    private TableView<Attribute> xpathAttributesTreeView;
+    private TableView<Attribute> xpathAttributesTableView;
     @FXML
     private TableColumn<Attribute, String> attrValueColumn;
     @FXML
@@ -81,11 +83,16 @@ public class NodeDetailPaneController extends AbstractController implements Node
 
         attrValueColumn.setCellValueFactory(param -> Val.constant(DesignerUtil.attrToXpathString(param.getValue())));
         attrNameColumn.setCellValueFactory(param -> Val.constant("@" + param.getValue().getName()));
+        attrNameColumn.setCellFactory(col -> new AttributeNameTableCell());
+
+        Label valueColGraphic = new Label("Value");
+        valueColGraphic.setTooltip(new Tooltip("This is the XPath 2.0 representation"));
+        attrValueColumn.setGraphic(valueColGraphic);
     }
 
     @Override
     public void setFocusNode(final Node node, DataHolder options) {
-        xpathAttributesTreeView.setItems(getAttributes(node));
+        xpathAttributesTableView.setItems(getAttributes(node));
         if (node == null) {
             additionalInfoListView.setItems(FXCollections.emptyObservableList());
             return;
@@ -101,7 +108,7 @@ public class NodeDetailPaneController extends AbstractController implements Node
      */
     private ObservableList<Attribute> getAttributes(Node node) {
         if (node == null) {
-            xpathAttributesTreeView.setPlaceholder(new Label("Select a node to show its attributes"));
+            xpathAttributesTableView.setPlaceholder(new Label("Select a node to show its attributes"));
             return FXCollections.emptyObservableList();
         }
 
@@ -113,7 +120,6 @@ public class NodeDetailPaneController extends AbstractController implements Node
             if (!(isHideCommonAttributes() && IGNORABLE_ATTRIBUTES.contains(attribute.getName()))) {
 
                 try {
-                    // TODO the display should be handled in a ListCell
                     result.add(attribute);
                 } catch (Exception ignored) {
                     // some attributes throw eg numberformat exceptions
@@ -122,7 +128,8 @@ public class NodeDetailPaneController extends AbstractController implements Node
             }
         }
 
-        xpathAttributesTreeView.setPlaceholder(new Label("No available attributes"));
+        result.sort(Comparator.comparing(Attribute::getName));
+        xpathAttributesTableView.setPlaceholder(new Label("No available attributes"));
         return result;
     }
 
