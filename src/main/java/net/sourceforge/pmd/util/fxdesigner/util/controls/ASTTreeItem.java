@@ -47,7 +47,8 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> implements Appli
     private ASTTreeItem(Node n, int treeIndex, DesignerRoot designerRoot) {
         super(n, treeIndex);
         this.designerRoot = designerRoot;
-        setExpanded(true);
+        DesignerBindings bindings = languageBindingsProperty().getOrElse(DefaultDesignerBindings.getInstance());
+        setExpanded(bindings.isExpandedByDefaultInTree(n));
 
         treeCellProperty().changes().subscribe(change -> {
             if (change.getOldValue() != null) {
