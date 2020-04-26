@@ -36,7 +36,7 @@
                 <columns>
                     <TableColumn fx:id="attrNameColumn" editable="false" sortType="ASCENDING" prefWidth="100"
                                  text="Name"/>
-                    <TableColumn fx:id="attrValueColumn" editable="false" text="Value" prefWidth="200"/>
+                    <TableColumn fx:id="attrValueColumn" editable="false" prefWidth="200"/>
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
