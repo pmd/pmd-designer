@@ -27,7 +27,7 @@ public class AttributeNameTableCell extends TableCell<Attribute, String> {
            .flatMap(Cell::itemProperty)
            .values()
            .distinct()
-           .subscribe(this::updateAttr);
+            .subscribe(this::updateAttr);
     }
 
 
