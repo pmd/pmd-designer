@@ -16,17 +16,22 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.ast.xpath.Attribute;
 import net.sourceforge.pmd.util.designerbindings.DesignerBindings;
 import net.sourceforge.pmd.util.designerbindings.DesignerBindings.DefaultDesignerBindings;
+import net.sourceforge.pmd.util.designerbindings.DesignerBindings.TreeIconId;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.util.TreeIcons;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.SearchableTreeView.SearchableTreeItem;
 
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 /**
@@ -200,7 +205,9 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> implements Appli
 
         Attribute attr = bindings.getMainAttribute(node);
 
-        TextFlow flow = new TextFlow(makeStyledText(node.getXPathNodeName(), NODE_XPATH_NAME_CSS));
+        TextFlow flow = new TextFlow();
+        addXPathName(flow, node.getXPathNodeName(), bindings.getIcon(node));
+
         if (attr != null && attr.getStringValue() != null) {
             flow.getChildren().add(makeStyledText(" [", NODE_XPATH_PUNCT_CSS));
             flow.getChildren().add(makeStyledText("@" + attr.getName(), NODE_XPATH_MAIN_ATTR_NAME_CSS));
@@ -209,6 +216,18 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> implements Appli
             flow.getChildren().add(makeStyledText("]", NODE_XPATH_PUNCT_CSS));
         }
         return flow;
+    }
+
+
+    private void addXPathName(TextFlow flow, String name, @Nullable TreeIconId id) {
+        if (id == null) {
+            flow.getChildren().addAll(makeStyledText(name, NODE_XPATH_NAME_CSS));
+        } else {
+            Text headText = new Text(name);
+            headText.getStyleClass().addAll(NODE_XPATH_NAME_CSS, "tree-icon-emphasis", TreeIcons.cssClass(id));
+            Tooltip.install(headText, new Tooltip(TreeIcons.displayName(id)));
+            flow.getChildren().add(headText);
+        }
     }
 
 
