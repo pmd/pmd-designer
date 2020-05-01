@@ -3,7 +3,7 @@
 #
 
 # VERSION_TAG e.g. "11.0.4+11" or "13+33"
-VERSION_TAG=11.0.6+10
+VERSION_TAG=11.0.7+10
 OPENJDK_MAJOR=${VERSION_TAG/.*/}
 OPENJDK_MAJOR=${OPENJDK_MAJOR/+*/}
 #BASE_URL=https://github.com/AdoptOpenJDK/openjdk${OPENJDK_MAJOR}-binaries/releases/download

@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.Optional;
 
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.util.DataMap;
+import net.sourceforge.pmd.util.DataMap.SimpleDataKey;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;
 
 import javafx.scene.control.TreeItem;
@@ -38,6 +40,10 @@ public final class AstTraversalUtil {
                            ? n : getRoot(n.getParent());
     }
 
+
+    private static final SimpleDataKey<Node> NEW_TREE_BRIDGE_KEY = DataMap.simpleDataKey("new.tree");
+
+
     /**
      * Tries hard to find the node in [myRoot] that corresponds most closely
      * to the given [node], which may be from another tree.
@@ -54,9 +60,12 @@ public final class AstTraversalUtil {
             return Optional.of(node); // same tree, don't set cache
         }
 
-        // user data of a node is the node it maps to in the other tree
-        if (node.getUserData() instanceof Node) {
-            return Optional.of((Node) node.getUserData());
+        {
+            // user data of a node is the node it maps to in the other tree
+            Node newNode = node.getUserMap().get(NEW_TREE_BRIDGE_KEY);
+            if (newNode != null) {
+                return Optional.of(newNode);
+            }
         }
 
         Optional<Node> result =
@@ -75,7 +84,7 @@ public final class AstTraversalUtil {
         // the [node] is mapped to the [result]
         // since several nodes may map to the same node in another tree,
         // it's not safe to set both cache entries
-        result.ifPresent(node::setUserData);
+        result.ifPresent(n -> node.getUserMap().set(NEW_TREE_BRIDGE_KEY, n));
 
         return result;
     }

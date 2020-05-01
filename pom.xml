@@ -4,7 +4,7 @@
     <groupId>net.sourceforge.pmd</groupId>
     <artifactId>pmd-ui</artifactId>
     <name>PMD Designer</name>
-    <version>6.22.0-SNAPSHOT</version>
+    <version>6.24.0-SNAPSHOT</version>
 
     <description>The Rule Designer is a graphical tool that helps PMD users develop their custom rules.</description>
     <url>https://pmd.github.io</url>
@@ -71,8 +71,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <pmd.build-tools.version>6-SNAPSHOT</pmd.build-tools.version>
-        <pmd.check.version>6.21.0</pmd.check.version>
+        <pmd.build-tools.version>6</pmd.build-tools.version>
+        <pmd.check.version>6.23.0</pmd.check.version>
 
         <jflex-output>${project.build.directory}/generated-sources/jflex</jflex-output>
 

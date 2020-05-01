@@ -170,8 +170,8 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         try {
             visibleLength = lastVisibleParToAllParIndex() - firstVisibleParToAllParIndex();
         } catch (AssertionError e) {
-            // may be thrown when many selection events occur in quick succession?
-            // Something like, the paragraphs
+            // May be thrown when many selection events occur in quick succession?
+            // The error is "dead code", probably a corner case in RichTextFX
             return;
         }
 
