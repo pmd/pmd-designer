@@ -30,10 +30,18 @@ public final class StringMatchUtil {
     /**
      * Selects the best {@link MatchResult} given a list of candidates and a query.
      *
-     * The results are useless unless you provide the {@link MatchSelector} that
-     * suits your use case.
+     * <p>The results are useless unless you provide the {@link MatchSelector} that
+     * suits your use case (limiter).
+     *
+     * @param candidates     List of stuff to sort
+     * @param matchExtractor Extracts the searchable text from an item
+     * @param limiter        Selects the best candidates, may process them further to break ties
+     * @param query          Text to search for
      */
-    public static <T> Stream<MatchResult<T>> filterResults(List<T> candidates, Function<T, String> matchExtractor, String query, MatchSelector<T> limiter) {
+    public static <T> Stream<MatchResult<T>> filterResults(List<? extends T> candidates,
+                                                           Function<? super T, String> matchExtractor,
+                                                           String query,
+                                                           MatchSelector<T> limiter) {
         if (query.length() < MIN_QUERY_LENGTH) {
             return Stream.empty();
         }
