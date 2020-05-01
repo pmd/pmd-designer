@@ -6,6 +6,8 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.AstTraversalUtil.parentIterator;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.reverse;
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.attrToXpathString;
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.makeStyledText;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,10 +24,10 @@ import net.sourceforge.pmd.util.designerbindings.DesignerBindings;
 import net.sourceforge.pmd.util.designerbindings.DesignerBindings.DefaultDesignerBindings;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.SearchableTreeView.SearchableTreeItem;
 
 import javafx.scene.control.TreeItem;
+import javafx.scene.text.TextFlow;
 
 /**
  * Represents a tree item (data, not UI) in the ast TreeView.
@@ -181,8 +183,32 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> implements Appli
         if (attr == null || attr.getStringValue() == null) {
             return node.getXPathNodeName();
         } else {
-            return node.getXPathNodeName() + " [@" + attr.getName() + " = " + DesignerUtil.attrToXpathString(attr) + "]";
+            return node.getXPathNodeName() + " [@" + attr.getName() + " = " + attrToXpathString(attr)
+                + "]";
         }
+    }
+
+
+    static final String NODE_XPATH_NAME_CSS = "node-xpath-name";
+    static final String NODE_XPATH_MAIN_ATTR_NAME_CSS = "node-xpath-main-attr-name";
+    static final String NODE_XPATH_PUNCT_CSS = "node-xpath-punct";
+    static final String NODE_XPATH_MAIN_ATTR_VALUE_CSS = "node-xpath-main-attr-value";
+
+
+    TextFlow styledPresentableText(Node node) {
+        DesignerBindings bindings = languageBindingsProperty().getOrElse(DefaultDesignerBindings.getInstance());
+
+        Attribute attr = bindings.getMainAttribute(node);
+
+        TextFlow flow = new TextFlow(makeStyledText(node.getXPathNodeName(), NODE_XPATH_NAME_CSS));
+        if (attr != null && attr.getStringValue() != null) {
+            flow.getChildren().add(makeStyledText(" [", NODE_XPATH_PUNCT_CSS));
+            flow.getChildren().add(makeStyledText("@" + attr.getName(), NODE_XPATH_MAIN_ATTR_NAME_CSS));
+            flow.getChildren().add(makeStyledText(" = ", NODE_XPATH_PUNCT_CSS));
+            flow.getChildren().add(makeStyledText(attrToXpathString(attr), NODE_XPATH_MAIN_ATTR_VALUE_CSS));
+            flow.getChildren().add(makeStyledText("]", NODE_XPATH_PUNCT_CSS));
+        }
+        return flow;
     }
 
 

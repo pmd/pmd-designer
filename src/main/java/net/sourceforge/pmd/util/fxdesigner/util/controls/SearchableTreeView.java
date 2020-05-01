@@ -226,7 +226,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
     public abstract static class SearchableTreeItem<T> extends TreeItem<T> {
 
         private final Var<SearchableTreeCell<T>> treeCell = Var.newSimpleVar(null);
-        private final Var<MatchResult> currentSearchResult = Var.newSimpleVar(null);
+        private final Var<MatchResult<SearchableTreeItem<T>>> currentSearchResult = Var.newSimpleVar(null);
         private final int treeIndex;
 
         public SearchableTreeItem(T n, int treeIndex) {
@@ -244,7 +244,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
             return treeCell;
         }
 
-        public Val<MatchResult> currentSearchResultProperty() {
+        public Val<MatchResult<SearchableTreeItem<T>>> currentSearchResultProperty() {
             return currentSearchResult;
         }
 
@@ -272,7 +272,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
                 });
         }
 
-        protected Val<MatchResult> searchResultProperty() {
+        protected Val<MatchResult<SearchableTreeItem<T>>> searchResultProperty() {
             return realItemProperty().flatMap(SearchableTreeItem::currentSearchResultProperty);
         }
 
@@ -285,19 +285,23 @@ public class SearchableTreeView<T> extends TreeView<T> {
                 setGraphic(null);
             } else {
 
-                Optional<MatchResult> completionResult = searchResultProperty().getOpt();
+                Optional<MatchResult<SearchableTreeItem<T>>> completionResult = searchResultProperty().getOpt();
 
                 if (completionResult.isPresent()) {
                     setGraphic(completionResult.get().getTextFlow());
                     setText(null);
                 } else {
-                    setGraphic(null);
-                    // todo would be nicer if the treeview had colors
-                    setText(realItemProperty().getValue().getSearchableText());
+                    setNonSearchState(realItemProperty().getValue());
                 }
 
                 commonUpdate(item);
             }
+        }
+
+        protected void setNonSearchState(SearchableTreeItem<T> realItem) {
+            setGraphic(null);
+            // todo would be nicer if the treeview had colors
+            setText(realItem.getSearchableText());
         }
 
         public abstract void commonUpdate(T item);

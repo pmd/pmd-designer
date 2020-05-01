@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -53,9 +55,7 @@ public final class StringMatchUtil {
 
 
     static Text makeNormalText(String text) {
-        Text matchLabel = new Text(text);
-        matchLabel.getStyleClass().add("text");
-        return matchLabel;
+        return DesignerUtil.makeStyledText(text, "text");
     }
 
 }

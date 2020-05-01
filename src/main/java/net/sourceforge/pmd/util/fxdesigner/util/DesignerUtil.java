@@ -51,6 +51,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.text.Text;
 import javafx.util.BuilderFactory;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -426,5 +427,12 @@ public final class DesignerUtil {
             stringValue = v + "()";
         }
         return String.valueOf(stringValue);
+    }
+
+
+    public static Text makeStyledText(String text, String cssClass) {
+        Text matchLabel = new Text(text);
+        matchLabel.getStyleClass().add(cssClass);
+        return matchLabel;
     }
 }

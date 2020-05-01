@@ -12,6 +12,7 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.SearchableTreeView.SearchableTreeCell;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.SearchableTreeView.SearchableTreeItem;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
@@ -59,6 +60,16 @@ public class ASTTreeCell extends SearchableTreeCell<Node> implements Application
         contextMenu.getItems().add(menuItem);
 
         return contextMenu;
+    }
+
+
+    @Override
+    protected void setNonSearchState(SearchableTreeItem<Node> realItem) {
+        ASTTreeItem astItem = (ASTTreeItem) realItem;
+
+        Node node = realItem.getValue();
+        setText(null);
+        setGraphic(node == null ? null : astItem.styledPresentableText(node));
     }
 
 
