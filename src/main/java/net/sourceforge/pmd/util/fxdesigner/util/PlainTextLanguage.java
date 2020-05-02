@@ -19,12 +19,12 @@ import net.sourceforge.pmd.lang.BaseLanguageModule;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.Parser;
 import net.sourceforge.pmd.lang.ParserOptions;
-import net.sourceforge.pmd.lang.ast.AbstractNode;
 import net.sourceforge.pmd.lang.ast.AstProcessingStage;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.ast.ParseException;
 import net.sourceforge.pmd.lang.ast.RootNode;
 import net.sourceforge.pmd.lang.ast.SourceCodePositioner;
+import net.sourceforge.pmd.lang.ast.impl.AbstractNodeWithTextCoordinates;
 import net.sourceforge.pmd.lang.rule.AbstractRuleChainVisitor;
 import net.sourceforge.pmd.lang.rule.AbstractRuleViolationFactory;
 import net.sourceforge.pmd.lang.rule.ParametricRuleViolation;
@@ -78,7 +78,7 @@ public final class PlainTextLanguage extends BaseLanguageModule {
                 }
 
                 @Override
-                public Node parse(String s, Reader reader) throws ParseException {
+                public RootNode parse(String s, Reader reader) throws ParseException {
                     try {
                         return new PlainTextFile(IOUtils.toString(reader));
                     } catch (IOException e) {
@@ -89,10 +89,9 @@ public final class PlainTextLanguage extends BaseLanguageModule {
         }
     }
 
-    public static class PlainTextFile extends AbstractNode implements RootNode {
+    public static class PlainTextFile extends AbstractNodeWithTextCoordinates<PlainTextFile, PlainTextFile> implements RootNode {
 
         PlainTextFile(String fileText) {
-            super(0);
             SourceCodePositioner positioner = new SourceCodePositioner(fileText);
             this.beginLine = 1;
             this.beginColumn = 1;
@@ -111,23 +110,8 @@ public final class PlainTextLanguage extends BaseLanguageModule {
         }
 
         @Override
-        public void setImage(String image) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void removeChildAtIndex(int childIndex) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        @Override
         public String toString() {
-            return "Plain text file (" + endLine + " lines)";
+            return "Plain text file (" + getEndLine() + " lines)";
         }
     }
 
