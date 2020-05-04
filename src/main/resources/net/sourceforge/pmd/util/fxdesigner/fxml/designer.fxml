@@ -94,11 +94,14 @@
             <center>
                 <SplitPane id="main-horizontal-split-pane" fx:id="mainHorizontalSplitPane" dividerPositions="0.8" orientation="VERTICAL" BorderPane.alignment="BOTTOM_CENTER">
                     <items>
-                        <BorderPane prefHeight="200.0" prefWidth="200.0">
-                            <left>
+                        <SplitPane prefHeight="200.0" dividerPositions="0.25">
+
                                 <TabPane id="nodeInfoTabPane"
-                                         prefWidth="300.0" side="LEFT"
-                                         tabClosingPolicy="UNAVAILABLE">
+                                         minWidth="150.0"
+                                         prefWidth="300.0"
+                                         side="LEFT"
+                                         tabClosingPolicy="UNAVAILABLE"
+                                         SplitPane.resizableWithParent="false">
 
                                     <tabs>
                                         <Tab text="Attributes">
@@ -112,11 +115,8 @@
                                         </Tab>
                                     </tabs>
                                 </TabPane>
-                            </left>
-                            <center>
                                 <fx:include fx:id="sourceEditor" source="editor.fxml" prefHeight="200.0" prefWidth="200.0" />
-                            </center>
-                        </BorderPane>
+                        </SplitPane>
                         <fx:include source="rule-editors.fxml" fx:id="ruleEditors" />
                     </items>
                 </SplitPane>
