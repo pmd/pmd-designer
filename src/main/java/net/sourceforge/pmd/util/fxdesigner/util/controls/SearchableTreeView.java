@@ -43,6 +43,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Popup;
 
+/**
+ *
+ * @param <T> Item type
+ * @see SearchableTreeItem
+ * @see SearchableTreeCell
+ */
 public class SearchableTreeView<T> extends TreeView<T> {
 
     public static final int MIN_QUERY_LENGTH = 1;
@@ -81,6 +87,9 @@ public class SearchableTreeView<T> extends TreeView<T> {
     }
 
 
+    /**
+     * Textfield for the search query.
+     */
     private void popSearchField() {
         TextField textField = new TextField();
         textField.setPrefWidth(150);
@@ -210,12 +219,12 @@ public class SearchableTreeView<T> extends TreeView<T> {
 
     }
 
-
     private List<MatchResult<SearchableTreeItem<T>>> selectMatches(String query, List<SearchableTreeItem<T>> items) {
         MatchSelector<SearchableTreeItem<T>> limiter =
             CamelCaseMatcher.<SearchableTreeItem<T>>allQueryStarts()
                 .andThen(c -> c.filter(it -> it.getScore() > 0))
                 .andThen(Stream::parallel)
+                .andThen(CamelCaseMatcher.onlyWordStarts())
                 .andThen(MatchSelector.selectBestTies());
 
         return StringMatchUtil.filterResults(items, SearchableTreeItem::getSearchableText, query, limiter)
@@ -223,11 +232,13 @@ public class SearchableTreeView<T> extends TreeView<T> {
                               .collect(Collectors.toList());
     }
 
+
     public abstract static class SearchableTreeItem<T> extends TreeItem<T> {
 
         private final Var<SearchableTreeCell<T>> treeCell = Var.newSimpleVar(null);
-        private final Var<MatchResult> currentSearchResult = Var.newSimpleVar(null);
+        private final Var<MatchResult<SearchableTreeItem<T>>> currentSearchResult = Var.newSimpleVar(null);
         private final int treeIndex;
+
 
         public SearchableTreeItem(T n, int treeIndex) {
             super(n);
@@ -244,17 +255,33 @@ public class SearchableTreeView<T> extends TreeView<T> {
             return treeCell;
         }
 
-        public Val<MatchResult> currentSearchResultProperty() {
+
+        public Val<MatchResult<SearchableTreeItem<T>>> currentSearchResultProperty() {
             return currentSearchResult;
         }
 
+
+        /**
+         * Text used to match search queries. This must be the
+         * same text as is displayed on the cell in normal mode.
+         */
         public abstract String getSearchableText();
+
 
         public int getTreeIndex() {
             return treeIndex;
         }
     }
 
+    /**
+     * A searchable tree cell is bound both ways to a searchable
+     * tree item. It has three visual states:
+     * <ul>
+     * <li>unbound (no underlying item, not visible in tree)
+     * <li>bound with a search result (in which case it displays the styled search result)
+     * <li>bound without a search result (in which case it displays the searchable text, maybe with some styling)
+     * </ul>
+     */
     public abstract static class SearchableTreeCell<T> extends TreeCell<T> {
 
         public SearchableTreeCell() {
@@ -272,7 +299,8 @@ public class SearchableTreeView<T> extends TreeView<T> {
                 });
         }
 
-        protected Val<MatchResult> searchResultProperty() {
+
+        protected Val<MatchResult<SearchableTreeItem<T>>> searchResultProperty() {
             return realItemProperty().flatMap(SearchableTreeItem::currentSearchResultProperty);
         }
 
@@ -285,20 +313,32 @@ public class SearchableTreeView<T> extends TreeView<T> {
                 setGraphic(null);
             } else {
 
-                Optional<MatchResult> completionResult = searchResultProperty().getOpt();
+                Optional<MatchResult<SearchableTreeItem<T>>> completionResult = searchResultProperty().getOpt();
 
                 if (completionResult.isPresent()) {
                     setGraphic(completionResult.get().getTextFlow());
                     setText(null);
                 } else {
-                    setGraphic(null);
-                    setText(realItemProperty().getValue().getSearchableText());
+                    setNonSearchState(realItemProperty().getValue());
                 }
 
                 commonUpdate(item);
             }
         }
 
+
+        /**
+         * Update just for when the item is not a search result.
+         */
+        protected void setNonSearchState(SearchableTreeItem<T> realItem) {
+            setGraphic(null);
+            setText(realItem.getSearchableText());
+        }
+
+
+        /**
+         * Update for both visible states.
+         */
         public abstract void commonUpdate(T item);
 
 

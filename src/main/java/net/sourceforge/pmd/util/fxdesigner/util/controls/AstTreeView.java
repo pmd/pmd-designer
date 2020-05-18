@@ -106,7 +106,7 @@ public class AstTreeView extends SearchableTreeView<Node> implements NodeSelecti
         // fetch the selected item before setting the root
         ASTTreeItem selectedTreeItem = (ASTTreeItem) getSelectionModel().getSelectedItem();
 
-        setRealRoot(root == null ? null : ASTTreeItem.buildRoot(root));
+        setRealRoot(root == null ? null : ASTTreeItem.buildRoot(root, getDesignerRoot()));
 
         if (getDebugName().contains("old")) {
             // prevent the old treeview from shooting back selection recovery events
