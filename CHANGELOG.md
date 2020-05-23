@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.25.0
+
+See https://github.com/pmd/pmd-designer/milestone/12
+
 ## 6.24.0
 
 * **Bump required pmd-core version to 6.23.0.** The previous minimal pmd-core version was 6.21.0.
