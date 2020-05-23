@@ -7,6 +7,9 @@ See https://github.com/pmd/pmd-designer/milestone/12
 ## 6.24.0
 
 * **Bump required pmd-core version to 6.23.0.** The previous minimal pmd-core version was 6.21.0.
+* Display the "main attribute" of nodes in the tree. This is usually the `@Name` of a node or the `@Image`. (refs [#42](https://github.com/pmd/pmd-designer/pull/42))
+* XPath attributes panel is revamped to a table, "extra info" is listed at the bottom (this includes the resolved type for Java) (refs [#42](https://github.com/pmd/pmd-designer/pull/42))
+* Deprecated XPath attributes are displayed crossed out. There is even a tooltip showing, which attribute to use instead. (refs [#42](https://github.com/pmd/pmd-designer/pull/42))
 
 See https://github.com/pmd/pmd-designer/milestone/10
 
