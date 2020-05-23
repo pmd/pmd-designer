@@ -4,7 +4,7 @@
     <groupId>net.sourceforge.pmd</groupId>
     <artifactId>pmd-ui</artifactId>
     <name>PMD Designer</name>
-    <version>6.24.0-SNAPSHOT</version>
+    <version>6.24.0</version>
 
     <description>The Rule Designer is a graphical tool that helps PMD users develop their custom rules.</description>
     <url>https://pmd.github.io</url>
@@ -20,7 +20,7 @@
         <connection>scm:git:git://github.com/pmd/pmd-designer.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/pmd/pmd-designer.git</developerConnection>
         <url>https://github.com/pmd/pmd-designer</url>
-        <tag>HEAD</tag>
+        <tag>6.24.0</tag>
     </scm>
     <ciManagement>
         <url>https://travis-ci.org/pmd/pmd-designer</url>
