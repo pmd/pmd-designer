@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Designer (JRE 11)" type="Application" factoryName="Application">
-    <option name="ALTERNATIVE_JRE_PATH" value="11" />
+    <option name="ALTERNATIVE_JRE_PATH" value="13" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <envs>
       <env name="JAVAFX_HOME" value="/usr/lib/jvm/javafx-sdk-11.0.2" />

@@ -31,6 +31,20 @@
 
 }
 
+.tree-cell {
+//  Style for ast tree cells
+/*
+"node-xpath-name"
+"node-xpath-main-attr-name"
+"node-xpath-punct"
+"node-xpath-main-attr-value"
+ */
+
+  .node-xpath-punct, .node-xpath-main-attr-name {
+    -fx-fill: gray;
+  }
+}
+
 
 .table-view {
   -fx-border-color: @darker-accent;
@@ -309,6 +323,11 @@
 .list-cell > .text-field {
   -fx-pref-height: 20;
   -fx-padding: 2 4 2 6;
+}
+
+.attribute-name.deprecated-attr > .text {
+  -fx-strikethrough: true;
+  -fx-background-color: red;
 }
 
 // For some reason including the Less files for these stylesheets

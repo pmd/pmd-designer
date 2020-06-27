@@ -1,9 +1,12 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.SplitPane?>
 <AnchorPane stylesheets="@../css/designer.css"
             xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -27,7 +30,22 @@
             </ToggleButton>
         </toolbarItems>
 
-        <ListView fx:id="xpathAttributesListView"/>
+        <SplitPane orientation="VERTICAL" dividerPositions=".95">
+
+            <TableView fx:id="xpathAttributesTableView">
+                <columns>
+                    <TableColumn fx:id="attrNameColumn" editable="false" sortType="ASCENDING" prefWidth="100"
+                                 text="Name"/>
+                    <TableColumn fx:id="attrValueColumn" editable="false" prefWidth="200"/>
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+            </TableView>
+
+            <ListView fx:id="additionalInfoListView"/>
+        </SplitPane>
+
 
     </ToolbarTitledPane>
 </AnchorPane>

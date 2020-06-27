@@ -6,6 +6,8 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import static net.sourceforge.pmd.util.fxdesigner.util.AstTraversalUtil.parentIterator;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.reverse;
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.attrToXpathString;
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.makeStyledText;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,14 +15,19 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.lang.ast.xpath.Attribute;
+import net.sourceforge.pmd.util.designerbindings.DesignerBindings;
+import net.sourceforge.pmd.util.designerbindings.DesignerBindings.DefaultDesignerBindings;
+import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.SearchableTreeView.SearchableTreeItem;
 
 import javafx.scene.control.TreeItem;
+import javafx.scene.text.TextFlow;
 
 /**
  * Represents a tree item (data, not UI) in the ast TreeView.
@@ -28,7 +35,7 @@ import javafx.scene.control.TreeItem;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public final class ASTTreeItem extends SearchableTreeItem<Node> {
+public final class ASTTreeItem extends SearchableTreeItem<Node> implements ApplicationComponent {
 
 
     /**
@@ -36,10 +43,14 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> {
      * The TreeItem must sync them to the TreeCell that currently displays it. The value is never null.
      */
     private final Var<Collection<String>> latentStyleClasses = Var.newSimpleVar(Collections.emptyList());
+    private final DesignerRoot designerRoot;
 
-    private ASTTreeItem(Node n, int treeIndex) {
+
+    private ASTTreeItem(Node n, int treeIndex, DesignerRoot designerRoot) {
         super(n, treeIndex);
-        setExpanded(true);
+        this.designerRoot = designerRoot;
+        DesignerBindings bindings = languageBindingsProperty().getOrElse(DefaultDesignerBindings.getInstance());
+        setExpanded(bindings.isExpandedByDefaultInTree(n));
 
         treeCellProperty().changes().subscribe(change -> {
             if (change.getOldValue() != null) {
@@ -110,26 +121,40 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> {
         latentStyleClasses.setValue(classes == null ? Collections.emptyList() : classes);
     }
 
+
     public void setStyleClasses(String... classes) {
         setStyleClasses(Arrays.asList(classes));
     }
+
 
     @Override
     public String getSearchableText() {
         return getValue() != null ? nodePresentableText(getValue()) : null;
     }
 
-    /** Builds an ASTTreeItem recursively from a node. */
-    static ASTTreeItem buildRoot(Node n) {
-        return buildRootImpl(n, new MutableInt(0));
+
+    @Override
+    public DesignerRoot getDesignerRoot() {
+        return designerRoot;
     }
 
-    /** Builds an ASTTreeItem recursively from a node. */
-    private static ASTTreeItem buildRootImpl(Node n, MutableInt idx) {
-        ASTTreeItem item = new ASTTreeItem(n, idx.getAndIncrement());
+
+    /**
+     * Builds an ASTTreeItem recursively from a node.
+     */
+    static ASTTreeItem buildRoot(Node n, DesignerRoot designerRoot) {
+        return buildRootImpl(n, new MutableInt(0), designerRoot);
+    }
+
+
+    /**
+     * Builds an ASTTreeItem recursively from a node.
+     */
+    private static ASTTreeItem buildRootImpl(Node n, MutableInt idx, DesignerRoot designerRoot) {
+        ASTTreeItem item = new ASTTreeItem(n, idx.getAndIncrement(), designerRoot);
         if (n.getNumChildren() > 0) {
             for (int i = 0; i < n.getNumChildren(); i++) {
-                item.getChildren().add(buildRootImpl(n.getChild(i), idx));
+                item.getChildren().add(buildRootImpl(n.getChild(i), idx, designerRoot));
             }
         }
         return item;
@@ -150,9 +175,41 @@ public final class ASTTreeItem extends SearchableTreeItem<Node> {
         }
     }
 
-    private static String nodePresentableText(Node node) {
-        String image = node.getImage() == null ? "" : " \"" + StringEscapeUtils.escapeJava(node.getImage()) + "\"";
-        return node.getXPathNodeName() + image;
+
+    private String nodePresentableText(Node node) {
+        DesignerBindings bindings = languageBindingsProperty().getOrElse(DefaultDesignerBindings.getInstance());
+
+        Attribute attr = bindings.getMainAttribute(node);
+        if (attr == null || attr.getStringValue() == null) {
+            return node.getXPathNodeName();
+        } else {
+            return node.getXPathNodeName() + " [@" + attr.getName() + " = " + attrToXpathString(attr)
+                + "]";
+        }
     }
+
+
+    static final String NODE_XPATH_NAME_CSS = "node-xpath-name";
+    static final String NODE_XPATH_MAIN_ATTR_NAME_CSS = "node-xpath-main-attr-name";
+    static final String NODE_XPATH_PUNCT_CSS = "node-xpath-punct";
+    static final String NODE_XPATH_MAIN_ATTR_VALUE_CSS = "node-xpath-main-attr-value";
+
+
+    TextFlow styledPresentableText(Node node) {
+        DesignerBindings bindings = languageBindingsProperty().getOrElse(DefaultDesignerBindings.getInstance());
+
+        Attribute attr = bindings.getMainAttribute(node);
+
+        TextFlow flow = new TextFlow(makeStyledText(node.getXPathNodeName(), NODE_XPATH_NAME_CSS));
+        if (attr != null && attr.getStringValue() != null) {
+            flow.getChildren().add(makeStyledText(" [", NODE_XPATH_PUNCT_CSS));
+            flow.getChildren().add(makeStyledText("@" + attr.getName(), NODE_XPATH_MAIN_ATTR_NAME_CSS));
+            flow.getChildren().add(makeStyledText(" = ", NODE_XPATH_PUNCT_CSS));
+            flow.getChildren().add(makeStyledText(attrToXpathString(attr), NODE_XPATH_MAIN_ATTR_VALUE_CSS));
+            flow.getChildren().add(makeStyledText("]", NODE_XPATH_PUNCT_CSS));
+        }
+        return flow;
+    }
+
 
 }

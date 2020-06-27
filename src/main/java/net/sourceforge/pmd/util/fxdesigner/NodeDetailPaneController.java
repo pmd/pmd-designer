@@ -5,29 +5,37 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
 import org.reactfx.EventStreams;
+import org.reactfx.collection.LiveList;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.ast.xpath.Attribute;
+import net.sourceforge.pmd.util.designerbindings.DesignerBindings;
+import net.sourceforge.pmd.util.designerbindings.DesignerBindings.AdditionalInfo;
+import net.sourceforge.pmd.util.designerbindings.DesignerBindings.DefaultDesignerBindings;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
+import net.sourceforge.pmd.util.fxdesigner.util.controls.AttributeNameTableCell;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 
 /**
  * The "Attributes" pane.
@@ -36,14 +44,22 @@ import javafx.scene.control.ToggleButton;
  */
 public class NodeDetailPaneController extends AbstractController implements NodeSelectionSource {
 
-    /** List of attribute names that are ignored if {@link #isHideCommonAttributes()} is true. */
+    /**
+     * List of attribute names that are ignored if {@link #isHideCommonAttributes()} is true.
+     */
     private static final List<String> IGNORABLE_ATTRIBUTES =
         Arrays.asList("BeginLine", "EndLine", "BeginColumn", "EndColumn", "FindBoundary", "SingleLine");
 
     @FXML
+    private TableView<Attribute> xpathAttributesTableView;
+    @FXML
+    private TableColumn<Attribute, String> attrValueColumn;
+    @FXML
+    private TableColumn<Attribute, String> attrNameColumn;
+    @FXML
     private ToggleButton hideCommonAttributesToggle;
     @FXML
-    private ListView<String> xpathAttributesListView;
+    private ListView<String> additionalInfoListView;
 
 
     protected NodeDetailPaneController(DesignerRoot root) {
@@ -52,7 +68,7 @@ public class NodeDetailPaneController extends AbstractController implements Node
 
     @Override
     protected void beforeParentInit() {
-        xpathAttributesListView.setPlaceholder(new Label("No available attributes"));
+        additionalInfoListView.setPlaceholder(new Label("No additional info"));
 
         Val<Node> currentSelection = initNodeSelectionHandling(getDesignerRoot(), EventStreams.never(), false);
 
@@ -64,22 +80,39 @@ public class NodeDetailPaneController extends AbstractController implements Node
             .distinct()
             .subscribe(show -> setFocusNode(currentSelection.getValue(), new DataHolder()));
 
+
+        attrValueColumn.setCellValueFactory(param -> Val.constant(DesignerUtil.attrToXpathString(param.getValue())));
+        attrNameColumn.setCellValueFactory(param -> Val.constant("@" + param.getValue().getName()));
+        attrNameColumn.setCellFactory(col -> new AttributeNameTableCell());
+
+        Label valueColGraphic = new Label("Value");
+        valueColGraphic.setTooltip(new Tooltip("This is the XPath 2.0 representation"));
+        attrValueColumn.setGraphic(valueColGraphic);
     }
 
     @Override
     public void setFocusNode(final Node node, DataHolder options) {
-        xpathAttributesListView.setItems(getAttributes(node));
+        xpathAttributesTableView.setItems(getAttributes(node));
+        if (node == null) {
+            additionalInfoListView.setItems(FXCollections.emptyObservableList());
+            return;
+        }
+        DesignerBindings bindings = languageBindingsProperty().getOrElse(DefaultDesignerBindings.getInstance());
+        ObservableList<AdditionalInfo> additionalInfo = FXCollections.observableArrayList(bindings.getAdditionalInfo(node));
+        additionalInfo.sort(Comparator.comparing(AdditionalInfo::getSortKey));
+        additionalInfoListView.setItems(LiveList.map(additionalInfo, AdditionalInfo::getDisplayString));
     }
 
     /**
      * Gets the XPath attributes of the node for display within a listview.
      */
-    private ObservableList<String> getAttributes(Node node) {
+    private ObservableList<Attribute> getAttributes(Node node) {
         if (node == null) {
+            xpathAttributesTableView.setPlaceholder(new Label("Select a node to show its attributes"));
             return FXCollections.emptyObservableList();
         }
 
-        ObservableList<String> result = FXCollections.observableArrayList();
+        ObservableList<Attribute> result = FXCollections.observableArrayList();
         Iterator<Attribute> attributeAxisIterator = node.getXPathAttributesIterator();
         while (attributeAxisIterator.hasNext()) {
             Attribute attribute = attributeAxisIterator.next();
@@ -87,9 +120,7 @@ public class NodeDetailPaneController extends AbstractController implements Node
             if (!(isHideCommonAttributes() && IGNORABLE_ATTRIBUTES.contains(attribute.getName()))) {
 
                 try {
-                    // TODO the display should be handled in a ListCell
-                    result.add(attribute.getName() + " = "
-                                   + ((attribute.getValue() != null) ? attribute.getStringValue() : "null"));
+                    result.add(attribute);
                 } catch (Exception ignored) {
                     // some attributes throw eg numberformat exceptions
                 }
@@ -97,9 +128,8 @@ public class NodeDetailPaneController extends AbstractController implements Node
             }
         }
 
-        DesignerUtil.getResolvedType(node).map(t -> "typeIs() = " + t).ifPresent(result::add);
-
-        Collections.sort(result);
+        result.sort(Comparator.comparing(Attribute::getName));
+        xpathAttributesTableView.setPlaceholder(new Label("No available attributes"));
         return result;
     }
 

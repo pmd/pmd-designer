@@ -76,6 +76,7 @@ public interface DesignerRoot {
     AppServiceDescriptor<TreeRendererRegistry> TREE_RENDERER_REGISTRY = new AppServiceDescriptor<>(TreeRendererRegistry.class);
 
 
+
     /**
      * Gets the instance of a service shared by the app.
      *
