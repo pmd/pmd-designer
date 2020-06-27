@@ -82,6 +82,7 @@
     <orderEntry type="library" name="Maven: net.sourceforge.saxon:saxon:9.1.0.8" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm:7.3.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.5" level="project" />
+    <orderEntry type="library" name="Maven: org.pcollections:pcollections:3.1.3" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.saxon:saxon:dom:9.1.0.8" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-apex:7.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-apex-jorje:lib:7.0.0-SNAPSHOT" level="project" />
@@ -105,6 +106,7 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: javax.inject:javax.inject:1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-java:7.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.sourceforge.pmd:pmd-scala:7.0.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.sourceforge.pmd:pmd-scala_2.13:7.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.scalameta:scalameta_2.13:4.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.scala-lang:scala-library:2.13.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.scalameta:parsers_2.13:4.2.0" level="project" />
@@ -131,6 +133,7 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.pmd:pmd-xml:7.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.sourceforge.pmd:pmd-modelica:7.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: net.sourceforge.pmd:pmd-lang-test:7.0.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest:2.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.3.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.3.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains:annotations:13.0" level="project" />

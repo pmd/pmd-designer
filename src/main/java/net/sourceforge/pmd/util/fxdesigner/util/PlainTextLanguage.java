@@ -25,7 +25,6 @@ import net.sourceforge.pmd.lang.ast.ParseException;
 import net.sourceforge.pmd.lang.ast.RootNode;
 import net.sourceforge.pmd.lang.ast.SourceCodePositioner;
 import net.sourceforge.pmd.lang.ast.impl.AbstractNodeWithTextCoordinates;
-import net.sourceforge.pmd.lang.rule.AbstractRuleChainVisitor;
 import net.sourceforge.pmd.lang.rule.AbstractRuleViolationFactory;
 import net.sourceforge.pmd.lang.rule.ParametricRuleViolation;
 import net.sourceforge.pmd.lang.rule.RuleViolationFactory;
@@ -40,7 +39,7 @@ public final class PlainTextLanguage extends BaseLanguageModule {
     static final String TERSE_NAME = "text";
 
     private PlainTextLanguage() {
-        super("Plain text", "Plain text", TERSE_NAME, RchainVisitor.class, "plain-text-file-goo-extension");
+        super("Plain text", "Plain text", TERSE_NAME,"plain-text-file-goo-extension");
         addVersion("default", new TextLvh(), true);
     }
 
@@ -115,16 +114,4 @@ public final class PlainTextLanguage extends BaseLanguageModule {
         }
     }
 
-    public static class RchainVisitor extends AbstractRuleChainVisitor {
-
-        @Override
-        protected void visit(Rule rule, Node node, RuleContext ctx) {
-            rule.apply(Collections.singletonList(node), ctx);
-        }
-
-        @Override
-        protected void indexNodes(List<Node> nodes, RuleContext ctx) {
-            // there's a single node...
-        }
-    }
 }

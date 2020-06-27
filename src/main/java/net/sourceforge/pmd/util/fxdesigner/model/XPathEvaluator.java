@@ -131,7 +131,7 @@ public final class XPathEvaluator {
             ruleContext.setLanguageVersion(languageVersion);
             ruleContext.setIgnoreExceptions(false);
 
-            ruleSets.apply(singletonList(compilationUnit), ruleContext, xpathRule.getLanguage());
+            ruleSets.apply(singletonList(compilationUnit), ruleContext);
 
             return results;
 
