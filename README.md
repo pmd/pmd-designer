@@ -26,6 +26,12 @@ If the `bin` directory of your PMD distribution is on your shell's path, then yo
 * `run.sh designer` on Linux/ OSX
 * `designer.bat` on Windows
 
+Alternatively, you can launch the program "from source" with Maven.
+* `$ ./mvnw -Prunning exec:java` will launch the program after compiling it, using the JavaFX distribution of your system
+* `$ ./mvnw -Prunning,with-javafx exec:java` will also add JavaFX dependencies on your classpath.
+You can change the version of those dependencies with eg `-Dopenjfx.version 13` for OpenJFX 13.
+See the list of available versions [here](https://search.maven.org/artifact/org.openjfx/javafx).
+
 ### Updating
 
 The latest version of the designer currently **works with PMD 6.23.0 and above**.
