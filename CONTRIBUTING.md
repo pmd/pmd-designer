@@ -11,9 +11,9 @@
 #### Clean build from source
 
 * Clone the repository
-* Run `./mvnw clean verify`
-* The artifact can then be found in the `target` directory (it won't include PMD
- dependencies)
+* Run `./mvnw -Pshading clean verify`
+* The artifact can then be found in the `target` directory 
+(it won't include PMD dependencies)
 
 #### IDE Setup
 
