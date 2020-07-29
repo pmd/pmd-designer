@@ -158,6 +158,19 @@
                     <forkCount>1.5C</forkCount>
                     <runOrder>alphabetical</runOrder>
                 </configuration>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                        <version>4.12</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.kotlintest</groupId>
+                        <artifactId>kotlintest-runner-junit5</artifactId>
+                        <version>3.1.8</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
@@ -621,11 +634,6 @@
             <version>${pmd.core.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.kotlintest</groupId>
-            <artifactId>kotlintest-runner-junit5</artifactId>
-            <version>3.1.8</version>
-        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
@@ -654,6 +662,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>io.kotlintest</groupId>
+            <artifactId>kotlintest-runner-junit5</artifactId>
+            <version>3.1.8</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
