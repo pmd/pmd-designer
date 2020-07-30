@@ -208,7 +208,7 @@ public class ASTManagerImpl implements ASTManager {
         for (AstProcessingStage<?> stage : processingStages) {
             try {
                 stage.processAST(node, ctx);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 e = new RuntimeException("Exception while processing " + stage, e);
                 component.logUserException(e, Category.PROCESSING_EXCEPTION);
                 break;
