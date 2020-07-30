@@ -571,7 +571,7 @@
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-scala</artifactId>
+            <artifactId>pmd-scala_2.13</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
             <scope>${pmd.module.scope}</scope>
