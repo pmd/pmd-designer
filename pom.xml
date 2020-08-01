@@ -4,7 +4,7 @@
     <groupId>net.sourceforge.pmd</groupId>
     <artifactId>pmd-ui</artifactId>
     <name>PMD Designer</name>
-    <version>6.25.0-SNAPSHOT</version>
+    <version>6.27.0-SNAPSHOT</version>
 
     <description>The Rule Designer is a graphical tool that helps PMD users develop their custom rules.</description>
     <url>https://pmd.github.io</url>
@@ -54,10 +54,10 @@
     </developers>
 
     <properties>
-        <pmd.core.version>6.23.0</pmd.core.version>
+        <pmd.core.version>6.27.0-SNAPSHOT</pmd.core.version>
         <openjfx.version>11.0.2</openjfx.version>
         <java.version>8</java.version>
-        <kotlin.version>1.2.61</kotlin.version>
+        <kotlin.version>1.3.72</kotlin.version>
 
         <!-- Those have different values based on the profile -->
         <openjfx.scope>provided</openjfx.scope>
@@ -166,9 +166,9 @@
                         <version>4.12</version>
                     </dependency>
                     <dependency>
-                        <groupId>io.kotlintest</groupId>
-                        <artifactId>kotlintest-runner-junit5</artifactId>
-                        <version>3.1.8</version>
+                        <groupId>io.kotest</groupId>
+                        <artifactId>kotest-runner-junit5-jvm</artifactId>
+                        <version>4.1.2</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -571,7 +571,8 @@
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-scala</artifactId>
+            <!-- Only depend on 2.13 -->
+            <artifactId>pmd-scala_2.13</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
             <scope>${pmd.module.scope}</scope>
@@ -663,9 +664,22 @@
         </dependency>
 
         <dependency>
-            <groupId>io.kotlintest</groupId>
-            <artifactId>kotlintest-runner-junit5</artifactId>
-            <version>3.1.8</version>
+            <groupId>io.kotest</groupId>
+            <artifactId>kotest-runner-junit5-jvm</artifactId>
+            <version>4.1.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.oowekyala.treeutils</groupId>
+            <artifactId>tree-matchers</artifactId>
+            <version>2.1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.oowekyala.treeutils</groupId>
+            <artifactId>tree-printers</artifactId>
+            <version>2.1.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
