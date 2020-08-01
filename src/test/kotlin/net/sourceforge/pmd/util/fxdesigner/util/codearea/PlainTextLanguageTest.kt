@@ -4,16 +4,16 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.codearea
 
-import io.kotlintest.should
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldNotBe
-import io.kotlintest.specs.FunSpec
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.should
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import net.sourceforge.pmd.lang.ast.test.matchNode
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry
 import net.sourceforge.pmd.util.fxdesigner.util.PlainTextLanguage.PlainTextFile
 import java.io.StringReader
 
-class PlainTextLanguagTest : FunSpec({
+class PlainTextLanguageTest : FunSpec({
 
     test("Test plain text lang is here") {
         AuxLanguageRegistry.plainTextLanguage() shouldNotBe null
