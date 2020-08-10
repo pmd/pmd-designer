@@ -4,9 +4,9 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.codearea
 
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldThrow
-import io.kotlintest.specs.FunSpec
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.assertions.throwables.shouldThrow
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.*
 import org.fxmisc.richtext.CodeArea
 

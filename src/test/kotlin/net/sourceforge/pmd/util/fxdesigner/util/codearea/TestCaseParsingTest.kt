@@ -4,10 +4,10 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.codearea
 
-import io.kotlintest.matchers.haveSize
-import io.kotlintest.should
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.FunSpec
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.haveSize
+import io.kotest.matchers.should
+import io.kotest.matchers.shouldBe
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser
 
