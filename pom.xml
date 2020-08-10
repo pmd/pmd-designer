@@ -58,6 +58,7 @@
         <openjfx.version>11.0.2</openjfx.version>
         <java.version>8</java.version>
         <kotlin.version>1.3.72</kotlin.version>
+        <kotest.version>4.1.2</kotest.version>
 
         <!-- Those have different values based on the profile -->
         <openjfx.scope>provided</openjfx.scope>
@@ -65,7 +66,7 @@
 
         <local.lib.repo>${project.basedir}/lib/mvn-repo</local.lib.repo>
 
-        <surefire.version>3.0.0-M3</surefire.version>
+        <surefire.version>3.0.0-M5</surefire.version>
         <checkstyle.version>3.1.0</checkstyle.version>
         <pmd.plugin.version>3.13.0</pmd.plugin.version>
         <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
@@ -76,7 +77,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <pmd.build-tools.version>6</pmd.build-tools.version>
-        <pmd.check.version>6.25.0</pmd.check.version>
+        <pmd.check.version>6.26.0</pmd.check.version>
 
         <jflex-output>${project.build.directory}/generated-sources/jflex</jflex-output>
 
@@ -155,20 +156,22 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
-                    <forkCount>1.5C</forkCount>
+                    <forkMode>once</forkMode>
                     <runOrder>alphabetical</runOrder>
                 </configuration>
 
                 <dependencies>
+                    <!-- Junit5 Platform Engine for Junit 3 & 4 -->
                     <dependency>
-                        <groupId>junit</groupId>
-                        <artifactId>junit</artifactId>
-                        <version>4.12</version>
+                        <groupId>org.junit.vintage</groupId>
+                        <artifactId>junit-vintage-engine</artifactId>
+                        <version>5.6.2</version>
                     </dependency>
+                    <!-- Junit5 Platform Engine for Kotlin Tests -->
                     <dependency>
                         <groupId>io.kotest</groupId>
                         <artifactId>kotest-runner-junit5-jvm</artifactId>
-                        <version>4.1.2</version>
+                        <version>${kotest.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -649,31 +652,12 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.4.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.4.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Junit 3 & 4 engine -->
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>5.4.0</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
+            <!-- Contains stuff like FunSpec, etc -->
             <groupId>io.kotest</groupId>
             <artifactId>kotest-runner-junit5-jvm</artifactId>
-            <version>4.1.2</version>
+            <version>${kotest.version}</version>
             <scope>test</scope>
         </dependency>
 
