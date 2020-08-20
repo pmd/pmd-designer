@@ -53,15 +53,14 @@ class CoordinateMappingTest : FunSpec({
         //--------
 
         codeArea.fromPmd(1, 1) shouldBe 0
-        codeArea.fromPmd(1, 2) shouldBe 0
-        codeArea.fromPmd(1, 7) shouldBe 0
-        codeArea.fromPmd(1, 8) shouldBe 0
-        codeArea.fromPmd(1, 9) shouldBe 1
-        codeArea.fromPmd(1, 10) shouldBe 2
+        codeArea.fromPmd(1, 2) shouldBe 1
+        codeArea.fromPmd(1, 3) shouldBe 2
+        codeArea.fromPmd(1, 8) shouldBe 7
 
         codeArea.toPmd(0) shouldBe TextPos2D(1, 1)
-        codeArea.toPmd(1) shouldBe TextPos2D(1, 9)
-        codeArea.toPmd(2) shouldBe TextPos2D(1, 10)
+        codeArea.toPmd(1) shouldBe TextPos2D(1, 2)
+        codeArea.toPmd(2) shouldBe TextPos2D(1, 3)
+        codeArea.toPmd(7) shouldBe TextPos2D(1, 8)
     }
 
     test("All tabs corner case") {
@@ -69,11 +68,12 @@ class CoordinateMappingTest : FunSpec({
         val codeArea = CodeArea("\t\t\t")
 
         codeArea.fromPmd(1, 1) shouldBe 0
-        codeArea.fromPmd(1, 2) shouldBe 0
+        codeArea.fromPmd(1, 2) shouldBe 1
+        codeArea.fromPmd(1, 3) shouldBe 2
 
         codeArea.toPmd(0) shouldBe TextPos2D(1, 1)
-        codeArea.toPmd(1) shouldBe TextPos2D(1, 9)
-        codeArea.toPmd(2) shouldBe TextPos2D(1, 17)
+        codeArea.toPmd(1) shouldBe TextPos2D(1, 2)
+        codeArea.toPmd(2) shouldBe TextPos2D(1, 3)
     }
 
     test("Empty corner case") {
