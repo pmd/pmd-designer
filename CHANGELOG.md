@@ -1,6 +1,9 @@
 # Changelog
 
-## 6.25.0
+## 6.27.0
+
+* **Bump required pmd-core version to 6.27.0.** The previous minimal pmd-core version was 6.23.0.
+* Adjust tab width char handling (refs [#45](https://github.com/pmd/pmd-designer/pull/45))
 
 See https://github.com/pmd/pmd-designer/milestone/12
 
