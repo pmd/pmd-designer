@@ -39,12 +39,10 @@ public final class DesignerStarter {
     private static MainCliArgs readParameters(String[] argv) {
 
         MainCliArgs argsObj = new MainCliArgs();
+        JCommander jCommander = new JCommander(argsObj);
+        jCommander.setProgramName("designer");
 
         try {
-            JCommander jCommander = JCommander.newBuilder()
-                                              .programName("designer")
-                                              .addObject(argsObj)
-                                              .build();
             jCommander.parse(argv);
 
             if (argsObj.help) {
@@ -57,7 +55,7 @@ public final class DesignerStarter {
         } catch (ParameterException e) {
             System.out.println(e.getMessage());
             System.out.println();
-            System.out.println(getHelpText(e.getJCommander()));
+            System.out.println(getHelpText(jCommander));
             System.exit(OK);
             throw new AssertionError();
         }
@@ -66,7 +64,6 @@ public final class DesignerStarter {
     }
 
 
-    @SuppressWarnings("PMD.AvoidCatchingThrowable")
     public static void main(String[] args) {
 
         readParameters(args);
