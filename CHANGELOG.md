@@ -1,6 +1,6 @@
 # Changelog
 
-## 6.25.0
+## 6.27.0
 
 See https://github.com/pmd/pmd-designer/milestone/12
 
