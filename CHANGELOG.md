@@ -1,6 +1,9 @@
 # Changelog
 
-## 6.25.0
+## 6.27.0
+
+* This version of pmd-designer requires at least PMD 6.27.0 due to changes in tab size.
+* Adjust tab width char handling (refs [#45](https://github.com/pmd/pmd-designer/pull/45))
 
 See https://github.com/pmd/pmd-designer/milestone/12
 
