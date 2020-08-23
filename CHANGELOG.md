@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.28.0
+
+* **Bump required pmd-core version to 6.27.0.** The previous minimal pmd-core version was 6.23.0.
+
+See https://github.com/pmd/pmd-designer/milestone/13
+
 ## 6.27.0
 
 * This version of pmd-designer requires at least PMD 6.27.0 due to changes in tab size.
