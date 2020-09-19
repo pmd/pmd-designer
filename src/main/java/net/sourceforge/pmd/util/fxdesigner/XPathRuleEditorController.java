@@ -9,7 +9,7 @@ import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExce
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +33,7 @@ import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
+import net.sourceforge.pmd.lang.rule.xpath.XPathVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
@@ -98,7 +98,6 @@ public final class XPathRuleEditorController extends AbstractController implemen
 
     private static final String NO_MATCH_MESSAGE = "No match in text";
     private static final Duration XPATH_REFRESH_DELAY = Duration.ofMillis(100);
-    private static final Pattern JAXEN_MISSING_PROPERTY_EXTRACTOR = Pattern.compile("Variable (\\w+)");
     private static final Pattern SAXON_MISSING_PROPERTY_EXTRACTOR = Pattern.compile("Undeclared variable in XPath expression: \\$(\\w+)");
     private final SoftReferenceCache<ExportXPathWizardController> exportWizard;
     private final ObservableXPathRuleBuilder ruleBuilder;
@@ -123,7 +122,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
     @FXML
     private ListView<TextAwareNodeWrapper> xpathResultListView;
     // ui property
-    private Var<String> xpathVersionUIProperty = Var.newSimpleVar(XPathRuleQuery.XPATH_2_0);
+    private Var<XPathVersion> xpathVersionUIProperty = Var.newSimpleVar(XPathVersion.DEFAULT);
     private SuspendableEventStream<TextAwareNodeWrapper> selectionEvents;
 
     public XPathRuleEditorController(DesignerRoot root) {
@@ -233,21 +232,16 @@ public final class XPathRuleEditorController extends AbstractController implemen
     private void initialiseVersionSelection() {
         ToggleGroup xpathVersionToggleGroup = new ToggleGroup();
 
-        List<String> versionItems = new ArrayList<>();
-        versionItems.add(XPathRuleQuery.XPATH_1_0);
-        versionItems.add(XPathRuleQuery.XPATH_1_0_COMPATIBILITY);
-        versionItems.add(XPathRuleQuery.XPATH_2_0);
-
-        versionItems.forEach(v -> {
-            RadioMenuItem item = new RadioMenuItem("XPath " + v);
+        for (XPathVersion v : Arrays.asList(XPathVersion.values())) {
+            RadioMenuItem item = new RadioMenuItem("XPath " + v.getXmlName());
             item.setUserData(v);
             item.setToggleGroup(xpathVersionToggleGroup);
             xpathVersionMenuButton.getItems().add(item);
-        });
+        }
 
-        xpathVersionUIProperty = DesignerUtil.mapToggleGroupToUserData(xpathVersionToggleGroup, DesignerUtil::defaultXPathVersion);
+        xpathVersionUIProperty = DesignerUtil.mapToggleGroupToUserData(xpathVersionToggleGroup, () -> XPathVersion.DEFAULT);
 
-        xpathVersionProperty().setValue(XPathRuleQuery.XPATH_2_0);
+        xpathVersionProperty().setValue(XPathVersion.DEFAULT);
     }
 
 
@@ -322,7 +316,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
     }
 
 
-    public Var<String> xpathVersionProperty() {
+    public Var<XPathVersion> xpathVersionProperty() {
         return xpathVersionUIProperty;
     }
 
@@ -397,11 +391,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
 
 
     private Optional<String> getMissingPropertyName(String errorMessage) {
-        Pattern nameExtractor = XPathRuleQuery.XPATH_1_0.equals(getRuleBuilder().getXpathVersion())
-                                ? JAXEN_MISSING_PROPERTY_EXTRACTOR
-                                : SAXON_MISSING_PROPERTY_EXTRACTOR;
-
-        Matcher matcher = nameExtractor.matcher(errorMessage);
+        Matcher matcher = SAXON_MISSING_PROPERTY_EXTRACTOR.matcher(errorMessage);
         return matcher.matches() ? Optional.of(matcher.group(1)) : Optional.empty();
     }
 

@@ -31,7 +31,6 @@ public class PropertyDescriptorSpec implements SettingsOwner {
     private static final String DEFAULT_STRING = "TODO";
 
     private final Val<Boolean> isNumerical;
-    private final Val<Boolean> isPackaged;
     private final Val<Boolean> isMultivalue;
 
     private final Var<PropertyTypeId> typeId = Var.newSimpleVar(PropertyTypeId.STRING);
@@ -42,7 +41,6 @@ public class PropertyDescriptorSpec implements SettingsOwner {
 
     public PropertyDescriptorSpec() {
         isNumerical = typeId.map(PropertyTypeId::isPropertyNumeric);
-        isPackaged = typeId.map(PropertyTypeId::isPropertyPackaged);
         isMultivalue = typeId.map(PropertyTypeId::isPropertyMultivalue);
     }
 
@@ -54,16 +52,6 @@ public class PropertyDescriptorSpec implements SettingsOwner {
 
     public Val<Boolean> isNumericalProperty() {
         return isNumerical;
-    }
-
-
-    public Boolean getIsPackaged() {
-        return isPackaged.getValue();
-    }
-
-
-    public Val<Boolean> isPackagedProperty() {
-        return isPackaged;
     }
 
 
@@ -182,6 +170,11 @@ public class PropertyDescriptorSpec implements SettingsOwner {
         values.put(PropertyDescriptorField.MAX, "+2000000");
 
         return externalBuilder.build(values);
+    }
+
+
+    Object parseValue() {
+        return build().valueFrom(getValue());
     }
 
 

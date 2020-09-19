@@ -6,28 +6,18 @@ package net.sourceforge.pmd.util.fxdesigner.util;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
-import net.sourceforge.pmd.Rule;
-import net.sourceforge.pmd.RuleContext;
-import net.sourceforge.pmd.RuleViolation;
 import net.sourceforge.pmd.lang.AbstractLanguageVersionHandler;
 import net.sourceforge.pmd.lang.BaseLanguageModule;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.Parser;
 import net.sourceforge.pmd.lang.ParserOptions;
-import net.sourceforge.pmd.lang.ast.AstProcessingStage;
-import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.ast.ParseException;
 import net.sourceforge.pmd.lang.ast.RootNode;
 import net.sourceforge.pmd.lang.ast.SourceCodePositioner;
 import net.sourceforge.pmd.lang.ast.impl.AbstractNodeWithTextCoordinates;
-import net.sourceforge.pmd.lang.rule.AbstractRuleViolationFactory;
-import net.sourceforge.pmd.lang.rule.ParametricRuleViolation;
-import net.sourceforge.pmd.lang.rule.RuleViolationFactory;
 
 /**
  * Default language module used when none is on the classpath.
@@ -44,28 +34,6 @@ public final class PlainTextLanguage extends BaseLanguageModule {
     }
 
     private static class TextLvh extends AbstractLanguageVersionHandler {
-
-        private static final RuleViolationFactory RV_FACTORY = new AbstractRuleViolationFactory() {
-            @Override
-            protected RuleViolation createRuleViolation(Rule rule, RuleContext ruleContext, Node node, String s) {
-                return new ParametricRuleViolation<>(rule, ruleContext, node, s);
-            }
-
-            @Override
-            protected RuleViolation createRuleViolation(Rule rule, RuleContext ruleContext, Node node, String s, int i, int i1) {
-                return new ParametricRuleViolation<>(rule, ruleContext, node, s);
-            }
-        };
-
-        @Override
-        public RuleViolationFactory getRuleViolationFactory() {
-            return RV_FACTORY;
-        }
-
-        @Override
-        public List<? extends AstProcessingStage<?>> getProcessingStages() {
-            return Collections.emptyList();
-        }
 
         @Override
         public Parser getParser(ParserOptions parserOptions) {

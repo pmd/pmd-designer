@@ -6,9 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.model;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -16,15 +14,11 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.sourceforge.pmd.Rule;
-import net.sourceforge.pmd.RuleContext;
-import net.sourceforge.pmd.RuleSet;
-import net.sourceforge.pmd.RuleSetFactory;
-import net.sourceforge.pmd.RuleSets;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.lang.rule.XPathRule;
-import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
+import net.sourceforge.pmd.lang.rule.xpath.XPathVersion;
+import net.sourceforge.pmd.lang.rule.xpath.internal.DeprecatedAttrLogger; // NOPMD
+import net.sourceforge.pmd.lang.rule.xpath.internal.SaxonXPathRuleQuery; // NOPMD
 import net.sourceforge.pmd.properties.PropertyDescriptor;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -58,7 +52,7 @@ public final class XPathEvaluator {
                        try {
                            return evaluateQuery(n,
                                                 component.getGlobalLanguageVersion(),
-                                                XPathRuleQuery.XPATH_2_0,
+                                                XPathVersion.DEFAULT,
                                                 query,
                                                 emptyMap(),
                                                 emptyList());
@@ -84,7 +78,7 @@ public final class XPathEvaluator {
      */
     public static List<Node> evaluateQuery(Node compilationUnit,
                                            LanguageVersion languageVersion,
-                                           String xpathVersion,
+                                           XPathVersion xpathVersion,
                                            String xpathQuery,
                                            Map<String, String> propertyValues,
                                            List<PropertyDescriptorSpec> properties) throws XPathEvaluationException {
@@ -94,54 +88,25 @@ public final class XPathEvaluator {
         }
 
         try {
-            List<Node> results = new ArrayList<>();
 
-            XPathRule xpathRule = new XPathRule() {
-                @Override
-                public void addViolation(Object data, Node node, String arg) {
-                    results.add(node);
-                }
-            };
+            Map<String, ? extends PropertyDescriptor<?>> descriptors = properties.stream().collect(Collectors.toMap(PropertyDescriptorSpec::getName, PropertyDescriptorSpec::build));
+            Map<PropertyDescriptor<?>, Object> allProperties =
+                propertyValues.entrySet().stream()
+                              .collect(Collectors.toMap(e -> descriptors.get(e.getKey()), e -> descriptors.get(e.getKey()).valueFrom(e.getValue())));
 
+            SaxonXPathRuleQuery xpathRule =
+                new SaxonXPathRuleQuery(
+                    xpathQuery,
+                    xpathVersion,
+                    allProperties,
+                    languageVersion.getLanguageVersionHandler().getXPathHandler(),
+                    DeprecatedAttrLogger.noop()
+                );
 
-            xpathRule.setMessage("");
-            xpathRule.setLanguage(languageVersion.getLanguage());
-            xpathRule.setXPath(xpathQuery);
-            xpathRule.setVersion(xpathVersion);
-
-            properties.stream()
-                      .map(PropertyDescriptorSpec::build)
-                      .forEach(xpathRule::definePropertyDescriptor);
-
-            propertyValues.forEach((k, v) -> {
-                PropertyDescriptor<?> d = xpathRule.getPropertyDescriptor(k);
-                if (d != null) {
-                    setRulePropertyCapture(xpathRule, d, v);
-                } else {
-                    throw new RuntimeException("Property '" + k + "' is not defined, available properties: "
-                                                   + properties.stream().map(PropertyDescriptorSpec::getName).collect(Collectors.toList()));
-                }
-            });
-
-            final RuleSet ruleSet = new RuleSetFactory().createSingleRuleRuleSet(xpathRule);
-
-            RuleSets ruleSets = new RuleSets(ruleSet);
-
-            RuleContext ruleContext = new RuleContext();
-            ruleContext.setLanguageVersion(languageVersion);
-            ruleContext.setIgnoreExceptions(false);
-
-            ruleSets.apply(singletonList(compilationUnit), ruleContext);
-
-            return results;
+            return xpathRule.evaluate(compilationUnit);
 
         } catch (RuntimeException e) {
             throw new XPathEvaluationException(e);
         }
     }
-
-    private static <T> void setRulePropertyCapture(Rule rule, PropertyDescriptor<T> descriptor, String value) {
-        rule.setProperty(descriptor, descriptor.valueFrom(value));
-    }
-
 }

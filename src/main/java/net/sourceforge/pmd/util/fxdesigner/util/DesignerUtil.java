@@ -33,8 +33,7 @@ import org.reactfx.Subscription;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.lang.ast.xpath.Attribute;
-import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
+import net.sourceforge.pmd.lang.rule.xpath.Attribute;
 import net.sourceforge.pmd.lang.symboltable.NameDeclaration;
 import net.sourceforge.pmd.lang.symboltable.NameOccurrence;
 import net.sourceforge.pmd.lang.symboltable.Scope;
@@ -100,13 +99,6 @@ public final class DesignerUtil {
 
         return fallback.get();
     }
-
-
-    public static String defaultXPathVersion() {
-        return XPathRuleQuery.XPATH_2_0;
-    }
-
-
 
 
     /**
