@@ -34,7 +34,7 @@ See the list of available versions [here](https://search.maven.org/artifact/org.
 
 ### Updating
 
-The latest version of the designer currently **works with PMD 6.23.0 and above**.
+The latest version of the designer currently **works with PMD 6.27.0 and above**.
 You can simply replace `pmd-ui-6.X.Y.jar` with the [latest build](https://github.com/pmd/pmd-designer/releases/latest) in the installation folder of your
 PMD distribution.
 
