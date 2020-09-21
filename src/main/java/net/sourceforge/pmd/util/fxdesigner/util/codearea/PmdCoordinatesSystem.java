@@ -54,8 +54,7 @@ public final class PmdCoordinatesSystem {
 
         Position pos = codeArea.offsetToPosition(absoluteOffset, Bias.Forward);
 
-        return new TextPos2D(getPmdLineFromRtfxParIndex(pos.getMajor()),
-                             getPmdColumnIndexFromRtfxColumn(codeArea, pos.getMajor(), pos.getMinor()));
+        return new TextPos2D(getPmdLineFromRtfxParIndex(pos.getMajor()), pos.getMinor() + 1);
     }
 
 
@@ -65,7 +64,7 @@ public final class PmdCoordinatesSystem {
      *
      * <ul>
      * <li>CodeArea counts a tab as 1 column width but displays it as 8 columns width.
-     * PMD counts it correctly as 8 columns, so the position must be offset.
+     * PMD counts it correctly as 1 column (since PMD 6.27.0, before it was 8 columns).
      * <li>PMD lines start at 1 but paragraph nums start at 0 in the code area,
      * same for columns.
      * <li>PMD's end column is inclusive and not exclusive.
@@ -76,33 +75,8 @@ public final class PmdCoordinatesSystem {
         column = max(column, 1);
 
         int parIdx = getRtfxParIndexFromPmdLine(line);
-        int raw = codeArea.getAbsolutePosition(parIdx, getRtfxColumnIndexFromPmdColumn(codeArea, parIdx, column));
+        int raw = codeArea.getAbsolutePosition(parIdx, column - 1);
         return clip(raw, 0, codeArea.getLength() - 1);
-    }
-
-
-    private static int getRtfxColumnIndexFromPmdColumn(CodeArea codeArea, int parIdx, int column) {
-        String parTxt = codeArea.getParagraph(parIdx).getText();
-        int end = column - 1;
-        for (int i = 0; i < end && end > 0; i++) {
-            char c = parTxt.charAt(i);
-            if (c == '\t') {
-                end = max(end - 7, 0);
-            }
-        }
-        return end;
-    }
-
-    private static int getPmdColumnIndexFromRtfxColumn(CodeArea codeArea, int parIdx, int rtfxCol) {
-        String parTxt = codeArea.getParagraph(parIdx).getText();
-        int mapped = rtfxCol;
-        for (int i = 0; i < rtfxCol && i < parTxt.length(); i++) {
-            char c = parTxt.charAt(i);
-            if (c == '\t') {
-                mapped += 7;
-            }
-        }
-        return mapped + 1;
     }
 
 
