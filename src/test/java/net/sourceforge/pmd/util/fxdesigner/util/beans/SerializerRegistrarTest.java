@@ -6,8 +6,8 @@ package net.sourceforge.pmd.util.fxdesigner.util.beans;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -17,8 +17,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.apache.commons.lang3.reflect.Typed;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -32,7 +32,7 @@ public class SerializerRegistrarTest {
 
     SerializerRegistrar testRegistrar;
 
-    @Before
+    @BeforeEach
     public void setup() {
         testRegistrar = new SerializerRegistrar();
     }
