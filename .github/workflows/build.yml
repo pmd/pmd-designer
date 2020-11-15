@@ -1,0 +1,34 @@
+name: build
+on:
+  push:
+    branches:
+      - main
+      - master
+      - compat-7.0
+  schedule:
+    # build it monthly: At 05:00 on day-of-month 1.
+    - cron:  '0 5 1 * *'
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.cache
+          key: ${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-
+      - name: Build
+        run: .ci/build.sh
+        shell: bash
+        env:
+          MAVEN_OPTS: -Dmaven.wagon.httpconnectionManager.ttlSeconds=180 -Dmaven.wagon.http.retryHandler.count=3
+          PMD_CI_SECRET_PASSPHRASE: ${{ secrets.PMD_CI_SECRET_PASSPHRASE }}
+          PMD_CI_REPO: ${{ github.repository }}
+          PMD_CI_GIT_REF: ${{ github.ref }}
