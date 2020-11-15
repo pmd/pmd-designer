@@ -7,8 +7,16 @@ function build_designer() {
     install_openjdk
     echo "::endgroup::"
 
+    echo "::group::Determine PMD Designer version"
+    ./mvnw -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.5.0:exec
     VERSION=$(./mvnw -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.5.0:exec)
+    echo "::endgroup::"
+
+    echo
+    echo
     echo "Building PMD Designer ${VERSION} on branch ${PMD_CI_GIT_REF} (${PMD_CI_REPO})"
+    echo
+    echo
 
     # builds on forks, builds for pull requests
     if [[ "${PMD_CI_REPO}" != "pmd/pmd-designer" || -n "${PMD_CI_PULL_REQUEST_NUMBER}" ]]; then
