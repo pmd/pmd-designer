@@ -22,8 +22,8 @@
     ```
 
 4.  Wait, until release is ready. The maven plugin will directly push the tag. The tag will be
-    built by [travis-ci](https://travis-ci.com/pmd/pmd-designer). After it is done, the new release
-    should be available under <https://repo.maven.apache.org/maven2/net/sourceforge/pmd/pmd-ui/>.
+    built by [github actions (workflow release)](https://github.com/pmd/pmd-designer/actions?query=workflow%3Arelease).
+    After it is done, the new release should be available under <https://repo.maven.apache.org/maven2/net/sourceforge/pmd/pmd-ui/>.
 
 5.  Add release notes to github releases: <https://github.com/pmd/pmd-designer/releases>
 
