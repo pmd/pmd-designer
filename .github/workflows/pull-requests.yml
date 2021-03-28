@@ -1,0 +1,25 @@
+name: pull-requests
+on: pull_request
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.cache
+          key: ${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-
+      - name: Build
+        run: .ci/build.sh
+        shell: bash
+        env:
+          MAVEN_OPTS: -Dmaven.wagon.httpconnectionManager.ttlSeconds=180 -Dmaven.wagon.http.retryHandler.count=3
+          PMD_CI_REPO: ${{ github.repository }}
+          PMD_CI_GIT_REF: ${{ github.ref }}
+          PMD_CI_PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
