@@ -7,7 +7,6 @@ package net.sourceforge.pmd.util.fxdesigner.app.services;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.latestValue;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStream.vetoableNull;
 
-import java.io.StringReader;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,11 +24,12 @@ import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.LanguageVersionHandler;
-import net.sourceforge.pmd.lang.Parser;
 import net.sourceforge.pmd.lang.ast.AstAnalysisContext;
 import net.sourceforge.pmd.lang.ast.AstProcessingStage;
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.lang.ast.Parser.ParserTask;
 import net.sourceforge.pmd.lang.ast.RootNode;
+import net.sourceforge.pmd.lang.ast.SemanticErrorReporter;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -192,11 +192,17 @@ public class ASTManagerImpl implements ASTManager {
                                              ClassLoader classLoader) throws ParseAbortedException {
 
         LanguageVersionHandler handler = version.getLanguageVersionHandler();
-        Parser parser = handler.getParser(handler.getDefaultParserOptions());
+        String dummyFilePath = "dummy." + version.getLanguage().getExtensions().get(0);
+        ParserTask task = new ParserTask(
+            version,
+            dummyFilePath,
+            source,
+            SemanticErrorReporter.noop()
+        );
 
         RootNode node;
         try {
-            node = (RootNode) parser.parse(null, new StringReader(source));
+            node = handler.getParser().parse(task);
         } catch (Exception e) {
             component.logUserException(e, Category.PARSE_EXCEPTION);
             throw new ParseAbortedException(e);

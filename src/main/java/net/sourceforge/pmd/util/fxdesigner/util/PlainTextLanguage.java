@@ -4,17 +4,12 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util;
 
-import java.io.IOException;
-import java.io.Reader;
-
-import org.apache.commons.io.IOUtils;
-
 import net.sourceforge.pmd.lang.AbstractLanguageVersionHandler;
 import net.sourceforge.pmd.lang.BaseLanguageModule;
 import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.lang.Parser;
-import net.sourceforge.pmd.lang.ParserOptions;
-import net.sourceforge.pmd.lang.ast.ParseException;
+import net.sourceforge.pmd.lang.ast.AstInfo;
+import net.sourceforge.pmd.lang.ast.Parser;
+import net.sourceforge.pmd.lang.ast.Parser.ParserTask;
 import net.sourceforge.pmd.lang.ast.RootNode;
 import net.sourceforge.pmd.lang.ast.SourceCodePositioner;
 import net.sourceforge.pmd.lang.ast.impl.AbstractNodeWithTextCoordinates;
@@ -36,29 +31,18 @@ public final class PlainTextLanguage extends BaseLanguageModule {
     private static class TextLvh extends AbstractLanguageVersionHandler {
 
         @Override
-        public Parser getParser(ParserOptions parserOptions) {
-            return new Parser() {
-                @Override
-                public ParserOptions getParserOptions() {
-                    return parserOptions;
-                }
-
-                @Override
-                public RootNode parse(String s, Reader reader) throws ParseException {
-                    try {
-                        return new PlainTextFile(IOUtils.toString(reader));
-                    } catch (IOException e) {
-                        throw new ParseException(e);
-                    }
-                }
-            };
+        public Parser getParser() {
+            return PlainTextFile::new;
         }
     }
 
     public static class PlainTextFile extends AbstractNodeWithTextCoordinates<PlainTextFile, PlainTextFile> implements RootNode {
 
-        PlainTextFile(String fileText) {
-            SourceCodePositioner positioner = new SourceCodePositioner(fileText);
+        private final AstInfo<PlainTextFile> astInfo;
+
+        PlainTextFile(ParserTask task) {
+            this.astInfo = new AstInfo<>(task, this);
+            SourceCodePositioner positioner = new SourceCodePositioner(task.getSourceText());
             this.beginLine = 1;
             this.beginColumn = 1;
             this.endLine = positioner.getLastLine();
@@ -78,6 +62,11 @@ public final class PlainTextLanguage extends BaseLanguageModule {
         @Override
         public String toString() {
             return "Plain text file (" + getEndLine() + " lines)";
+        }
+
+        @Override
+        public AstInfo<? extends RootNode> getAstInfo() {
+            return astInfo;
         }
     }
 

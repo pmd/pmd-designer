@@ -8,6 +8,9 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import net.sourceforge.pmd.lang.ast.FileAnalysisException
+import net.sourceforge.pmd.lang.ast.Parser
+import net.sourceforge.pmd.lang.ast.SemanticErrorReporter
 import net.sourceforge.pmd.lang.ast.test.matchNode
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry
 import net.sourceforge.pmd.util.fxdesigner.util.PlainTextLanguage.PlainTextFile
@@ -55,6 +58,7 @@ private fun String.parse(): PlainTextFile {
 
     lang.defaultVersion shouldNotBe null
 
-    val parser = lang.defaultVersion.languageVersionHandler.getParser(lang.defaultVersion.languageVersionHandler.defaultParserOptions)
-    return parser.parse(":dummy:", StringReader(this)) as PlainTextFile
+    val parser = lang.defaultVersion.languageVersionHandler.parser
+    val task = Parser.ParserTask(lang.defaultVersion, FileAnalysisException.NO_FILE_NAME, this, SemanticErrorReporter.noop())
+    return parser.parse(task) as PlainTextFile
 }
