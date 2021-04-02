@@ -30,18 +30,17 @@ public class MetricResultListCell extends ListCell<MetricResult> {
             setText(null);
             setGraphic(null);
         } else {
-            setText(item.getKey().name() + " = " + niceDoubleString(item.getValue()));
+            setText(item.getKey().displayName() + " = " + niceDoubleString(item.getValue()));
         }
     }
 
 
     /** Gets a nice string representation of a double. */
-    private String niceDoubleString(double val) {
-        if (val == (int) val) {
-            return String.valueOf((int) val);
-        } else {
-            return String.format(Locale.ROOT, "%.4f", val);
+    private String niceDoubleString(Number val) {
+        if (val instanceof Double || val instanceof Float) {
+            return String.format(Locale.ROOT, "%.4f %%", val.doubleValue() * 100);
         }
+        return val.toString(); // integrals
     }
 
 

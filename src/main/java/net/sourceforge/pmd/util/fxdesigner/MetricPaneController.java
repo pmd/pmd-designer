@@ -4,15 +4,17 @@
 
 package net.sourceforge.pmd.util.fxdesigner;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.EventStreams;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.metrics.LanguageMetricsProvider;
+import net.sourceforge.pmd.lang.metrics.Metric;
+import net.sourceforge.pmd.lang.metrics.MetricOptions;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.NodeSelectionSource;
@@ -39,9 +41,9 @@ public class MetricPaneController extends AbstractController implements NodeSele
     @FXML
     private ToolbarTitledPane metricsTitledPane;
     @FXML
-    private ListView<MetricResult> metricResultsListView;
+    private ListView<MetricResult<?>> metricResultsListView;
 
-    private Var<Integer> numAvailableMetrics = Var.newSimpleVar(0);
+    private final Var<Integer> numAvailableMetrics = Var.newSimpleVar(0);
 
 
     public MetricPaneController(DesignerRoot designerRoot) {
@@ -67,33 +69,42 @@ public class MetricPaneController extends AbstractController implements NodeSele
     @Override
     public void setFocusNode(final Node node, DataHolder options) {
 
-        ObservableList<MetricResult> metrics = evaluateAllMetrics(node);
+        ObservableList<MetricResult<?>> metrics = evaluateAllMetrics(node);
         metricResultsListView.setItems(metrics);
 
         numAvailableMetrics.setValue((int) metrics.stream()
                                                   .map(MetricResult::getValue)
-                                                  .filter(result -> !result.isNaN())
                                                   .count());
     }
+
 
     public Val<Integer> numAvailableMetrics() {
         return numAvailableMetrics;
     }
 
 
-
-    private ObservableList<MetricResult> evaluateAllMetrics(Node n) {
-        LanguageMetricsProvider<?, ?> provider = getGlobalLanguageVersion().getLanguageVersionHandler().getLanguageMetricsProvider();
+    private ObservableList<MetricResult<?>> evaluateAllMetrics(Node n) {
+        LanguageMetricsProvider provider = getGlobalLanguageVersion().getLanguageVersionHandler().getLanguageMetricsProvider();
         if (provider == null) {
             return FXCollections.emptyObservableList();
         }
-        List<MetricResult> resultList =
-            provider.computeAllMetricsFor(n)
-                    .entrySet()
-                    .stream()
-                    .map(e -> new MetricResult(e.getKey(), e.getValue()))
-                    .collect(Collectors.toList());
-        return FXCollections.observableArrayList(resultList);
+        ArrayList<MetricResult<?>> results = new ArrayList<>();
+        for (Metric<?, ?> metric : provider.getMetrics()) {
+            MetricResult<?> result = computeMetric(metric, n);
+            if (result != null) {
+                results.add(result);
+            }
+        }
+        return FXCollections.observableArrayList(results);
+    }
+
+
+    private <R extends Number> MetricResult<R> computeMetric(Metric<?, R> metric, Node node) {
+        @Nullable R result = Metric.compute(metric, node, MetricOptions.emptyOptions());
+        if (result != null) {
+            return new MetricResult<>(metric, result);
+        }
+        return null;
     }
 
 

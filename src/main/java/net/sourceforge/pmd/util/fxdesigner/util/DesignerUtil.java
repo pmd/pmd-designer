@@ -159,11 +159,11 @@ public final class DesignerUtil {
     }
 
 
-    public static <T> StringConverter<T> stringConverter(Function<T, String> toString, Function<String, T> fromString) {
+    public static <T> StringConverter<T> stringConverter(@NonNull Function<T, String> toString, @NonNull Function<String, T> fromString) {
         return new StringConverter<T>() {
             @Override
             public String toString(T object) {
-                return toString.apply(object);
+                return object == null ? "null" : toString.apply(object);
             }
 
 
