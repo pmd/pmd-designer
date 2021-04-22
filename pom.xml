@@ -76,7 +76,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <pmd.build-tools.version>6</pmd.build-tools.version>
+        <pmd.build-tools.version>11</pmd.build-tools.version>
         <pmd.check.version>6.26.0</pmd.check.version>
 
         <jflex-output>${project.build.directory}/generated-sources/jflex</jflex-output>

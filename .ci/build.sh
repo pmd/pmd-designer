@@ -1,90 +1,70 @@
 #!/usr/bin/env bash
 
+# Exit this script immediately if a command/function exits with a non-zero status.
 set -e
 
-function build_designer() {
-    echo "::group::Install OpenJDK"
-    install_openjdk
-    echo "::endgroup::"
+SCRIPT_INCLUDES="log.bash utils.bash setup-secrets.bash openjdk.bash maven.bash github-releases-api.bash"
+# shellcheck source=inc/fetch_ci_scripts.bash
+source "$(dirname "$0")/inc/fetch_ci_scripts.bash" && fetch_ci_scripts
 
-    echo "::group::Determine PMD Designer version"
-    ./mvnw -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.5.0:exec
-    VERSION=$(./mvnw -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.5.0:exec)
-    echo "::endgroup::"
+function build() {
+    pmd_ci_log_group_start "Install OpenJDK"
+        pmd_ci_openjdk_install_adoptopenjdk 11
+        pmd_ci_openjdk_setdefault 11
+    pmd_ci_log_group_end
 
     echo
-    echo
-    echo "Building PMD Designer ${VERSION} on branch ${PMD_CI_GIT_REF} (${PMD_CI_REPO})"
-    echo
+    pmd_ci_maven_display_info_banner
+    pmd_ci_utils_determine_build_env pmd/pmd-designer
     echo
 
-    # builds on forks, builds for pull requests
-    if [[ "${PMD_CI_REPO}" != "pmd/pmd-designer" || -n "${PMD_CI_PULL_REQUEST_NUMBER}" ]]; then
-        ./mvnw clean verify -B -V -e
+    if pmd_ci_utils_is_fork_or_pull_request; then
+        pmd_ci_log_group_start "Build with mvnw"
+            ./mvnw clean verify --activate-profiles shading --show-version --errors --batch-mode --no-transfer-progress
+        pmd_ci_log_group_end
         exit 0
     fi
 
+    # only builds on pmd/pmd-designer continue here
+    pmd_ci_log_group_start "Setup environment"
+        pmd_ci_setup_secrets_private_env
+        pmd_ci_setup_secrets_gpg_key
+        pmd_ci_maven_setup_settings
+    pmd_ci_log_group_end
 
-    # builds on pmd/pmd-designer
-    echo "::group::Setup Tasks"
-    setup_secrets
-    setup_maven
-    echo "::endgroup::"
 
     # snapshot or release - it only depends on the version (SNAPSHOT or no SNAPSHOT)
-    ./mvnw clean deploy -B -V -e -Psign
-}
+    # the build command is the same
+    pmd_ci_log_group_start "Build with mvnw"
+        pmd_ci_maven_verify_version || exit 0
+        ./mvnw clean deploy --activate-profiles sign,shading --show-version --errors --batch-mode --no-transfer-progress
+    pmd_ci_log_group_end
 
-## helper functions
+    if pmd_ci_maven_isReleaseBuild; then
+        pmd_ci_log_group_start "Update Github Releases"
+            # create a draft github release
+            pmd_ci_gh_releases_createDraftRelease "${PMD_CI_TAG}" "$(git rev-list -n 1 "${PMD_CI_TAG}")"
+            GH_RELEASE="$RESULT"
 
-function setup_secrets() {
-    echo "Setting up secrets..."
-    # Required secrets are: CI_DEPLOY_USERNAME, CI_DEPLOY_PASSWORD, CI_SIGN_KEYNAME, CI_SIGN_PASSPHRASE
-    local -r env_file=".ci/files/env"
-    printenv PMD_CI_SECRET_PASSPHRASE | gpg --batch --yes --decrypt \
-        --passphrase-fd 0 \
-        --output ${env_file} ${env_file}.gpg
-    source ${env_file} >/dev/null 2>&1
-    rm ${env_file}
+            # Deploy to github releases
+            pmd_ci_gh_releases_uploadAsset "$GH_RELEASE" "target/pmd-ui-${PMD_CI_MAVEN_PROJECT_VERSION}.jar"
 
-    local -r key_file=".ci/files/release-signing-key-D0BF1D737C9A1C22.asc"
-    printenv PMD_CI_SECRET_PASSPHRASE | gpg --batch --yes --decrypt \
-        --passphrase-fd 0 \
-        --output ${key_file} ${key_file}.gpg
-    gpg --batch --import ${key_file}
-    rm ${key_file}
-}
+            # extract the release notes
+            RELEASE_NAME="${PMD_CI_MAVEN_PROJECT_VERSION}"
+            BEGIN_LINE=$(grep -n "^## " CHANGELOG.md|head -1|cut -d ":" -f 1)
+            BEGIN_LINE=$((BEGIN_LINE + 1))
+            END_LINE=$(grep -n "^## " CHANGELOG.md|head -2|tail -1|cut -d ":" -f 1)
+            END_LINE=$((END_LINE - 1))
+            RELEASE_BODY="$(head -$END_LINE CHANGELOG.md | tail -$((END_LINE - BEGIN_LINE)))"
 
-function setup_maven() {
-    echo "Setting up Maven..."
-    mkdir -p ${HOME}/.m2
-    cp .ci/files/maven-settings.xml ${HOME}/.m2/settings.xml
-}
+            pmd_ci_gh_releases_updateRelease "$GH_RELEASE" "$RELEASE_NAME" "$RELEASE_BODY"
 
-function install_openjdk() {
-    echo "Installing OpenJDK"
-    OPENJDK_VERSION=11
-    JDK_OS=linux
-    COMPONENTS_TO_STRIP=1 # e.g. openjdk-11.0.3+7/bin/java
-    DOWNLOAD_URL=$(curl --silent -X GET "https://api.adoptopenjdk.net/v3/assets/feature_releases/${OPENJDK_VERSION}/ga?architecture=x64&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=${JDK_OS}&page=0&page_size=1&project=jdk&sort_method=DEFAULT&sort_order=DESC&vendor=adoptopenjdk" \
-        -H "accept: application/json" \
-        | jq -r ".[0].binaries[0].package.link")
-    OPENJDK_ARCHIVE=$(basename ${DOWNLOAD_URL})
-    CACHE_DIR=${HOME}/.cache/openjdk
-    TARGET_DIR=${HOME}/openjdk${OPENJDK_VERSION}
-    mkdir -p ${CACHE_DIR}
-    mkdir -p ${TARGET_DIR}
-    if [ ! -e ${CACHE_DIR}/${OPENJDK_ARCHIVE} ]; then
-        echo "Downloading from ${DOWNLOAD_URL} to ${CACHE_DIR}"
-        curl --location --output ${CACHE_DIR}/${OPENJDK_ARCHIVE} "${DOWNLOAD_URL}"
-    else
-        echo "Skipped download, file ${CACHE_DIR}/${OPENJDK_ARCHIVE} already exists"
+            # Publish release - this sends out notifications on github
+            pmd_ci_gh_releases_publishRelease "$GH_RELEASE"
+        pmd_ci_log_group_end
     fi
-    tar --extract --file ${CACHE_DIR}/${OPENJDK_ARCHIVE} -C ${TARGET_DIR} --strip-components=${COMPONENTS_TO_STRIP}
-    export JAVA_HOME="${TARGET_DIR}"
-    export PATH="${TARGET_DIR}/bin:${PATH}"
-    java -version
-    echo "Java is available at ${TARGET_DIR}"
 }
 
-build_designer
+build
+
+exit 0
