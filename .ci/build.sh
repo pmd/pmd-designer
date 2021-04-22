@@ -36,7 +36,7 @@ function build() {
     # snapshot or release - it only depends on the version (SNAPSHOT or no SNAPSHOT)
     # the build command is the same
     pmd_ci_log_group_start "Build with mvnw"
-        pmd_ci_maven_verify_version
+        pmd_ci_maven_verify_version || exit 0
         ./mvnw clean deploy --activate-profiles sign,shading --show-version --errors --batch-mode --no-transfer-progress
     pmd_ci_log_group_end
 
