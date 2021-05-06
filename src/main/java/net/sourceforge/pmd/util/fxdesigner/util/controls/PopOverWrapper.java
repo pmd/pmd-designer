@@ -58,7 +58,7 @@ public final class PopOverWrapper<T> {
     }
 
     public void rebind(T identity) {
-        if (identity != this.identity) {
+        if (!Objects.equals(identity, this.identity)) {
             this.identity = identity;
             handleHiding(null);
             preload(() -> rebinder.apply(identity, myPopover.getValue()));
