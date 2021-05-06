@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
@@ -193,7 +194,7 @@ public class MainDesignerController extends AbstractController {
         });
 
         if (languageChoicebox.getItems().size() == 1
-            && languageChoicebox.getItems().get(0) == AuxLanguageRegistry.plainTextLanguage()) {
+            && AuxLanguageRegistry.plainTextLanguage().equals(languageChoicebox.getItems().get(0))) {
 
             Platform.runLater(() -> SimplePopups.showStickyNotification(languageChoicebox, AlertType.ERROR,
                                                                         "No pmd language modules on classpath!",
@@ -235,7 +236,7 @@ public class MainDesignerController extends AbstractController {
                             "Pick a language?"
                         );
                     }
-                } else if (guess != sourceEditorController.getLanguageVersion()) {
+                } else if (!Objects.equals(guess, sourceEditorController.getLanguageVersion())) {
                     // guess the language from the extension
                     sourceEditorController.setLanguageVersion(guess);
                     SimplePopups.showActionFeedback(

@@ -139,7 +139,7 @@ public final class ExportXPathWizardController implements Initializable {
             alert.showAndWait();
 
             exportResultArea.setSyntaxHighlighter(new XmlSyntaxHighlighter());
-            if (alert.getResult() == ButtonType.YES) {
+            if (ButtonType.YES.equals(alert.getResult())) {
                 nameProperty().setValue("");
                 descriptionProperty().setValue("");
                 messageProperty().setValue("");
