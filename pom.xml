@@ -67,7 +67,8 @@
         <local.lib.repo>${project.basedir}/lib/mvn-repo</local.lib.repo>
 
         <surefire.version>3.0.0-M5</surefire.version>
-        <checkstyle.version>3.1.0</checkstyle.version>
+        <checkstyle.version>8.42</checkstyle.version>
+        <checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
         <pmd.plugin.version>3.13.0</pmd.plugin.version>
         <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
         <source.plugin.version>3.0.1</source.plugin.version>
@@ -219,7 +220,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${checkstyle.version}</version>
+                <version>${checkstyle.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>checkstyle-check</id>
@@ -233,7 +234,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>8.29</version>
+                        <version>${checkstyle.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>net.sourceforge.pmd</groupId>
