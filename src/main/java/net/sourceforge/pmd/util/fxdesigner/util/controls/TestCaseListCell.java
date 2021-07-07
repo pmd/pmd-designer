@@ -45,7 +45,6 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
@@ -66,7 +65,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
     @Override
     protected Pair<Node, Subscription> getNonEditingGraphic(LiveTestCase testCase) {
         HBox hBox = new HBox();
-        hBox.setSpacing(10);
+        hBox.setSpacing(5);
 
         FontIcon statusIcon = new FontIcon();
         Label statusLabel = new Label();
@@ -99,13 +98,6 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
                                        }
                                    });
 
-
-        Label descriptionLabel = new Label();
-
-        ControlUtil.bindLabelPropertyWithDefault(descriptionLabel, "(no description)", testCase.descriptionProperty());
-
-        ControlUtil.registerDoubleClickListener(descriptionLabel, this::doStartEdit);
-
         Button editDescription = new Button();
         editDescription.setGraphic(new FontIcon("far-edit"));
         editDescription.getStyleClass().addAll("edit-test-description", "icon-button");
@@ -113,20 +105,27 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         editDescription.setOnAction(e1 -> doStartEdit());
         sub = sub.and(() -> editDescription.setOnAction(null));
 
-        Pane spacer = new Pane();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Label descriptionLabel = new Label();
+        ControlUtil.bindLabelPropertyWithDefault(descriptionLabel, "(no description)", testCase.descriptionProperty());
+
+        HBox descriptionPane = new HBox();
+        descriptionPane.getChildren().addAll(editDescription, descriptionLabel);
+        descriptionPane.setAlignment(Pos.CENTER_LEFT);
+        descriptionPane.setSpacing(2);
+        HBox.setHgrow(descriptionPane, Priority.ALWAYS);
+        ControlUtil.registerDoubleClickListener(descriptionPane, this::doStartEdit);
 
         Button duplicate = new Button();
         duplicate.setGraphic(new FontIcon("far-copy"));
         duplicate.getStyleClass().addAll("duplicate-test", "icon-button");
-        Tooltip.install(duplicate, new Tooltip("Copy test case"));
+        Tooltip.install(duplicate, new Tooltip("Duplicate test case"));
         duplicate.setOnAction(e1 -> collection.duplicate(testCase));
         sub = sub.and(() -> duplicate.setOnAction(null));
 
 
         ToggleButton load = new ToggleButton();
         load.setToggleGroup(collection.getLoadedToggleGroup());
-        load.setGraphic(new FontIcon("fas-external-link-alt"));
+        load.setGraphic(new FontIcon("far-file-code"));
         load.getStyleClass().addAll("load-button", "icon-button");
         Tooltip.install(load, new Tooltip("Load test case in editor"));
 
@@ -154,10 +153,7 @@ public class TestCaseListCell extends SmartTextFieldListCell<LiveTestCase> {
         Tooltip.install(delete, new Tooltip("Remove test case"));
         delete.setOnAction(e -> collection.deleteTestCase(testCase));
 
-        ControlUtil.registerDoubleClickListener(spacer, load::fire);
-
-
-        hBox.getChildren().setAll(statusLabel, descriptionLabel, editDescription, spacer, delete, duplicate, load);
+        hBox.getChildren().setAll(statusLabel, descriptionPane, delete, duplicate, load);
         hBox.setAlignment(Pos.CENTER_LEFT);
 
 
