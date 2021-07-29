@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.37.0
+
+* [#50](https://github.com/pmd/pmd-designer/pull/50) Usability improvements by [Juan](https://github.com/jsotuyod)
+
 ## 6.28.0
 
 * **Bump required pmd-core version to 6.27.0.** The previous minimal pmd-core version was 6.23.0.
