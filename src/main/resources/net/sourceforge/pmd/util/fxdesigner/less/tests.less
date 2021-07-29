@@ -16,6 +16,7 @@
       .status-label {
         -fx-background-color: white;
         -fx-background-radius: 12;
+        -fx-padding: 0 1;
       }
 
       .test-status {
@@ -65,6 +66,16 @@
   }
 }
 
+.list-view .list-cell,
+.list-view:focused .list-cell:selected {
+  .icon-button.edit-test-description {
+    .force-square(16);
+
+    .ikonli-font-icon {
+      -fx-icon-size: 10;
+    }
+  }
+}
 
 .button.node-drag-over, .button:node-drag-possible-target {
 
