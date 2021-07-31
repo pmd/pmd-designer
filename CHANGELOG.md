@@ -1,5 +1,8 @@
 # Changelog
 
+## Next
+
+
 ## 6.37.0
 
 * [#50](https://github.com/pmd/pmd-designer/pull/50) Usability improvements by [Juan](https://github.com/jsotuyod)
