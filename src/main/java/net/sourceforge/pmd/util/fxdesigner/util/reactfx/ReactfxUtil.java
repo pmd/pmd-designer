@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.BinaryOperator;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -190,33 +189,6 @@ public final class ReactfxUtil {
 
     public static <T> Val<T> vetoableNull(Val<T> base, Duration duration) {
         return latestValue(VetoableEventStream.vetoableNull(base.values(), duration));
-    }
-
-    /** Like the other overload, using the setter of the ui property. */
-    public static <T> Subscription rewireInit(Property<T> underlying, Property<T> ui) {
-        return rewireInit(underlying, ui, ui::setValue);
-    }
-
-    /**
-     * Binds the underlying property to a source of values (UI property). The UI
-     * property is also initialised using a setter.
-     *
-     * @param underlying The underlying property
-     * @param ui         The property exposed to the user (the one in this wizard)
-     * @param setter     Setter to initialise the UI value
-     * @param <T>        Type of values
-     */
-    public static <T> Subscription rewireInit(Property<T> underlying, ObservableValue<? extends T> ui,
-                                              Consumer<? super T> setter) {
-        setter.accept(underlying.getValue());
-        return rewire(underlying, ui);
-    }
-
-    /** Like rewireInit, with no initialisation. */
-    public static <T> Subscription rewire(Property<T> underlying, ObservableValue<? extends T> source) {
-        underlying.unbind();
-        underlying.bind(source); // Bindings are garbage collected after the popup dies
-        return underlying::unbind;
     }
 
     public static Var<Boolean> booleanVar(BooleanProperty p) {
