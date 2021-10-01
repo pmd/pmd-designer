@@ -59,7 +59,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.controls.PopOverWrapper;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.PropertyMapView;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ToolbarTitledPane;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.ViolationCollectionView;
-import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -324,8 +323,8 @@ public class SourceEditorController extends AbstractController {
         }
 
         Subscription sub = Subscription.multi(
-            ReactfxUtil.rewireInit(newValue.sourceProperty(), astManager.sourceCodeProperty()),
-            ReactfxUtil.rewireInit(newValue.languageVersionProperty(), languageVersionUIProperty),
+            DesignerUtil.rewireInit(newValue.sourceProperty(), astManager.sourceCodeProperty()),
+            DesignerUtil.rewireInit(newValue.languageVersionProperty(), languageVersionUIProperty),
             () -> propertiesPopover.rebind(null)
         );
 

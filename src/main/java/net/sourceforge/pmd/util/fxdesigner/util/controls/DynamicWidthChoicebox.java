@@ -4,7 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
-import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewire;
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.rewire;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;

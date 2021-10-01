@@ -6,7 +6,7 @@ package net.sourceforge.pmd.util.fxdesigner.popups;
 
 import static net.sourceforge.pmd.properties.MultiValuePropertyDescriptor.DEFAULT_DELIMITER;
 import static net.sourceforge.pmd.properties.MultiValuePropertyDescriptor.DEFAULT_NUMERIC_DELIMITER;
-import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.rewireInit;
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.rewireInit;
 
 import java.net.URL;
 import java.util.Objects;
