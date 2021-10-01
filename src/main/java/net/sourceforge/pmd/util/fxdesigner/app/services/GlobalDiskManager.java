@@ -16,7 +16,7 @@ public interface GlobalDiskManager {
 
     /**
      * Gets the main settings directory of the app. This directory
-     * contains all {@linkplain ResourceManager resource directories},
+     * contains all {@code resource directories},
      * the files containing the user-specific settings, etc. By default
      * it's somewhere in {@code ${user.home}/.pmd}.
      */
