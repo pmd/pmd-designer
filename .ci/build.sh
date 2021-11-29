@@ -9,7 +9,7 @@ source "$(dirname "$0")/inc/fetch_ci_scripts.bash" && fetch_ci_scripts
 
 function build() {
     pmd_ci_log_group_start "Install OpenJDK"
-        pmd_ci_openjdk_install_adoptopenjdk 11
+        pmd_ci_openjdk_install_adoptium 11
         pmd_ci_openjdk_setdefault 11
     pmd_ci_log_group_end
 
