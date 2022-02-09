@@ -51,7 +51,7 @@ class NodeStyleSpan {
     // and I don't have time to simplify it before 6.5.0
     public PositionSnapshot snapshot() {
         int lastKnownStart = getAbsolutePosition(node.getBeginLine(), node.getBeginColumn());
-        int lastKnownEnd = getAbsolutePosition(node.getEndLine(), node.getEndColumn()) + 1; // exclusive
+        int lastKnownEnd = getAbsolutePosition(node.getEndLine(), node.getEndColumn());
         return new PositionSnapshot(lastKnownStart, lastKnownEnd);
     }
 
@@ -86,8 +86,8 @@ class NodeStyleSpan {
      * Snapshot of the node's absolute position in the code area.
      */
     class PositionSnapshot implements TextAwareNodeWrapper {
-        private final int beginIndex;
-        private final int endIndex;
+        private final int beginIndex; // inclusive
+        private final int endIndex; // exclusive
 
 
         PositionSnapshot(int beginIndex, int endIndex) {
