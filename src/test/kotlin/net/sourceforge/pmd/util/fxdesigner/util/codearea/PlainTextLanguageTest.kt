@@ -12,6 +12,8 @@ import net.sourceforge.pmd.lang.ast.FileAnalysisException
 import net.sourceforge.pmd.lang.ast.Parser
 import net.sourceforge.pmd.lang.ast.SemanticErrorReporter
 import net.sourceforge.pmd.lang.ast.test.matchNode
+import net.sourceforge.pmd.lang.document.TextDocument
+import net.sourceforge.pmd.lang.document.TextFile
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry
 import net.sourceforge.pmd.util.fxdesigner.util.PlainTextLanguage.PlainTextFile
 import java.io.StringReader
@@ -59,6 +61,7 @@ private fun String.parse(): PlainTextFile {
     lang.defaultVersion shouldNotBe null
 
     val parser = lang.defaultVersion.languageVersionHandler.parser
-    val task = Parser.ParserTask(lang.defaultVersion, FileAnalysisException.NO_FILE_NAME, this, SemanticErrorReporter.noop())
+    val doc = TextDocument.readOnlyString(this, lang.defaultVersion)
+    val task = Parser.ParserTask(doc, SemanticErrorReporter.noop())
     return parser.parse(task) as PlainTextFile
 }

@@ -11,8 +11,10 @@ import net.sourceforge.pmd.lang.ast.AstInfo;
 import net.sourceforge.pmd.lang.ast.Parser;
 import net.sourceforge.pmd.lang.ast.Parser.ParserTask;
 import net.sourceforge.pmd.lang.ast.RootNode;
-import net.sourceforge.pmd.lang.ast.SourceCodePositioner;
-import net.sourceforge.pmd.lang.ast.impl.AbstractNodeWithTextCoordinates;
+import net.sourceforge.pmd.lang.ast.impl.AbstractNode;
+import net.sourceforge.pmd.lang.document.FileLocation;
+import net.sourceforge.pmd.lang.document.TextDocument;
+import net.sourceforge.pmd.lang.document.TextRegion;
 
 /**
  * Default language module used when none is on the classpath.
@@ -36,17 +38,23 @@ public final class PlainTextLanguage extends BaseLanguageModule {
         }
     }
 
-    public static class PlainTextFile extends AbstractNodeWithTextCoordinates<PlainTextFile, PlainTextFile> implements RootNode {
+    public static class PlainTextFile extends AbstractNode<PlainTextFile, PlainTextFile> implements RootNode {
 
         private final AstInfo<PlainTextFile> astInfo;
+        private final FileLocation location;
+
 
         PlainTextFile(ParserTask task) {
             this.astInfo = new AstInfo<>(task, this);
-            SourceCodePositioner positioner = new SourceCodePositioner(task.getSourceText());
-            this.beginLine = 1;
-            this.beginColumn = 1;
-            this.endLine = positioner.getLastLine();
-            this.endColumn = positioner.getLastLineColumn();
+            TextDocument doc = task.getTextDocument();
+            TextRegion entireRegion = TextRegion.fromOffsetLength(0, doc.getLength());
+            this.location = doc.toLocation(entireRegion);
+        }
+
+
+        @Override
+        public FileLocation getReportLocation() {
+            return location;
         }
 
         @Override

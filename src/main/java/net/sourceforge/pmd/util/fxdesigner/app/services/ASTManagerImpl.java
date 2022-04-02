@@ -8,9 +8,7 @@ import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.lates
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStream.vetoableNull;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,12 +22,11 @@ import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.LanguageVersionHandler;
-import net.sourceforge.pmd.lang.ast.AstAnalysisContext;
-import net.sourceforge.pmd.lang.ast.AstProcessingStage;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.ast.Parser.ParserTask;
 import net.sourceforge.pmd.lang.ast.RootNode;
 import net.sourceforge.pmd.lang.ast.SemanticErrorReporter;
+import net.sourceforge.pmd.lang.document.TextDocument;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -191,13 +188,13 @@ public class ASTManagerImpl implements ASTManager {
                                              LanguageVersion version,
                                              ClassLoader classLoader) throws ParseAbortedException {
 
-        LanguageVersionHandler handler = version.getLanguageVersionHandler();
         String dummyFilePath = "dummy." + version.getLanguage().getExtensions().get(0);
+        TextDocument textDocument = TextDocument.readOnlyString(source, dummyFilePath, version);
+        LanguageVersionHandler handler = version.getLanguageVersionHandler();
         ParserTask task = new ParserTask(
-            version,
-            dummyFilePath,
-            source,
-            SemanticErrorReporter.noop()
+            textDocument,
+            SemanticErrorReporter.noop(),
+            classLoader
         );
 
         RootNode node;
@@ -208,40 +205,10 @@ public class ASTManagerImpl implements ASTManager {
             throw new ParseAbortedException(e);
         }
 
-        AstAnalysisContext ctx = getCtx(version, classLoader);
-        List<AstProcessingStage<?>> processingStages = new ArrayList<>(handler.getProcessingStages());
-        processingStages.sort(AstProcessingStage::compare);
-        for (AstProcessingStage<?> stage : processingStages) {
-            try {
-                stage.processAST(node, ctx);
-            } catch (Exception e) {
-                e = new RuntimeException("Exception while processing " + stage, e);
-                component.logUserException(e, Category.PROCESSING_EXCEPTION);
-                break;
-            }
-        }
-
         // Notify that the parse went OK so we can avoid logging very recent exceptions
 
         component.raiseParsableSourceFlag(() -> "Param hash: " + Objects.hash(source, version, classLoader));
 
         return Optional.of(node);
     }
-
-    @NonNull
-    private static AstAnalysisContext getCtx(LanguageVersion version, ClassLoader classLoader) {
-        return new AstAnalysisContext() {
-            @Override
-            public ClassLoader getTypeResolutionClassLoader() {
-                return classLoader;
-            }
-
-            @Override
-            public LanguageVersion getLanguageVersion() {
-                return version;
-            }
-        };
-    }
-
-
 }
