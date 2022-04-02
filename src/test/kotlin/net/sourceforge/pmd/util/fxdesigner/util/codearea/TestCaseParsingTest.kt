@@ -8,6 +8,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.haveSize
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import net.sourceforge.pmd.lang.document.TextRegion
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser
 
@@ -74,7 +75,7 @@ class TestCaseParsingTest : FunSpec({
             expectedViolations[0].apply {
                 isExactRange shouldBe false
                 message shouldBe null
-                (PmdCoordinatesSystem.TextPos2D(3, 0) in range!!) shouldBe true
+                (3 in range!!) shouldBe true
             }
 
         }
@@ -91,15 +92,18 @@ class TestCaseParsingTest : FunSpec({
             expectedViolations[0].apply {
                 isExactRange shouldBe false
                 message shouldBe null
-                (PmdCoordinatesSystem.TextPos2D(3, 0) in range!!) shouldBe true
-                (PmdCoordinatesSystem.TextPos2D(3, 10) in range!!) shouldBe true
+                // these numbers are start and end of the third line
+                (77 in range!!) shouldBe true
+                (148 in range!!) shouldBe true
             }
 
 
             expectedViolations[1].apply {
                 isExactRange shouldBe false
                 message shouldBe null
-                (PmdCoordinatesSystem.TextPos2D(3, 10) in range!!) shouldBe true
+                // these numbers are start and end of the third line
+                (77 in range!!) shouldBe true
+                (148 in range!!) shouldBe true
             }
 
             source shouldBe """public class UseShortArrayExample {

@@ -7,52 +7,70 @@ package net.sourceforge.pmd.util.fxdesigner.model.testing;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.lang.document.TextRegion;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
 public class LiveViolationRecord implements SettingsOwner, Comparable<LiveViolationRecord> {
 
-    private final Var<@Nullable TextRange> range;
+    private final Var<@Nullable TextRegion> range;
     private final Var<Boolean> exactRange;
     private final Var<@Nullable String> message;
+    private int line;
+
 
     public LiveViolationRecord() {
         this(null, null, false);
     }
 
-    public LiveViolationRecord(int line) {
-        this(TextRange.fullLine(line, 10000), null, false);
+
+    public LiveViolationRecord(@Nullable TextRegion range, @Nullable String message, boolean exactRange) {
+        this.line = -1;
+        this.range = Var.newSimpleVar(range);
+        this.message = Var.newSimpleVar(message);
+        this.exactRange = Var.newSimpleVar(exactRange);
     }
 
-    public LiveViolationRecord(@Nullable TextRange range, @Nullable String message, boolean exactRange) {
-        this.range = Var.newSimpleVar(range);
+    public LiveViolationRecord(int line, @Nullable String message, boolean exactRange) {
+        this.line = line;
+        this.range = Var.newSimpleVar(null);
         this.message = Var.newSimpleVar(message);
         this.exactRange = Var.newSimpleVar(exactRange);
     }
 
     @Override
     public int compareTo(LiveViolationRecord o) {
-        TextRange mine = getRange();
-        TextRange theirs = o.getRange();
+        TextRegion mine = getRange();
+        TextRegion theirs = o.getRange();
         if (mine == null || theirs == null) {
             return 0;
         } else {
-            return Integer.compare(mine.startPos.line, theirs.startPos.line);
+            return mine.compareTo(theirs);
         }
     }
 
+
+    @PersistentProperty
+    public int getLine() {
+        return line;
+    }
+
+    public void setLine(int line) {
+        this.line = line;
+    }
+
+
     @PersistentProperty
     @Nullable
-    public TextRange getRange() {
+    public TextRegion getRange() {
         return range.getValue();
     }
 
-    public Var<@Nullable TextRange> rangeProperty() {
+    public Var<@Nullable TextRegion> rangeProperty() {
         return range;
     }
 
-    public void setRange(@Nullable TextRange range) {
+    public void setRange(@Nullable TextRegion range) {
         this.range.setValue(range);
     }
 

@@ -9,18 +9,17 @@ import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.iter
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.reverse;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.toIterable;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.or;
-import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.endPosition;
 import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.findNodeAt;
 import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.findNodeCovering;
-import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.rangeOf;
 
 import java.util.Iterator;
 import java.util.Optional;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.DataMap;
 import net.sourceforge.pmd.util.DataMap.SimpleDataKey;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;
 
 import javafx.scene.control.TreeItem;
 
@@ -34,13 +33,6 @@ public final class AstTraversalUtil {
     }
 
 
-    public static Node getRoot(Node n) {
-        return n == null ? null
-                         : n.getParent() == null
-                           ? n : getRoot(n.getParent());
-    }
-
-
     private static final SimpleDataKey<Node> NEW_TREE_BRIDGE_KEY = DataMap.simpleDataKey("new.tree");
 
 
@@ -51,12 +43,12 @@ public final class AstTraversalUtil {
      * @param myRoot (Nullable) root of the tree in which to search
      * @param node   (Nullable) node to look for
      */
-    public static Optional<Node> mapToMyTree(final Node myRoot, final Node node, TextPos2D caretPositionOrNull) {
+    public static Optional<Node> mapToMyTree(final Node myRoot, final Node node, @Nullable Integer caretPositionOrNull) {
         if (myRoot == null || node == null) {
             return Optional.empty();
         }
 
-        if (AstTraversalUtil.getRoot(node) == myRoot) {
+        if (node.getRoot() == myRoot) {
             return Optional.of(node); // same tree, don't set cache
         }
 
@@ -74,10 +66,10 @@ public final class AstTraversalUtil {
                     // first try with path
                     findOldNodeInNewAst(node, myRoot),
                     // then try with exact range
-                    () -> findNodeCovering(myRoot, rangeOf(node), true)
+                    () -> findNodeCovering(myRoot, node.getTextRegion(), true)
                 ),
                 // fallback on leaf if nothing works
-                () -> findNodeAt(myRoot, caretPositionOrNull == null ? endPosition(node)
+                () -> findNodeAt(myRoot, caretPositionOrNull == null ? node.getTextRegion().getEndOffset()
                                                                      : caretPositionOrNull)
             );
 

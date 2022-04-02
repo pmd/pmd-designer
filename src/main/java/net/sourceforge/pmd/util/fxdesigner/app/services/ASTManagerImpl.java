@@ -59,11 +59,12 @@ public class ASTManagerImpl implements ASTManager {
     /**
      * Last valid source that was compiled, corresponds to {@link #compilationUnit}.
      */
-    private SuspendableVar<String> sourceCode = Var.newSimpleVar("").suspendable();
+    private final SuspendableVar<String> sourceCode = Var.newSimpleVar("").suspendable();
+    private final SuspendableVar<TextDocument> sourceDocument = Var.newSimpleVar(TextDocument.readOnlyString("", languageVersion.getValue())).suspendable();
 
-    private Var<ParseAbortedException> currentException = Var.newSimpleVar(null);
+    private final Var<ParseAbortedException> currentException = Var.newSimpleVar(null);
 
-    private Var<Map<String, String>> ruleProperties = Var.newSimpleVar(Collections.emptyMap());
+    private final Var<Map<String, String>> ruleProperties = Var.newSimpleVar(Collections.emptyMap());
 
     public ASTManagerImpl(DesignerRoot owner) {
         this.designerRoot = owner;
@@ -113,6 +114,21 @@ public class ASTManagerImpl implements ASTManager {
         sourceCode.bind(base.sourceCodeProperty());
         classLoaderProperty().bind(base.classLoaderProperty());
 
+    }
+
+
+    public TextDocument getSourceDocument() {
+        return sourceDocument.getValue();
+    }
+
+
+    public SuspendableVar<TextDocument> sourceDocumentProperty() {
+        return sourceDocument;
+    }
+
+
+    public void setSourceDocument(TextDocument sourceDocument) {
+        this.sourceDocument.setValue(sourceDocument);
     }
 
 

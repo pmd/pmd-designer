@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,6 @@ import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
 public class TestXmlParser {
 
@@ -94,7 +92,7 @@ public class TestXmlParser {
 
         NodeList expectedMessagesNodes = testCode.getElementsByTagName("expected-messages");
         List<String> messages = new ArrayList<>();
-        if (expectedMessagesNodes != null && expectedMessagesNodes.getLength() > 0) {
+        if (expectedMessagesNodes.getLength() > 0) {
             Element item = (Element) expectedMessagesNodes.item(0);
             NodeList messagesNodes = item.getElementsByTagName("message");
             for (int j = 0; j < messagesNodes.getLength(); j++) {
@@ -104,7 +102,7 @@ public class TestXmlParser {
 
         NodeList expectedLineNumbersNodes = testCode.getElementsByTagName("expected-linenumbers");
         List<Integer> expectedLineNumbers = new ArrayList<>();
-        if (expectedLineNumbersNodes != null && expectedLineNumbersNodes.getLength() > 0) {
+        if (expectedLineNumbersNodes.getLength() > 0) {
             Element item = (Element) expectedLineNumbersNodes.item(0);
             String numbers = item.getTextContent();
             for (String n : numbers.split(" *, *")) {
@@ -180,17 +178,11 @@ public class TestXmlParser {
         live.setLanguageVersion(version);
         live.setIgnored(ignored);
 
-        List<String> lines = Arrays.asList(code.split("\\r?\\n"));
-
         for (int i = 0; i < expectedProblems; i++) {
             String m = messages.size() > i ? messages.get(i) : null;
             int line = lineNumbers.size() > i ? lineNumbers.get(i) : -1;
 
-            TextRange tr = line >= 0
-                           ? TextRange.fullLine(line, lines.get(line - 1).length())
-                           : null;
-
-            live.getExpectedViolations().add(new LiveViolationRecord(tr, m, false));
+            live.getExpectedViolations().add(new LiveViolationRecord(line, m, false));
         }
         properties.forEach((k, v) -> live.setProperty(k.toString(), v.toString()));
         return live;

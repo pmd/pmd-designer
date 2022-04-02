@@ -32,7 +32,9 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import net.sourceforge.pmd.lang.document.TextDocument;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.PlainTextLanguage;
 
 public class TestXmlDumper {
 
@@ -93,8 +95,13 @@ public class TestXmlDumper {
         if (expectedViolations.size() > 0 && expectedViolations.stream().allMatch(it -> it.getRange() != null)) {
             Element linenos = doc.createElementNS(NS, "expected-linenumbers");
 
-            String joined = expectedViolations.stream().map(it -> it.getRange().startPos.line + "")
-                                              .collect(Collectors.joining(","));
+            // create a text doc just to ask for line numbers
+            TextDocument textDocument = TextDocument.readOnlyString(descriptor.getSource(), PlainTextLanguage.INSTANCE.getDefaultVersion());
+
+            String joined = expectedViolations
+                .stream()
+                .map(it -> "" + textDocument.lineNumberAt(it.getRange().getStartOffset()))
+                .collect(Collectors.joining(","));
             linenos.setTextContent(joined);
             testCode.appendChild(linenos);
 

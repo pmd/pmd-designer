@@ -10,6 +10,7 @@ import java.util.Comparator;
 import org.fxmisc.richtext.model.StyledDocument;
 
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.lang.document.TextRegion;
 import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
 
 
@@ -50,15 +51,11 @@ class NodeStyleSpan {
     // I originally wrote it like that because I didn't think enough about it,
     // and I don't have time to simplify it before 6.5.0
     public PositionSnapshot snapshot() {
-        int lastKnownStart = getAbsolutePosition(node.getBeginLine(), node.getBeginColumn());
-        int lastKnownEnd = getAbsolutePosition(node.getEndLine(), node.getEndColumn());
+        TextRegion region = node.getTextRegion();
+        int lastKnownStart = region.getStartOffset();
+        int lastKnownEnd = region.getEndOffset();
         return new PositionSnapshot(lastKnownStart, lastKnownEnd);
     }
-
-    private int getAbsolutePosition(int line, int column) {
-        return PmdCoordinatesSystem.getOffsetFromPmdPosition(codeArea, line, column);
-    }
-
 
 
     @Override
