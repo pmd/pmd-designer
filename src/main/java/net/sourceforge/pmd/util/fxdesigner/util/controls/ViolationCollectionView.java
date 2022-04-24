@@ -108,9 +108,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
         view.setEditable(true);
 
         DragAndDropUtil.registerAsNodeDragTarget(view, textRange -> {
-            LiveViolationRecord record = new LiveViolationRecord();
-            record.setRange(textRange);
-            record.setExactRange(true);
+            LiveViolationRecord record = new LiveViolationRecord(textRange, null);
             getItems().add(record);
         }, getDesignerRoot());
 
@@ -207,7 +205,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
 
 
         private String getLabel(LiveViolationRecord violation) {
-            TextRegion range = violation.getRange();
+            TextRegion range = violation.getRegion();
             if (range == null) {
                 if (violation.getLine() > 0) {
                     return "(L." + violation.getLine() + ")";

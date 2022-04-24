@@ -31,9 +31,13 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.lang.document.TextDocument;
+import net.sourceforge.pmd.lang.document.TextRegion;
+import net.sourceforge.pmd.util.StringUtil;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.PlainTextLanguage;
 
 public class TestXmlParser {
 
@@ -52,6 +56,7 @@ public class TestXmlParser {
         }
         return tests;
     }
+
 
     private LiveTestCase parseSingle(Element testCode, Element root, ObservableRuleBuilder owner) {
         //
@@ -178,15 +183,29 @@ public class TestXmlParser {
         live.setLanguageVersion(version);
         live.setIgnored(ignored);
 
+        // create a document just to map source lines to regions
+        // language is irrelevant so we use plain text
+        @SuppressWarnings("PMD.CloseResource")
+        TextDocument doc = TextDocument.readOnlyString(code, PlainTextLanguage.INSTANCE.getDefaultVersion());
+
         for (int i = 0; i < expectedProblems; i++) {
             String m = messages.size() > i ? messages.get(i) : null;
-            int line = lineNumbers.size() > i ? lineNumbers.get(i) : -1;
+            // the region in which the violation is expected to occur
+            TextRegion region;
+            int line = -1;
+            if (lineNumbers.size() > i) {
+                line = lineNumbers.get(i);
+                region = doc.createLineRange(line, line);
+            } else {
+                region = doc.getEntireRegion();
+            }
 
-            live.getExpectedViolations().add(new LiveViolationRecord(line, m, false));
+            live.getExpectedViolations().add(new LiveViolationRecord(line, region, m));
         }
         properties.forEach((k, v) -> live.setProperty(k.toString(), v.toString()));
         return live;
     }
+
 
     private String getNodeValue(Element parentElm, String nodeName, boolean required) {
         NodeList nodes = parentElm.getElementsByTagName(nodeName);
@@ -200,6 +219,7 @@ public class TestXmlParser {
         Node node = nodes.item(0);
         return parseTextNode(node);
     }
+
 
     private String parseTextNode(Node exampleNode) {
         StringBuilder buffer = new StringBuilder();
@@ -225,6 +245,7 @@ public class TestXmlParser {
         }
     }
 
+
     private static TestCollection parseXmlTests(InputStream is, ObservableRuleBuilder owner) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -242,6 +263,7 @@ public class TestXmlParser {
 
     }
 
+
     private static DocumentBuilder getDocumentBuilder(DocumentBuilderFactory dbf) throws ParserConfigurationException {
         DocumentBuilder builder = dbf.newDocumentBuilder();
         builder.setErrorHandler(new ErrorHandler() {
@@ -250,10 +272,12 @@ public class TestXmlParser {
                 throw exception;
             }
 
+
             @Override
             public void fatalError(SAXParseException exception) throws SAXException {
                 throw exception;
             }
+
 
             @Override
             public void error(SAXParseException exception) throws SAXException {

@@ -4,6 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.value.Var;
 
@@ -13,35 +14,30 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.Pe
 
 public class LiveViolationRecord implements SettingsOwner, Comparable<LiveViolationRecord> {
 
-    private final Var<@Nullable TextRegion> range;
-    private final Var<Boolean> exactRange;
+    /**
+     * The region in which the violation has to occur.
+     */
+    private final Var<@NonNull TextRegion> region;
     private final Var<@Nullable String> message;
     private int line;
 
 
-    public LiveViolationRecord() {
-        this(null, null, false);
+    public LiveViolationRecord(@NonNull TextRegion region, @Nullable String message) {
+        this(-1, region, message);
     }
 
 
-    public LiveViolationRecord(@Nullable TextRegion range, @Nullable String message, boolean exactRange) {
-        this.line = -1;
-        this.range = Var.newSimpleVar(range);
-        this.message = Var.newSimpleVar(message);
-        this.exactRange = Var.newSimpleVar(exactRange);
-    }
-
-    public LiveViolationRecord(int line, @Nullable String message, boolean exactRange) {
+    public LiveViolationRecord(int line, @NonNull TextRegion region, String message) {
         this.line = line;
-        this.range = Var.newSimpleVar(null);
+        this.region = Var.newSimpleVar(region);
         this.message = Var.newSimpleVar(message);
-        this.exactRange = Var.newSimpleVar(exactRange);
     }
+
 
     @Override
     public int compareTo(LiveViolationRecord o) {
-        TextRegion mine = getRange();
-        TextRegion theirs = o.getRange();
+        TextRegion mine = getRegion();
+        TextRegion theirs = o.getRegion();
         if (mine == null || theirs == null) {
             return 0;
         } else {
@@ -55,37 +51,28 @@ public class LiveViolationRecord implements SettingsOwner, Comparable<LiveViolat
         return line;
     }
 
+
     public void setLine(int line) {
         this.line = line;
     }
 
 
     @PersistentProperty
-    @Nullable
-    public TextRegion getRange() {
-        return range.getValue();
+    @NonNull
+    public TextRegion getRegion() {
+        return region.getValue();
     }
 
-    public Var<@Nullable TextRegion> rangeProperty() {
-        return range;
+
+    public Var<@NonNull TextRegion> regionProperty() {
+        return region;
     }
 
-    public void setRange(@Nullable TextRegion range) {
-        this.range.setValue(range);
+
+    public void setRegion(@NonNull TextRegion region) {
+        this.region.setValue(region);
     }
 
-    @PersistentProperty
-    public boolean isExactRange() {
-        return exactRange.getValue();
-    }
-
-    public void setExactRange(boolean exactRange) {
-        this.exactRange.setValue(exactRange);
-    }
-
-    public Var<Boolean> exactRangeProperty() {
-        return exactRange;
-    }
 
     @PersistentProperty
     @Nullable
@@ -93,9 +80,11 @@ public class LiveViolationRecord implements SettingsOwner, Comparable<LiveViolat
         return message.getValue();
     }
 
+
     public Var<@Nullable String> messageProperty() {
         return message;
     }
+
 
     public void setMessage(@Nullable String message) {
         this.message.setValue(message);
@@ -104,9 +93,8 @@ public class LiveViolationRecord implements SettingsOwner, Comparable<LiveViolat
 
     public LiveViolationRecord deepCopy() {
         return new LiveViolationRecord(
-            getRange(),
-            getMessage(),
-            isExactRange()
+            getRegion(),
+            getMessage()
         );
     }
 }

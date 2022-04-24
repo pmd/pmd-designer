@@ -8,11 +8,12 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.haveSize
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import net.sourceforge.pmd.lang.ast.test.IntelliMarker
 import net.sourceforge.pmd.lang.document.TextRegion
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser
 
-class TestCaseParsingTest : FunSpec({
+class TestCaseParsingTest : IntelliMarker, FunSpec({
 
 
     test("Map normal text") {
@@ -52,6 +53,10 @@ class TestCaseParsingTest : FunSpec({
                     <description>case with two initializers</description>
                     <expected-problems>2</expected-problems>
                     <expected-linenumbers>3,3</expected-linenumbers>
+                    <expected-messages>
+                        <message>a</message>
+                        <message>b</message>
+                    </expected-messages>
                     <code><![CDATA[
             public class UseShortArrayExample {
                 void foo() {
@@ -73,9 +78,9 @@ class TestCaseParsingTest : FunSpec({
             expectedViolations should haveSize(1)
 
             expectedViolations[0].apply {
-                isExactRange shouldBe false
                 message shouldBe null
-                (3 in range!!) shouldBe true
+                // this is the third line
+                region shouldBe TextRegion.fromBothOffsets(77, 148)
             }
 
         }
@@ -90,20 +95,16 @@ class TestCaseParsingTest : FunSpec({
             expectedViolations should haveSize(2)
 
             expectedViolations[0].apply {
-                isExactRange shouldBe false
-                message shouldBe null
-                // these numbers are start and end of the third line
-                (77 in range!!) shouldBe true
-                (148 in range!!) shouldBe true
+                message shouldBe "a"
+                // this is the third line
+                region shouldBe TextRegion.fromBothOffsets(77, 148)
             }
 
 
             expectedViolations[1].apply {
-                isExactRange shouldBe false
-                message shouldBe null
-                // these numbers are start and end of the third line
-                (77 in range!!) shouldBe true
-                (148 in range!!) shouldBe true
+                message shouldBe "b"
+                // this is the third line
+                region shouldBe TextRegion.fromBothOffsets(77, 148)
             }
 
             source shouldBe """public class UseShortArrayExample {

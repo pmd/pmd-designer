@@ -30,11 +30,6 @@ public final class TestCaseUtil {
                                   "Expected " + expectedViolations.size() + " violations, actual " + actual.size());
         }
 
-        if (expectedViolations.stream().noneMatch(it -> it.getRange() != null)) {
-            return new TestResult(TestStatus.PASS, null);
-        }
-
-
         actual = new ArrayList<>(actual);
         actual.sort(LINE_COMP);
 
@@ -46,10 +41,10 @@ public final class TestCaseUtil {
 
             TextRegion actualRange = node.getTextRegion();
             LiveViolationRecord expected = expectedViolations.get(i);
-            TextRegion expectedRange = expected.getRange();
+            TextRegion expectedRange = expected.getRegion();
 
-            if (expectedRange != null && !expectedRange.contains(actualRange.getStartOffset())
-            || expected.getLine() > 0 && node.getBeginLine() != expected.getLine()) {
+            if (!expectedRange.contains(actualRange.getStartOffset())
+                || expected.getLine() > 0 && node.getBeginLine() != expected.getLine()) {
                 return new TestResult(TestStatus.FAIL, "Wrong position for node at offset " + actualRange.getStartOffset());
             }
         }

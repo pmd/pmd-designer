@@ -216,7 +216,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
         Val<Map<TextRegion, LiveList<LiveViolationRecord>>> mapVal =
             ReactfxUtil.groupBy(liveTestCase.getExpectedViolations(),
-                                LiveViolationRecord::getRange);
+                                LiveViolationRecord::getRegion);
 
         Subscription pin = mapVal.pin();
 

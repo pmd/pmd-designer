@@ -230,9 +230,7 @@ public class SourceEditorController extends AbstractController {
         DragAndDropUtil.registerAsNodeDragTarget(
             violationsButton,
             range -> {
-                LiveViolationRecord record = new LiveViolationRecord();
-                record.setRange(range);
-                record.setExactRange(true);
+                LiveViolationRecord record = new LiveViolationRecord(range, null);
                 SimplePopups.showActionFeedback(violationsButton, AlertType.CONFIRMATION, "Violation added");
                 currentlyOpenTestCase.ifPresent(v -> v.getExpectedViolations().add(record));
             }, getDesignerRoot());

@@ -25,7 +25,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.reactfx.collection.LiveList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -96,7 +96,7 @@ public class TestXmlDumper {
             testCode.appendChild(messages);
         }
 
-        if (expectedViolations.size() > 0 && expectedViolations.stream().allMatch(it -> it.getRange() != null)) {
+        if (expectedViolations.size() > 0) {
             Element linenos = doc.createElementNS(NS, "expected-linenumbers");
 
             // create a text doc just to ask for line numbers
@@ -104,7 +104,7 @@ public class TestXmlDumper {
 
             String joined = expectedViolations
                 .stream()
-                .mapToInt(it -> getLine(textDocument, it.getRange()))
+                .mapToInt(it -> getLine(textDocument, it.getRegion()))
                 .mapToObj(Integer::toString)
                 .collect(Collectors.joining(","));
             linenos.setTextContent(joined);
@@ -129,9 +129,8 @@ public class TestXmlDumper {
     }
 
 
-    private int getLine(TextDocument textDocument, @Nullable TextRegion region) {
-        return region == null ? -1
-                              : textDocument.lineColumnAtOffset(region.getStartOffset()).getLine();
+    private int getLine(TextDocument textDocument, @NonNull TextRegion region) {
+        return textDocument.lineColumnAtOffset(region.getStartOffset()).getLine();
     }
 
 
