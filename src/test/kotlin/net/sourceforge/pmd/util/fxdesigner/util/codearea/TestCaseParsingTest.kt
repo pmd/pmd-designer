@@ -80,7 +80,7 @@ class TestCaseParsingTest : IntelliMarker, FunSpec({
             expectedViolations[0].apply {
                 message shouldBe null
                 // this is the third line
-                region shouldBe TextRegion.fromBothOffsets(77, 148)
+                region shouldBe TextRegion.fromOffsetLength(53, 37)
             }
 
         }
@@ -97,21 +97,22 @@ class TestCaseParsingTest : IntelliMarker, FunSpec({
             expectedViolations[0].apply {
                 message shouldBe "a"
                 // this is the third line
-                region shouldBe TextRegion.fromBothOffsets(77, 148)
+                region shouldBe TextRegion.fromOffsetLength(53, 70)
             }
 
 
             expectedViolations[1].apply {
                 message shouldBe "b"
                 // this is the third line
-                region shouldBe TextRegion.fromBothOffsets(77, 148)
+                region shouldBe TextRegion.fromOffsetLength(53, 70)
             }
 
-            source shouldBe """public class UseShortArrayExample {
+            source shouldBe """
+            public class UseShortArrayExample {
                 void foo() {
                     int ar[] = new int[] { 1,2,3}, foo[] = new int[] { 4, 5, 6 };
                 }
-            }"""
+            }""".trimIndent()
         }
 
 

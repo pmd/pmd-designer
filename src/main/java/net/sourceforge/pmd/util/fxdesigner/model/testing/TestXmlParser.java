@@ -31,6 +31,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.lang.document.Chars;
 import net.sourceforge.pmd.lang.document.TextDocument;
 import net.sourceforge.pmd.lang.document.TextRegion;
 import net.sourceforge.pmd.util.StringUtil;
@@ -137,8 +138,9 @@ public class TestXmlParser {
                 throw new RuntimeException("No matching code fragment found for coderef");
             }
         }
+        code = StringUtil.trimIndent(Chars.wrap(code).trimBlankLines()).toString();
 
-        String description = getNodeValue(testCode, "description", true);
+        String description = getNodeValue(testCode, "description", true).trim();
         int expectedProblems = Integer.parseInt(getNodeValue(testCode, "expected-problems", true));
 
         String languageVersionString = getNodeValue(testCode, "source-type", false);
@@ -229,7 +231,7 @@ public class TestXmlParser {
                 buffer.append(node.getNodeValue());
             }
         }
-        return buffer.toString().trim();
+        return buffer.toString();
     }
 
 
