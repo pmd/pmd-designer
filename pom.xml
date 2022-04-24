@@ -873,7 +873,7 @@
             <!-- Eg use -Prun,with-javafx -->
             <id>with-javafx</id>
             <properties>
-                <openjfx.scope>runtime</openjfx.scope>
+                <openjfx.scope>compile</openjfx.scope>
             </properties>
         </profile>
 

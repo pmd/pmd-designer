@@ -25,6 +25,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.collection.LiveList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,6 +34,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sourceforge.pmd.lang.document.TextDocument;
+import net.sourceforge.pmd.lang.document.TextRegion;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.PlainTextLanguage;
 
@@ -41,6 +43,7 @@ public class TestXmlDumper {
 
     public static final String SCHEMA_LOCATION = "http://pmd.sourceforge.net/rule-tests http://pmd.sourceforge.net/rule-tests_1_0_0.xsd";
     private static final String NS = "http://pmd.sourceforge.net/rule-tests";
+
 
     private void appendTests(Document doc, List<LiveTestCase> descriptors) {
         Element root = doc.getDocumentElement();
@@ -52,6 +55,7 @@ public class TestXmlDumper {
             root.appendChild(doc.createTextNode("\n\n"));
         }
     }
+
 
     private void appendSingle(Element testCode, LiveTestCase descriptor, Document doc) {
 
@@ -100,7 +104,8 @@ public class TestXmlDumper {
 
             String joined = expectedViolations
                 .stream()
-                .map(it -> "" + textDocument.lineNumberAt(it.getRange().getStartOffset()))
+                .mapToInt(it -> getLine(textDocument, it.getRange()))
+                .mapToObj(Integer::toString)
                 .collect(Collectors.joining(","));
             linenos.setTextContent(joined);
             testCode.appendChild(linenos);
@@ -124,6 +129,12 @@ public class TestXmlDumper {
     }
 
 
+    private int getLine(TextDocument textDocument, @Nullable TextRegion region) {
+        return region == null ? -1
+                              : textDocument.lineColumnAtOffset(region.getStartOffset()).getLine();
+    }
+
+
     public static String dumpXmlTests(TestCollection collection) throws Exception {
         StringWriter out = new StringWriter();
         dumpXmlTests(out, collection);
@@ -138,6 +149,7 @@ public class TestXmlDumper {
             dumpXmlTests(out, collection);
         }
     }
+
 
     public static void dumpXmlTests(Writer outWriter, TestCollection collection) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -178,6 +190,7 @@ public class TestXmlDumper {
 
     }
 
+
     private static DocumentBuilder getDocumentBuilder(DocumentBuilderFactory dbf) throws ParserConfigurationException {
         DocumentBuilder builder = dbf.newDocumentBuilder();
         builder.setErrorHandler(new ErrorHandler() {
@@ -186,10 +199,12 @@ public class TestXmlDumper {
                 throw exception;
             }
 
+
             @Override
             public void fatalError(SAXParseException exception) throws SAXException {
                 throw exception;
             }
+
 
             @Override
             public void error(SAXParseException exception) throws SAXException {

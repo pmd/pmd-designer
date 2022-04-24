@@ -9,8 +9,6 @@ import java.util.function.Consumer;
 import org.reactfx.Subscription;
 
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.lang.ast.TextAvailableNode;
-import net.sourceforge.pmd.lang.document.TextDocument;
 import net.sourceforge.pmd.lang.document.TextRegion;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 
@@ -23,7 +21,7 @@ import javafx.scene.input.TransferMode;
 public final class DragAndDropUtil {
 
     // since dragboard contents must be Serializable we
-    // put a TextRange2d in the dragboard and not a Node
+    // put a TextRegion in the dragboard and not a Node
 
     /** Style class for {@linkplain #registerAsNodeDragTarget(javafx.scene.Node, Consumer, DesignerRoot) node drag over.} */
     public static final String NODE_DRAG_OVER = "node-drag-over";
@@ -56,19 +54,6 @@ public final class DragAndDropUtil {
         });
 
         return () -> source.setOnDragDetected(null);
-    }
-
-
-    private static TextRegion getTextRegion(Node data) {
-        if (data instanceof TextAvailableNode) {
-            return ((TextAvailableNode) data).getTextRegion();
-        } else {
-            TextDocument doc = data.getAstInfo().getTextDocument();
-            // i need a way to turn
-            int startOffset = doc.offsetAtLineColumn(data.getBeginLine(), data.getBeginColumn());
-            int endOffset = doc.offsetAtLineColumn(data.getEndLine(), data.getEndColumn());
-            return TextRegion.fromBothOffsets(startOffset, endOffset);
-        }
     }
 
 

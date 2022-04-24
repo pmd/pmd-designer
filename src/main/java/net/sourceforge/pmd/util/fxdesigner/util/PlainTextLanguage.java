@@ -12,8 +12,6 @@ import net.sourceforge.pmd.lang.ast.Parser;
 import net.sourceforge.pmd.lang.ast.Parser.ParserTask;
 import net.sourceforge.pmd.lang.ast.RootNode;
 import net.sourceforge.pmd.lang.ast.impl.AbstractNode;
-import net.sourceforge.pmd.lang.document.FileLocation;
-import net.sourceforge.pmd.lang.document.TextDocument;
 import net.sourceforge.pmd.lang.document.TextRegion;
 
 /**
@@ -41,20 +39,15 @@ public final class PlainTextLanguage extends BaseLanguageModule {
     public static class PlainTextFile extends AbstractNode<PlainTextFile, PlainTextFile> implements RootNode {
 
         private final AstInfo<PlainTextFile> astInfo;
-        private final FileLocation location;
 
 
         PlainTextFile(ParserTask task) {
             this.astInfo = new AstInfo<>(task, this);
-            TextDocument doc = task.getTextDocument();
-            TextRegion entireRegion = TextRegion.fromOffsetLength(0, doc.getLength());
-            this.location = doc.toLocation(entireRegion);
         }
 
-
         @Override
-        public FileLocation getReportLocation() {
-            return location;
+        public TextRegion getTextRegion() {
+            return getTextDocument().getEntireRegion();
         }
 
         @Override

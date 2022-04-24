@@ -10,8 +10,6 @@ import static net.sourceforge.pmd.util.fxdesigner.util.DesignerIteratorUtil.toIt
 import java.util.Optional;
 
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.lang.document.TextPos2d;
-import net.sourceforge.pmd.lang.document.TextRange2d;
 import net.sourceforge.pmd.lang.document.TextRegion;
 
 
@@ -115,24 +113,4 @@ public final class PmdCoordinatesSystem {
         });
     }
 
-
-    /**
-     * Compatible with {@link #fromString(String)} ()}
-     */
-    public static String toString(TextRange2d range2d) {
-        TextPos2d start = range2d.getStartPos();
-        TextPos2d end = range2d.getEndPos();
-        return start.getLine() + ":" + start.getColumn()
-            + ":" + end.getLine() + ":" + end.getColumn();
-    }
-
-
-    /**
-     * Compatible with {@link #toString(TextRange2d)}
-     */
-    public static TextRange2d fromString(String str) {
-        String[] split = str.split(":");
-        return TextRange2d.range2d(TextPos2d.pos2d(Integer.parseInt(split[0]), Integer.parseInt(split[1])),
-                                   TextPos2d.pos2d(Integer.parseInt(split[2]), Integer.parseInt(split[3])));
-    }
 }
