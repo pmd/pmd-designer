@@ -21,7 +21,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.TextAwareNodeWrapper;
  * @author Clément Fournier
  * @since 6.5.0
  */
-class NodeStyleSpan {
+final class NodeStyleSpan {
 
     private static final Comparator<NodeStyleSpan> COMPARATOR = Comparator.comparing(NodeStyleSpan::getNode, Comparator.comparingInt(Node::getBeginLine).thenComparing(Node::getBeginColumn));
     private final Node node;
