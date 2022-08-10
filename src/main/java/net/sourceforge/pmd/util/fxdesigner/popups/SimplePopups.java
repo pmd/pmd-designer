@@ -19,6 +19,13 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
+import net.sourceforge.pmd.PMDVersion;
+import net.sourceforge.pmd.lang.Language;
+import net.sourceforge.pmd.util.fxdesigner.DesignerVersion;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
@@ -32,12 +39,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Popup;
 import javafx.util.Duration;
-import net.sourceforge.pmd.PMDVersion;
-import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.util.fxdesigner.DesignerVersion;
-import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 
 /**

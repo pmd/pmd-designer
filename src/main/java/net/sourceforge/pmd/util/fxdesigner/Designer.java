@@ -12,6 +12,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import net.sourceforge.pmd.lang.ast.xpath.Attribute;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerParams;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -20,11 +26,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import net.sourceforge.pmd.lang.ast.xpath.Attribute;
-import net.sourceforge.pmd.util.fxdesigner.app.DesignerParams;
-import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 
 /**

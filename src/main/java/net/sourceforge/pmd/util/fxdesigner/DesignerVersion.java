@@ -15,7 +15,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 /**
  * Stores the current Designer and PMD version and provides utility methods around them.
  */
-public class DesignerVersion {
+public final class DesignerVersion {
 
     /**
      * Constant that contains always the current version of the designer.

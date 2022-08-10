@@ -11,6 +11,8 @@ import javax.swing.JOptionPane;
 
 import org.apache.commons.lang3.SystemUtils;
 
+import net.sourceforge.pmd.annotation.InternalApi;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import javafx.application.Application;
@@ -47,7 +49,7 @@ public final class DesignerStarter {
         }
     }
 
-
+    @Deprecated
     private static MainCliArgs readParameters(String[] argv) {
 
         MainCliArgs argsObj = new MainCliArgs();
@@ -75,7 +77,12 @@ public final class DesignerStarter {
 
     }
 
-
+    /**
+     * Starting from PMD 7.0.0 this method usage will be limited for development.
+     * CLI support will be provided by pmd-cli
+     */
+    @Deprecated
+    @InternalApi
     public static void main(String[] args) {
 
         readParameters(args);
@@ -118,6 +125,7 @@ public final class DesignerStarter {
         return null;
     }
 
+    @Deprecated
     private static String getHelpText(JCommander jCommander) {
 
         StringBuilder sb = new StringBuilder();
@@ -139,7 +147,7 @@ public final class DesignerStarter {
     }
 
     @SuppressWarnings("PMD.AvoidCatchingThrowable")
-    private static void launchGui(String[] args) {
+    public static int launchGui(String[] args) {
         setSystemProperties();
 
         String message = null;
@@ -152,14 +160,16 @@ public final class DesignerStarter {
         if (message != null) {
             System.err.println(message);
             JOptionPane.showMessageDialog(null, message);
-            System.exit(ERROR_EXIT);
+            return ERROR_EXIT;
         }
 
         try {
             Application.launch(Designer.class, args);
         } catch (Throwable unrecoverable) {
             unrecoverable.printStackTrace();
-            System.exit(ERROR_EXIT);
+            return ERROR_EXIT;
         }
+
+        return OK;
     }
 }

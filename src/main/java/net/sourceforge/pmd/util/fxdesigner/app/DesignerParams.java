@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import com.sun.javafx.application.ParametersImpl;
-
 import javafx.application.Application.Parameters;
 
 
