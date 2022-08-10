@@ -87,7 +87,8 @@ public final class DesignerStarter {
 
         readParameters(args);
 
-        launchGui(args);
+        final int ret = launchGui(args);
+        System.exit(ret);
     }
 
     private static void setSystemProperties() {
