@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import com.sun.javafx.application.ParametersImpl;
+
 import javafx.application.Application.Parameters;
 
 
@@ -42,7 +43,7 @@ public final class DesignerParams {
     public DesignerParams(Parameters params) {
         List<String> raw = params.getRaw();
         // error output is disabled by default
-        if (raw.contains("-v") || raw.contains("--verbose")) {
+        if (raw.contains("-v") || raw.contains("--verbose") || raw.contains("--debug") || raw.contains("-D")) {
             isDeveloperMode = true;
         }
 
