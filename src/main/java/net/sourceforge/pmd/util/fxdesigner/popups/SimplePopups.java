@@ -19,13 +19,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
-import net.sourceforge.pmd.PMDVersion;
-import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.util.fxdesigner.Designer;
-import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
@@ -39,6 +32,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Popup;
 import javafx.util.Duration;
+import net.sourceforge.pmd.PMDVersion;
+import net.sourceforge.pmd.lang.Language;
+import net.sourceforge.pmd.util.fxdesigner.DesignerVersion;
+import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
+import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
+import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 
 /**
@@ -213,8 +212,8 @@ public final class SimplePopups {
 
         String sb =
             "PMD core version:\t\t\t" + PMDVersion.VERSION + "\n"
-                + "Designer version:\t\t\t" + Designer.getCurrentVersion()
-                + " (supports PMD core " + Designer.getPmdCoreMinVersion() + ")\n"
+                + "Designer version:\t\t\t" + DesignerVersion.getCurrentVersion()
+                + " (supports PMD core " + DesignerVersion.getPmdCoreMinVersion() + ")\n"
                 + "Designer settings dir:\t\t"
                 + root.getService(DesignerRoot.DISK_MANAGER).getSettingsDirectory() + "\n"
                 + "Available languages:\t\t"
