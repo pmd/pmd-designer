@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.sourceforge.pmd.util.fxdesigner.Designer;
+import net.sourceforge.pmd.util.fxdesigner.DesignerVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 
@@ -33,7 +33,7 @@ public class GlobalDiskManagerImpl implements GlobalDiskManager, ApplicationComp
         this.settingsDirectory = settingsDirectory;
 
 
-        Path curVersionStamp = settingsDirectory.resolve("version-" + Designer.getCurrentVersion());
+        Path curVersionStamp = settingsDirectory.resolve("version-" + DesignerVersion.getCurrentVersion());
 
 
         List<Path> diskVersionStamps = getDiskVersionStamps();
@@ -62,7 +62,7 @@ public class GlobalDiskManagerImpl implements GlobalDiskManager, ApplicationComp
                         .filter(it -> !Files.isDirectory(it))
                         .filter(it -> it.getFileName().toString().startsWith(STAMP_PREFIX))
                         .collect(Collectors.toList());
-        } catch (IOException e) {
+        } catch (IOException ignored) {
             return Collections.emptyList();
         }
     }

@@ -95,6 +95,11 @@ buildNumber.properties
 
 # End of https://www.gitignore.io/api/intellij,maven
 
+### Eclipse ###
+.project
+.settings
+.classpath
+
 .idea/*
 # Share run configurations for easier setup
 !/.idea/runConfigurations/
