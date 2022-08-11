@@ -69,7 +69,7 @@ public final class SettingsPersistenceUtil {
                                                              return null;
                                                          });
         Serializer<Properties> propertiesSerializer =
-            SerializerRegistrar.getInstance().getSerializer(new TypeLiteral<Map<String, String>>() {})
+            SerializerRegistrar.getInstance().getSerializer(new TypeLiteral<Map<String, String>>() { })
                                .map(
                                    m -> {
                                        Properties p = new Properties();

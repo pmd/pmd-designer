@@ -8,6 +8,13 @@
       <writeAnnotation name="javafx.fxml.FXML" />
     </writeAnnotations>
   </component>
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/pom.xml" />
+      </list>
+    </option>
+  </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="org.checkerframework.checker.nullness.qual.Nullable" />
     <option name="myDefaultNotNull" value="org.checkerframework.checker.nullness.qual.NonNull" />

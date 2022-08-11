@@ -29,10 +29,12 @@ public interface ASTManager extends ApplicationComponent, SettingsOwner {
 
 
     SuspendableVar<String> sourceCodeProperty();
+
     SuspendableVar<TextDocument> sourceDocumentProperty();
 
 
     String getSourceCode();
+
     TextDocument getSourceDocument();
 
 
