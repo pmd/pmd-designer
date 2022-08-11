@@ -12,12 +12,12 @@ import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.lang.document.TextRegion;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
 import javafx.beans.NamedArg;
@@ -108,9 +108,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
         view.setEditable(true);
 
         DragAndDropUtil.registerAsNodeDragTarget(view, textRange -> {
-            LiveViolationRecord record = new LiveViolationRecord();
-            record.setRange(textRange);
-            record.setExactRange(true);
+            LiveViolationRecord record = new LiveViolationRecord(textRange, null);
             getItems().add(record);
         }, getDesignerRoot());
 
@@ -173,8 +171,7 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
 
-            TextRange range = violation.getRange();
-            Label lineLabel = new Label(range == null ? "(no line)" : "(L. " + range.startPos.line + ")");
+            Label lineLabel = new Label(getLabel(violation));
             lineLabel.getStyleClass().addAll("line-label");
 
             Label messageLabel = new Label();
@@ -204,6 +201,18 @@ public class ViolationCollectionView extends VBox implements ApplicationComponen
 
             return new Pair<>(hBox, Subscription.EMPTY);
 
+        }
+
+
+        private String getLabel(LiveViolationRecord violation) {
+            TextRegion range = violation.getRegion();
+            if (range == null) {
+                if (violation.getLine() > 0) {
+                    return "(L." + violation.getLine() + ")";
+                }
+                return "(no line)";
+            }
+            return "(at " + range.getStartOffset() + "-" + range.getEndOffset() + ")";
         }
 
     }

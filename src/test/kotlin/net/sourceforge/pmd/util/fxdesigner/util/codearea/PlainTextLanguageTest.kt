@@ -8,15 +8,16 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import net.sourceforge.pmd.lang.ast.FileAnalysisException
 import net.sourceforge.pmd.lang.ast.Parser
 import net.sourceforge.pmd.lang.ast.SemanticErrorReporter
+import net.sourceforge.pmd.lang.ast.test.IntelliMarker
 import net.sourceforge.pmd.lang.ast.test.matchNode
+import net.sourceforge.pmd.lang.document.TextDocument
+import net.sourceforge.pmd.lang.document.TextRange2d
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry
 import net.sourceforge.pmd.util.fxdesigner.util.PlainTextLanguage.PlainTextFile
-import java.io.StringReader
 
-class PlainTextLanguageTest : FunSpec({
+class PlainTextLanguageTest : IntelliMarker, FunSpec({
 
     test("Test plain text lang is here") {
         AuxLanguageRegistry.plainTextLanguage() shouldNotBe null
@@ -24,30 +25,28 @@ class PlainTextLanguageTest : FunSpec({
 
     test("Test plain text language parsing") {
 
-        val string = "ohahaha"
+        val string = "oha"
 
         string.parse() should matchNode<PlainTextFile> {
-            it.beginLine shouldBe 1
-            it.endLine shouldBe 1
-            it.beginColumn shouldBe 1
-            it.endColumn shouldBe string.length
+            it.reportLocation.toRange2d() shouldBe TextRange2d.range2d(
+                1, 1, 1, string.length + 1
+            )
         }
     }
 
-    test("Test plain text language lines") {
-
+    test("Test plain text language lines (LF)") {
         "abc\nabcd".parse() should matchNode<PlainTextFile> {
-            it.beginLine shouldBe 1
-            it.endLine shouldBe 2
-            it.beginColumn shouldBe 1
-            it.endColumn shouldBe 4
+            it.reportLocation.toRange2d() shouldBe TextRange2d.range2d(
+                1, 1, 2, 5
+            )
         }
+    }
 
+    test("Test plain text language lines (CRLF)") {
         "abc\r\nabcd".parse() should matchNode<PlainTextFile> {
-            it.beginLine shouldBe 1
-            it.endLine shouldBe 2
-            it.beginColumn shouldBe 1
-            it.endColumn shouldBe 4
+            it.reportLocation.toRange2d() shouldBe TextRange2d.range2d(
+                1, 1, 2, 5
+            )
         }
     }
 
@@ -59,6 +58,7 @@ private fun String.parse(): PlainTextFile {
     lang.defaultVersion shouldNotBe null
 
     val parser = lang.defaultVersion.languageVersionHandler.parser
-    val task = Parser.ParserTask(lang.defaultVersion, FileAnalysisException.NO_FILE_NAME, this, SemanticErrorReporter.noop())
+    val doc = TextDocument.readOnlyString(this, lang.defaultVersion)
+    val task = Parser.ParserTask(doc, SemanticErrorReporter.noop())
     return parser.parse(task) as PlainTextFile
 }

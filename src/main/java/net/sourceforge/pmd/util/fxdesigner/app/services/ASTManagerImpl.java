@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -26,6 +25,7 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.ast.Parser.ParserTask;
 import net.sourceforge.pmd.lang.ast.RootNode;
 import net.sourceforge.pmd.lang.ast.SemanticErrorReporter;
+import net.sourceforge.pmd.lang.document.TextDocument;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -58,11 +58,12 @@ public class ASTManagerImpl implements ASTManager {
     /**
      * Last valid source that was compiled, corresponds to {@link #compilationUnit}.
      */
-    private SuspendableVar<String> sourceCode = Var.newSimpleVar("").suspendable();
+    private final SuspendableVar<String> sourceCode = Var.newSimpleVar("").suspendable();
+    private final SuspendableVar<TextDocument> sourceDocument = Var.newSimpleVar(TextDocument.readOnlyString("", languageVersion.getValue())).suspendable();
 
-    private Var<ParseAbortedException> currentException = Var.newSimpleVar(null);
+    private final Var<ParseAbortedException> currentException = Var.newSimpleVar(null);
 
-    private Var<Map<String, String>> ruleProperties = Var.newSimpleVar(Collections.emptyMap());
+    private final Var<Map<String, String>> ruleProperties = Var.newSimpleVar(Collections.emptyMap());
 
     public ASTManagerImpl(DesignerRoot owner) {
         this.designerRoot = owner;
@@ -105,13 +106,21 @@ public class ASTManagerImpl implements ASTManager {
                   });
     }
 
-    public ASTManagerImpl(ASTManagerImpl base, Function<LanguageVersion, LanguageVersion> languageVersionMap) {
-        this(base.getDesignerRoot());
 
-        languageVersionProperty().bind(base.languageVersionProperty().map(languageVersionMap));
-        sourceCode.bind(base.sourceCodeProperty());
-        classLoaderProperty().bind(base.classLoaderProperty());
+    @Override
+    public TextDocument getSourceDocument() {
+        return sourceDocument.getValue();
+    }
 
+
+    @Override
+    public SuspendableVar<TextDocument> sourceDocumentProperty() {
+        return sourceDocument;
+    }
+
+
+    public void setSourceDocument(TextDocument sourceDocument) {
+        this.sourceDocument.setValue(sourceDocument);
     }
 
 
@@ -187,12 +196,11 @@ public class ASTManagerImpl implements ASTManager {
                                              LanguageVersion version,
                                              ClassLoader classLoader) throws ParseAbortedException {
 
-        LanguageVersionHandler handler = version.getLanguageVersionHandler();
         String dummyFilePath = "dummy." + version.getLanguage().getExtensions().get(0);
+        TextDocument textDocument = TextDocument.readOnlyString(source, dummyFilePath, version);
+        LanguageVersionHandler handler = version.getLanguageVersionHandler();
         ParserTask task = new ParserTask(
-            version,
-            dummyFilePath,
-            source,
+            textDocument,
             SemanticErrorReporter.noop(),
             classLoader
         );

@@ -34,11 +34,11 @@ import org.xml.sax.SAXException;
 import net.sourceforge.pmd.RulePriority;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.lang.document.TextRegion;
 import net.sourceforge.pmd.properties.PropertyTypeId;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.Serializer;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.SerializerRegistrar;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
 
 /**
@@ -56,7 +56,18 @@ public final class SettingsPersistenceUtil {
         SerializerRegistrar.getInstance().registerMapped(PropertyTypeId.class, String.class, PropertyTypeId::getStringId, PropertyTypeId::lookupMnemonic);
         SerializerRegistrar.getInstance().registerMapped(LanguageVersion.class, String.class, LanguageVersion::getTerseName, AuxLanguageRegistry::findLanguageVersionByTerseName);
         SerializerRegistrar.getInstance().registerMapped(Language.class, String.class, Language::getTerseName, AuxLanguageRegistry::findLanguageByTerseName);
-        SerializerRegistrar.getInstance().registerMapped(TextRange.class, String.class, TextRange::toString, TextRange::fromString);
+        SerializerRegistrar.getInstance().registerMapped(TextRegion.class, String.class,
+                                                         region -> region.getStartOffset() + "-"
+                                                             + region.getEndOffset(),
+                                                         str -> {
+                                                             String[] split = str.split("-");
+                                                             if (split.length > 0) {
+                                                                 int startOffSet = parseInt(split[0], 0);
+                                                                 int endOffSet = parseInt(split[1], 0);
+                                                                 return TextRegion.fromBothOffsets(startOffSet, endOffSet);
+                                                             }
+                                                             return null;
+                                                         });
         Serializer<Properties> propertiesSerializer =
             SerializerRegistrar.getInstance().getSerializer(new TypeLiteral<Map<String, String>>() { })
                                .map(
@@ -71,6 +82,15 @@ public final class SettingsPersistenceUtil {
                                        return m;
                                    });
         SerializerRegistrar.getInstance().register(propertiesSerializer, Properties.class);
+    }
+
+
+    private static int parseInt(String str, int defaultValue) {
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException nf) {
+            return defaultValue;
+        }
     }
 
 

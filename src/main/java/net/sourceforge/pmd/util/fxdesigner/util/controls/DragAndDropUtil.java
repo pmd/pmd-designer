@@ -9,8 +9,8 @@ import java.util.function.Consumer;
 import org.reactfx.Subscription;
 
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.lang.document.TextRegion;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
 import javafx.css.PseudoClass;
 import javafx.scene.input.ClipboardContent;
@@ -21,7 +21,7 @@ import javafx.scene.input.TransferMode;
 public final class DragAndDropUtil {
 
     // since dragboard contents must be Serializable we
-    // put a TextRange in the dragboard and not a Node
+    // put a TextRegion in the dragboard and not a Node
 
     /** Style class for {@linkplain #registerAsNodeDragTarget(javafx.scene.Node, Consumer, DesignerRoot) node drag over.} */
     public static final String NODE_DRAG_OVER = "node-drag-over";
@@ -41,7 +41,7 @@ public final class DragAndDropUtil {
             // drag and drop
             Dragboard db = source.startDragAndDrop(TransferMode.LINK);
             ClipboardContent content = new ClipboardContent();
-            content.put(NODE_RANGE_DATA_FORMAT, TextRange.fullLine(data.getBeginLine(), 10000));
+            content.put(NODE_RANGE_DATA_FORMAT, data.getTextRegion());
             db.setContent(content);
             root.getService(DesignerRoot.IS_NODE_BEING_DRAGGED).setValue(true);
             evt.consume();
@@ -56,6 +56,7 @@ public final class DragAndDropUtil {
         return () -> source.setOnDragDetected(null);
     }
 
+
     /**
      * Registers a {@link javafx.scene.Node} as the target of a drag and
      * drop initiated by {@link #registerAsNodeDragSource(javafx.scene.Node, Node, DesignerRoot)}.
@@ -66,7 +67,7 @@ public final class DragAndDropUtil {
      * @param nodeRangeConsumer Action to run with the {@link Dragboard} contents on success
      * @param root
      */
-    public static void registerAsNodeDragTarget(javafx.scene.Node target, Consumer<TextRange> nodeRangeConsumer, DesignerRoot root) {
+    public static void registerAsNodeDragTarget(javafx.scene.Node target, Consumer<TextRegion> nodeRangeConsumer, DesignerRoot root) {
 
         root.getService(DesignerRoot.IS_NODE_BEING_DRAGGED)
             .values()
@@ -101,7 +102,7 @@ public final class DragAndDropUtil {
 
             Dragboard db = evt.getDragboard();
             if (db.hasContent(NODE_RANGE_DATA_FORMAT)) {
-                TextRange content = (TextRange) db.getContent(NODE_RANGE_DATA_FORMAT);
+                TextRegion content = (TextRegion) db.getContent(NODE_RANGE_DATA_FORMAT);
                 nodeRangeConsumer.accept(content);
                 success = true;
             }
