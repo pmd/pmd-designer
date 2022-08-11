@@ -6,8 +6,11 @@ package net.sourceforge.pmd.util.fxdesigner;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.lang3.SystemUtils;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+
 import javafx.application.Application;
 
 /**
@@ -68,7 +71,16 @@ public final class DesignerStarter {
 
         readParameters(args);
 
+        setSystemProperties();
         launchGui(args);
+    }
+
+    private static void setSystemProperties() {
+        if (SystemUtils.IS_OS_LINUX) {
+            // On Linux, JavaFX renders text poorly by default. These settings help to aleviate the problems.
+            System.setProperty("prism.text", "t2k");
+            System.setProperty("prism.lcdtext", "true");
+        }
     }
 
     private static String getHelpText(JCommander jCommander) {
