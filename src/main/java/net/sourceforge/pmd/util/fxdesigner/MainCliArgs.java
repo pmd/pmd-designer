@@ -6,10 +6,11 @@ package net.sourceforge.pmd.util.fxdesigner;
 
 import com.beust.jcommander.Parameter;
 
+@Deprecated
 final class MainCliArgs {
 
 
-    @Parameter(names = {"--verbose", "-v"},
+    @Parameter(names = {"--verbose", "-v", "-D", "--debug"},
                arity = 0,
                description = "Whether to launch the app in verbose mode. "
                    + "This enables logging of exception stack traces and "

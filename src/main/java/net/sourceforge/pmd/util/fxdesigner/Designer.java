@@ -5,23 +5,18 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import net.sourceforge.pmd.PMDVersion;
 import net.sourceforge.pmd.lang.ast.xpath.Attribute;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerParams;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -40,44 +35,6 @@ import javafx.stage.Stage;
  * @since 6.0.0
  */
 public class Designer extends Application {
-
-    /**
-     * Constant that contains always the current version of the designer.
-     */
-    private static final String VERSION;
-    private static final String PMD_CORE_MIN_VERSION;
-    private static final String UNKNOWN_VERSION = "unknown";
-
-
-    /**
-     * Determines the version from maven's generated pom.properties file.
-     */
-    static {
-        VERSION = readProperty("/META-INF/maven/net.sourceforge.pmd/pmd-ui/pom.properties", "version").orElse(UNKNOWN_VERSION);
-        PMD_CORE_MIN_VERSION = readProperty(ResourceUtil.resolveResource("designer.properties"), "pmd.core.version").orElse(UNKNOWN_VERSION);
-    }
-
-
-    public static String getCurrentVersion() {
-        return VERSION;
-    }
-
-    public static String getPmdCoreMinVersion() {
-        return PMD_CORE_MIN_VERSION;
-    }
-
-    private static Optional<String> readProperty(String resourcePath, String key) {
-        try (InputStream stream = PMDVersion.class.getResourceAsStream(resourcePath)) {
-            if (stream != null) {
-                final Properties properties = new Properties();
-                properties.load(stream);
-                return Optional.ofNullable(properties.getProperty(key));
-            }
-        } catch (final IOException ignored) {
-            // fallthrough
-        }
-        return Optional.empty();
-    }
 
     private long initStartTimeMillis;
     private DesignerRoot designerRoot;
@@ -101,7 +58,7 @@ public class Designer extends Application {
     public void start(Stage stage, DesignerRoot owner) throws IOException {
         this.designerRoot = owner;
 
-        stage.setTitle("PMD Rule Designer (v " + Designer.VERSION + ')');
+        stage.setTitle("PMD Rule Designer (v " + DesignerVersion.getCurrentVersion() + ')');
         setIcons(stage);
 
         Logger.getLogger(Attribute.class.getName()).setLevel(Level.OFF);

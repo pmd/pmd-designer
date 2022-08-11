@@ -42,7 +42,7 @@ public final class DesignerParams {
     public DesignerParams(Parameters params) {
         List<String> raw = params.getRaw();
         // error output is disabled by default
-        if (raw.contains("-v") || raw.contains("--verbose")) {
+        if (raw.contains("-v") || raw.contains("--verbose") || raw.contains("--debug") || raw.contains("-D")) {
             isDeveloperMode = true;
         }
 

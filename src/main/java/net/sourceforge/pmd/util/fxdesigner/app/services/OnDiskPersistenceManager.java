@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
-import net.sourceforge.pmd.util.fxdesigner.Designer;
+import net.sourceforge.pmd.util.fxdesigner.DesignerVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil;
@@ -85,7 +85,7 @@ public class OnDiskPersistenceManager implements PersistenceManager {
         process.start().waitFor();
         process.command("git", "add", output.toString());
         process.start().waitFor();
-        process.command("git", "commit", "-m", "\"On version " + Designer.getCurrentVersion() + "\"");
+        process.command("git", "commit", "-m", "\"On version " + DesignerVersion.getCurrentVersion() + "\"");
         process.start().waitFor();
 
     }
