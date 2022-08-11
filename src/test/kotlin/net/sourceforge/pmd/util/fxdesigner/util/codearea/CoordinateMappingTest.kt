@@ -9,6 +9,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.assertions.throwables.shouldThrow
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.*
 import org.fxmisc.richtext.CodeArea
+import javafx.application.Platform
 
 class CoordinateMappingTest : FunSpec({
 
@@ -17,6 +18,11 @@ class CoordinateMappingTest : FunSpec({
 
     fun CodeArea.fromPmd(line: Int, column: Int): Int =
             getOffsetFromPmdPosition(this, line, column)
+
+    beforeSpec() {
+        // Ensure the platform is initialized to avoid NPEs
+        Platform.startup({ });
+    }
 
     test("Map normal text") {
 
