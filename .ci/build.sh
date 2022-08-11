@@ -20,8 +20,7 @@ function build() {
 
     if pmd_ci_utils_is_fork_or_pull_request; then
         pmd_ci_log_group_start "Build with mvnw"
-            Xvfb :99
-            DISPLAY=:99 ./mvnw clean verify --activate-profiles shading --show-version --errors --batch-mode --no-transfer-progress
+            ./mvnw clean verify --activate-profiles shading --show-version --errors --batch-mode --no-transfer-progress
         pmd_ci_log_group_end
         exit 0
     fi
