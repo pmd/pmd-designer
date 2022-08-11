@@ -7,14 +7,12 @@ package net.sourceforge.pmd.util.fxdesigner;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
 import javax.swing.JOptionPane;
 
 import org.apache.commons.lang3.SystemUtils;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-
 import javafx.application.Application;
 
 /**
