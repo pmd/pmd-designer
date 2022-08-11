@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -107,21 +106,14 @@ public class ASTManagerImpl implements ASTManager {
                   });
     }
 
-    public ASTManagerImpl(ASTManagerImpl base, Function<LanguageVersion, LanguageVersion> languageVersionMap) {
-        this(base.getDesignerRoot());
 
-        languageVersionProperty().bind(base.languageVersionProperty().map(languageVersionMap));
-        sourceCode.bind(base.sourceCodeProperty());
-        classLoaderProperty().bind(base.classLoaderProperty());
-
-    }
-
-
+    @Override
     public TextDocument getSourceDocument() {
         return sourceDocument.getValue();
     }
 
 
+    @Override
     public SuspendableVar<TextDocument> sourceDocumentProperty() {
         return sourceDocument;
     }
