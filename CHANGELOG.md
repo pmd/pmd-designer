@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## 6.49.0
 
 **Fixed issues:**
 
