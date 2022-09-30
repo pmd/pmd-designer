@@ -119,7 +119,7 @@ public final class AuxLanguageRegistry {
 
     @NonNull
     public static Stream<Language> getSupportedLanguages() {
-        return Stream.concat(Stream.of(PlainTextLanguage.INSTANCE), LanguageRegistry.getLanguages().stream());
+        return Stream.concat(Stream.of(PlainTextLanguage.INSTANCE), LanguageRegistry.PMD.getLanguages().stream());
     }
 
     @NonNull
