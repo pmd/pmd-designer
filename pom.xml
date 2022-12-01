@@ -57,8 +57,9 @@
         <pmd.core.version>7.0.0-SNAPSHOT</pmd.core.version>
         <openjfx.version>11.0.2</openjfx.version>
         <java.version>8</java.version>
-        <kotlin.version>1.7.0</kotlin.version>
-        <kotest.version>4.4.3</kotest.version>
+        <kotlin.version>1.7.20</kotlin.version>
+        <kotest.version>5.5.4</kotest.version>
+        <junit5.version>5.8.2</junit5.version> <!-- needed by kotest -->
 
         <!-- Those have different values based on the profile -->
         <openjfx.scope>provided</openjfx.scope>
@@ -66,7 +67,7 @@
 
         <local.lib.repo>${project.basedir}/lib/mvn-repo</local.lib.repo>
 
-        <surefire.version>3.0.0-M5</surefire.version>
+        <surefire.version>3.0.0-M7</surefire.version>
         <checkstyle.version>10.3.3</checkstyle.version>
         <checkstyle.plugin.version>3.2.0</checkstyle.plugin.version>
         <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
@@ -166,7 +167,7 @@
                     <dependency>
                         <groupId>org.junit.vintage</groupId>
                         <artifactId>junit-vintage-engine</artifactId>
-                        <version>5.6.2</version>
+                        <version>${junit5.version}</version>
                     </dependency>
                     <!-- Junit5 Platform Engine for Kotlin Tests -->
                     <dependency>
@@ -438,6 +439,44 @@
         </pluginRepository>
     </pluginRepositories>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- ensure kotlin version, since version from pmd-lang-test (pmd.core.version) might be older -->
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib-common</artifactId>
+                <version>${kotlin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib</artifactId>
+                <version>${kotlin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-reflect</artifactId>
+                <version>${kotlin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib-jdk8</artifactId>
+                <version>${kotlin.version}</version>
+            </dependency>
+
+            <!-- ensure kotest version, since version from pmd-lang-test (pmd.core.version) might be older -->
+            <dependency>
+                <groupId>io.kotest</groupId>
+                <artifactId>kotest-runner-junit5-jvm</artifactId>
+                <version>${kotest.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.kotest</groupId>
+                <artifactId>kotest-assertions-core-jvm</artifactId>
+                <version>${kotest.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- OpenJFX dependencies are provided. OpenJFX needs to be installed separately. -->
         <dependency>
@@ -656,7 +695,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.6.0</version>
+            <version>${junit5.version}</version>
             <scope>test</scope>
         </dependency>
 
