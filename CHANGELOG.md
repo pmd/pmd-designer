@@ -1,12 +1,21 @@
 # Changelog
 
-## Next
+## 6.49.0
+
+**Fixed issues:**
+
+* [#10](https://github.com/pmd/pmd-designer/issues/10) [ui] Designer font display
+
+**Merged pull requests:**
+
+* [#52](https://github.com/pmd/pmd-designer/pull/52) Better expose entry points for pmd-cli integration by [@jsotuyod](https://github.com/jsotuyod)
+* [#53](https://github.com/pmd/pmd-designer/pull/53) Resolve text rendering issues across different platforms by [@jsotuyod](https://github.com/jsotuyod)
 
 See https://github.com/pmd/pmd-designer/milestone/14
 
 ## 6.37.0
 
-* [#50](https://github.com/pmd/pmd-designer/pull/50) Usability improvements by [Juan](https://github.com/jsotuyod)
+* [#50](https://github.com/pmd/pmd-designer/pull/50) Usability improvements by [@jsotuyod](https://github.com/jsotuyod)
 
 * **Bump required pmd-core version to 6.27.0.** The previous minimal pmd-core version was 6.23.0.
 

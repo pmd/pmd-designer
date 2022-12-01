@@ -36,6 +36,22 @@ import javafx.stage.Stage;
  */
 public class Designer extends Application {
 
+    /**
+     * @deprecated Use {@code DesignerVersion.getCurrentVersion()} instead.
+     */
+    @Deprecated
+    public static String getCurrentVersion() {
+        return DesignerVersion.getCurrentVersion();
+    }
+    
+    /**
+     * @deprecated Use {@code DesignerVersion.getPmdCoreMinVersion()} instead.
+     */
+    @Deprecated
+    public static String getPmdCoreMinVersion() {
+        return DesignerVersion.getPmdCoreMinVersion();
+    }
+    
     private long initStartTimeMillis;
     private DesignerRoot designerRoot;
 
