@@ -67,19 +67,19 @@
 
         <local.lib.repo>${project.basedir}/lib/mvn-repo</local.lib.repo>
 
-        <surefire.version>3.0.0-M7</surefire.version>
-        <checkstyle.version>10.3.3</checkstyle.version>
-        <checkstyle.plugin.version>3.2.0</checkstyle.plugin.version>
-        <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
-        <source.plugin.version>3.0.1</source.plugin.version>
-        <jar.plugin.version>3.1.0</jar.plugin.version>
+        <surefire.version>3.0.0-M8</surefire.version>
+        <checkstyle.version>10.6.0</checkstyle.version>
+        <checkstyle.plugin.version>3.2.1</checkstyle.plugin.version>
+        <javadoc.plugin.version>3.4.1</javadoc.plugin.version>
+        <source.plugin.version>3.2.1</source.plugin.version>
+        <jar.plugin.version>3.3.0</jar.plugin.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <pmd.build-tools.version>19</pmd.build-tools.version>
-        <pmd.plugin.version>3.19.0</pmd.plugin.version>
-        <pmd.check.version>6.52.0</pmd.check.version>
+        <pmd.plugin.version>3.20.0</pmd.plugin.version>
+        <pmd.check.version>6.53.0</pmd.check.version>
 
         <jflex-output>${project.build.directory}/generated-sources/jflex</jflex-output>
 
@@ -104,7 +104,7 @@
             <plugin>
                 <groupId>de.jflex</groupId>
                 <artifactId>jflex-maven-plugin</artifactId>
-                <version>1.7.0</version>
+                <version>1.8.2</version>
                 <executions>
                     <execution>
                         <id>lexer-gen</id>
@@ -146,7 +146,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.10.1</version>
                 <configuration>
                     <release>${java.version}</release>
                     <useIncrementalCompilation>false</useIncrementalCompilation>
@@ -158,7 +158,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
-                    <forkMode>once</forkMode>
                     <runOrder>alphabetical</runOrder>
                 </configuration>
 
@@ -181,7 +180,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>add-generated-sources</id>
@@ -362,7 +361,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>1.1.0</version>
                 <executions>
                     <execution>
                         <phase>generate-resources</phase>
@@ -381,7 +380,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.8</version>
+                <version>1.6.13</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
@@ -395,7 +394,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>3.0.0-M7</version>
                 <configuration>
                     <releaseProfiles>shading,sign</releaseProfiles>
                     <pushChanges>true</pushChanges>
@@ -742,7 +741,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
-                        <version>3.2.1</version>
+                        <version>3.4.1</version>
                         <configuration>
 
                             <!-- We can't just use an artifactSet/excludes to exclude pmd dependencies -->
@@ -859,7 +858,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -867,14 +866,6 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
-                                <configuration>
-                                    <!-- https://issues.apache.org/jira/browse/MGPG-59 - once m-gpg-p 1.7. is released,
-                                         this should not be needed anymore -->
-                                    <gpgArguments>
-                                        <arg>--pinentry-mode</arg>
-                                        <arg>loopback</arg>
-                                    </gpgArguments>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -890,7 +881,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-                        <version>3.0.0</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <goals>
