@@ -67,7 +67,7 @@
 
         <local.lib.repo>${project.basedir}/lib/mvn-repo</local.lib.repo>
 
-        <surefire.version>3.0.0-M7</surefire.version>
+        <surefire.version>3.0.0-M8</surefire.version>
         <checkstyle.version>10.3.3</checkstyle.version>
         <checkstyle.plugin.version>3.2.0</checkstyle.plugin.version>
         <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
@@ -158,7 +158,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
-                    <forkMode>once</forkMode>
                     <runOrder>alphabetical</runOrder>
                 </configuration>
 
