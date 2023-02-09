@@ -29,10 +29,10 @@ import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.internal.util.ClasspathClassLoader; // NOPMD
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.util.ClasspathClassLoader;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
