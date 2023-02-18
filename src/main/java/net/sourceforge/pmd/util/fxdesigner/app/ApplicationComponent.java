@@ -10,8 +10,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.reactfx.value.Val;
 
 import net.sourceforge.pmd.lang.Language;
-import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.lang.LanguageVersionHandler;
 import net.sourceforge.pmd.util.designerbindings.DesignerBindings;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.services.AppServiceDescriptor;
@@ -50,11 +48,6 @@ public interface ApplicationComponent {
     }
 
 
-    default LanguageVersion getGlobalLanguageVersion() {
-        return getService(DesignerRoot.AST_MANAGER).languageVersionProperty().getValue();
-    }
-
-
     /**
      * The language is now global to the app.
      */
@@ -65,9 +58,8 @@ public interface ApplicationComponent {
 
     default Val<DesignerBindings> languageBindingsProperty() {
         return getService(DesignerRoot.AST_MANAGER)
-            .languageVersionProperty()
-            .map(LanguageVersion::getLanguageVersionHandler)
-            .map(LanguageVersionHandler::getDesignerBindings);
+            .languageProcessorProperty()
+            .map(lp -> lp.services().getDesignerBindings());
     }
 
 

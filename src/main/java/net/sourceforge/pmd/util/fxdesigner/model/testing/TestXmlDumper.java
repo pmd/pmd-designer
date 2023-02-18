@@ -35,8 +35,8 @@ import org.xml.sax.SAXParseException;
 
 import net.sourceforge.pmd.lang.document.TextDocument;
 import net.sourceforge.pmd.lang.document.TextRegion;
+import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.PlainTextLanguage;
 
 public class TestXmlDumper {
 
@@ -100,7 +100,7 @@ public class TestXmlDumper {
             Element linenos = doc.createElementNS(NS, "expected-linenumbers");
 
             // create a text doc just to ask for line numbers
-            TextDocument textDocument = TextDocument.readOnlyString(descriptor.getSource(), PlainTextLanguage.INSTANCE.getDefaultVersion());
+            TextDocument textDocument = TextDocument.readOnlyString(descriptor.getSource(), AuxLanguageRegistry.plainTextLanguage().getDefaultVersion());
 
             String joined = expectedViolations
                 .stream()

@@ -38,7 +38,6 @@ import net.sourceforge.pmd.util.StringUtil;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.PlainTextLanguage;
 
 public class TestXmlParser {
 
@@ -188,7 +187,7 @@ public class TestXmlParser {
         // create a document just to map source lines to regions
         // language is irrelevant so we use plain text
         @SuppressWarnings("PMD.CloseResource")
-        TextDocument doc = TextDocument.readOnlyString(code, PlainTextLanguage.INSTANCE.getDefaultVersion());
+        TextDocument doc = TextDocument.readOnlyString(code, AuxLanguageRegistry.plainTextLanguage().getDefaultVersion());
 
         for (int i = 0; i < expectedProblems; i++) {
             String m = messages.size() > i ? messages.get(i) : null;

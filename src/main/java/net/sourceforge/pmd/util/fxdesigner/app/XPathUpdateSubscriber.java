@@ -57,7 +57,6 @@ public abstract class XPathUpdateSubscriber implements ApplicationComponent {
 
                 try {
                     List<Node> results = XPathEvaluator.evaluateQuery(compil,
-                                                                      astManager.languageVersionProperty().getValue(),
                                                                       query.getVersion(),
                                                                       query.getExpression(),
                                                                       props,

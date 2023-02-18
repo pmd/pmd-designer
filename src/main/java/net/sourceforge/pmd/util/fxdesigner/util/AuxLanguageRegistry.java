@@ -4,6 +4,9 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util;
 
+import static net.sourceforge.pmd.util.CollectionUtil.setOf;
+import static net.sourceforge.pmd.util.CollectionUtil.union;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +20,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.lang.PlainTextLanguage;
 
 /**
  * Utilities to extend the functionality of {@link LanguageRegistry}.
@@ -26,12 +30,21 @@ import net.sourceforge.pmd.lang.LanguageVersion;
 public final class AuxLanguageRegistry {
 
     private static final String DEFAULT_LANGUAGE_NAME = "Java";
+    public static final LanguageRegistry AUX_LANG_REGISTRY = new LanguageRegistry(union(LanguageRegistry.PMD.getLanguages(),
+                                                                                        setOf(plainTextLanguage())));
     private static List<LanguageVersion> supportedLanguageVersions;
     private static Map<String, LanguageVersion> extensionsToLanguage;
+
 
     private AuxLanguageRegistry() {
 
     }
+
+
+    public static LanguageRegistry supportedLangs() {
+        return AUX_LANG_REGISTRY;
+    }
+
 
     public static LanguageVersion findLanguageVersionByTerseName(String string) {
         String[] split = string.split(" ");
@@ -63,7 +76,7 @@ public final class AuxLanguageRegistry {
     }
 
     public static Language plainTextLanguage() {
-        return PlainTextLanguage.INSTANCE;
+        return PlainTextLanguage.getInstance();
     }
 
     @NonNull
@@ -119,7 +132,7 @@ public final class AuxLanguageRegistry {
 
     @NonNull
     public static Stream<Language> getSupportedLanguages() {
-        return Stream.concat(Stream.of(PlainTextLanguage.INSTANCE), LanguageRegistry.PMD.getLanguages().stream());
+        return AUX_LANG_REGISTRY.getLanguages().stream();
     }
 
     @NonNull
@@ -131,9 +144,7 @@ public final class AuxLanguageRegistry {
 
     @Nullable
     public static Language findLanguageByName(String n) {
-        return getSupportedLanguages().filter(it -> it.getName().equals(n))
-                                      .findFirst()
-                                      .orElse(null);
+        return AUX_LANG_REGISTRY.getLanguageByFullName(n);
     }
 
     @NonNull
@@ -144,9 +155,7 @@ public final class AuxLanguageRegistry {
 
     @Nullable
     public static Language findLanguageByTerseName(String name) {
-        return getSupportedLanguages().filter(it -> it.getTerseName().equals(name))
-                                      .findFirst()
-                                      .orElse(null);
+        return AUX_LANG_REGISTRY.getLanguageById(name);
     }
 
 }
