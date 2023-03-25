@@ -8,6 +8,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import net.sourceforge.pmd.lang.LanguageProcessorRegistry
+import net.sourceforge.pmd.lang.PlainTextLanguage.PlainTextFile
 import net.sourceforge.pmd.lang.ast.Parser
 import net.sourceforge.pmd.lang.ast.SemanticErrorReporter
 import net.sourceforge.pmd.lang.ast.test.IntelliMarker
@@ -15,7 +17,6 @@ import net.sourceforge.pmd.lang.ast.test.matchNode
 import net.sourceforge.pmd.lang.document.TextDocument
 import net.sourceforge.pmd.lang.document.TextRange2d
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry
-import net.sourceforge.pmd.util.fxdesigner.util.PlainTextLanguage.PlainTextFile
 
 class PlainTextLanguageTest : IntelliMarker, FunSpec({
 
@@ -57,8 +58,13 @@ private fun String.parse(): PlainTextFile {
 
     lang.defaultVersion shouldNotBe null
 
-    val parser = lang.defaultVersion.languageVersionHandler.parser
+    val processor = lang.createProcessor(lang.newPropertyBundle())
+    val parser = processor.services().parser
     val doc = TextDocument.readOnlyString(this, lang.defaultVersion)
-    val task = Parser.ParserTask(doc, SemanticErrorReporter.noop())
+    val task = Parser.ParserTask(
+        doc,
+        SemanticErrorReporter.noop(),
+        LanguageProcessorRegistry.singleton(processor)
+    )
     return parser.parse(task) as PlainTextFile
 }

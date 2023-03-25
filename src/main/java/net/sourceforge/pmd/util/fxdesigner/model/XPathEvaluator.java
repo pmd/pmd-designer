@@ -14,13 +14,11 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.rule.xpath.XPathVersion;
 import net.sourceforge.pmd.lang.rule.xpath.internal.DeprecatedAttrLogger; // NOPMD
 import net.sourceforge.pmd.lang.rule.xpath.internal.SaxonXPathRuleQuery; // NOPMD
 import net.sourceforge.pmd.properties.PropertyDescriptor;
-import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 
 
@@ -44,14 +42,12 @@ public final class XPathEvaluator {
      * @return The results, or an empty list if there was an error
      */
     public static List<Node> simpleEvaluate(DesignerRoot root, String query) {
-        ApplicationComponent component = () -> root;
         return root.getService(DesignerRoot.AST_MANAGER)
                    .compilationUnitProperty()
                    .getOpt()
                    .map(n -> {
                        try {
                            return evaluateQuery(n,
-                                                component.getGlobalLanguageVersion(),
                                                 XPathVersion.DEFAULT,
                                                 query,
                                                 emptyMap(),
@@ -69,7 +65,6 @@ public final class XPathEvaluator {
      * no side effects.
      *
      * @param compilationUnit AST root
-     * @param languageVersion language version
      * @param xpathVersion    XPath version
      * @param xpathQuery      XPath query
      * @param properties      Properties of the rule
@@ -77,7 +72,6 @@ public final class XPathEvaluator {
      * @throws XPathEvaluationException if there was an error during the evaluation. The cause is preserved
      */
     public static List<Node> evaluateQuery(Node compilationUnit,
-                                           LanguageVersion languageVersion,
                                            XPathVersion xpathVersion,
                                            String xpathQuery,
                                            Map<String, String> propertyValues,
@@ -99,7 +93,7 @@ public final class XPathEvaluator {
                     xpathQuery,
                     xpathVersion,
                     allProperties,
-                    languageVersion.getLanguageVersionHandler().getXPathHandler(),
+                    compilationUnit.getAstInfo().getLanguageProcessor().services().getXPathHandler(),
                     DeprecatedAttrLogger.noop()
                 );
 

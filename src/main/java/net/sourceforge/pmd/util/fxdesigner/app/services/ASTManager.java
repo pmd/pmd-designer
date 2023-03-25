@@ -10,6 +10,7 @@ import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.lang.LanguageProcessor;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.document.TextDocument;
@@ -42,6 +43,8 @@ public interface ASTManager extends ApplicationComponent, SettingsOwner {
 
 
     Val<LanguageVersion> languageVersionProperty();
+
+    Val<LanguageProcessor> languageProcessorProperty();
 
 
     Val<Node> compilationUnitProperty();

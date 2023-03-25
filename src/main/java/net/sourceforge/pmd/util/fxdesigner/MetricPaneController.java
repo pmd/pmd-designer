@@ -84,7 +84,7 @@ public class MetricPaneController extends AbstractController implements NodeSele
 
 
     private ObservableList<MetricResult<?>> evaluateAllMetrics(Node n) {
-        LanguageMetricsProvider provider = getGlobalLanguageVersion().getLanguageVersionHandler().getLanguageMetricsProvider();
+        LanguageMetricsProvider provider = n.getAstInfo().getLanguageProcessor().services().getLanguageMetricsProvider();
         if (provider == null) {
             return FXCollections.emptyObservableList();
         }

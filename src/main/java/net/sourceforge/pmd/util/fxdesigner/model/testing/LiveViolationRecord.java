@@ -22,6 +22,12 @@ public class LiveViolationRecord implements SettingsOwner, Comparable<LiveViolat
     private int line;
 
 
+    // this ctor is used by the thing that restores application state
+    @SuppressWarnings("unused")
+    public LiveViolationRecord() {
+        this(-1, TextRegion.caretAt(0), null);
+    }
+
     public LiveViolationRecord(@NonNull TextRegion region, @Nullable String message) {
         this(-1, region, message);
     }
