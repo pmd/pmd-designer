@@ -7,20 +7,22 @@ package net.sourceforge.pmd.util.fxdesigner.model;
 import java.util.List;
 import java.util.Objects;
 
+import net.sourceforge.pmd.lang.rule.xpath.XPathVersion;
+
 public class VersionedXPathQuery {
 
-    private final String version;
+    private final XPathVersion version;
     private final String expression;
     private final List<PropertyDescriptorSpec> definedProperties;
 
 
-    public VersionedXPathQuery(String version, String expression, List<PropertyDescriptorSpec> definedProperties) {
+    public VersionedXPathQuery(XPathVersion version, String expression, List<PropertyDescriptorSpec> definedProperties) {
         this.version = version;
         this.expression = expression;
         this.definedProperties = definedProperties;
     }
 
-    public String getVersion() {
+    public XPathVersion getVersion() {
         return version;
     }
 

@@ -25,6 +25,7 @@ import org.reactfx.value.Var;
 import net.sourceforge.pmd.RulePriority;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.lang.rule.xpath.XPathVersion;
 import net.sourceforge.pmd.properties.PropertyTypeId;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
@@ -76,7 +77,7 @@ public final class ExportXPathWizardController implements Initializable {
 
     // those are not configurable in the form and so need their own property
     private final Var<String> xpathExpression = Var.newSimpleVar("");
-    private final Var<String> xpathVersion = Var.newSimpleVar(DesignerUtil.defaultXPathVersion());
+    private final Var<XPathVersion> xpathVersion = Var.newSimpleVar(XPathVersion.DEFAULT);
     private final Stage myPopupStage;
     private final DesignerRoot root;
     @FXML
@@ -219,7 +220,7 @@ public final class ExportXPathWizardController implements Initializable {
     }
 
 
-    private Var<String> xpathVersionProperty() {
+    private Var<XPathVersion> xpathVersionProperty() {
         return xpathVersion;
     }
 

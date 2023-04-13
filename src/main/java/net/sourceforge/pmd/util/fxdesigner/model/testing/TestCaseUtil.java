@@ -9,8 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
+import net.sourceforge.pmd.lang.document.TextRegion;
 
 public final class TestCaseUtil {
 
@@ -25,31 +24,28 @@ public final class TestCaseUtil {
 
         // TODO messages
 
-        List<LiveViolationRecord> expected = testCase.getExpectedViolations();
-        if (actual.size() != expected.size()) {
+        List<LiveViolationRecord> expectedViolations = testCase.getExpectedViolations();
+        if (actual.size() != expectedViolations.size()) {
             return new TestResult(TestStatus.FAIL,
-                                  "Expected " + expected.size() + " violations, actual " + actual.size());
+                                  "Expected " + expectedViolations.size() + " violations, actual " + actual.size());
         }
-
-        if (expected.stream().noneMatch(it -> it.getRange() != null)) {
-            return new TestResult(TestStatus.PASS, null);
-        }
-
 
         actual = new ArrayList<>(actual);
         actual.sort(LINE_COMP);
 
-        expected = new ArrayList<>(expected);
-        expected.sort(Comparator.naturalOrder());
+        expectedViolations = new ArrayList<>(expectedViolations);
+        expectedViolations.sort(Comparator.naturalOrder());
 
         for (int i = 0; i < actual.size(); i++) {
             Node node = actual.get(i);
 
-            TextRange actualRange = PmdCoordinatesSystem.rangeOf(node);
-            TextRange expectedRange = expected.get(i).getRange();
+            TextRegion actualRange = node.getTextRegion();
+            LiveViolationRecord expected = expectedViolations.get(i);
+            TextRegion expectedRange = expected.getRegion();
 
-            if (expectedRange != null && !expectedRange.contains(actualRange.startPos)) {
-                return new TestResult(TestStatus.FAIL, "Wrong position for node at line " + actualRange.startPos.line);
+            if (!expectedRange.contains(actualRange.getStartOffset())
+                || expected.getLine() > 0 && node.getBeginLine() != expected.getLine()) {
+                return new TestResult(TestStatus.FAIL, "Wrong position for node at offset " + actualRange.getStartOffset());
             }
         }
 

@@ -4,30 +4,30 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model;
 
-import java.util.AbstractMap.SimpleEntry;
-
-import net.sourceforge.pmd.lang.metrics.MetricKey;
+import net.sourceforge.pmd.lang.metrics.Metric;
 
 /**
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class MetricResult {
+public class MetricResult<R extends Number> {
 
-    private final SimpleEntry<MetricKey<?>, Double> simpleEntry;
+    private final Metric<?, R> metric;
+    private final R value;
 
 
-    public MetricResult(MetricKey<?> key, Double value) {
-        simpleEntry = new SimpleEntry<>(key, value);
+    public MetricResult(Metric<?, R> metric, R value) {
+        this.metric = metric;
+        this.value = value;
     }
 
 
-    public MetricKey<?> getKey() {
-        return simpleEntry.getKey();
+    public Metric<?, R> getKey() {
+        return metric;
     }
 
 
-    public Double getValue() {
-        return simpleEntry.getValue();
+    public R getValue() {
+        return value;
     }
 }

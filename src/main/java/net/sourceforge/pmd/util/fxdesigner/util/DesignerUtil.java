@@ -33,8 +33,7 @@ import org.reactfx.Subscription;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.lang.ast.xpath.Attribute;
-import net.sourceforge.pmd.lang.rule.xpath.XPathRuleQuery;
+import net.sourceforge.pmd.lang.rule.xpath.Attribute;
 import net.sourceforge.pmd.lang.symboltable.NameDeclaration;
 import net.sourceforge.pmd.lang.symboltable.NameOccurrence;
 import net.sourceforge.pmd.lang.symboltable.Scope;
@@ -102,13 +101,6 @@ public final class DesignerUtil {
     }
 
 
-    public static String defaultXPathVersion() {
-        return XPathRuleQuery.XPATH_2_0;
-    }
-
-
-
-
     /**
      * Gets the URL to an fxml file from its simple name.
      *
@@ -167,11 +159,11 @@ public final class DesignerUtil {
     }
 
 
-    public static <T> StringConverter<T> stringConverter(Function<T, String> toString, Function<String, T> fromString) {
+    public static <T> StringConverter<T> stringConverter(@NonNull Function<T, String> toString, @NonNull Function<String, T> fromString) {
         return new StringConverter<T>() {
             @Override
             public String toString(T object) {
-                return toString.apply(object);
+                return object == null ? "null" : toString.apply(object);
             }
 
 

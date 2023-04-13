@@ -10,8 +10,10 @@ import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.lang.LanguageProcessor;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.lang.document.TextDocument;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
@@ -29,14 +31,20 @@ public interface ASTManager extends ApplicationComponent, SettingsOwner {
 
     SuspendableVar<String> sourceCodeProperty();
 
+    SuspendableVar<TextDocument> sourceDocumentProperty();
+
 
     String getSourceCode();
+
+    TextDocument getSourceDocument();
 
 
     void setSourceCode(String sourceCode);
 
 
     Val<LanguageVersion> languageVersionProperty();
+
+    Val<LanguageProcessor> languageProcessorProperty();
 
 
     Val<Node> compilationUnitProperty();

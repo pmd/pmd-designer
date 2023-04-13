@@ -9,7 +9,6 @@ import static java.lang.Math.min;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.findNodeAt;
-import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.getPmdLineAndColumnFromOffset;
 import static net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.getRtfxParIndexFromPmdLine;
 
 import java.time.Duration;
@@ -35,6 +34,7 @@ import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.lang.document.TextRegion;
 import net.sourceforge.pmd.util.designerbindings.DesignerBindings;
 import net.sourceforge.pmd.util.designerbindings.RelatedNodesSelector;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
@@ -48,7 +48,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.RichRunnable;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.AvailableSyntaxHighlighters;
 import net.sourceforge.pmd.util.fxdesigner.util.codearea.HighlightLayerCodeArea;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.NodeEditionCodeArea.StyleLayerIds;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
 
@@ -139,7 +138,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
                     return;
                 }
 
-                TextPos2D target = getPmdLineAndColumnFromOffset(this, ev.getCharacterIndex());
+                int target = ev.getCharacterIndex();
 
                 findNodeAt(currentRoot, target)
                     .map(n -> NodeSelectionEvent.of(n, new DataHolder().withData(CARET_POSITION, target)))
@@ -215,7 +214,9 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         IntFunction<javafx.scene.Node> base = defaultLineNumberFactory();
 
 
-        Val<Map<Integer, LiveList<LiveViolationRecord>>> mapVal = ReactfxUtil.groupBy(liveTestCase.getExpectedViolations(), (LiveViolationRecord v) -> v.getRange().startPos.line);
+        Val<Map<TextRegion, LiveList<LiveViolationRecord>>> mapVal =
+            ReactfxUtil.groupBy(liveTestCase.getExpectedViolations(),
+                                LiveViolationRecord::getRegion);
 
         Subscription pin = mapVal.pin();
 

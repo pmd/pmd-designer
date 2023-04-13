@@ -7,24 +7,33 @@ package net.sourceforge.pmd.util.fxdesigner.app.services;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.latestValue;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStream.vetoableNull;
 
-import java.io.StringReader;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
+import org.slf4j.event.Level;
 
+import net.sourceforge.pmd.lang.JvmLanguagePropertyBundle;
+import net.sourceforge.pmd.lang.Language;
+import net.sourceforge.pmd.lang.LanguageProcessor;
+import net.sourceforge.pmd.lang.LanguageProcessorRegistry;
+import net.sourceforge.pmd.lang.LanguagePropertyBundle;
+import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
-import net.sourceforge.pmd.lang.LanguageVersionHandler;
-import net.sourceforge.pmd.lang.Parser;
 import net.sourceforge.pmd.lang.ast.Node;
+import net.sourceforge.pmd.lang.ast.Parser.ParserTask;
+import net.sourceforge.pmd.lang.ast.RootNode;
+import net.sourceforge.pmd.lang.ast.SemanticErrorReporter;
+import net.sourceforge.pmd.lang.document.TextDocument;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -32,6 +41,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.Tuple3;
+import net.sourceforge.pmd.util.log.MessageReporter;
 
 
 /**
@@ -41,6 +51,25 @@ import net.sourceforge.pmd.util.fxdesigner.util.Tuple3;
  * @since 6.0.0
  */
 public class ASTManagerImpl implements ASTManager {
+
+    public static final MessageReporter NOOP_REPORTER = new MessageReporter() { // todo replace with MessageReporter.noop
+        @Override
+        public boolean isLoggable(Level level) {
+            return false;
+        }
+
+
+        @Override
+        public void logEx(Level level, @Nullable String s, Object[] objects, @Nullable Throwable throwable) {
+            // noop
+        }
+
+
+        @Override
+        public int numErrors() {
+            return 0;
+        }
+    };
 
     private final DesignerRoot designerRoot;
 
@@ -57,11 +86,13 @@ public class ASTManagerImpl implements ASTManager {
     /**
      * Last valid source that was compiled, corresponds to {@link #compilationUnit}.
      */
-    private SuspendableVar<String> sourceCode = Var.newSimpleVar("").suspendable();
+    private final SuspendableVar<String> sourceCode = Var.newSimpleVar("").suspendable();
+    private final SuspendableVar<TextDocument> sourceDocument = Var.newSimpleVar(TextDocument.readOnlyString("", languageVersion.getValue())).suspendable();
+    private final SuspendableVar<LanguageProcessorRegistry> lpRegistry = Var.<LanguageProcessorRegistry>newSimpleVar(null).suspendable();
 
-    private Var<ParseAbortedException> currentException = Var.newSimpleVar(null);
+    private final Var<ParseAbortedException> currentException = Var.newSimpleVar(null);
 
-    private Var<Map<String, String>> ruleProperties = Var.newSimpleVar(Collections.emptyMap());
+    private final Var<Map<String, String>> ruleProperties = Var.newSimpleVar(Collections.emptyMap());
 
     public ASTManagerImpl(DesignerRoot owner) {
         this.designerRoot = owner;
@@ -91,7 +122,7 @@ public class ASTManagerImpl implements ASTManager {
 
                       Node updated;
                       try {
-                          updated = refreshAST(this, source, version, classLoader).orElse(null);
+                          updated = refreshAST(this, source, version, refreshRegistry(version, classLoader)).orElse(null);
                           currentException.setValue(null);
                       } catch (ParseAbortedException e) {
                           updated = null;
@@ -104,13 +135,21 @@ public class ASTManagerImpl implements ASTManager {
                   });
     }
 
-    public ASTManagerImpl(ASTManagerImpl base, Function<LanguageVersion, LanguageVersion> languageVersionMap) {
-        this(base.getDesignerRoot());
 
-        languageVersionProperty().bind(base.languageVersionProperty().map(languageVersionMap));
-        sourceCode.bind(base.sourceCodeProperty());
-        classLoaderProperty().bind(base.classLoaderProperty());
+    @Override
+    public TextDocument getSourceDocument() {
+        return sourceDocument.getValue();
+    }
 
+
+    @Override
+    public SuspendableVar<TextDocument> sourceDocumentProperty() {
+        return sourceDocument;
+    }
+
+
+    public void setSourceDocument(TextDocument sourceDocument) {
+        this.sourceDocument.setValue(sourceDocument);
     }
 
 
@@ -148,15 +187,26 @@ public class ASTManagerImpl implements ASTManager {
         return ruleProperties;
     }
 
+
     @Override
     public Var<LanguageVersion> languageVersionProperty() {
         return languageVersion;
     }
 
 
+    @Override
+    public Val<LanguageProcessor> languageProcessorProperty() {
+        return lpRegistry.mapDynamic(
+            languageVersionProperty().map(LanguageVersion::getLanguage)
+                                     .map(l -> lp -> lp.getProcessor(l))
+        );
+    }
+
+
     public LanguageVersion getLanguageVersion() {
         return languageVersion.getValue();
     }
+
 
     public void setLanguageVersion(LanguageVersion version) {
         this.languageVersion.setValue(version);
@@ -171,10 +221,50 @@ public class ASTManagerImpl implements ASTManager {
         return nodeVal;
     }
 
+
     @Override
     public Var<ParseAbortedException> currentExceptionProperty() {
         return currentException;
     }
+
+
+    private LanguageProcessorRegistry refreshRegistry(LanguageVersion version, ClassLoader classLoader) {
+        LanguageProcessorRegistry current = lpRegistry.getValue();
+        if (current == null) {
+            Map<Language, LanguagePropertyBundle> langProperties = new HashMap<>();
+            LanguagePropertyBundle bundle = version.getLanguage().newPropertyBundle();
+            bundle.setLanguageVersion(version.getVersion());
+            if (bundle instanceof JvmLanguagePropertyBundle) {
+                ((JvmLanguagePropertyBundle) bundle).setClassLoader(classLoader);
+            }
+
+            langProperties.put(version.getLanguage(), bundle);
+
+            LanguageRegistry languages =
+                AuxLanguageRegistry.supportedLangs()
+                                   .getDependenciesOf(version.getLanguage());
+
+            LanguageProcessorRegistry newRegistry =
+                LanguageProcessorRegistry.create(languages,
+                                                 langProperties,
+                                                 NOOP_REPORTER);
+            lpRegistry.setValue(newRegistry);
+            return newRegistry;
+        }
+
+        // already created, need to check that the version is the same
+        if (!current.getLanguages().getLanguages().contains(version.getLanguage())
+            || !current.getProcessor(version.getLanguage()).getLanguageVersion().equals(version)) {
+            // current is invalid, recreate it
+            current.close();
+            lpRegistry.setValue(null);
+            return refreshRegistry(version, classLoader);
+        }
+
+        // the current one is fine
+        return current;
+    }
+
 
     /**
      * Refreshes the compilation unit given the current state of the model.
@@ -184,43 +274,30 @@ public class ASTManagerImpl implements ASTManager {
     private static Optional<Node> refreshAST(ApplicationComponent component,
                                              String source,
                                              LanguageVersion version,
-                                             ClassLoader classLoader) throws ParseAbortedException {
+                                             LanguageProcessorRegistry lpRegistry) throws ParseAbortedException {
 
-        LanguageVersionHandler languageVersionHandler = version.getLanguageVersionHandler();
-        Parser parser = languageVersionHandler.getParser(languageVersionHandler.getDefaultParserOptions());
+        String dummyFilePath = "dummy." + version.getLanguage().getExtensions().get(0);
+        TextDocument textDocument = TextDocument.readOnlyString(source, dummyFilePath, version);
 
-        Node node;
+        ParserTask task = new ParserTask(
+            textDocument,
+            SemanticErrorReporter.noop(),
+            lpRegistry
+        );
+
+        LanguageProcessor processor = lpRegistry.getProcessor(version.getLanguage());
+        RootNode node;
         try {
-            node = parser.parse(null, new StringReader(source));
+            node = processor.services().getParser().parse(task);
         } catch (Exception e) {
             component.logUserException(e, Category.PARSE_EXCEPTION);
             throw new ParseAbortedException(e);
         }
 
-
-        try {
-            languageVersionHandler.getSymbolFacade().start(node);
-        } catch (Exception e) {
-            component.logUserException(e, Category.SYMBOL_FACADE_EXCEPTION);
-        }
-        try {
-            languageVersionHandler.getQualifiedNameResolutionFacade(classLoader).start(node);
-        } catch (Exception e) {
-            component.logUserException(e, Category.QNAME_RESOLUTION_EXCEPTION);
-        }
-
-        try {
-            languageVersionHandler.getTypeResolutionFacade(classLoader).start(node);
-        } catch (Exception e) {
-            component.logUserException(e, Category.TYPERESOLUTION_EXCEPTION);
-        }
-
         // Notify that the parse went OK so we can avoid logging very recent exceptions
 
-        component.raiseParsableSourceFlag(() -> "Param hash: " + Objects.hash(source, version, classLoader));
+        component.raiseParsableSourceFlag(() -> "Param hash: " + Objects.hash(source, version, lpRegistry));
 
         return Optional.of(node);
     }
-
-
 }

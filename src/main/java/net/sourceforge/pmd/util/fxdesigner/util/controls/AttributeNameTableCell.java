@@ -7,7 +7,7 @@ package net.sourceforge.pmd.util.fxdesigner.util.controls;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.value.Val;
 
-import net.sourceforge.pmd.lang.ast.xpath.Attribute;
+import net.sourceforge.pmd.lang.rule.xpath.Attribute;
 
 import javafx.scene.control.Cell;
 import javafx.scene.control.TableCell;

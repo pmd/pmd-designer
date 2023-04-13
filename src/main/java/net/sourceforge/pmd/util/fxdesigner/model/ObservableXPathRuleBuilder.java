@@ -8,7 +8,7 @@ import org.reactfx.EventStream;
 import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.lang.rule.XPathRule;
-import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.lang.rule.xpath.XPathVersion;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ObservableTickList;
 
@@ -22,26 +22,37 @@ import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ObservableTickList;
 public class ObservableXPathRuleBuilder extends ObservableRuleBuilder {
 
 
-    private final Var<String> xpathVersion = Var.newSimpleVar(DesignerUtil.defaultXPathVersion());
+    private final Var<XPathVersion> xpathVersion = Var.newSimpleVar(XPathVersion.DEFAULT);
     private final Var<String> xpathExpression = Var.newSimpleVar("");
+
 
     public ObservableXPathRuleBuilder() {
         setClazz(XPathRule.class);
         setLanguage(null); // this will be set by the constructor of the controller
     }
 
-    @PersistentProperty
-    public String getXpathVersion() {
+    public XPathVersion getXpathVersion() {
         return xpathVersion.getValue();
     }
 
 
-    public void setXpathVersion(String xpathVersion) {
+    public void setXpathVersion(XPathVersion xpathVersion) {
         this.xpathVersion.setValue(xpathVersion);
     }
 
 
-    public Var<String> xpathVersionProperty() {
+    @PersistentProperty
+    public String getPersistedXpathVersion() {
+        return xpathVersion.getValue().getXmlName();
+    }
+
+
+    public void setPersistedXpathVersion(String xpathVersion) {
+        this.xpathVersion.setValue(XPathVersion.ofId(xpathVersion));
+    }
+
+
+    public Var<XPathVersion> xpathVersionProperty() {
         return xpathVersion;
     }
 

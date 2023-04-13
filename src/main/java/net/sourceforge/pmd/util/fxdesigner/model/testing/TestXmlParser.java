@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +31,13 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.lang.document.Chars;
+import net.sourceforge.pmd.lang.document.TextDocument;
+import net.sourceforge.pmd.lang.document.TextRegion;
+import net.sourceforge.pmd.util.StringUtil;
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextRange;
 
 public class TestXmlParser {
 
@@ -54,6 +56,7 @@ public class TestXmlParser {
         }
         return tests;
     }
+
 
     private LiveTestCase parseSingle(Element testCode, Element root, ObservableRuleBuilder owner) {
         //
@@ -94,7 +97,7 @@ public class TestXmlParser {
 
         NodeList expectedMessagesNodes = testCode.getElementsByTagName("expected-messages");
         List<String> messages = new ArrayList<>();
-        if (expectedMessagesNodes != null && expectedMessagesNodes.getLength() > 0) {
+        if (expectedMessagesNodes.getLength() > 0) {
             Element item = (Element) expectedMessagesNodes.item(0);
             NodeList messagesNodes = item.getElementsByTagName("message");
             for (int j = 0; j < messagesNodes.getLength(); j++) {
@@ -104,7 +107,7 @@ public class TestXmlParser {
 
         NodeList expectedLineNumbersNodes = testCode.getElementsByTagName("expected-linenumbers");
         List<Integer> expectedLineNumbers = new ArrayList<>();
-        if (expectedLineNumbersNodes != null && expectedLineNumbersNodes.getLength() > 0) {
+        if (expectedLineNumbersNodes.getLength() > 0) {
             Element item = (Element) expectedLineNumbersNodes.item(0);
             String numbers = item.getTextContent();
             for (String n : numbers.split(" *, *")) {
@@ -134,8 +137,9 @@ public class TestXmlParser {
                 throw new RuntimeException("No matching code fragment found for coderef");
             }
         }
+        code = StringUtil.trimIndent(Chars.wrap(code).trimBlankLines()).toString();
 
-        String description = getNodeValue(testCode, "description", true);
+        String description = getNodeValue(testCode, "description", true).trim();
         int expectedProblems = Integer.parseInt(getNodeValue(testCode, "expected-problems", true));
 
         String languageVersionString = getNodeValue(testCode, "source-type", false);
@@ -180,21 +184,29 @@ public class TestXmlParser {
         live.setLanguageVersion(version);
         live.setIgnored(ignored);
 
-        List<String> lines = Arrays.asList(code.split("\\r?\\n"));
+        // create a document just to map source lines to regions
+        // language is irrelevant so we use plain text
+        @SuppressWarnings("PMD.CloseResource")
+        TextDocument doc = TextDocument.readOnlyString(code, AuxLanguageRegistry.plainTextLanguage().getDefaultVersion());
 
         for (int i = 0; i < expectedProblems; i++) {
             String m = messages.size() > i ? messages.get(i) : null;
-            int line = lineNumbers.size() > i ? lineNumbers.get(i) : -1;
+            // the region in which the violation is expected to occur
+            TextRegion region;
+            int line = -1;
+            if (lineNumbers.size() > i) {
+                line = lineNumbers.get(i);
+                region = doc.createLineRange(line, line);
+            } else {
+                region = doc.getEntireRegion();
+            }
 
-            TextRange tr = line >= 0
-                           ? TextRange.fullLine(line, lines.get(line - 1).length())
-                           : null;
-
-            live.getExpectedViolations().add(new LiveViolationRecord(tr, m, false));
+            live.getExpectedViolations().add(new LiveViolationRecord(line, region, m));
         }
         properties.forEach((k, v) -> live.setProperty(k.toString(), v.toString()));
         return live;
     }
+
 
     private String getNodeValue(Element parentElm, String nodeName, boolean required) {
         NodeList nodes = parentElm.getElementsByTagName(nodeName);
@@ -209,6 +221,7 @@ public class TestXmlParser {
         return parseTextNode(node);
     }
 
+
     private String parseTextNode(Node exampleNode) {
         StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < exampleNode.getChildNodes().getLength(); i++) {
@@ -217,7 +230,7 @@ public class TestXmlParser {
                 buffer.append(node.getNodeValue());
             }
         }
-        return buffer.toString().trim();
+        return buffer.toString();
     }
 
 
@@ -232,6 +245,7 @@ public class TestXmlParser {
             return parseXmlTests(is, owner);
         }
     }
+
 
     private static TestCollection parseXmlTests(InputStream is, ObservableRuleBuilder owner) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -250,6 +264,7 @@ public class TestXmlParser {
 
     }
 
+
     private static DocumentBuilder getDocumentBuilder(DocumentBuilderFactory dbf) throws ParserConfigurationException {
         DocumentBuilder builder = dbf.newDocumentBuilder();
         builder.setErrorHandler(new ErrorHandler() {
@@ -258,10 +273,12 @@ public class TestXmlParser {
                 throw exception;
             }
 
+
             @Override
             public void fatalError(SAXParseException exception) throws SAXException {
                 throw exception;
             }
+
 
             @Override
             public void error(SAXParseException exception) throws SAXException {

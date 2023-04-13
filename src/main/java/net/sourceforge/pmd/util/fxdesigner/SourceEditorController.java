@@ -29,10 +29,10 @@ import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.internal.util.ClasspathClassLoader; // NOPMD
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.util.ClasspathClassLoader;
 import net.sourceforge.pmd.util.fxdesigner.app.AbstractController;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.ASTManager;
@@ -230,9 +230,7 @@ public class SourceEditorController extends AbstractController {
         DragAndDropUtil.registerAsNodeDragTarget(
             violationsButton,
             range -> {
-                LiveViolationRecord record = new LiveViolationRecord();
-                record.setRange(range);
-                record.setExactRange(true);
+                LiveViolationRecord record = new LiveViolationRecord(range, null);
                 SimplePopups.showActionFeedback(violationsButton, AlertType.CONFIRMATION, "Violation added");
                 currentlyOpenTestCase.ifPresent(v -> v.getExpectedViolations().add(record));
             }, getDesignerRoot());

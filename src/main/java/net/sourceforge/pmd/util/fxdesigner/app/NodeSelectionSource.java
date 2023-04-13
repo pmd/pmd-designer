@@ -15,9 +15,10 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.util.fxdesigner.XPathRuleEditorController;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder;
 import net.sourceforge.pmd.util.fxdesigner.util.DataHolder.DataKey;
-import net.sourceforge.pmd.util.fxdesigner.util.codearea.PmdCoordinatesSystem.TextPos2D;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.AstTreeView;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil;
+
+import javafx.application.Platform;
 
 
 /**
@@ -43,7 +44,7 @@ public interface NodeSelectionSource extends ApplicationComponent {
      * The position of the caret, when the selection is carried out from
      * the code area.
      */
-    DataKey<TextPos2D> CARET_POSITION = new DataKey<>("caretPosition");
+    DataKey<Integer> CARET_POSITION = new DataKey<>("caretPosition");
 
 
     /**
@@ -74,7 +75,7 @@ public interface NodeSelectionSource extends ApplicationComponent {
         EventStream<NodeSelectionEvent> selection = channel.messageStream(alwaysHandleSelection, this);
         selection.subscribe(evt -> {
             try {
-                setFocusNode(evt.selected, evt.options);
+                Platform.runLater(() -> setFocusNode(evt.selected, evt.options));
             } catch (Exception e) {
                 logInternalException(e);
                 printShortStackTrace(e);

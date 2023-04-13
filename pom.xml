@@ -4,7 +4,7 @@
     <groupId>net.sourceforge.pmd</groupId>
     <artifactId>pmd-ui</artifactId>
     <name>PMD Designer</name>
-    <version>6.49.1-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
 
     <description>The Rule Designer is a graphical tool that helps PMD users develop their custom rules.</description>
     <url>https://pmd.github.io</url>
@@ -54,7 +54,7 @@
     </developers>
 
     <properties>
-        <pmd.core.version>6.27.0</pmd.core.version>
+        <pmd.core.version>7.0.0-SNAPSHOT</pmd.core.version>
         <openjfx.version>11.0.2</openjfx.version>
         <java.version>8</java.version>
         <kotlin.version>1.7.20</kotlin.version>
@@ -698,6 +698,13 @@
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
+            <artifactId>pmd-swift</artifactId>
+            <version>${pmd.core.version}</version>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-javascript</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
@@ -854,6 +861,74 @@
         </profile>
 
         <profile>
+            <!-- Profile to build a fat runnable jar. -->
+            <!-- It's kind of shitty that we can't select dependencies to include manually, -->
+            <!-- a gradle script may help. -->
+            <id>fat-java-jar</id>
+            <activation>
+                <property>
+                    <name>fat-java</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>${jar.plugin.version}</version>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Multi-Release>true</Multi-Release>
+                                    <Main-Class>net.sourceforge.pmd.util.fxdesigner.DesignerStarter</Main-Class>
+                                </manifestEntries>
+                            </archive>
+                            <finalName>pmd-ui-fat-${pmd.core.version}</finalName>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>3.4.1</version>
+                        <configuration>
+
+                            <!-- Relocate nothing -->
+
+                            <!-- Merge resource provider files like Ikonli icon resolvers -->
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.pmd</groupId>
+                    <artifactId>pmd-core</artifactId>
+                    <version>${pmd.core.version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge.pmd</groupId>
+                    <artifactId>pmd-java</artifactId>
+                    <version>${pmd.core.version}</version>
+                    <optional>true</optional>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>sign</id>
             <build>
                 <plugins>
@@ -905,7 +980,7 @@
             <!-- Eg use -Prun,with-javafx -->
             <id>with-javafx</id>
             <properties>
-                <openjfx.scope>runtime</openjfx.scope>
+                <openjfx.scope>compile</openjfx.scope>
             </properties>
         </profile>
 
