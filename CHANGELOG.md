@@ -1,5 +1,13 @@
 # Changelog
 
+## Next
+
+**Fixed issues:**
+
+**Merged pull requests:**
+
+See https://github.com/pmd/pmd-designer/milestone/11
+
 ## 7.0.0-rc1
 
 * **Bump required pmd-core version to 7.0.0-rc1.**
@@ -12,6 +20,8 @@
 
 * [#51](https://github.com/pmd/pmd-designer/pull/51) Compat with pmd/pmd#3893 by [@oowekyala](https://github.com/oowekyala)
 * [#57](https://github.com/pmd/pmd-designer/pull/57) Update to latest pmd 7 changes by [@oowekyala](https://github.com/oowekyala)
+
+See https://github.com/pmd/pmd-designer/milestone/11
 
 ## 6.49.0
 
