@@ -4,7 +4,7 @@
     <groupId>net.sourceforge.pmd</groupId>
     <artifactId>pmd-ui</artifactId>
     <name>PMD Designer</name>
-    <version>7.0.0-SNAPSHOT</version>
+    <version>7.0.0-rc1</version>
 
     <description>The Rule Designer is a graphical tool that helps PMD users develop their custom rules.</description>
     <url>https://pmd.github.io</url>
@@ -20,7 +20,7 @@
         <connection>scm:git:git://github.com/pmd/pmd-designer.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/pmd/pmd-designer.git</developerConnection>
         <url>https://github.com/pmd/pmd-designer</url>
-        <tag>HEAD</tag>
+        <tag>7.0.0-rc1</tag>
     </scm>
     <ciManagement>
         <url>https://github.com/pmd/pmd-designer/actions</url>
@@ -897,8 +897,7 @@
 
                             <!-- Merge resource provider files like Ikonli icon resolvers -->
                             <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                             </transformers>
                         </configuration>
                         <executions>
