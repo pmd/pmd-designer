@@ -2,6 +2,10 @@
 
 ## 7.0.0-rc1
 
+**Fixed issues:**
+
+* [#43](https://github.com/pmd/pmd-designer/issues/43) Update PMD 7 Logo in the Designer
+
 **Merged pull requests:**
 
 * [#51](https://github.com/pmd/pmd-designer/pull/51) Compat with pmd/pmd#3893 by [@oowekyala](https://github.com/oowekyala)
