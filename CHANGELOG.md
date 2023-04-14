@@ -2,6 +2,8 @@
 
 ## 7.0.0-rc1
 
+* **Bump required pmd-core version to 7.0.0-rc1.**
+
 **Merged pull requests:**
 
 * [#51](https://github.com/pmd/pmd-designer/pull/51) Compat with pmd/pmd#3893 by [@oowekyala](https://github.com/oowekyala)
