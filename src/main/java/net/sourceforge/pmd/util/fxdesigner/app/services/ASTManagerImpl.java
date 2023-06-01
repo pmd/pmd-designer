@@ -33,6 +33,7 @@ import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.ast.Parser.ParserTask;
 import net.sourceforge.pmd.lang.ast.RootNode;
 import net.sourceforge.pmd.lang.ast.SemanticErrorReporter;
+import net.sourceforge.pmd.lang.document.FileId;
 import net.sourceforge.pmd.lang.document.TextDocument;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
@@ -277,7 +278,7 @@ public class ASTManagerImpl implements ASTManager {
                                              LanguageProcessorRegistry lpRegistry) throws ParseAbortedException {
 
         String dummyFilePath = "dummy." + version.getLanguage().getExtensions().get(0);
-        TextDocument textDocument = TextDocument.readOnlyString(source, dummyFilePath, version);
+        TextDocument textDocument = TextDocument.readOnlyString(source, FileId.fromPathLikeString(dummyFilePath), version);
 
         ParserTask task = new ParserTask(
             textDocument,

@@ -2,7 +2,12 @@
 
 ## Next
 
+* **Bump required pmd-core version to 7.0.0-rc3.**
+
 **Fixed issues:**
+
+* [#61](https://github.com/pmd/pmd-designer/issues/61) Remove dependency to jcommander
+* [#63](https://github.com/pmd/pmd-designer/issues/63) Update to PMD 7.0.0-rc3
 
 **Merged pull requests:**
 
