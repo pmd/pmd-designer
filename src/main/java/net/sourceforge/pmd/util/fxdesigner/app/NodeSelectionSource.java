@@ -4,8 +4,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app;
 
-import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.printShortStackTrace;
-
 import java.util.Objects;
 
 import org.reactfx.EventStream;
@@ -78,7 +76,6 @@ public interface NodeSelectionSource extends ApplicationComponent {
                 Platform.runLater(() -> setFocusNode(evt.selected, evt.options));
             } catch (Exception e) {
                 logInternalException(e);
-                printShortStackTrace(e);
                 // don't rethrow so that an error by one source doesn't affect others
             }
         });
