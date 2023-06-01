@@ -4,6 +4,8 @@
 
 **Fixed issues:**
 
+* [#62](https://github.com/pmd/pmd-designer/issues/62) Exceptions and errors are not always logged
+
 **Merged pull requests:**
 
 See https://github.com/pmd/pmd-designer/milestone/11
