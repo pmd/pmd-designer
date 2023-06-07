@@ -10,6 +10,7 @@ import static java.util.Collections.emptyMap;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -83,10 +84,11 @@ public final class XPathEvaluator {
 
         try {
 
-            Map<String, ? extends PropertyDescriptor<?>> descriptors = properties.stream().collect(Collectors.toMap(PropertyDescriptorSpec::getName, PropertyDescriptorSpec::build));
+            Map<String, PropertyDescriptor<?>> descriptors = properties.stream().collect(Collectors.toMap(PropertyDescriptorSpec::getName, PropertyDescriptorSpec::build));
+            // Take in all set values or defaults
             Map<PropertyDescriptor<?>, Object> allProperties =
-                propertyValues.entrySet().stream()
-                              .collect(Collectors.toMap(e -> descriptors.get(e.getKey()), e -> descriptors.get(e.getKey()).valueFrom(e.getValue())));
+                descriptors.entrySet().stream()
+                              .collect(Collectors.<Entry<String, PropertyDescriptor<?>>, PropertyDescriptor<?>, Object>toMap(e -> e.getValue(), e -> propertyValues.containsKey(e.getKey()) ? e.getValue().valueFrom(propertyValues.get(e.getKey())) : e.getValue().defaultValue()));
 
             SaxonXPathRuleQuery xpathRule =
                 new SaxonXPathRuleQuery(
