@@ -129,7 +129,9 @@ public class ASTManagerImpl implements ASTManager {
                           updated = null;
                           currentException.setValue(e);
                       } catch (LinkageError e) {
+                          // LinkageErrors might occur due to API incompatibilities with pmd-core at runtime.
                           updated = null;
+                          logInternalException(e);
                       }
 
                       compilationUnit.setValue(updated);

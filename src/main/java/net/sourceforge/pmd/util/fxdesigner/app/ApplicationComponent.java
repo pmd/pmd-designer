@@ -4,6 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app;
 
+import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.printShortStackTrace;
+
 import java.util.function.Supplier;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -143,6 +145,7 @@ public interface ApplicationComponent {
 
     /** Logs an exception that occurred somewhere in the app logic. */
     default void logInternalException(Throwable throwable) {
+        printShortStackTrace(throwable);
         if (isDeveloperMode()) {
             System.err.println("Exception in " + this.getDebugName() + ": " + throwable.getMessage());
             System.err.println("  See the event log for more info");
