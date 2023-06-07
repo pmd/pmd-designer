@@ -13,8 +13,6 @@ import org.apache.commons.lang3.SystemUtils;
 
 import net.sourceforge.pmd.annotation.InternalApi;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
 import javafx.application.Application;
 
 /**
@@ -46,43 +44,12 @@ public final class DesignerStarter {
         }
     }
 
-    @Deprecated
-    private static MainCliArgs readParameters(String[] argv) {
-
-        MainCliArgs argsObj = new MainCliArgs();
-        JCommander jCommander = new JCommander(argsObj);
-        jCommander.setProgramName("designer");
-
-        try {
-            jCommander.parse(argv);
-
-            if (argsObj.help) {
-                System.out.println(getHelpText(jCommander));
-                System.exit(ExitStatus.OK.getCode());
-            }
-
-            return argsObj;
-
-        } catch (ParameterException e) {
-            System.out.println(e.getMessage());
-            System.out.println();
-            System.out.println(getHelpText(jCommander));
-            System.exit(ExitStatus.OK.getCode());
-            throw new AssertionError();
-        }
-
-
-    }
-
     /**
      * Starting from PMD 7.0.0 this method usage will be limited for development.
      * CLI support will be provided by pmd-cli
      */
     @InternalApi
     public static void main(String[] args) {
-
-        readParameters(args);
-
         final ExitStatus ret = launchGui(args);
         System.exit(ret.getCode());
     }
@@ -120,27 +87,6 @@ public final class DesignerStarter {
         }
 
         return null;
-    }
-
-    @Deprecated
-    private static String getHelpText(JCommander jCommander) {
-
-        StringBuilder sb = new StringBuilder();
-
-
-        jCommander.usage(sb, " ");
-        sb.append("\n");
-        sb.append("\n");
-        sb.append("PMD Rule Designer\n");
-        sb.append("-----------------\n");
-        sb.append("\n");
-        sb.append("The Rule Designer is a graphical tool that helps PMD users develop their custom rules.\n");
-        sb.append("\n");
-        sb.append("\n");
-        sb.append("Source & README: https://github.com/pmd/pmd-designer\n");
-        sb.append("Usage documentation: https://pmd.github.io/latest/pmd_userdocs_extending_designer_reference.html");
-
-        return sb.toString();
     }
 
     @SuppressWarnings("PMD.AvoidCatchingThrowable")
