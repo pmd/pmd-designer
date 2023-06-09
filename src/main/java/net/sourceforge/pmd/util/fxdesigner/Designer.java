@@ -21,6 +21,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -97,11 +98,18 @@ public class Designer extends Application {
         ));
 
         stage.setOnCloseRequest(e -> {
-            owner.getService(DesignerRoot.PERSISTENCE_MANAGER).persistSettings(mainController);
-            Platform.exit();
-            // VM sometimes fails to exit for no apparent reason
-            // all our threads are killed so it's not our fault
-            System.exit(0);
+            Task<Void> closerTask = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    owner.getService(DesignerRoot.PERSISTENCE_MANAGER).persistSettings(mainController);
+                    return null;
+                }
+            };
+            closerTask.setOnSucceeded(event -> {
+                Platform.exit();
+            });
+            new Thread(closerTask).start();
+            e.consume(); // don't close the window yet, will be closed by Platform#exit
         });
 
         Parent root = loader.load();
