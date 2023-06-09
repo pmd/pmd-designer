@@ -12,6 +12,8 @@
 
 **Merged pull requests:**
 
+* [#68](https://github.com/pmd/pmd-designer/pull/68) Expose all properties with default values by [@jsotuyod](https://github.com/jsotuyod)
+
 See https://github.com/pmd/pmd-designer/milestone/11
 
 ## 7.0.0-rc1
