@@ -13,6 +13,7 @@
 **Merged pull requests:**
 
 * [#68](https://github.com/pmd/pmd-designer/pull/68) Expose all properties with default values by [@jsotuyod](https://github.com/jsotuyod)
+* [#70](https://github.com/pmd/pmd-designer/pull/70) Fix drag and drop for tests case violations by [@adangel](https://github.com/adangel)
 
 See https://github.com/pmd/pmd-designer/milestone/11
 
