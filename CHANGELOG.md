@@ -14,6 +14,7 @@
 
 * [#68](https://github.com/pmd/pmd-designer/pull/68) Expose all properties with default values by [@jsotuyod](https://github.com/jsotuyod)
 * [#69](https://github.com/pmd/pmd-designer/pull/69) Perform the persistence asynchronously to not block the main (UI) thread #69 by [@adangel](https://github.com/adangel)
+* [#70](https://github.com/pmd/pmd-designer/pull/70) Fix drag and drop for tests case violations by [@adangel](https://github.com/adangel)
 
 See https://github.com/pmd/pmd-designer/milestone/11
 

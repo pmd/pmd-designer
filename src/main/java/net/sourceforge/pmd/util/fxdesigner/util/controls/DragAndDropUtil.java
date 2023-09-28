@@ -4,6 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
+import java.io.Serializable;
 import java.util.function.Consumer;
 
 import org.reactfx.Subscription;
@@ -22,6 +23,19 @@ public final class DragAndDropUtil {
 
     // since dragboard contents must be Serializable we
     // put a TextRegion in the dragboard and not a Node
+    private static class SerializableTextRegion implements Serializable {
+        private final int startOffset;
+        private final int length;
+
+        private SerializableTextRegion(TextRegion region) {
+            startOffset = region.getStartOffset();
+            length = region.getLength();
+        }
+
+        private TextRegion toRegion() {
+            return TextRegion.fromOffsetLength(startOffset, length);
+        }
+    }
 
     /** Style class for {@linkplain #registerAsNodeDragTarget(javafx.scene.Node, Consumer, DesignerRoot) node drag over.} */
     public static final String NODE_DRAG_OVER = "node-drag-over";
@@ -41,7 +55,7 @@ public final class DragAndDropUtil {
             // drag and drop
             Dragboard db = source.startDragAndDrop(TransferMode.LINK);
             ClipboardContent content = new ClipboardContent();
-            content.put(NODE_RANGE_DATA_FORMAT, data.getTextRegion());
+            content.put(NODE_RANGE_DATA_FORMAT, new SerializableTextRegion(data.getTextRegion()));
             db.setContent(content);
             root.getService(DesignerRoot.IS_NODE_BEING_DRAGGED).setValue(true);
             evt.consume();
@@ -102,7 +116,7 @@ public final class DragAndDropUtil {
 
             Dragboard db = evt.getDragboard();
             if (db.hasContent(NODE_RANGE_DATA_FORMAT)) {
-                TextRegion content = (TextRegion) db.getContent(NODE_RANGE_DATA_FORMAT);
+                TextRegion content = ((SerializableTextRegion) db.getContent(NODE_RANGE_DATA_FORMAT)).toRegion();
                 nodeRangeConsumer.accept(content);
                 success = true;
             }
