@@ -2,7 +2,7 @@
 
 ## Next
 
-* **Bump required pmd-core version to 7.0.0-rc3.**
+* **Bump required pmd-core version to 7.0.0-SNAPSHOT.**
 
 **Fixed issues:**
 

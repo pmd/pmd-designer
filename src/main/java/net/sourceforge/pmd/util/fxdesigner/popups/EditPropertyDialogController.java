@@ -4,8 +4,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.popups;
 
-import static net.sourceforge.pmd.properties.MultiValuePropertyDescriptor.DEFAULT_DELIMITER;
-import static net.sourceforge.pmd.properties.MultiValuePropertyDescriptor.DEFAULT_NUMERIC_DELIMITER;
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.rewireInit;
 
 import java.net.URL;
@@ -20,9 +18,8 @@ import org.reactfx.Subscription;
 import org.reactfx.util.Try;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.properties.PropertySerializer;
 import net.sourceforge.pmd.properties.PropertyTypeId;
-import net.sourceforge.pmd.properties.ValueParser;
-import net.sourceforge.pmd.properties.ValueParserConstants;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.model.PropertyDescriptorSpec;
@@ -141,20 +138,15 @@ public class EditPropertyDialogController implements Initializable, ApplicationC
     private void registerTypeDependentValidators(PropertyTypeId typeId) {
         Validator<String> valueValidator = (c, val) ->
                 ValidationResult.fromErrorIf(valueField, "The value couldn't be parsed",
-                                             Try.tryGet(() -> getValueParser(typeId).valueOf(getValue())).isFailure());
+                                             Try.tryGet(() -> getValueParser(typeId).fromString(getValue())).isFailure());
 
 
         validationSupport.registerValidator(valueField, valueValidator);
     }
 
 
-    private ValueParser<?> getValueParser(PropertyTypeId typeId) {
-        ValueParser<?> parser = typeId.getValueParser();
-        if (typeId.isPropertyMultivalue()) {
-            char delimiter = typeId.isPropertyNumeric() ? DEFAULT_NUMERIC_DELIMITER : DEFAULT_DELIMITER;
-            parser = ValueParserConstants.multi(parser, delimiter);
-        }
-        return parser;
+    private PropertySerializer<?> getValueParser(PropertyTypeId typeId) {
+        return typeId.getBuilderUtils().getXmlMapper();
     }
 
 

@@ -10,6 +10,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import net.sourceforge.pmd.lang.LanguageProcessorRegistry
 import net.sourceforge.pmd.lang.PlainTextLanguage.PlainTextFile
+import net.sourceforge.pmd.lang.PmdCapableLanguage
 import net.sourceforge.pmd.lang.ast.Parser
 import net.sourceforge.pmd.lang.ast.SemanticErrorReporter
 import net.sourceforge.pmd.lang.ast.test.IntelliMarker
@@ -54,7 +55,7 @@ class PlainTextLanguageTest : IntelliMarker, FunSpec({
 })
 
 private fun String.parse(): PlainTextFile {
-    val lang = AuxLanguageRegistry.plainTextLanguage()
+    val lang : PmdCapableLanguage = AuxLanguageRegistry.plainTextLanguage()
 
     lang.defaultVersion shouldNotBe null
 

@@ -5,17 +5,14 @@
 package net.sourceforge.pmd.util.fxdesigner.model;
 
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.reactfx.EventStream;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+import net.sourceforge.pmd.properties.NumericConstraints;
+import net.sourceforge.pmd.properties.PropertyBuilder;
 import net.sourceforge.pmd.properties.PropertyDescriptor;
-import net.sourceforge.pmd.properties.PropertyDescriptorField;
 import net.sourceforge.pmd.properties.PropertyTypeId;
-import net.sourceforge.pmd.properties.builders.PropertyDescriptorExternalBuilder;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 
@@ -40,8 +37,35 @@ public class PropertyDescriptorSpec implements SettingsOwner {
 
 
     public PropertyDescriptorSpec() {
-        isNumerical = typeId.map(PropertyTypeId::isPropertyNumeric);
-        isMultivalue = typeId.map(PropertyTypeId::isPropertyMultivalue);
+        isNumerical = typeId.map(this::isPropertyNumeric);
+        isMultivalue = typeId.map(this::isPropertyMultivalue);
+    }
+
+    private Boolean isPropertyMultivalue(PropertyTypeId propertyTypeId) {
+        switch (propertyTypeId) {
+        case DOUBLE_LIST:
+        case LONG_LIST:
+        case STRING_LIST:
+        case INTEGER_LIST:
+        case CHARACTER_LIST:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    private Boolean isPropertyNumeric(PropertyTypeId propertyTypeId) {
+        switch (propertyTypeId) {
+        case LONG:
+        case DOUBLE:
+        case INTEGER:
+        case LONG_LIST:
+        case DOUBLE_LIST:
+        case INTEGER_LIST:
+            return true;
+        default:
+            return false;
+        }
     }
 
 
@@ -161,20 +185,19 @@ public class PropertyDescriptorSpec implements SettingsOwner {
      * @return the descriptor if it can be built
      */
     public PropertyDescriptor<?> build() {
-        PropertyDescriptorExternalBuilder<?> externalBuilder = getTypeId().getFactory();
-        Map<PropertyDescriptorField, String> values = new HashMap<>();
-        values.put(PropertyDescriptorField.NAME, getName());
-        values.put(PropertyDescriptorField.DEFAULT_VALUE, getValue());
-        values.put(PropertyDescriptorField.DESCRIPTION, getDescription());
-        values.put(PropertyDescriptorField.MIN, "-2000000");
-        values.put(PropertyDescriptorField.MAX, "+2000000");
-
-        return externalBuilder.build(values);
+        PropertyBuilder propertyBuilder = getTypeId().getBuilderUtils().newBuilder(getName());
+        Object defaultValue = getTypeId().getBuilderUtils().getXmlMapper().fromString(getValue());
+        propertyBuilder.desc(getDescription());
+        propertyBuilder.defaultValue(defaultValue);
+        if (isPropertyNumeric(getTypeId())) {
+            propertyBuilder.require(NumericConstraints.inRange(-2_000_000, +2_000_000));
+        }
+        return propertyBuilder.build();
     }
 
 
     Object parseValue() {
-        return build().valueFrom(getValue());
+        return getTypeId().getBuilderUtils().getXmlMapper().fromString(getValue());
     }
 
 
