@@ -9,6 +9,7 @@
 * [#61](https://github.com/pmd/pmd-designer/issues/61) Remove dependency to jcommander
 * [#62](https://github.com/pmd/pmd-designer/issues/62) Exceptions and errors are not always logged
 * [#63](https://github.com/pmd/pmd-designer/issues/63) Update to PMD 7.0.0-rc3
+* [#72](https://github.com/pmd/pmd-designer/issues/72) NPE when launching Designer
 
 **Merged pull requests:**
 
