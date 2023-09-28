@@ -6,10 +6,14 @@ package net.sourceforge.pmd.util.fxdesigner.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
@@ -23,9 +27,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.apache.commons.io.FilenameUtils;
-
 
 /**
  * Deals with resource fetching and the hardcore details of when we're in a Jar
@@ -93,16 +94,34 @@ public final class ResourceUtil {
     /** Maps paths to classes. */
     private static Class<?> toClass(Path path, String packageName) {
         return Optional.of(path)
-                       .filter(p -> "class".equalsIgnoreCase(FilenameUtils.getExtension(path.toString())))
+                       .filter(p -> "class".equalsIgnoreCase(getFilenameExtension(path.toString())))
             .<Class<?>>map(p -> {
                 try {
-                    return Class.forName(packageName + "." + FilenameUtils.getBaseName(path.getFileName().toString()));
+                    return Class.forName(packageName + "." + getFilenameBase(path.getFileName().toString()));
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                     return null;
                 }
             })
             .orElse(null);
+    }
+
+    private static String getFilenameExtension(String name) {
+        String filename = Paths.get(name).getFileName().toString();
+        int lastDot = filename.lastIndexOf('.');
+        if (lastDot > -1) {
+            return filename.substring(lastDot + 1);
+        }
+        return filename;
+    }
+
+    private static String getFilenameBase(String name) {
+        String filename = Paths.get(name).getFileName().toString();
+        int lastDot = filename.lastIndexOf('.');
+        if (lastDot > -1) {
+            return filename.substring(0, lastDot);
+        }
+        return filename;
     }
 
     private static String getJarRelativePath(URI uri) {
@@ -174,6 +193,20 @@ public final class ResourceUtil {
             } catch (FileSystemNotFoundException e) {
                 return FileSystems.newFileSystem(uri, Collections.<String, String>emptyMap());
             }
+        }
+    }
+
+    public static String readToString(InputStream stream, Charset charset) {
+        try (InputStreamReader reader = new InputStreamReader(stream, charset)) {
+            StringBuilder result = new StringBuilder(8192);
+            int count;
+            char[] buffer = new char[8192];
+            while ((count = reader.read(buffer)) != -1) {
+                result.append(buffer, 0, count);
+            }
+            return result.toString();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 }

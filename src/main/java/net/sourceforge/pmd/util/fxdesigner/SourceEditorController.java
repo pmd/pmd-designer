@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.controlsfx.control.PopOver;
@@ -331,31 +330,10 @@ public class SourceEditorController extends AbstractController {
 
 
     private String getDefaultText() {
-        try {
-            // TODO this should take language into account
-            //  it doesn't handle the case where java is not on the classpath
+        // TODO this should take language into account
+        //  it doesn't handle the case where java is not on the classpath
 
-            return IOUtils.resourceToString(ResourceUtil.resolveResource("placeholders/editor.java"), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "class Foo {\n"
-                + "\n"
-                + "    /*\n"
-                + "        Welcome to the PMD Rule designer :)\n"
-                + "\n"
-                + "        Type some code in this area\n"
-                + "        \n"
-                + "        On the right, the Abstract Syntax Tree is displayed\n"
-                + "        On the left, you can examine the XPath attributes of\n"
-                + "        the nodes you select\n"
-                + "        \n"
-                + "        You can set the language you'd like to work in with\n"
-                + "        the cog icon above this code area\n"
-                + "     */\n"
-                + "\n"
-                + "    int i = 0;\n"
-                + "}";
-        }
+        return ResourceUtil.readToString(SourceEditorController.class.getResourceAsStream(ResourceUtil.resolveResource("placeholders/editor.java")), StandardCharsets.UTF_8);
     }
 
 

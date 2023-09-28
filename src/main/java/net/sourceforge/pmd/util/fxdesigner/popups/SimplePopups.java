@@ -7,12 +7,10 @@ package net.sourceforge.pmd.util.fxdesigner.popups;
 import static java.lang.Double.max;
 import static java.lang.Math.min;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -25,6 +23,7 @@ import net.sourceforge.pmd.util.fxdesigner.DesignerVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
@@ -192,11 +191,7 @@ public final class SimplePopups {
         licenseAlert.setHeaderText("License");
 
         ScrollPane scroll = new ScrollPane();
-        try {
-            scroll.setContent(new TextArea(IOUtils.toString(SimplePopups.class.getResourceAsStream(LICENSE_FILE_PATH), StandardCharsets.UTF_8)));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        scroll.setContent(new TextArea(ResourceUtil.readToString(SimplePopups.class.getResourceAsStream(LICENSE_FILE_PATH), StandardCharsets.UTF_8)));
 
         licenseAlert.getDialogPane().setContent(scroll);
         licenseAlert.showAndWait();
