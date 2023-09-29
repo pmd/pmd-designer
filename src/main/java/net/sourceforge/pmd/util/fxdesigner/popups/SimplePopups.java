@@ -23,6 +23,7 @@ import net.sourceforge.pmd.util.fxdesigner.DesignerVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.JavaFxUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 
 import javafx.animation.Animation;
@@ -207,14 +208,17 @@ public final class SimplePopups {
         TextArea textArea = new TextArea();
 
         String sb =
-            "PMD core version:\t\t\t" + PMDVersion.VERSION + "\n"
+            "PMD core version:\t\t" + PMDVersion.VERSION + "\n"
                 + "Designer version:\t\t\t" + DesignerVersion.getCurrentVersion()
                 + " (supports PMD core " + DesignerVersion.getPmdCoreMinVersion() + ")\n"
                 + "Designer settings dir:\t\t"
                 + root.getService(DesignerRoot.DISK_MANAGER).getSettingsDirectory() + "\n"
                 + "Available languages:\t\t"
                 + AuxLanguageRegistry.getSupportedLanguages().map(Language::getTerseName).collect(Collectors.toList())
-                + "\n";
+                + "\n"
+                + "\n"
+                + "Java Version:\t\t\t\t" + System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")\n"
+                + "JavaFX Version:\t\t\t" + JavaFxUtil.getJavaFxVersion() + "\n";
 
         textArea.setText(sb);
         scroll.setContent(textArea);

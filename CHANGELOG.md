@@ -9,6 +9,7 @@
 * [#61](https://github.com/pmd/pmd-designer/issues/61) Remove dependency to jcommander
 * [#62](https://github.com/pmd/pmd-designer/issues/62) Exceptions and errors are not always logged
 * [#63](https://github.com/pmd/pmd-designer/issues/63) Update to PMD 7.0.0-rc3
+* [#72](https://github.com/pmd/pmd-designer/issues/72) NPE when launching Designer
 * [#73](https://github.com/pmd/pmd-designer/issues/73) Remove commons-io dependency
 
 **Merged pull requests:**
@@ -18,6 +19,7 @@
 * [#70](https://github.com/pmd/pmd-designer/pull/70) Fix drag and drop for tests case violations by [@adangel](https://github.com/adangel)
 * [#74](https://github.com/pmd/pmd-designer/pull/74) Remove commons-io by [@adangel](https://github.com/adangel)
 * [#75](https://github.com/pmd/pmd-designer/pull/75) Update to PMD 7.0.0-SNAPSHOT (upcoming 7.0.0-rc4) by [@adangel](https://github.com/adangel)
+* [#76](https://github.com/pmd/pmd-designer/pull/76) Correctly determine JavaFX version when embedded by [@adangel](https://github.com/adangel)
 
 See https://github.com/pmd/pmd-designer/milestone/11
 
