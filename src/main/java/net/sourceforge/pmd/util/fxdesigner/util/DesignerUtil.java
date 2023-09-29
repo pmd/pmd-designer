@@ -65,7 +65,7 @@ public final class DesignerUtil {
     private static final Pattern EXCEPTION_PREFIX_PATTERN = Pattern.compile("(?:(?:\\w+\\.)*\\w+:\\s*)*\\s*(.*)$", Pattern.DOTALL);
 
     private static final Pattern JJT_ACCEPT_PATTERN = Pattern.compile("net.sourceforge.pmd.lang.\\w++.ast.AST(\\w+).jjtAccept");
-    public static final String DESIGNER_DOC_URL = "https://pmd.github.io/latest/pmd_userdocs_extending_designer_reference.html";
+    public static final String DESIGNER_DOC_URL = "https://docs.pmd-code.org/latest/pmd_userdocs_extending_designer_reference.html";
     public static final String DESIGNER_NEW_ISSUE_URL = "https://github.com/pmd/pmd-designer/issues/new/choose";
 
 
