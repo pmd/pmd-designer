@@ -9,12 +9,14 @@
 * [#61](https://github.com/pmd/pmd-designer/issues/61) Remove dependency to jcommander
 * [#62](https://github.com/pmd/pmd-designer/issues/62) Exceptions and errors are not always logged
 * [#63](https://github.com/pmd/pmd-designer/issues/63) Update to PMD 7.0.0-rc3
+* [#73](https://github.com/pmd/pmd-designer/issues/73) Remove commons-io dependency
 
 **Merged pull requests:**
 
 * [#68](https://github.com/pmd/pmd-designer/pull/68) Expose all properties with default values by [@jsotuyod](https://github.com/jsotuyod)
 * [#69](https://github.com/pmd/pmd-designer/pull/69) Perform the persistence asynchronously to not block the main (UI) thread #69 by [@adangel](https://github.com/adangel)
 * [#70](https://github.com/pmd/pmd-designer/pull/70) Fix drag and drop for tests case violations by [@adangel](https://github.com/adangel)
+* [#74](https://github.com/pmd/pmd-designer/pull/74) Remove commons-io by [@adangel](https://github.com/adangel)
 
 See https://github.com/pmd/pmd-designer/milestone/11
 

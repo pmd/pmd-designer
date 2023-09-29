@@ -23,7 +23,6 @@ import java.util.Objects;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.reactfx.Subscription;
 import org.reactfx.value.Var;
@@ -37,6 +36,7 @@ import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.LimitedSizeStack;
+import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.SoftReferenceCache;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.controls.DynamicWidthChoicebox;
@@ -218,7 +218,7 @@ public class MainDesignerController extends AbstractController {
     private void loadSourceFromFile(File file) {
         if (file != null) {
             try {
-                String source = IOUtils.toString(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8);
+                String source = ResourceUtil.readToString(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8);
                 sourceEditorController.setText(source);
                 LanguageVersion guess = getLanguageVersionFromExtension(file.getName());
                 if (guess == null) {
