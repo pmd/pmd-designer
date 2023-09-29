@@ -75,7 +75,7 @@ public final class AuxLanguageRegistry {
         }
     }
 
-    public static Language plainTextLanguage() {
+    public static PlainTextLanguage plainTextLanguage() {
         return PlainTextLanguage.getInstance();
     }
 

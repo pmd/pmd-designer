@@ -87,8 +87,9 @@ public final class XPathEvaluator {
             Map<String, PropertyDescriptor<?>> descriptors = properties.stream().collect(Collectors.toMap(PropertyDescriptorSpec::getName, PropertyDescriptorSpec::build));
             // Take in all set values or defaults
             Map<PropertyDescriptor<?>, Object> allProperties =
-                descriptors.entrySet().stream()
-                              .collect(Collectors.<Entry<String, PropertyDescriptor<?>>, PropertyDescriptor<?>, Object>toMap(e -> e.getValue(), e -> propertyValues.containsKey(e.getKey()) ? e.getValue().valueFrom(propertyValues.get(e.getKey())) : e.getValue().defaultValue()));
+                    descriptors.entrySet().stream()
+                              .collect(Collectors.<Entry<String, PropertyDescriptor<?>>, PropertyDescriptor<?>, Object>toMap(
+                                      e -> e.getValue(), e -> propertyValues.containsKey(e.getKey()) ? e.getValue().serializer().fromString(propertyValues.get(e.getKey())) : e.getValue().defaultValue()));
 
             SaxonXPathRuleQuery xpathRule =
                 new SaxonXPathRuleQuery(

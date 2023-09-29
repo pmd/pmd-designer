@@ -86,10 +86,10 @@ public class LiveTreeRenderer implements ApplicationComponent {
 
 
     private static <T> String getValueAsString(PropertyDescriptor<T> d) {
-        return d.asDelimitedString(d.defaultValue());
+        return d.serializer().toString(d.defaultValue());
     }
 
     private static <T> void setProperty(PropertySource bundle, PropertyDescriptor<T> d, String value) {
-        bundle.setProperty(d, d.valueFrom(value));
+        bundle.setProperty(d, d.serializer().fromString(value));
     }
 }
