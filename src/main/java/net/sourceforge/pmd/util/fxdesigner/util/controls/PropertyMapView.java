@@ -140,7 +140,7 @@ public class PropertyMapView extends VBox implements ApplicationComponent {
         popOver.setUserData(view);
     }
 
-    private class PropertyMappingListCell extends SmartTextFieldListCell<Pair<PropertyDescriptorSpec, Var<String>>> {
+    private final class PropertyMappingListCell extends SmartTextFieldListCell<Pair<PropertyDescriptorSpec, Var<String>>> {
 
         @Override
         protected Pair<Node, Subscription> getNonEditingGraphic(Pair<PropertyDescriptorSpec, Var<String>> pair) {

@@ -30,6 +30,7 @@ import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
@@ -183,7 +184,7 @@ public final class EventLogController extends AbstractController {
         // reset error nodes on closing
         binding = binding.and(() -> selectedErrorNodes.setValue(Collections.emptyList()));
 
-        SortedList<LogEntry> logEntries = new SortedList<>(getLogger().getLog(), Comparator.reverseOrder());
+        ObservableList<LogEntry> logEntries = new SortedList<>(getLogger().getLog(), Comparator.reverseOrder());
         eventLogTableView.itemsProperty().setValue(logEntries);
         binding = binding.and(
             () -> eventLogTableView.itemsProperty().setValue(FXCollections.emptyObservableList())

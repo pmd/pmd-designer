@@ -8,11 +8,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import net.sourceforge.pmd.lang.rule.xpath.Attribute;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerParams;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
@@ -77,8 +74,6 @@ public class Designer extends Application {
 
         stage.setTitle("PMD Rule Designer (v " + DesignerVersion.getCurrentVersion() + ')');
         setIcons(stage);
-
-        Logger.getLogger(Attribute.class.getName()).setLevel(Level.OFF);
 
         System.out.println(stage.getTitle() + " initializing... ");
 

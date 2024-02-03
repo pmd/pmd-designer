@@ -51,7 +51,7 @@ public final class DistinctBetweenStream<I> extends EventStreamBase<I> {
     }
 
     static <I> DistinctBetweenStream<I> distinctBetween(EventStream<I> input, Function<Runnable, Timer> timerFactory) {
-        return new DistinctBetweenStream<I>(input, timerFactory);
+        return new DistinctBetweenStream<>(input, timerFactory);
     }
 
 }

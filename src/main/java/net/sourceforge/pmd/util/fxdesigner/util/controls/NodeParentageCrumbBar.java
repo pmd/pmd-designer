@@ -65,14 +65,14 @@ public class NodeParentageCrumbBar extends BreadCrumbBar<Node> implements NodeSe
         final Callback<TreeItem<Node>, Button> originalCrumbFactory = getCrumbFactory();
 
         setOnCrumbAction(ev -> {
-            if (ev.getSelectedCrumb() != ellipsisCrumb) {
+            if (ev.getSelectedCrumb() != ellipsisCrumb) { // NOPMD - CompareObjectsWithEquals
                 selectionEvents.push(ev.getSelectedCrumb().getValue());
             }
         });
 
         setCrumbFactory(item -> {
             Button button = originalCrumbFactory.call(item);
-            if (item == ellipsisCrumb) {
+            if (item == ellipsisCrumb) { // NOPMD - CompareObjectsWithEquals
                 button.setText("... (" + numElidedNodes + ")");
                 button.setTooltip(new Tooltip(numElidedNodes + " ancestors are not shown"));
             } else if (item != null) {

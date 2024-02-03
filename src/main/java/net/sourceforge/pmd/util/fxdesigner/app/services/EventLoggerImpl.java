@@ -13,6 +13,7 @@ import static net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Set;
 
 import org.reactfx.EventSource;
 import org.reactfx.EventStream;
@@ -95,8 +96,8 @@ public class EventLoggerImpl implements ApplicationComponent, EventLogger {
 
 
     private static EventStream<LogEntry> filterOnCategory(EventStream<LogEntry> input, boolean complement, Category first, Category... selection) {
-        EnumSet<Category> considered = EnumSet.of(first, selection);
-        EnumSet<Category> complemented = complement ? EnumSet.complementOf(considered) : considered;
+        EnumSet<Category> considered = EnumSet.of(first, selection); // NOPMD - need to use EnumSet for next line EnumSet.complementOf
+        Set<Category> complemented = complement ? EnumSet.complementOf(considered) : considered;
 
         return input.filter(e -> complemented.contains(e.getCategory()));
     }

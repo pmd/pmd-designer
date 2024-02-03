@@ -83,7 +83,7 @@ public interface NodeSelectionSource extends ApplicationComponent {
     }
 
 
-    class NodeSelectionEvent {
+    final class NodeSelectionEvent {
 
         // RRR data class
 

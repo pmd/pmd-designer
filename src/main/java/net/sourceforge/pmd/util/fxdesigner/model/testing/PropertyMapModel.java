@@ -137,7 +137,7 @@ public class PropertyMapModel {
         return RebindSubscription.make(
             () -> mapping.remove(p),
             addedP -> {
-                if (addedP == p) {
+                if (addedP.equals(p)) {
                     return makeDefault(p, mapping);
                 } else {
                     mapping.remove(p);

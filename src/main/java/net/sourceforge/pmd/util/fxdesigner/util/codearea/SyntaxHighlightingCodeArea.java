@@ -198,11 +198,6 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
         setStyleSpans(0, styleSyntaxHighlightChange(oldSyntaxHighlight, newSyntax));
     }
 
-    @Override
-    public void setStyleSpans(int from, @NonNull StyleSpans<? extends Collection<String>> styleSpans) {
-        super.setStyleSpans(from, styleSpans);
-    }
-
     /**
      * Given the old value of the highlighting spans, and a newly computed value,
      * computes the spans as they should be applied to the codearea. The default behaviour

@@ -86,7 +86,7 @@ public class TestXmlDumper {
         numViolations.setTextContent(expectedViolations.size() + "");
         testCode.appendChild(numViolations);
 
-        if (expectedViolations.size() > 0 && expectedViolations.stream().allMatch(it -> it.getMessage() != null)) {
+        if (!expectedViolations.isEmpty() && expectedViolations.stream().allMatch(it -> it.getMessage() != null)) {
             Element messages = doc.createElementNS(NS, "expected-messages");
             for (LiveViolationRecord record : expectedViolations) {
                 Element r = doc.createElementNS(NS, "message");
@@ -96,7 +96,7 @@ public class TestXmlDumper {
             testCode.appendChild(messages);
         }
 
-        if (expectedViolations.size() > 0) {
+        if (!expectedViolations.isEmpty()) {
             Element linenos = doc.createElementNS(NS, "expected-linenumbers");
 
             // create a text doc just to ask for line numbers
@@ -119,7 +119,7 @@ public class TestXmlDumper {
 
         boolean hasNonDefaultVersion = descriptor.languageVersionProperty()
                                                  .getOpt()
-                                                 .filter(it -> it.getLanguage().getDefaultVersion() != it)
+                                                 .filter(it -> !it.getLanguage().getDefaultVersion().equals(it))
                                                  .isPresent();
         if (hasNonDefaultVersion) {
             Element sourceType = doc.createElementNS(NS, "source-type");
