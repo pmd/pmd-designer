@@ -67,25 +67,24 @@
         <properties>
             <property name="xpath">
                 <value><![CDATA[
-//ClassOrInterfaceBodyDeclaration[Annotation[pmd-java:typeIs('javafx.fxml.FXML')]]
-/FieldDeclaration/VariableDeclarator/VariableDeclaratorId
-                  [not(ends-with(@Name, ../../Type/@TypeImage))]
-
-                  (: The following are the exceptions to the rule :)
-                  [not(ends-with(@Name, 'Controller') and ends-with(../../Type/@TypeImage, 'Controller'))]
-                  [not(../../Type/@TypeImage = 'TextField' and ends-with(@Name, 'Field'))]
-                  [not(../../Type/@TypeImage = 'ToggleButton' and ends-with(@Name, 'Toggle'))]
-                  [not(../../Type/@TypeImage = 'TextArea' or ends-with(../../Type/@TypeImage, 'CodeArea') and ends-with(@Name, 'Area'))]
-                  [not(../../Type/@TypeImage = 'TableColumn' and ends-with(@Name, 'Column'))]
-                  [not(../../Type/@TypeImage = 'MenuItem' and ends-with(@Name, 'Button'))]
-                  [not(ends-with(../../Type/@TypeImage, 'Choicebox') and ends-with(@Name, 'Choicebox'))]
-                  [not(ends-with(../../Type/@TypeImage, 'TitledPane') and ends-with(@Name, 'Pane'))]
-                  (: This last clause allows variables to be named the same as their type, modulo Camel case :)
-                  (: Ideally we would only allow this for our custom types, but there's currently no easy :)
-                  (: way to get the type name of a node to check the package. :)
-                  (: We should create a function for that, eg typeNameOf :)
-                  [not(string-length(../../Type/@TypeImage) = string-length(@Name)
-                       and substring(../../Type/@TypeImage, 2) = substring(@Name, 2))]
+//FieldDeclaration[ModifierList/Annotation[pmd-java:typeIs('javafx.fxml.FXML')]]
+  /VariableDeclarator/VariableDeclaratorId
+    [not(ends-with(@Name, ../../ClassOrInterfaceType/@SimpleName))]
+    (: The following are the exceptions to the rule :)
+    [not(ends-with(@Name, 'Controller') and ends-with(../../ClassOrInterfaceType/@SimpleName, 'Controller'))]
+    [not(../../ClassOrInterfaceType/@SimpleName = 'TextField' and ends-with(@Name, 'Field'))]
+    [not(../../ClassOrInterfaceType/@SimpleName = 'ToggleButton' and ends-with(@Name, 'Toggle'))]
+    [not(../../ClassOrInterfaceType/@SimpleName = 'TextArea' or ends-with(../../ClassOrInterfaceType/@SimpleName, 'CodeArea') and ends-with(@Name, 'Area'))]
+    [not(../../ClassOrInterfaceType/@SimpleName = 'TableColumn' and ends-with(@Name, 'Column'))]
+    [not(../../ClassOrInterfaceType/@SimpleName = 'MenuItem' and ends-with(@Name, 'Button'))]
+    [not(ends-with(../../ClassOrInterfaceType/@SimpleName, 'Choicebox') and ends-with(@Name, 'Choicebox'))]
+    [not(ends-with(../../ClassOrInterfaceType/@SimpleName, 'TitledPane') and ends-with(@Name, 'Pane'))]
+    (: This last clause allows variables to be named the same as their type, modulo Camel case :)
+    (: Ideally we would only allow this for our custom types, but there's currently no easy :)
+    (: way to get the type name of a node to check the package. :)
+    (: We should create a function for that, eg typeNameOf :)
+    [not(string-length(../../ClassOrInterfaceType/@SimpleName) = string-length(@Name)
+        and substring(../../ClassOrInterfaceType/@SimpleName, 2) = substring(@Name, 2))]
             ]]></value>
             </property>
         </properties>
