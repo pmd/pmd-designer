@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+
+* **Bump required pmd-core version to 7.0.0-SNAPSHOT.**
+
 ## 7.0.0-rc4
 
 * **Bump required pmd-core version to 7.0.0-rc4.**
