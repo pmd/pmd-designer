@@ -330,7 +330,7 @@ public final class XPathRuleEditorController extends AbstractController implemen
 
         Val<Function<String, String>> languagePrefix =
             getRuleBuilder().languageProperty()
-                            .map(Language::getTerseName)
+                            .map(Language::getId)
                             .map(lname -> rname -> lname + "/" + rname);
 
         return getRuleBuilder().nameProperty()

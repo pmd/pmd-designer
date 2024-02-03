@@ -24,7 +24,7 @@ class AstPackageExplorer implements NodeNameFinder {
 
     AstPackageExplorer(Language language) {
         availableNodeNames =
-            ResourceUtil.getClassesInPackage("net.sourceforge.pmd.lang." + language.getTerseName() + ".ast")
+            ResourceUtil.getClassesInPackage("net.sourceforge.pmd.lang." + language.getId() + ".ast")
                         .filter(clazz -> clazz.getSimpleName().startsWith("AST"))
                         .filter(clazz -> !clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers()))
                         .map(m -> m.getSimpleName().substring("AST".length()))

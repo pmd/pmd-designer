@@ -214,7 +214,7 @@ public final class SimplePopups {
                 + "Designer settings dir:\t\t"
                 + root.getService(DesignerRoot.DISK_MANAGER).getSettingsDirectory() + "\n"
                 + "Available languages:\t\t"
-                + AuxLanguageRegistry.getSupportedLanguages().map(Language::getTerseName).collect(Collectors.toList())
+                + AuxLanguageRegistry.getSupportedLanguages().map(Language::getId).collect(Collectors.toList())
                 + "\n"
                 + "\n"
                 + "Java Version:\t\t\t\t" + System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")\n"

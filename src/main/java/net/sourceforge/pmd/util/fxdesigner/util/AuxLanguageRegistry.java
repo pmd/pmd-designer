@@ -63,7 +63,7 @@ public final class AuxLanguageRegistry {
 
     // TODO need a notion of dialect in core + language services
     public static boolean isXmlDialect(Language language) {
-        switch (language.getTerseName()) {
+        switch (language.getId()) {
         case "xml":
         case "pom":
         case "wsql":

@@ -264,7 +264,7 @@ public final class ExportXPathWizardController implements Initializable {
             .withDefaultIndent("      ")
             .withDefaultEscape(StringEscapeUtils::escapeXml10)
             .append("<rule name=\"").bind(ObservableRuleBuilder::nameProperty).appendLine("\"")
-            .appendIndent(1).append("language=\"").bind(ObservableRuleBuilder::languageProperty, Language::getTerseName).appendLine("\"")
+            .appendIndent(1).append("language=\"").bind(ObservableRuleBuilder::languageProperty, Language::getId).appendLine("\"")
             .bind(ObservableRuleBuilder::minimumVersionProperty, indented(2, surrounded("minimumLanguageVersion=\"", "\"\n", asString(LanguageVersion::getVersion))))
             .bind(ObservableRuleBuilder::maximumVersionProperty, indented(2, surrounded("maximumLanguageVersion=\"", "\"\n", asString(LanguageVersion::getVersion))))
             .withDefaultEscape(s -> s) // special escape for message

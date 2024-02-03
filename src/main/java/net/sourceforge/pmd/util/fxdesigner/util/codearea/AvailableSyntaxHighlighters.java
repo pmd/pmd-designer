@@ -68,7 +68,7 @@ public enum AvailableSyntaxHighlighters implements SyntaxHighlighter {
      */
     public static Optional<SyntaxHighlighter> getHighlighterForLanguage(Language language) {
         return Arrays.stream(AvailableSyntaxHighlighters.values())
-                     .filter(e -> e.language.equals(language.getTerseName()))
+                     .filter(e -> e.language.equals(language.getId()))
                      .findFirst()
                      .map(h -> h.engine);
 

@@ -55,7 +55,7 @@ public final class SettingsPersistenceUtil {
         SerializerRegistrar.getInstance().registerMapped(RulePriority.class, Integer.class, RulePriority::getPriority, RulePriority::valueOf);
         SerializerRegistrar.getInstance().registerMapped(PropertyTypeId.class, String.class, PropertyTypeId::getStringId, PropertyTypeId::lookupMnemonic);
         SerializerRegistrar.getInstance().registerMapped(LanguageVersion.class, String.class, LanguageVersion::getTerseName, AuxLanguageRegistry::findLanguageVersionByTerseName);
-        SerializerRegistrar.getInstance().registerMapped(Language.class, String.class, Language::getTerseName, AuxLanguageRegistry::findLanguageByTerseName);
+        SerializerRegistrar.getInstance().registerMapped(Language.class, String.class, Language::getId, AuxLanguageRegistry::findLanguageByTerseName);
         SerializerRegistrar.getInstance().registerMapped(TextRegion.class, String.class,
                                                          region -> region.getStartOffset() + "-"
                                                              + region.getEndOffset(),
