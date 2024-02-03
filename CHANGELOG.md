@@ -4,6 +4,10 @@
 
 * **Bump required pmd-core version to 7.0.0-SNAPSHOT.**
 
+**Merged pull requests:**
+
+* [#77](https://github.com/pmd/pmd-designer/pull/77) Enable PMD checks with PMD 7 by [@adangel](https://github.com/adangel)
+
 ## 7.0.0-rc4
 
 * **Bump required pmd-core version to 7.0.0-rc4.**
