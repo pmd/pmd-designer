@@ -226,7 +226,7 @@ public final class ControlUtil {
 
     public static void copyToClipboardButton(Button button, Supplier<String> copiedText) {
         button.setOnAction(e -> {
-            final ClipboardContent content = new ClipboardContent();
+            final ClipboardContent content = new ClipboardContent(); // NOPMD - can't use Map<> because of putString(...) method
             content.putString(copiedText.get());
             Clipboard.getSystemClipboard().setContent(content);
             SimplePopups.showActionFeedback(button, AlertType.CONFIRMATION, "Copied to clipboard");

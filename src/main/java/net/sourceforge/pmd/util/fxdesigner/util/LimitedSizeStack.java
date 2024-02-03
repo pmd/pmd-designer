@@ -4,7 +4,7 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 /**
  * Stack with a limited size, without duplicates, without null value. Used to store recent files.
@@ -14,7 +14,7 @@ import java.util.Stack;
  * @author Clément Fournier
  * @since 6.0.0
  */
-public class LimitedSizeStack<E> extends Stack<E> {
+public class LimitedSizeStack<E> extends ArrayDeque<E> {
 
     private final int maxSize;
 
@@ -25,9 +25,9 @@ public class LimitedSizeStack<E> extends Stack<E> {
 
 
     @Override
-    public E push(E item) {
+    public void push(E item) {
         if (item == null) {
-            return null;
+            return;
         }
 
         this.remove(item);
@@ -35,9 +35,7 @@ public class LimitedSizeStack<E> extends Stack<E> {
         super.push(item);
 
         if (size() > maxSize) {
-            this.removeElementAt(size() - 1);
+            this.removeLast();
         }
-
-        return item;
     }
 }

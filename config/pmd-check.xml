@@ -26,10 +26,9 @@
         </description>
         <priority>1</priority>
         <properties>
-            <property name="version" value="2.0"/>
             <property name="xpath">
                 <value><![CDATA[
-                //ImportDeclaration/Name[starts-with(@Image, "net.sourceforge.pmd.") and contains(@Image, ".internal")]
+                //ImportDeclaration[starts-with(@PackageName, "net.sourceforge.pmd.") and contains(@PackageName, ".internal")]
             ]]></value>
             </property>
         </properties>
@@ -47,7 +46,6 @@
         <priority>1</priority>
         <properties>
             <property name="apiVersion" type="String" value="8" description="JavaFX API version to enforce"/>
-            <property name="version" value="2.0"/>
             <property name="xpath">
                 <value><![CDATA[
                 //*[starts-with(@xmlns,"http://javafx.com/javafx/") and xmlns != string-join(("http://javafx.com/javafx/", $apiVersion), "")]
@@ -67,7 +65,6 @@
         </description>
         <priority>1</priority>
         <properties>
-            <property name="version" value="2.0" />
             <property name="xpath">
                 <value><![CDATA[
 //ClassOrInterfaceBodyDeclaration[Annotation[pmd-java:typeIs('javafx.fxml.FXML')]]

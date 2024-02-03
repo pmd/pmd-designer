@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.reactfx.Subscription;
@@ -23,7 +24,7 @@ public final class DragAndDropUtil {
 
     // since dragboard contents must be Serializable we
     // put a TextRegion in the dragboard and not a Node
-    private static class SerializableTextRegion implements Serializable {
+    private static final class SerializableTextRegion implements Serializable {
         private final int startOffset;
         private final int length;
 
@@ -54,7 +55,7 @@ public final class DragAndDropUtil {
         source.setOnDragDetected(evt -> {
             // drag and drop
             Dragboard db = source.startDragAndDrop(TransferMode.LINK);
-            ClipboardContent content = new ClipboardContent();
+            Map<DataFormat, Object> content = new ClipboardContent();
             content.put(NODE_RANGE_DATA_FORMAT, new SerializableTextRegion(data.getTextRegion()));
             db.setContent(content);
             root.getService(DesignerRoot.IS_NODE_BEING_DRAGGED).setValue(true);
@@ -89,7 +90,7 @@ public final class DragAndDropUtil {
 
 
         target.setOnDragOver(evt -> {
-            if (evt.getGestureSource() != target
+            if (evt.getGestureSource() != target // NOPMD CompareObjectsWithEquals
                 && evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
                 /* allow for both copying and moving, whatever user chooses */
                 evt.acceptTransferModes(TransferMode.LINK);
@@ -98,7 +99,7 @@ public final class DragAndDropUtil {
         });
 
         target.setOnDragEntered(evt -> {
-            if (evt.getGestureSource() != target
+            if (evt.getGestureSource() != target // NOPMD CompareObjectsWithEquals
                 && evt.getDragboard().hasContent(NODE_RANGE_DATA_FORMAT)) {
                 target.getStyleClass().addAll(NODE_DRAG_OVER);
             }

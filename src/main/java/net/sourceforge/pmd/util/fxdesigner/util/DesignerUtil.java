@@ -75,7 +75,7 @@ public final class DesignerUtil {
 
 
     public static <T> Set<T> setOf(T... ts) {
-        LinkedHashSet<T> set = new LinkedHashSet<>(ts.length);
+        Set<T> set = new LinkedHashSet<>(ts.length);
         Collections.addAll(set, ts);
         return set;
     }
@@ -400,7 +400,7 @@ public final class DesignerUtil {
                 // Controls that need the DesignerRoot can declare a constructor
                 // with a parameter w/ signature @NamedArg("designerRoot") DesignerRoot
                 // to be injected with the relevant instance of the app.
-                ProxyBuilder<Object> builder = new ProxyBuilder<>(type);
+                ProxyBuilder<Object> builder = new ProxyBuilder<>(type); // NOPMD - can't use Map<> here: it's a builder, not a map.
                 builder.put("designerRoot", owner);
                 return builder;
             } else {

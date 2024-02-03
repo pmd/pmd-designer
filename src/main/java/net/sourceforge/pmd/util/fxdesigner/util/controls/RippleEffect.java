@@ -31,13 +31,13 @@ public class RippleEffect {
     private Duration rippleDuration = Duration.millis(250);
     private double lastRippleHeight = 0;
     private double lastRippleWidth = 0;
-    private Color rippleColor = new Color(0, 0, 0, 0.11);
 
     private EventHandler<MouseEvent> handler;
 
     public RippleEffect(ReadOnlyDoubleProperty containerWidth,
                         ReadOnlyDoubleProperty containerHeight,
                         Supplier<Background> containerBackground) {
+        Color rippleColor = new Color(0, 0, 0, 0.11);
         circleRipple = new Circle(0.1, rippleColor);
         circleRipple.setOpacity(0.0);
         // Optional box blur on ripple - smoother ripple effect

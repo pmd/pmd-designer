@@ -156,7 +156,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
     /** Scroll the editor to a node and makes it visible. */
     private void scrollToNode(Node node, boolean scrollToTop) {
 
-        if (getVisibleParagraphs().size() < 1) {
+        if (getVisibleParagraphs().isEmpty()) {
             return;
         }
 

@@ -174,7 +174,7 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
         final StyleSpans<Collection<String>> base = allSpans.get(0);
 
         return allSpans.stream()
-                       .filter(spans -> spans != base)
+                       .filter(spans -> !base.equals(spans))
                        .filter(spans -> spans.length() <= getLength())
                        .reduce(base, (accumulator, elt) -> accumulator.overlay(elt, SyntaxHighlightingCodeArea::additiveOverlay));
 

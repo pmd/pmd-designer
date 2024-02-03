@@ -18,9 +18,9 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -123,7 +123,7 @@ public class MainDesignerController extends AbstractController {
     private DynamicWidthChoicebox<Language> languageChoicebox;
 
     // Other fields
-    private final Stack<File> recentFiles = new LimitedSizeStack<>(5);
+    private final Deque<File> recentFiles = new LimitedSizeStack<>(5);
 
     public MainDesignerController(@NamedArg("designerRoot") DesignerRoot designerRoot) {
         super(designerRoot);
@@ -293,7 +293,7 @@ public class MainDesignerController extends AbstractController {
 
     @PersistentProperty
     public List<File> getRecentFiles() {
-        return recentFiles;
+        return new ArrayList<>(recentFiles);
     }
 
 

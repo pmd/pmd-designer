@@ -5,6 +5,7 @@
 package net.sourceforge.pmd.util.fxdesigner;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.EventStreams;
@@ -88,7 +89,7 @@ public class MetricPaneController extends AbstractController implements NodeSele
         if (provider == null) {
             return FXCollections.emptyObservableList();
         }
-        ArrayList<MetricResult<?>> results = new ArrayList<>();
+        List<MetricResult<?>> results = new ArrayList<>();
         for (Metric<?, ?> metric : provider.getMetrics()) {
             MetricResult<?> result = computeMetric(metric, n);
             if (result != null) {

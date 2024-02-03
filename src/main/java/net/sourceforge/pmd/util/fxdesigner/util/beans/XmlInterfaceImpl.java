@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -29,8 +28,6 @@ import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.TypedObject;
  * @since 6.14.0 (V2, no beanutils)
  */
 public class XmlInterfaceImpl extends XmlInterface {
-
-    private static final Logger LOGGER = Logger.getLogger(XmlInterface.class.getName());
 
     // names used in the Xml schema
     private static final String SCHEMA_NODE_ELEMENT = "node";
@@ -83,7 +80,7 @@ public class XmlInterfaceImpl extends XmlInterface {
                     node.addChild(parseSettingsOwnerNode(child));
                 }
             } catch (ClassNotFoundException e) {
-                LOGGER.warning("Ignoring unknown settings node of type " + child.getAttribute(SCHEMA_NODE_CLASS_ATTRIBUTE));
+                System.out.println("Ignoring unknown settings node of type " + child.getAttribute(SCHEMA_NODE_CLASS_ATTRIBUTE));
             }
         }
 
