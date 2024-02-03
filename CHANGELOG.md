@@ -7,6 +7,7 @@
 **Merged pull requests:**
 
 * [#77](https://github.com/pmd/pmd-designer/pull/77) Enable PMD checks with PMD 7 by [@adangel](https://github.com/adangel)
+* [#78](https://github.com/pmd/pmd-designer/pull/78) Fix deprecations from PMD 7 (getTerseName -> getId) by [@adangel](https://github.com/adangel)
 
 ## 7.0.0-rc4
 
