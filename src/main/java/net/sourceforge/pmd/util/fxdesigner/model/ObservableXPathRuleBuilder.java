@@ -7,7 +7,7 @@ package net.sourceforge.pmd.util.fxdesigner.model;
 import org.reactfx.EventStream;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.lang.rule.XPathRule;
+import net.sourceforge.pmd.lang.rule.xpath.XPathRule;
 import net.sourceforge.pmd.lang.rule.xpath.XPathVersion;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsPersistenceUtil.PersistentProperty;
 import net.sourceforge.pmd.util.fxdesigner.util.reactfx.ObservableTickList;

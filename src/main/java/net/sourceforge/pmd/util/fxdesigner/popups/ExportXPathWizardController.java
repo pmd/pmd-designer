@@ -22,9 +22,9 @@ import org.controlsfx.validation.Validator;
 import org.reactfx.Subscription;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.RulePriority;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
+import net.sourceforge.pmd.lang.rule.RulePriority;
 import net.sourceforge.pmd.lang.rule.xpath.XPathVersion;
 import net.sourceforge.pmd.properties.PropertyTypeId;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -286,7 +286,6 @@ public final class ExportXPathWizardController implements Initializable {
                             .append("\" description=\"").bind(PropertyDescriptorSpec::descriptionProperty)
                             .appendLine("\"/>")
             )
-            .appendIndent(2).append("<property name=\"version\" value=\"").bind(ObservableXPathRuleBuilder::xpathVersionProperty).appendLine("\"/>")
             .appendIndent(2).appendLine("<property name=\"xpath\">")
             .appendIndent(3).appendLine("<value>")
             .appendLine("<![CDATA[")
