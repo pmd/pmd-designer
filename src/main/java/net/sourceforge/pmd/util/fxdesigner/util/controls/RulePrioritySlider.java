@@ -4,13 +4,13 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
-import static net.sourceforge.pmd.RulePriority.HIGH;
-import static net.sourceforge.pmd.RulePriority.LOW;
-import static net.sourceforge.pmd.RulePriority.MEDIUM;
+import static net.sourceforge.pmd.lang.rule.RulePriority.HIGH;
+import static net.sourceforge.pmd.lang.rule.RulePriority.LOW;
+import static net.sourceforge.pmd.lang.rule.RulePriority.MEDIUM;
 
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.RulePriority;
+import net.sourceforge.pmd.lang.rule.RulePriority;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
 
 import javafx.scene.control.Slider;
