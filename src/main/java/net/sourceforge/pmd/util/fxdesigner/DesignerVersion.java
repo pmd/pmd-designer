@@ -25,10 +25,10 @@ public final class DesignerVersion {
     private static final String UNKNOWN_VERSION = "unknown";
 
     /**
-     * Determines the version from maven's generated pom.properties file.
+     * Determines the version from maven's generated designer.properties file.
      */
     static {
-        VERSION = readProperty("/META-INF/maven/net.sourceforge.pmd/pmd-designer/pom.properties", "version").orElse(UNKNOWN_VERSION);
+        VERSION = readProperty(ResourceUtil.resolveResource("designer.properties"), "pmd.designer.version").orElse(UNKNOWN_VERSION);
         PMD_CORE_MIN_VERSION = readProperty(ResourceUtil.resolveResource("designer.properties"), "pmd.core.version").orElse(UNKNOWN_VERSION);
     }
 

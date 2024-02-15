@@ -54,7 +54,9 @@
     </developers>
 
     <properties>
+        <pmd.designer.version>${project.version}</pmd.designer.version> <!-- see DesignerVersion -->
         <pmd.core.version>7.0.0-SNAPSHOT</pmd.core.version>
+
         <openjfx.version>11.0.2</openjfx.version>
         <java.version>8</java.version>
         <kotlin.version>1.7.20</kotlin.version>

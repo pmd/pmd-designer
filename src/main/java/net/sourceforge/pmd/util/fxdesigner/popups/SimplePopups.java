@@ -210,7 +210,7 @@ public final class SimplePopups {
         String sb =
             "PMD core version:\t\t" + PMDVersion.VERSION + "\n"
                 + "Designer version:\t\t\t" + DesignerVersion.getCurrentVersion()
-                + " (supports PMD core " + DesignerVersion.getPmdCoreMinVersion() + ")\n"
+                + " (min. supported PMD core " + DesignerVersion.getPmdCoreMinVersion() + ")\n"
                 + "Designer settings dir:\t\t"
                 + root.getService(DesignerRoot.DISK_MANAGER).getSettingsDirectory() + "\n"
                 + "Available languages:\t\t"
