@@ -1,7 +1,7 @@
 # PMD Rule Designer
 
 [![Build Status](https://github.com/pmd/pmd-designer/workflows/build/badge.svg?branch=master)](https://github.com/pmd/pmd-designer/actions?query=workflow%3Abuild)
-[![Maven Central](https://img.shields.io/maven-central/v/net.sourceforge.pmd/pmd-ui.svg)](https://maven-badges.herokuapp.com/maven-central/net.sourceforge.pmd/pmd-ui)
+[![Maven Central](https://img.shields.io/maven-central/v/net.sourceforge.pmd/pmd-designer.svg)](https://maven-badges.herokuapp.com/maven-central/net.sourceforge.pmd/pmd-designer)
 [![Join the chat](https://img.shields.io/gitter/room/pmd/pmd-designer)](https://app.gitter.im/#/room/#pmd_pmd-designer:gitter.im?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
@@ -37,8 +37,8 @@ See the list of available versions [here](https://search.maven.org/artifact/org.
 
 ### Updating
 
-The latest version of the designer currently **works with PMD 7.0.0-rc1 and above**.
-You can simply replace `pmd-ui-7.X.Y.jar` with the [latest build](https://github.com/pmd/pmd-designer/releases/latest)
+The latest version of the designer currently **works with PMD 7.0.0 and above**.
+You can simply replace `pmd-designer-7.X.Y.jar` with the [latest build](https://github.com/pmd/pmd-designer/releases/latest)
 in the installation folder of your PMD distribution.
 
 ## Usage

@@ -4,6 +4,23 @@
 
 * **Bump required pmd-core version to 7.0.0-SNAPSHOT.**
 
+**Changed maven GAV**
+The maven coordinates (GAV) have been changed. The artifactId has been renamed to pmd-designer.
+
+```xml
+<dependency>
+  <groupId>net.sourceforge.pmd</groupId>
+  <artifactId>pmd-designer</artifactId>
+  <version>7.0.0</version>
+</dependency>
+```
+
+At the same time, the release artefact name changed to **pmd-designer-7.0.0.jar**.
+
+**Fixed issues:**
+
+* [#65](https://github.com/pmd/pmd-designer/issues/65) Rename artifactId to pmd-designer
+
 **Merged pull requests:**
 
 * [#77](https://github.com/pmd/pmd-designer/pull/77) Enable PMD checks with PMD 7 by [@adangel](https://github.com/adangel)

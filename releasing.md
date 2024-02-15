@@ -26,11 +26,11 @@
 
 4.  Wait, until release is ready. The maven plugin will directly push the tag. The tag will be
     built by [github actions](https://github.com/pmd/pmd-designer/actions).
-    After it is done, the new release should be available under <https://repo.maven.apache.org/maven2/net/sourceforge/pmd/pmd-ui/>.
+    After it is done, the new release should be available under <https://repo.maven.apache.org/maven2/net/sourceforge/pmd/pmd-designer/>.
 
 5.  Verify the release on Github Releases: <https://github.com/pmd/pmd-designer/releases>
     
-    The release notes from `/CHANGELOG.md` should be there. Also, the shaded pmd-ui-*.jar should
+    The release notes from `/CHANGELOG.md` should be there. Also, the shaded pmd-designer-*.jar should
     have been uploaded.
 
 6.  Add a new section at the top in `/CHANGELOG.md` to prepare for the next version.

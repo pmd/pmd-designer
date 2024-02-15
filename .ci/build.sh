@@ -47,7 +47,8 @@ function build() {
             GH_RELEASE="$RESULT"
 
             # Deploy to github releases
-            pmd_ci_gh_releases_uploadAsset "$GH_RELEASE" "target/pmd-ui-${PMD_CI_MAVEN_PROJECT_VERSION}.jar"
+            # Note: This is the shaded jar
+            pmd_ci_gh_releases_uploadAsset "$GH_RELEASE" "target/pmd-designer-${PMD_CI_MAVEN_PROJECT_VERSION}.jar"
 
             # extract the release notes
             RELEASE_NAME="${PMD_CI_MAVEN_PROJECT_VERSION}"
