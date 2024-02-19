@@ -35,7 +35,7 @@ import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.document.TextRegion;
 import net.sourceforge.pmd.lang.rule.RulePriority;
-import net.sourceforge.pmd.properties.PropertyTypeId;
+import net.sourceforge.pmd.properties.internal.PropertyTypeId;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.Serializer;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.converters.SerializerRegistrar;

@@ -28,7 +28,15 @@
         <properties>
             <property name="xpath">
                 <value><![CDATA[
-                //ImportDeclaration[starts-with(@PackageName, "net.sourceforge.pmd.") and contains(@PackageName, ".internal")]
+                //ImportDeclaration
+                    [ends-with(@ImportedName, 'InternalApiBridge')]
+                |
+                //ImportDeclaration
+                    [starts-with(@PackageName, "net.sourceforge.pmd.") and contains(@PackageName, ".internal")]
+                    (: allow PropertyTypeId - the designer is for now the only client. Until then it stays internal,
+                       but is used by the designer.
+                    :)
+                    [@ImportedName != 'net.sourceforge.pmd.properties.internal.PropertyTypeId']
             ]]></value>
             </property>
         </properties>

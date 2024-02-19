@@ -16,11 +16,9 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
-import org.slf4j.event.Level;
 
 import net.sourceforge.pmd.lang.JvmLanguagePropertyBundle;
 import net.sourceforge.pmd.lang.Language;
@@ -42,7 +40,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.Tuple3;
-import net.sourceforge.pmd.util.log.MessageReporter;
+import net.sourceforge.pmd.util.log.PmdReporter;
 
 
 /**
@@ -53,24 +51,7 @@ import net.sourceforge.pmd.util.log.MessageReporter;
  */
 public class ASTManagerImpl implements ASTManager {
 
-    public static final MessageReporter NOOP_REPORTER = new MessageReporter() { // todo replace with MessageReporter.noop
-        @Override
-        public boolean isLoggable(Level level) {
-            return false;
-        }
-
-
-        @Override
-        public void logEx(Level level, @Nullable String s, Object[] objects, @Nullable Throwable throwable) {
-            // noop
-        }
-
-
-        @Override
-        public int numErrors() {
-            return 0;
-        }
-    };
+    public static final PmdReporter NOOP_REPORTER = PmdReporter.quiet();
 
     private final DesignerRoot designerRoot;
 

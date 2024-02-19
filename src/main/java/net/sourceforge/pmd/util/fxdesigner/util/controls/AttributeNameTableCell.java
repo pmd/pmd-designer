@@ -50,12 +50,8 @@ public class AttributeNameTableCell extends TableCell<Attribute, String> {
             return;
         }
 
-        String replacement = attr.replacementIfDeprecated();
-        if (replacement != null) {
+        if (attr.isDeprecated()) {
             String txt = "This attribute is deprecated";
-            if (!replacement.isEmpty()) {
-                txt += ", please use " + replacement + " instead";
-            }
             Tooltip t = new Tooltip(txt);
             tooltip = t;
             getStyleClass().add(DEPRECATED_CSS_CLASS);
