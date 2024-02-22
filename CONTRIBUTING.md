@@ -24,8 +24,8 @@
 1. [Open IntelliJ's terminal](https://stackoverflow.com/a/28044371/6245827) and
 paste the following:
 ```shell
-git update-index --skip-worktree -- .idea/misc.xml pmd-ui.iml # Ignore some config files
-mvn process-resources # Generate CSS resources
+git update-index --skip-worktree -- .idea/misc.xml pmd-designer.iml # Ignore some config files
+./mvnw process-resources # Generate CSS resources
 ```
 
 4. [Synchronize the directory contents](https://stackoverflow.com/a/4599243/6245827) to pick-up on the new CSS files

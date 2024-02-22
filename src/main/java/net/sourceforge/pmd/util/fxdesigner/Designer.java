@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import net.sourceforge.pmd.PMDVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerParams;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
@@ -72,7 +73,7 @@ public class Designer extends Application {
     public void start(Stage stage, DesignerRoot owner) throws IOException {
         this.designerRoot = owner;
 
-        stage.setTitle("PMD Rule Designer (v " + DesignerVersion.getCurrentVersion() + ')');
+        stage.setTitle("PMD Rule Designer " + DesignerVersion.getCurrentVersion() + " (with PMD " + PMDVersion.VERSION + ")");
         setIcons(stage);
 
         System.out.println(stage.getTitle() + " initializing... ");

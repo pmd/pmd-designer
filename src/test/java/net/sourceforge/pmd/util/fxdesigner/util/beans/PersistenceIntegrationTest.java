@@ -29,7 +29,7 @@ public class PersistenceIntegrationTest {
         bean.setK(IOException.class);
         bean.setStr("hahahaha");
 
-        File tmp = Files.createTempFile("pmd-ui-test", "").toFile();
+        File tmp = Files.createTempFile("pmd-designer-test", "").toFile();
 
         SettingsPersistenceUtil.persistProperties(bean, tmp);
 
