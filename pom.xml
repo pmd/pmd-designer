@@ -579,6 +579,21 @@
                 <artifactId>kotest-assertions-core-jvm</artifactId>
                 <version>${kotest.version}</version>
             </dependency>
+
+            <!-- dependencies provided by pmd-dist -->
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>2.11.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.14.0</version>
+                <scope>provided</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -629,12 +644,6 @@
             <version>0.9.2</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.checkerframework</groupId>
-            <artifactId>checker-qual</artifactId>
-            <version>2.11.1</version>
-        </dependency>
-
         <!-- We need two incompatible versions of controlsfx, one for Java 8, and one for Java 9+ -->
         <!-- Ideally ControlsFX would release a MR jar but that doesn't seem to be in their priorities: -->
         <!-- https://github.com/controlsfx/controlsfx/issues/1014 -->
@@ -662,11 +671,13 @@
             <version>1.0</version>
         </dependency>
 
-        <!-- Those are shaded to avoid duplication -->
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-qual</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.14.0</version>
         </dependency>
 
         <!-- Icon packs -->
@@ -835,14 +846,6 @@
                             <!-- We can't just use an artifactSet/excludes to exclude pmd dependencies -->
                             <!-- because it would include their transitive dependencies -->
 
-                            <relocations>
-                                <!-- Relocate apache dependencies because they're included in the binary dist-->
-                                <relocation>
-                                    <pattern>org.apache.commons</pattern>
-                                    <shadedPattern>org.shaded.apache.commons</shadedPattern>
-                                </relocation>
-                            </relocations>
-
                             <!-- Merge resource provider files like Ikonli icon resolvers -->
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
@@ -934,6 +937,18 @@
                 </plugins>
             </build>
             <dependencies>
+                <!-- normally provided by pmd-dist, but not when create a fat-jar -->
+                <dependency>
+                    <groupId>org.checkerframework</groupId>
+                    <artifactId>checker-qual</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <!-- pmd dependencies -->
                 <dependency>
                     <groupId>net.sourceforge.pmd</groupId>
                     <artifactId>pmd-core</artifactId>
@@ -972,7 +987,9 @@
         </profile>
 
         <profile>
-            <!-- This is a runnable profile that includes all pmd modules -->
+            <!-- This is a runnable profile that includes all pmd modules (scope runtime)
+                 as well as the dependencies, that are normally provided
+            -->
             <id>running</id>
             <build>
                 <plugins>
@@ -994,11 +1011,24 @@
                     </plugin>
                 </plugins>
             </build>
+            <dependencies>
+                <!-- normally provided by pmd-dist, but not when running directly -->
+                <dependency>
+                    <groupId>org.checkerframework</groupId>
+                    <artifactId>checker-qual</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
         </profile>
 
         <profile>
             <!-- This profile adds openjfx dependencies to the classpath -->
-            <!-- Eg use -Prun,with-javafx -->
+            <!-- Eg use -Prunning,with-javafx -->
             <id>with-javafx</id>
             <properties>
                 <openjfx.scope>compile</openjfx.scope>
