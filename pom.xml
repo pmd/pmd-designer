@@ -668,11 +668,6 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.14.0</version>
         </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.3.0</version>
-        </dependency>
 
         <!-- Icon packs -->
         <!-- Unfortunately these can't be updated as the author now uses Java 11...-->
