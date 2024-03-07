@@ -32,7 +32,7 @@ If the `bin` directory of your PMD distribution is on your shell's path, then yo
 Alternatively, you can launch the program "from source" with Maven.
 * `$ ./mvnw -Prunning exec:java` will launch the program after compiling it, using the JavaFX distribution of your system
 * `$ ./mvnw -Prunning,with-javafx exec:java` will also add JavaFX dependencies on your classpath.
-You can change the version of those dependencies with eg `-Dopenjfx.version 13` for OpenJFX 13.
+You can change the version of those dependencies with eg `-Dopenjfx.version=13` for OpenJFX 13.
 See the list of available versions [here](https://search.maven.org/artifact/org.openjfx/javafx).
 
 ### Updating
@@ -56,7 +56,7 @@ You can package a runnable jar containing the PMD dependencies with maven. For
 now the only option is to build a jar that contains pmd-core and pmd-java:
 
 ```
-mvn clean package -Dfat-java -Dpmd.core.version=7.0.0-SNAPSHOT
+./mvnw clean package -Dfat-java -Dpmd.core.version=7.0.0-SNAPSHOT
 ```
 The `pmd.core.version` property selects the version of pmd-core *and pmd-java*
 that will be included. The built jar can then be found in your `target` directory.
