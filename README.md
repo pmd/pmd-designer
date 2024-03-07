@@ -21,8 +21,8 @@ rules. Main features:
 The designer is part of PMD's binary distributions. To install a distribution, see the
 [documentation page](https://docs.pmd-code.org/latest/pmd_userdocs_installation.html) about installing PMD.
 
-The app needs JRE 1.8 or above to run. Be aware that on JRE 11+, the JavaFX distribution should be installed
-separately. Visit [the download page](https://gluonhq.com/products/javafx/) to download a distribution,
+The app needs either Oracle Java 8 (which includes JavaFX) or OpenJDK 11+ and a separately installed
+OpenJFX distribution. Visit [JavaFX - Gluon](https://gluonhq.com/products/javafx/) to download an SDK distribution,
 extract it, and set the `JAVAFX_HOME` environment variable.
 
 If the `bin` directory of your PMD distribution is on your shell's path, then you can **launch the app** with
@@ -32,7 +32,7 @@ If the `bin` directory of your PMD distribution is on your shell's path, then yo
 Alternatively, you can launch the program "from source" with Maven.
 * `$ ./mvnw -Prunning exec:java` will launch the program after compiling it, using the JavaFX distribution of your system
 * `$ ./mvnw -Prunning,with-javafx exec:java` will also add JavaFX dependencies on your classpath.
-You can change the version of those dependencies with eg `-Dopenjfx.version=13` for OpenJFX 13.
+You can change the version of those dependencies with eg `-Dopenjfx.version=21.0.2` for OpenJFX 21.
 See the list of available versions [here](https://search.maven.org/artifact/org.openjfx/javafx).
 
 ### Updating
@@ -62,6 +62,7 @@ The `pmd.core.version` property selects the version of pmd-core *and pmd-java*
 that will be included. The built jar can then be found in your `target` directory.
 **Such a jar cannot be used in a PMD distribution** and must be used in a
 standalone fashion, otherwise classpath conflicts may arise.
+You can additionally enable the profile `with-javafx` to include openjfx as well.
 
 You should never run the `install` goal with the `-Dfat-java` property! This
 would install the fat jar in your local repo and may cause dependency conflicts.

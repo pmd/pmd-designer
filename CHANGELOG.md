@@ -17,8 +17,17 @@ The maven coordinates (GAV) have been changed. The artifactId has been renamed t
 
 At the same time, the release artefact name changed to **pmd-designer-7.0.0.jar**.
 
+**Changed default OpenJFX version to be 17**
+
+The designer is built now against openjfx 17. When using the designer with OpenJDK, at least Java 11
+is required with openjfx 17 or later.
+
+The designer can still be started with Oracle's Java 8, which includes JavaFX. But this is not
+explicitly tested.
+
 **Fixed issues:**
 
+* [#54](https://github.com/pmd/pmd-designer/issues/54) Upgrade openjfx to 17
 * [#65](https://github.com/pmd/pmd-designer/issues/65) Rename artifactId to pmd-designer
 
 **Merged pull requests:**
