@@ -1,11 +1,12 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Designer (JRE 8)" type="Application" factoryName="Application">
-    <option name="ALTERNATIVE_JRE_PATH" value="1.8 (oracle)" />
+  <configuration default="false" name="Designer (Java 11)" type="Application" factoryName="Application">
+    <option name="ALTERNATIVE_JRE_PATH" value="temurin-11" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
     <option name="MAIN_CLASS_NAME" value="net.sourceforge.pmd.util.fxdesigner.DesignerStarter" />
     <module name="pmd-designer" />
     <option name="PROGRAM_PARAMETERS" value="-v" />
+    <option name="VM_PARAMETERS" value="--add-opens javafx.controls/javafx.scene.control.skin=ALL-UNNAMED --add-opens javafx.controls/com.sun.javafx.scene.control.inputmap=ALL-UNNAMED --illegal-access=warn" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="net.sourceforge.pmd.util.fxdesigner.app.*" />
