@@ -781,12 +781,6 @@
             <artifactId>pmd-lang-test</artifactId>
             <version>${pmd.core.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
