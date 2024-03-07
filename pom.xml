@@ -54,6 +54,8 @@
     </developers>
 
     <properties>
+        <project.build.outputTimestamp>2023-09-30T17:20:53Z</project.build.outputTimestamp>
+
         <pmd.designer.version>${project.version}</pmd.designer.version> <!-- see DesignerVersion -->
         <pmd.core.version>7.0.0-SNAPSHOT</pmd.core.version>
 
