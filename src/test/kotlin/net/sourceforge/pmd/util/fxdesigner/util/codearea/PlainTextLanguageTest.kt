@@ -13,8 +13,8 @@ import net.sourceforge.pmd.lang.PlainTextLanguage.PlainTextFile
 import net.sourceforge.pmd.lang.PmdCapableLanguage
 import net.sourceforge.pmd.lang.ast.Parser
 import net.sourceforge.pmd.lang.ast.SemanticErrorReporter
-import net.sourceforge.pmd.lang.ast.test.IntelliMarker
-import net.sourceforge.pmd.lang.ast.test.matchNode
+import net.sourceforge.pmd.lang.test.ast.IntelliMarker
+import net.sourceforge.pmd.lang.test.ast.matchNode
 import net.sourceforge.pmd.lang.document.TextDocument
 import net.sourceforge.pmd.lang.document.TextRange2d
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry

@@ -8,7 +8,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.haveSize
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
-import net.sourceforge.pmd.lang.ast.test.IntelliMarker
+import net.sourceforge.pmd.lang.test.ast.IntelliMarker
 import net.sourceforge.pmd.lang.document.TextRegion
 import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder
 import net.sourceforge.pmd.util.fxdesigner.model.testing.TestXmlParser
