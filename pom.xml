@@ -81,7 +81,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <pmd.build-tools.version>23-SNAPSHOT</pmd.build-tools.version>
+        <pmd.build-tools.version>23</pmd.build-tools.version>
         <pmd.plugin.version>3.21.2</pmd.plugin.version>
         <pmd.check.version>7.0.0-rc4</pmd.check.version>
 
