@@ -762,7 +762,7 @@
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-vm</artifactId>
+            <artifactId>pmd-velocity</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
             <scope>${pmd.module.scope}</scope>
