@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+**Fixed issues:**
+
+**Merged pull requests:**
+
+See https://github.com/pmd/pmd-designer/milestone/15
+
 ## 7.0.0
 
 * **Bump required pmd-core version to 7.0.0.**
@@ -36,6 +44,8 @@ explicitly tested.
 * [#78](https://github.com/pmd/pmd-designer/pull/78) Fix deprecations from PMD 7 (getTerseName -> getId) by [@adangel](https://github.com/adangel)
 * [#79](https://github.com/pmd/pmd-designer/pull/79) Update to latest PMD 7.0.0-SNAPSHOT by [@adangel](https://github.com/adangel)
 * [#83](https://github.com/pmd/pmd-designer/pull/83) Avoid deprecated and internal API usage by [@adangel](https://github.com/adangel)
+
+See https://github.com/pmd/pmd-designer/milestone/11
 
 ## 7.0.0-rc4
 
