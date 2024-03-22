@@ -1,8 +1,8 @@
 # Changelog
 
-## Next
+## 7.0.0
 
-* **Bump required pmd-core version to 7.0.0-SNAPSHOT.**
+* **Bump required pmd-core version to 7.0.0.**
 
 **Changed maven GAV**
 The maven coordinates (GAV) have been changed. The artifactId has been renamed to pmd-designer.
