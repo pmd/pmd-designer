@@ -20,7 +20,7 @@
           language="java"
           since="6.5.0"
           message="This module should not use pmd-core''s internal API"
-          class="net.sourceforge.pmd.lang.rule.XPathRule">
+          class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
         <description>
             Injected FXML fields should be suffixed by their type
         </description>
@@ -40,6 +40,13 @@
             ]]></value>
             </property>
         </properties>
+        <example><![CDATA[
+import net.sourceforge.pmd.lang.InternalApiBridge; // violation
+import net.sourceforge.pmd.lang.ast.internal.StreamImpl; // violation
+import net.sourceforge.pmd.lang.ast.Node; // ok
+
+public class Foo {}
+]]></example>
     </rule>
 
     <!-- FIXME this doesn't work because "fxml" is not part of the patterns for the XML language... -->
@@ -47,7 +54,7 @@
           language="xml"
           since="6.5.0"
           message='FXML docs for this project should specify an API version of 8: xmlns="http://javafx.com/javafx/8"'
-          class="net.sourceforge.pmd.lang.rule.XPathRule">
+          class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
         <description>
             FXML docs for this project should specify an API version of 8.
         </description>
@@ -67,7 +74,7 @@
           language="java"
           since="6.5.0"
           message="Injected FXML fields should be suffixed by their type, eg ''HelloButton'', here it''s ''{0}''"
-          class="net.sourceforge.pmd.lang.rule.XPathRule">
+          class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
         <description>
             Injected FXML fields should be suffixed by their type
         </description>
@@ -76,26 +83,45 @@
             <property name="xpath">
                 <value><![CDATA[
 //FieldDeclaration[ModifierList/Annotation[pmd-java:typeIs('javafx.fxml.FXML')]]
-  /VariableDeclarator/VariableDeclaratorId
-    [not(ends-with(@Name, ../../ClassOrInterfaceType/@SimpleName))]
+  /VariableDeclarator/VariableId
+    [not(ends-with(@Name, ../../ClassType/@SimpleName))]
     (: The following are the exceptions to the rule :)
-    [not(ends-with(@Name, 'Controller') and ends-with(../../ClassOrInterfaceType/@SimpleName, 'Controller'))]
-    [not(../../ClassOrInterfaceType/@SimpleName = 'TextField' and ends-with(@Name, 'Field'))]
-    [not(../../ClassOrInterfaceType/@SimpleName = 'ToggleButton' and ends-with(@Name, 'Toggle'))]
-    [not(../../ClassOrInterfaceType/@SimpleName = 'TextArea' or ends-with(../../ClassOrInterfaceType/@SimpleName, 'CodeArea') and ends-with(@Name, 'Area'))]
-    [not(../../ClassOrInterfaceType/@SimpleName = 'TableColumn' and ends-with(@Name, 'Column'))]
-    [not(../../ClassOrInterfaceType/@SimpleName = 'MenuItem' and ends-with(@Name, 'Button'))]
-    [not(ends-with(../../ClassOrInterfaceType/@SimpleName, 'Choicebox') and ends-with(@Name, 'Choicebox'))]
-    [not(ends-with(../../ClassOrInterfaceType/@SimpleName, 'TitledPane') and ends-with(@Name, 'Pane'))]
+    [not(ends-with(@Name, 'Controller') and ends-with(../../ClassType/@SimpleName, 'Controller'))]
+    [not(../../ClassType/@SimpleName = 'TextField' and ends-with(@Name, 'Field'))]
+    [not(../../ClassType/@SimpleName = 'ToggleButton' and ends-with(@Name, 'Toggle'))]
+    [not(../../ClassType/@SimpleName = 'TextArea' or ends-with(../../ClassOrInterfaceType/@SimpleName, 'CodeArea') and ends-with(@Name, 'Area'))]
+    [not(../../ClassType/@SimpleName = 'TableColumn' and ends-with(@Name, 'Column'))]
+    [not(../../ClassType/@SimpleName = 'MenuItem' and ends-with(@Name, 'Button'))]
+    [not(../../ClassType/@SimpleName = 'SyntaxHighlightingCodeArea' and ends-with(@Name, 'Area'))]
+    [not(ends-with(../../ClassType/@SimpleName, 'Choicebox') and ends-with(@Name, 'Choicebox'))]
+    [not(ends-with(../../ClassType/@SimpleName, 'TitledPane') and ends-with(@Name, 'Pane'))]
     (: This last clause allows variables to be named the same as their type, modulo Camel case :)
     (: Ideally we would only allow this for our custom types, but there's currently no easy :)
     (: way to get the type name of a node to check the package. :)
     (: We should create a function for that, eg typeNameOf :)
-    [not(string-length(../../ClassOrInterfaceType/@SimpleName) = string-length(@Name)
-        and substring(../../ClassOrInterfaceType/@SimpleName, 2) = substring(@Name, 2))]
+    [not(string-length(../../ClassType/@SimpleName) = string-length(@Name)
+        and substring(../../ClassType/@SimpleName, 2) = substring(@Name, 2))]
             ]]></value>
             </property>
         </properties>
+        <example><![CDATA[
+import javafx.fxml.FXML;
+import javafx.scene.control.MenuItem;
+
+public class MyController {
+    @FXML
+    private MenuItem about; // violation
+
+    @FXML
+    private MenuItem aboutMenuItem; // ok
+
+    @FXML
+    private TextField nameField; // ok, exception
+
+    @FXML
+    private MenuItem aboutButton; // ok, exception
+}
+]]></example>
     </rule>
 
 </ruleset>
