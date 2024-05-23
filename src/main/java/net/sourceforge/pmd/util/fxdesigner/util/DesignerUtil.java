@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -411,14 +412,21 @@ public final class DesignerUtil {
 
 
     public static String attrToXpathString(Attribute attr) {
-        String stringValue = attr.getStringValue();
-        Object v = attr.getValue();
+        return valueToXPathString(attr.getValue(), attr.getStringValue());
+    }
+
+    private static String valueToXPathString(Object v, String stringValue) {
         if (v instanceof String || v instanceof Enum) {
-            stringValue = "\"" + StringEscapeUtils.escapeJava(stringValue) + "\"";
+            return "\"" + StringEscapeUtils.escapeJava(stringValue) + "\"";
         } else if (v instanceof Boolean) {
-            stringValue = v + "()";
+            return v + "()";
+        } else if (v instanceof Collection) {
+            return ((Collection<?>) v).stream()
+                    .map(o -> valueToXPathString(o, String.valueOf(o)))
+                    .collect(Collectors.joining(", ", "(", ")"));
         }
-        return String.valueOf(stringValue);
+
+        return String.valueOf(v);
     }
 
 
