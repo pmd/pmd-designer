@@ -6,6 +6,8 @@
 
 **Merged pull requests:**
 
+* [#85](https://github.com/pmd/pmd-designer/pull/85) Properly stringify collection attributes as sequences by [@jsotuyod](https://github.com/jsotuyod)
+
 See https://github.com/pmd/pmd-designer/milestone/15
 
 ## 7.0.0
