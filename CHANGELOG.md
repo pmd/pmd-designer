@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+**Fixed issues:**
+
+**Merged pull requests:**
+
+See https://github.com/pmd/pmd-designer/milestone/16
+
 ## 7.2.0
 
 **Merged pull requests:**
