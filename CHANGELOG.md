@@ -1,8 +1,6 @@
 # Changelog
 
-## Unreleased
-
-**Fixed issues:**
+## 7.2.0
 
 **Merged pull requests:**
 
