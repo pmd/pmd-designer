@@ -72,8 +72,8 @@
         <local.lib.repo>${project.basedir}/lib/mvn-repo</local.lib.repo>
 
         <surefire.version>3.2.5</surefire.version>
-        <checkstyle.version>10.14.0</checkstyle.version>
-        <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
+        <checkstyle.version>10.18.1</checkstyle.version>
+        <checkstyle.plugin.version>3.5.0</checkstyle.plugin.version>
         <javadoc.plugin.version>3.6.3</javadoc.plugin.version>
         <source.plugin.version>3.3.0</source.plugin.version>
         <jar.plugin.version>3.3.0</jar.plugin.version>
