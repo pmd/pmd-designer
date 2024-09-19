@@ -2,9 +2,19 @@
 
 ## Unreleased
 
+**New Git default branch - "main"**
+
+We are joining the Git community and updating "master" to "main". Using the term "master" for the main
+development branch can be offensive to some people. Existing versions of Git have been always capable of
+working with any branch name and since 2.28.0 (July 2020) the default initial branch is configurable
+(`init.defaultBranch`). Since October 2020, the default branch for new repositories on GitHub
+is "main". Finally, PMD will also use this new name for the main branch in all our own repositories.
+
 **Fixed issues:**
 
 **Merged pull requests:**
+
+* [#93](https://github.com/pmd/pmd-designer/pull/93) Change branch master to main by [@adangel](https://github.com/adangel)
 
 See https://github.com/pmd/pmd-designer/milestone/16
 
