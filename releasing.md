@@ -1,6 +1,6 @@
 # Releasing pmd-designer
 
-1.  Checkout master branch:
+1.  Checkout main branch:
     
     ``` shell
     git clone https://github.com/pmd/pmd-designer.git
@@ -19,7 +19,7 @@
     Note: the tag will be pushed automatically.
     
     ``` shell
-    git switch master
+    git switch main
     ./mvnw release:clean
     ./mvnw release:prepare
     ```
