@@ -63,7 +63,7 @@
         <java.version>8</java.version>
         <kotlin.version>1.7.20</kotlin.version>
         <kotest.version>5.5.5</kotest.version>
-        <junit5.version>5.8.2</junit5.version> <!-- needed by kotest -->
+        <junit5.version>5.11.0</junit5.version> <!-- needed by kotest -->
 
         <!-- Those have different values based on the profile -->
         <openjfx.scope>provided</openjfx.scope>
