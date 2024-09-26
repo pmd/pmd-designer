@@ -59,7 +59,7 @@
         <pmd.designer.version>${project.version}</pmd.designer.version> <!-- see DesignerVersion -->
         <pmd.core.version>7.0.0</pmd.core.version>
 
-        <openjfx.version>17.0.10</openjfx.version>
+        <openjfx.version>22.0.2</openjfx.version>
         <java.version>8</java.version>
         <kotlin.version>1.7.20</kotlin.version>
         <kotest.version>5.5.5</kotest.version>
