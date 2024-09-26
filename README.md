@@ -1,6 +1,6 @@
 # PMD Rule Designer
 
-[![Build Status](https://github.com/pmd/pmd-designer/workflows/build/badge.svg?branch=main)](https://github.com/pmd/pmd-designer/actions?query=workflow%3Abuild)
+[![Build Status](https://github.com/pmd/pmd-designer/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/pmd/pmd-designer/actions/workflows/build.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/net.sourceforge.pmd/pmd-designer.svg)](https://maven-badges.herokuapp.com/maven-central/net.sourceforge.pmd/pmd-designer)
 [![Join the chat](https://img.shields.io/gitter/room/pmd/pmd-designer)](https://app.gitter.im/#/room/#pmd_pmd-designer:gitter.im?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
