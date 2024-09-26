@@ -76,7 +76,7 @@
         <checkstyle.plugin.version>3.5.0</checkstyle.plugin.version>
         <javadoc.plugin.version>3.6.3</javadoc.plugin.version>
         <source.plugin.version>3.3.0</source.plugin.version>
-        <jar.plugin.version>3.3.0</jar.plugin.version>
+        <jar.plugin.version>3.4.2</jar.plugin.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
