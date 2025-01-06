@@ -35,7 +35,7 @@ jobs:
       run: |
         echo "LANG=en_US.UTF-8" >> $GITHUB_ENV
         echo "MAVEN_OPTS=-Dmaven.wagon.httpconnectionManager.ttlSeconds=180 -Dmaven.wagon.http.retryHandler.count=3" >> $GITHUB_ENV
-        echo "PMD_CI_SCRIPTS_URL=https://raw.githubusercontent.com/pmd/build-tools/28/scripts" >> $GITHUB_ENV
+        echo "PMD_CI_SCRIPTS_URL=https://raw.githubusercontent.com/pmd/build-tools/main/scripts" >> $GITHUB_ENV
     - name: Check Environment
       shell: bash
       run: |
@@ -50,3 +50,5 @@ jobs:
       env:
         PMD_CI_SECRET_PASSPHRASE: ${{ secrets.PMD_CI_SECRET_PASSPHRASE }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PMD_CI_GPG_PRIVATE_KEY: ${{ secrets.PMD_CI_GPG_PRIVATE_KEY }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.PMD_CI_GPG_PASSPHRASE }}

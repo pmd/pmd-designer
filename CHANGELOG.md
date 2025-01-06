@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+**New GPG Release Signing Key**
+
+Since January 2025, we switched the GPG Key we use for signing releases in Maven Central to be
+[A0B5CA1A4E086838](https://keyserver.ubuntu.com/pks/lookup?search=0x2EFA55D0785C31F956F2F87EA0B5CA1A4E086838&fingerprint=on&op=index).
+The full fingerprint is `2EFA 55D0 785C 31F9 56F2  F87E A0B5 CA1A 4E08 6838`.
+
 **New Git default branch - "main"**
 
 We are joining the Git community and updating "master" to "main". Using the term "master" for the main
@@ -15,6 +21,7 @@ is "main". Finally, PMD will also use this new name for the main branch in all o
 **Merged pull requests:**
 
 * [#93](https://github.com/pmd/pmd-designer/pull/93) Change branch master to main by [@adangel](https://github.com/adangel)
+* [#98](https://github.com/pmd/pmd-designer/pull/98) Use new gpg key (A0B5CA1A4E086838) by [@adangel](https://github.com/adangel)
 
 See https://github.com/pmd/pmd-designer/milestone/16
 
