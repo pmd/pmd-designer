@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+**🚀 New and Noteworthy:**
+
+**🐛 Fixed issues:**
+
+**✨ Merged pull requests:**
+
+**📦 Dependency updates:**
+
+See https://github.com/pmd/pmd-designer/milestone/17
+
+## 7.10.0 (2025-01-23)
+
 **🚨 New GPG Release Signing Key**
 
 Since January 2025, we switched the GPG Key we use for signing releases in Maven Central to be
