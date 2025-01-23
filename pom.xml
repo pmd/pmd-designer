@@ -73,7 +73,7 @@
 
         <local.lib.repo>${project.basedir}/lib/mvn-repo</local.lib.repo>
 
-        <surefire.version>3.2.5</surefire.version>
+        <surefire.version>3.5.2</surefire.version>
         <checkstyle.version>10.18.1</checkstyle.version>
         <checkstyle.plugin.version>3.5.0</checkstyle.plugin.version>
         <javadoc.plugin.version>3.11.2</javadoc.plugin.version>
