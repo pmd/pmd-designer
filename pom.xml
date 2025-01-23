@@ -57,13 +57,15 @@
         <project.build.outputTimestamp>2024-05-31T09:07:03Z</project.build.outputTimestamp>
 
         <pmd.designer.version>${project.version}</pmd.designer.version> <!-- see DesignerVersion -->
-        <pmd.core.version>7.0.0</pmd.core.version> <!-- minimum supported PMD version -->
+        <pmd.core.version>7.0.0</pmd.core.version> <!-- minimum supported PMD version (API) -->
 
         <openjfx.version>17.0.10</openjfx.version>
         <java.version>8</java.version>
+
+        <pmd.langtest.version>7.9.0</pmd.langtest.version>
         <kotlin.version>2.0.20</kotlin.version>
-        <kotest.version>5.5.5</kotest.version>
-        <junit5.version>5.11.0</junit5.version> <!-- needed by kotest -->
+        <kotest.version>5.9.1</kotest.version>
+        <junit5.version>5.11.0</junit5.version>
 
         <!-- Those have different values based on the profile -->
         <openjfx.scope>provided</openjfx.scope>
@@ -771,7 +773,7 @@
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-lang-test</artifactId>
-            <version>${pmd.core.version}</version>
+            <version>${pmd.langtest.version}</version>
             <scope>test</scope>
         </dependency>
 
