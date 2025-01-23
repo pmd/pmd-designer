@@ -2,13 +2,13 @@
 
 ## Unreleased
 
-**New GPG Release Signing Key**
+**🚨 New GPG Release Signing Key**
 
 Since January 2025, we switched the GPG Key we use for signing releases in Maven Central to be
 [A0B5CA1A4E086838](https://keyserver.ubuntu.com/pks/lookup?search=0x2EFA55D0785C31F956F2F87EA0B5CA1A4E086838&fingerprint=on&op=index).
 The full fingerprint is `2EFA 55D0 785C 31F9 56F2  F87E A0B5 CA1A 4E08 6838`.
 
-**New Git default branch - "main"**
+**🚀 New Git default branch - "main"**
 
 We are joining the Git community and updating "master" to "main". Using the term "master" for the main
 development branch can be offensive to some people. Existing versions of Git have been always capable of
@@ -16,12 +16,27 @@ working with any branch name and since 2.28.0 (July 2020) the default initial br
 (`init.defaultBranch`). Since October 2020, the default branch for new repositories on GitHub
 is "main". Finally, PMD will also use this new name for the main branch in all our own repositories.
 
-**Fixed issues:**
-
-**Merged pull requests:**
+**✨ Merged pull requests:**
 
 * [#93](https://github.com/pmd/pmd-designer/pull/93) Change branch master to main by [@adangel](https://github.com/adangel)
 * [#98](https://github.com/pmd/pmd-designer/pull/98) Use new gpg key (A0B5CA1A4E086838) by [@adangel](https://github.com/adangel)
+
+**📦 Dependency updates:**
+
+* [#88](https://github.com/pmd/pmd-designer/pull/88) Bump org.apache.commons:commons-lang3 from 3.14.0 to 3.17.0
+* [#90](https://github.com/pmd/pmd-designer/pull/90) Bump org.apache.maven.plugins:maven-jar-plugin from 3.3.0 to 3.4.2
+* [#91](https://github.com/pmd/pmd-designer/pull/91) Bump kotest.version from 5.5.5 to 5.9.1
+* [#92](https://github.com/pmd/pmd-designer/pull/92) Bump junit5.version from 5.8.2 to 5.11.0
+* [#94](https://github.com/pmd/pmd-designer/pull/94) Bump kotlin.version from 1.7.20 to 2.0.20
+* [#96](https://github.com/pmd/pmd-designer/pull/96) Bump pmd-build-tools from 27-SNAPSHOT to 28
+* [#97](https://github.com/pmd/pmd-designer/pull/97) Bump pmd from 7.5.0 to 7.8.0 for checks
+* [#99](https://github.com/pmd/pmd-designer/pull/99) Bump build-tools from 29-SNAPSHOT to 29
+* [#100](https://github.com/pmd/pmd-designer/pull/100) Bump maven-pmd-plugin from 3.24.0 to 3.26.0
+* [#101](https://github.com/pmd/pmd-designer/pull/101) Bump kotlin.version from 2.0.20 to 2.0.21
+* [#102](https://github.com/pmd/pmd-designer/pull/102) Bump org.checkerframework:checker-qual from 2.11.1 to 3.48.4
+* [#104](https://github.com/pmd/pmd-designer/pull/104) Bump org.apache.maven.plugins:maven-deploy-plugin from 3.1.1 to 3.1.3
+* [#105](https://github.com/pmd/pmd-designer/pull/105) Bump org.apache.maven.plugins:maven-javadoc-plugin from 3.6.3 to 3.11.2
+* [#106](https://github.com/pmd/pmd-designer/pull/106) Bump org.sonatype.plugins:nexus-staging-maven-plugin from 1.6.13 to 1.7.0
 
 See https://github.com/pmd/pmd-designer/milestone/16
 
