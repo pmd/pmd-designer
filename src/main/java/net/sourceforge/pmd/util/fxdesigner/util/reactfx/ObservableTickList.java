@@ -33,8 +33,12 @@ public final class ObservableTickList<E> extends BaseObservableListDelegate<E> i
 
     @Override
     protected Subscription observeInputs() {
-        return ReactfxExtensions.dynamic(base, (e, i) -> ticks.apply(e).subscribe(k -> this.notifyObservers(Collections::emptyList)))
-                                .and(LiveList.observeQuasiChanges(base, this::notifyObservers));
+        return ReactfxExtensions.dynamic(base, (e, i) -> {
+            // explicitly using a local var to help PMD, see https://github.com/pmd/pmd/issues/5493
+            EventStream<?> eventStream = ticks.apply(e);
+            return eventStream.subscribe(k -> this.notifyObservers(Collections::emptyList));
+        })
+        .and(LiveList.observeQuasiChanges(base, this::notifyObservers));
     }
 
 }
