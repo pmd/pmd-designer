@@ -62,7 +62,7 @@
         <openjfx.version>17.0.10</openjfx.version>
         <java.version>8</java.version>
 
-        <pmd.langtest.version>7.10.0</pmd.langtest.version>
+        <pmd.langtest.version>7.11.0</pmd.langtest.version>
         <kotlin.version>2.0.21</kotlin.version>
         <kotest.version>5.9.1</kotest.version>
         <junit5.version>5.11.4</junit5.version>
