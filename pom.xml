@@ -57,7 +57,7 @@
         <project.build.outputTimestamp>2025-01-23T10:14:57Z</project.build.outputTimestamp>
 
         <pmd.designer.version>${project.version}</pmd.designer.version> <!-- see DesignerVersion -->
-        <pmd.core.version>7.0.0</pmd.core.version> <!-- minimum supported PMD version (API) -->
+        <pmd.core.version>7.12.0</pmd.core.version> <!-- minimum supported PMD version (API) -->
 
         <openjfx.version>17.0.10</openjfx.version>
         <java.version>8</java.version>
