@@ -65,7 +65,8 @@
         <pmd.langtest.version>7.12.0</pmd.langtest.version>
         <kotlin.version>2.0.21</kotlin.version>
         <kotest.version>5.9.1</kotest.version>
-        <junit5.version>5.11.4</junit5.version>
+        <junit5.version>5.12.1</junit5.version>
+        <junit5.platform.version>1.12.1</junit5.platform.version>
 
         <!-- Those have different values based on the profile -->
         <openjfx.scope>provided</openjfx.scope>
@@ -532,6 +533,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit5.version}</version>
+                <scope>import</scope>
+            </dependency>
+
             <!-- ensure kotlin version, since version from pmd-lang-test (pmd.core.version) might be older -->
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -781,6 +789,17 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+          explicitly overwrite junit-platform-launcher, as
+          kotest might bring a different version.
+        -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>${junit5.platform.version}</version>
             <scope>test</scope>
         </dependency>
 
