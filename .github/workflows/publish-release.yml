@@ -1,0 +1,130 @@
+name: Publish Release
+
+on:
+  workflow_run:
+    workflows: [Build]
+    types:
+      - completed
+    branches:
+      - '**'
+      - '!main'
+      - '!dependabot/**'
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
+env:
+  LANG: 'en_US.UTF-8'
+
+jobs:
+  check-version:
+    # only run in the official pmd/pmd-designer repo, where we have access to the secrets and not on forks
+    # and only run for _successful_ push workflow runs on tags.
+    if: ${{ github.repository == 'pmd/designer'
+      && contains(fromJSON('["push", "workflow_dispatch"]'), github.event.workflow_run.event)
+      && github.event.workflow_run.head_branch != 'main'
+      && github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      VERSION: ${{ steps.version.outputs.VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
+      - name: Determine Version
+        id: version
+        env:
+          REF: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          if ! git show-ref --exists "refs/tags/$REF"; then
+            echo "::error ::Tag $REF does not exist, aborting."
+            exit 1
+          fi
+          
+          VERSION=$(./mvnw --batch-mode --no-transfer-progress help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Determined VERSION=$VERSION"
+          if [[ "$VERSION" = *-SNAPSHOT ]]; then
+            echo "::error ::VERSION=$VERSION is a snapshot version, aborting."
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Add Job Summary
+        env:
+          WORKFLOW_RUN_DISPLAY_TITLE: ${{ github.event.workflow_run.display_title }}
+          WORKFLOW_RUN_NAME: ${{ github.event.workflow_run.name }}
+          WORKFLOW_RUN_NUMBER: ${{ github.event.workflow_run.run_number }}
+          WORKFLOW_RUN_HTML_URL: ${{ github.event.workflow_run.html_url }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+          TAG: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          echo "### Run Info" >> "${GITHUB_STEP_SUMMARY}"
+          echo "Building Version: ${VERSION}" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "Tag: ${TAG}" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "Called by [${WORKFLOW_RUN_DISPLAY_TITLE} (${WORKFLOW_RUN_NAME} #${WORKFLOW_RUN_NUMBER})](${WORKFLOW_RUN_HTML_URL})" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+
+  deploy-to-maven-central:
+    needs: check-version
+    # use environment maven-central, where secrets are configured for OSSRH_*
+    environment:
+      name: maven-central
+      url: https://repo.maven.apache.org/maven2/net/sourceforge/pmd/pmd-designer/
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write # to create a new release
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          gpg-private-key: ${{ secrets.PMD_CI_GPG_PRIVATE_KEY }}
+      - name: Build and Publish
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.PMD_CI_GPG_PASSPHRASE }}
+        run: |
+          ./mvnw --show-version --errors --batch-mode \
+            -Psign,shading \
+            deploy
+      - name: Prepare Release Notes
+        run: |
+          BEGIN_LINE=$(grep -n "^## " CHANGELOG.md|head -1|cut -d ":" -f 1)
+          BEGIN_LINE=$((BEGIN_LINE + 1))
+          END_LINE=$(grep -n "^## " CHANGELOG.md|head -2|tail -1|cut -d ":" -f 1)
+          END_LINE=$((END_LINE - 1))
+          RELEASE_BODY="$(head -$END_LINE CHANGELOG.md | tail -$((END_LINE - BEGIN_LINE)))"
+          echo "$RELEASE_BODY" > release_notes.md
+      - name: Create Release
+        env:
+          TAG_NAME: ${{ github.event.workflow_run.head_branch }}
+          VERSION: ${{ needs.check-version.outputs.VERSION }}
+        run: |
+          # Note: The release asset is the shaded jar
+          gh release create "$TAG_NAME" "target/pmd-designer-${VERSION}.jar" \
+              --verify-tag \
+              --notes-file release_notes.md \
+              --title "$VERSION"
