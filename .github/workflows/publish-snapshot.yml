@@ -1,0 +1,85 @@
+name: Publish Snapshot
+
+on:
+  workflow_run:
+    workflows: [Build]
+    types:
+      - completed
+    branches:
+      - main
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
+env:
+  LANG: 'en_US.UTF-8'
+
+jobs:
+  check-version:
+    # only run in the official pmd/pmd-designer repo, where we have access to the secrets and not on forks
+    # and only run for _successful_ push workflow runs on branch "main".
+    if: ${{ github.repository == 'pmd/pmd-designer'
+      && github.event.workflow_run.event == 'push'
+      && github.event.workflow_run.head_branch == 'main'
+      && github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      VERSION: ${{ steps.version.outputs.VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
+      - name: Determine Version
+        id: version
+        run: |
+          VERSION=$(./mvnw --batch-mode --no-transfer-progress help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Determined VERSION=$VERSION"
+          if [[ "$VERSION" != *-SNAPSHOT ]]; then
+            echo "::error ::VERSION=$VERSION is not a snapshot version, aborting."
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
+  deploy-to-maven-central:
+    needs: check-version
+    # use environment maven-central, where secrets are configured for OSSRH_*
+    environment:
+      name: maven-central
+      url: https://oss.sonatype.org/content/repositories/snapshots/net/sourceforge/pmd/pmd-designer/
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          gpg-private-key: ${{ secrets.PMD_CI_GPG_PRIVATE_KEY }}
+      - name: Build and Publish
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.PMD_CI_GPG_PASSPHRASE }}
+        run: |
+          ./mvnw --show-version --errors --batch-mode \
+              -Psign,shading \
+              deploy
