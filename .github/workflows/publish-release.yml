@@ -83,7 +83,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
-      contents: write # to create a new release
+      contents: write # to create a release (via gh cli)
     defaults:
       run:
         shell: bash
@@ -120,6 +120,8 @@ jobs:
           echo "$RELEASE_BODY" > release_notes.md
       - name: Create Release
         env:
+          # Token required for GH CLI:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ github.event.workflow_run.head_branch }}
           VERSION: ${{ needs.check-version.outputs.VERSION }}
         run: |
