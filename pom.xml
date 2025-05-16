@@ -25,16 +25,6 @@
     <ciManagement>
         <url>https://github.com/pmd/pmd-designer/actions</url>
     </ciManagement>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
     <developers>
         <developer>
             <id>oowekyala</id>
@@ -121,6 +111,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
                     <version>3.6.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.7.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -393,16 +388,14 @@
             </plugin>
 
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.7.0</version>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <!-- if autoReleaseAfterClose is true, then the artifacts will be
-                         automatically promoted to maven central -->
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                    <waitUntil>published</waitUntil>
+                    <deploymentName>${project.artifactId}</deploymentName>
                 </configuration>
             </plugin>
 
@@ -505,31 +498,7 @@
             <id>local-libs</id>
             <url>file://${local.lib.repo}</url>
         </repository>
-        <repository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>sonatype-nexus-plugin-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <dependencyManagement>
         <dependencies>
@@ -1043,6 +1012,35 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>central-portal-snapshots</id>
+            <repositories>
+                <repository>
+                    <name>Central Portal Snapshots</name>
+                    <id>central-portal-snapshots</id>
+                    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <name>Central Portal Snapshots</name>
+                    <id>central-portal-snapshots</id>
+                    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
     </profiles>
 
 </project>
