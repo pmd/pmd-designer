@@ -55,7 +55,7 @@
         <pmd.langtest.version>7.14.0</pmd.langtest.version>
         <kotlin.version>2.0.21</kotlin.version>
         <kotest.version>5.9.1</kotest.version>
-        <junit5.version>5.12.2</junit5.version>
+        <junit5.version>5.13.0</junit5.version>
         <junit5.platform.version>1.12.2</junit5.platform.version>
 
         <!-- Those have different values based on the profile -->
