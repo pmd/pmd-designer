@@ -33,7 +33,6 @@ import javafx.scene.control.TreeView;
  * @author Clément Fournier
  * @since 6.0.0
  */
-@SuppressWarnings("PMD.UnusedPrivateField")
 public class ScopesPanelController extends AbstractController implements NodeSelectionSource {
 
 
