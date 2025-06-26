@@ -35,7 +35,6 @@ import javafx.scene.control.ListView;
  * @author Clément Fournier
  * @since 6.0.0
  */
-@SuppressWarnings("PMD.UnusedPrivateField")
 public class MetricPaneController extends AbstractController implements NodeSelectionSource {
 
 

@@ -54,7 +54,6 @@ class TreeViewWrapper<T> {
 
         // we can't use wrapped.getSkin() because it may be null.
         // we don't care about the specific instance, we just want the class
-        @SuppressWarnings("PMD.UselessOverridingMethod")
         Skin<?> dftSkin = new TreeView<Object>() {
             @Override
             protected Skin<?> createDefaultSkin() {

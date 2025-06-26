@@ -63,7 +63,6 @@ import javafx.stage.FileChooser;
  * @author Clément Fournier
  * @since 6.0.0
  */
-@SuppressWarnings("PMD.UnusedPrivateField")
 public class MainDesignerController extends AbstractController {
 
 
