@@ -396,7 +396,7 @@
                     <publishingServerId>central</publishingServerId>
                     <autoPublish>true</autoPublish>
                     <waitUntil>published</waitUntil>
-                    <deploymentName>${project.artifactId}</deploymentName>
+                    <deploymentName>PMD Designer ${project.version}</deploymentName>
                     <waitMaxTime>${central-publishing.waitMaxTime}</waitMaxTime>
                 </configuration>
             </plugin>
