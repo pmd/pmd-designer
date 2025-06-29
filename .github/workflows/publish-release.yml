@@ -81,7 +81,7 @@ jobs:
       name: maven-central
       url: https://repo.maven.apache.org/maven2/net/sourceforge/pmd/pmd-designer/
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 180
     permissions:
       contents: write # to create a release (via gh cli)
     defaults:

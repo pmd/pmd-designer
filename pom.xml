@@ -80,6 +80,7 @@
 
         <jflex-output>${project.build.directory}/generated-sources/jflex</jflex-output>
 
+        <central-publishing.waitMaxTime>10800</central-publishing.waitMaxTime> <!-- 10800s = 180min = 3h -->
     </properties>
 
     <build>
@@ -396,6 +397,7 @@
                     <autoPublish>true</autoPublish>
                     <waitUntil>published</waitUntil>
                     <deploymentName>${project.artifactId}</deploymentName>
+                    <waitMaxTime>${central-publishing.waitMaxTime}</waitMaxTime>
                 </configuration>
             </plugin>
 
