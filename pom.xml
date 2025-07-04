@@ -52,11 +52,11 @@
         <openjfx.version>17.0.10</openjfx.version>
         <java.version>8</java.version>
 
-        <pmd.langtest.version>7.14.0</pmd.langtest.version>
+        <pmd.langtest.version>7.15.0</pmd.langtest.version>
         <kotlin.version>2.0.21</kotlin.version>
         <kotest.version>5.9.1</kotest.version>
-        <junit5.version>5.13.1</junit5.version>
-        <junit5.platform.version>1.13.1</junit5.platform.version>
+        <junit5.version>5.13.2</junit5.version>
+        <junit5.platform.version>1.13.2</junit5.platform.version>
 
         <!-- Those have different values based on the profile -->
         <openjfx.scope>provided</openjfx.scope>
@@ -65,7 +65,7 @@
         <local.lib.repo>${project.basedir}/lib/mvn-repo</local.lib.repo>
 
         <surefire.version>3.5.3</surefire.version>
-        <checkstyle.version>10.25.1</checkstyle.version>
+        <checkstyle.version>10.26.1</checkstyle.version>
         <checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
         <javadoc.plugin.version>3.11.2</javadoc.plugin.version>
         <source.plugin.version>3.3.1</source.plugin.version>
@@ -75,7 +75,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <pmd.build-tools.version>32</pmd.build-tools.version>
-        <pmd.plugin.version>3.26.0</pmd.plugin.version>
+        <pmd.plugin.version>3.27.0</pmd.plugin.version>
         <pmd.check.version>7.15.0</pmd.check.version>
 
         <jflex-output>${project.build.directory}/generated-sources/jflex</jflex-output>
