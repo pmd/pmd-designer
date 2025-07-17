@@ -9,7 +9,10 @@
 
 2.  Verify changelog `/CHANGELOG.md`. Adjust version number if necessary.
     
-    Note: The first section will be used for the release notes on github releases.
+    Note: The first section will be used for the release notes on GitHub releases.
+
+    Tip: Execute `.ci/tools/release-notes-generate.sh` in order to generate most parts of the
+    release notes (fixed issues, pull requests, dependencies).
 
 3.  Prepare the release (creates a new release tag).
     This will be done for you: http://maven.apache.org/plugins/maven-release-plugin/examples/prepare-release.html
@@ -34,3 +37,19 @@
     have been uploaded.
 
 6.  Add a new section at the top in `/CHANGELOG.md` to prepare for the next version.
+
+    Template:
+    ```markdown
+    ## Unreleased
+    
+    **🚀 New and Noteworthy:**
+    
+    **🐛 Fixed issues:**
+    
+    **✨ Merged pull requests:**
+    
+    **📦 Dependency updates:**
+    
+    See https://github.com/pmd/pmd-designer/milestone/17
+    
+    ```
