@@ -2,8 +2,13 @@
 set -e
 
 MILESTONE_NAME="next"
+echo "Generating release notes (fixed issues, pull requests, dependencies) for milestone '${MILESTONE_NAME}'..."
+
 
 BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+read -s -p "Enter GitHub Token: " GITHUB_TOKEN
+echo
 
 CURL_API_HEADER=(--header "X-GitHub-Api-Version: 2022-11-28")
 CURL_AUTH_HEADER=()
