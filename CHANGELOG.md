@@ -10,10 +10,11 @@
 * [#168](https://github.com/pmd/pmd-designer/pull/168): Refactor GitHub Actions Workflows - [Andreas Dangel](https://github.com/adangel) (@adangel)
 * [#169](https://github.com/pmd/pmd-designer/pull/169): \[ci] publish-snapshot/release: migrate to central portal - [Andreas Dangel](https://github.com/adangel) (@adangel)
 * [#170](https://github.com/pmd/pmd-designer/pull/170): \[ci] Make build a reuseable workflow - [Andreas Dangel](https://github.com/adangel) (@adangel)
+* [#207](https://github.com/pmd/pmd-designer/pull/207): \[ci] Cleanup old scripts - [Andreas Dangel](https://github.com/adangel) (@adangel)
 
 **📦 Dependency updates:**
 <details>
-<summary>59 updates</summary>
+<summary>61 updates</summary>
 
 * [#108](https://github.com/pmd/pmd-designer/pull/108): Bump org.apache.maven.plugins:maven-clean-plugin from 3.3.2 to 3.4.0
 * [#109](https://github.com/pmd/pmd-designer/pull/109): Bump org.apache.maven.plugins:maven-surefire-plugin from 3.2.5 to 3.5.2
@@ -74,6 +75,8 @@
 * [#202](https://github.com/pmd/pmd-designer/pull/202): Bump org.apache.maven.plugins:maven-gpg-plugin from 3.2.7 to 3.2.8
 * [#204](https://github.com/pmd/pmd-designer/pull/204): Bump org.apache.maven.plugins:maven-enforcer-plugin from 3.5.0 to 3.6.0
 * [#205](https://github.com/pmd/pmd-designer/pull/205): Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.18.0
+* [#208](https://github.com/pmd/pmd-designer/pull/208): Bump maven from 3.9.10 to 3.9.11
+* [#209](https://github.com/pmd/pmd-designer/pull/209): Bump build-tools from 32 to 33
 
 </details>
 
