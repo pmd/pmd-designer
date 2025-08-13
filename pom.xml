@@ -49,7 +49,7 @@
         <pmd.designer.version>${project.version}</pmd.designer.version> <!-- see DesignerVersion -->
         <pmd.core.version>7.0.0</pmd.core.version> <!-- minimum supported PMD version (API) -->
 
-        <openjfx.version>17.0.10</openjfx.version>
+        <openjfx.version>26-ea+3</openjfx.version>
         <java.version>8</java.version>
 
         <pmd.langtest.version>7.16.0</pmd.langtest.version>
