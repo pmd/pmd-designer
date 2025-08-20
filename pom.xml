@@ -70,7 +70,7 @@
         <surefire.version>3.5.3</surefire.version>
         <checkstyle.version>10.26.1</checkstyle.version>
         <checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
-        <javadoc.plugin.version>3.11.2</javadoc.plugin.version>
+        <javadoc.plugin.version>3.11.3</javadoc.plugin.version>
         <source.plugin.version>3.3.1</source.plugin.version>
         <jar.plugin.version>3.4.2</jar.plugin.version>
 
