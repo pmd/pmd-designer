@@ -12,6 +12,7 @@
 * [#170](https://github.com/pmd/pmd-designer/pull/170): \[ci] Make build a reuseable workflow - [Andreas Dangel](https://github.com/adangel) (@adangel)
 * [#207](https://github.com/pmd/pmd-designer/pull/207): \[ci] Cleanup old scripts - [Andreas Dangel](https://github.com/adangel) (@adangel)
 * [#216](https://github.com/pmd/pmd-designer/pull/216): chore: CI Improvements - [Andreas Dangel](https://github.com/adangel) (@adangel)
+* [#251](https://github.com/pmd/pmd-designer/pull/251): chore: Use Java 17 for builds - [Andreas Dangel](https://github.com/adangel) (@adangel)
 
 **📦 Dependency updates:**
 <details>
