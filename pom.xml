@@ -58,8 +58,7 @@
         <kotlin.compiler.jvmTarget>1.${java.version}</kotlin.compiler.jvmTarget>
         <kotlin.version>2.2.20</kotlin.version>
         <kotest.version>5.9.1</kotest.version>
-        <junit5.version>6.0.0</junit5.version>
-        <junit5.platform.version>1.13.4</junit5.platform.version>
+        <junit.version>6.0.0</junit.version>
 
         <!-- Those have different values based on the profile -->
         <openjfx.scope>provided</openjfx.scope>
@@ -185,11 +184,11 @@
                 </configuration>
 
                 <dependencies>
-                    <!-- Junit5 Platform Engine for Junit 3 & 4 -->
+                    <!-- Junit6 Platform Engine for Junit 3 & 4 -->
                     <dependency>
                         <groupId>org.junit.vintage</groupId>
                         <artifactId>junit-vintage-engine</artifactId>
-                        <version>${junit5.version}</version>
+                        <version>${junit.version}</version>
                     </dependency>
                     <!-- Junit5 Platform Engine for Kotlin Tests -->
                     <dependency>
@@ -509,7 +508,8 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>${junit5.version}</version>
+                <version>${junit.version}</version>
+                <type>pom</type>
                 <scope>import</scope>
             </dependency>
 
@@ -761,7 +761,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit5.version}</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -772,7 +772,7 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
-            <version>${junit5.platform.version}</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
 
