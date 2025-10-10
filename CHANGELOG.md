@@ -16,7 +16,7 @@
 
 **📦 Dependency updates:**
 <details>
-<summary>61 updates</summary>
+<summary>87 updates</summary>
 
 * [#108](https://github.com/pmd/pmd-designer/pull/108): Bump org.apache.maven.plugins:maven-clean-plugin from 3.3.2 to 3.4.0
 * [#109](https://github.com/pmd/pmd-designer/pull/109): Bump org.apache.maven.plugins:maven-surefire-plugin from 3.2.5 to 3.5.2
@@ -79,6 +79,32 @@
 * [#205](https://github.com/pmd/pmd-designer/pull/205): Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.18.0
 * [#208](https://github.com/pmd/pmd-designer/pull/208): Bump maven from 3.9.10 to 3.9.11
 * [#209](https://github.com/pmd/pmd-designer/pull/209): Bump build-tools from 32 to 33
+* [#210](https://github.com/pmd/pmd-designer/pull/210): Bump org.apache.maven.plugins:maven-enforcer-plugin from 3.6.0 to 3.6.1
+* [#211](https://github.com/pmd/pmd-designer/pull/211): Bump net.sourceforge.pmd:pmd-lang-test from 7.15.0 to 7.16.0
+* [#212](https://github.com/pmd/pmd-designer/pull/212): Bump junit5.version from 5.13.3 to 5.13.4
+* [#214](https://github.com/pmd/pmd-designer/pull/214): Bump org.junit.platform:junit-platform-launcher from 1.13.3 to 1.13.4
+* [#218](https://github.com/pmd/pmd-designer/pull/218): Bump actions/checkout from 4.2.2 to 5.0.0
+* [#219](https://github.com/pmd/pmd-designer/pull/219): Bump actions/create-github-app-token from 2.0.6 to 2.1.1
+* [#221](https://github.com/pmd/pmd-designer/pull/221): Bump net.sourceforge.pmd:pmd-build-tools-config from 33 to 34
+* [#223](https://github.com/pmd/pmd-designer/pull/223): Bump org.apache.maven.plugins:maven-javadoc-plugin from 3.11.2 to 3.11.3
+* [#224](https://github.com/pmd/pmd-designer/pull/224): Bump kotlin.version from 2.2.0 to 2.2.10
+* [#225](https://github.com/pmd/pmd-designer/pull/225): Bump actions/setup-java from 4.7.1 to 5.0.0
+* [#229](https://github.com/pmd/pmd-designer/pull/229): Bump org.checkerframework:checker-qual from 3.49.5 to 3.50.0
+* [#232](https://github.com/pmd/pmd-designer/pull/232): Bump actions/create-github-app-token from 2.1.1 to 2.1.4
+* [#233](https://github.com/pmd/pmd-designer/pull/233): Bump kotlin.version from 2.2.10 to 2.2.20
+* [#235](https://github.com/pmd/pmd-designer/pull/235): Bump org.apache.maven.plugins:maven-shade-plugin from 3.6.0 to 3.6.1
+* [#236](https://github.com/pmd/pmd-designer/pull/236): Bump net.sourceforge.pmd:pmd-lang-test from 7.16.0 to 7.17.0
+* [#237](https://github.com/pmd/pmd-designer/pull/237): Bump org.checkerframework:checker-qual from 3.50.0 to 3.51.0
+* [#238](https://github.com/pmd/pmd-designer/pull/238): Bump org.sonatype.central:central-publishing-maven-plugin from 0.8.0 to 0.9.0
+* [#239](https://github.com/pmd/pmd-designer/pull/239): Bump org.apache.maven.plugins:maven-compiler-plugin from 3.14.0 to 3.14.1
+* [#240](https://github.com/pmd/pmd-designer/pull/240): Bump org.apache.maven.plugins:maven-surefire-plugin from 3.5.3 to 3.5.4
+* [#241](https://github.com/pmd/pmd-designer/pull/241): Bump org.apache.maven.plugins:maven-javadoc-plugin from 3.11.3 to 3.12.0
+* [#243](https://github.com/pmd/pmd-designer/pull/243): Bump org.codehaus.mojo:exec-maven-plugin from 3.5.1 to 3.6.0
+* [#244](https://github.com/pmd/pmd-designer/pull/244): Bump junit.version from 5.13.4 to 6.0.0
+* [#246](https://github.com/pmd/pmd-designer/pull/246): Bump org.apache.commons:commons-lang3 from 3.18.0 to 3.19.0
+* [#247](https://github.com/pmd/pmd-designer/pull/247): Bump com.puppycrawl.tools:checkstyle from 10.26.1 to 12.0.0
+* [#248](https://github.com/pmd/pmd-designer/pull/248): Bump org.apache.maven.plugins:maven-enforcer-plugin from 3.6.1 to 3.6.2
+* [#250](https://github.com/pmd/pmd-designer/pull/250): Bump org.checkerframework:checker-qual from 3.51.0 to 3.51.1
 
 </details>
 
