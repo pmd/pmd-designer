@@ -24,7 +24,7 @@ public final class DesignerVersion {
     private static final String PMD_CORE_MIN_VERSION;
     private static final String UNKNOWN_VERSION = "unknown";
 
-    /**
+    /*
      * Determines the version from maven's generated designer.properties file.
      */
     static {

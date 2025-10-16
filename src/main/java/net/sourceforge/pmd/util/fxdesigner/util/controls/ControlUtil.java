@@ -4,11 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.util.controls;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.util.function.Function;
@@ -243,8 +240,7 @@ public final class ControlUtil {
 
             if (file != null) {
 
-                try (OutputStream is = Files.newOutputStream(file.toPath());
-                     Writer out = new BufferedWriter(new OutputStreamWriter(is))) {
+                try (Writer out = Files.newBufferedWriter(file.toPath())) {
 
                     out.write(content.get());
                     SimplePopups.showActionFeedback(button, AlertType.CONFIRMATION, "File saved");

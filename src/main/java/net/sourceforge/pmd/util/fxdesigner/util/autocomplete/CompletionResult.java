@@ -47,6 +47,7 @@ public class CompletionResult implements Comparable<CompletionResult> {
 
 
     @Override
+    @SuppressWarnings("PMD.OverrideBothEqualsAndHashCodeOnComparable") // not used in a sorted set/map
     public int compareTo(CompletionResult o) {
         return Integer.compare(score, o.score);
     }
