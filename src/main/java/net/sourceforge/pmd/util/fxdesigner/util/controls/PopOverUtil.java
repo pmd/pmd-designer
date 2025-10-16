@@ -64,8 +64,6 @@ public final class PopOverUtil {
             popOver.show(owner, bounds.getMinX() + bounds.getWidth() / 2,
                          bounds.getMinY() + bounds.getHeight() - offset);
             break;
-        default:
-            break;
         }
     }
 

@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.IntFunction;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -222,7 +221,13 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
 
         liveTestCase.addCommitHandler(t -> pin.unsubscribe());
 
-        Val<IntFunction<Val<Integer>>> map1 = mapVal.map(it -> (int j) -> Optional.ofNullable(it.get(j)).orElse(new LiveArrayList<>()).sizeProperty());
+        Val<IntFunction<Val<Integer>>> map1 = mapVal.map(it -> (int j) -> it.entrySet().stream()
+                // TODO: this is probably wrong - j is not the offset, but the line number
+                .filter((entry) -> entry.getKey().contains(j))
+                .findFirst()
+                .map(Map.Entry::getValue)
+                .orElse(new LiveArrayList<>())
+                .sizeProperty());
 
         IntFunction<Val<Integer>> numViolationsPerLine = i -> map1.flatMap(it -> it.apply(i));
 

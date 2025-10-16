@@ -41,6 +41,7 @@ public class LiveViolationRecord implements SettingsOwner, Comparable<LiveViolat
 
 
     @Override
+    @SuppressWarnings("PMD.OverrideBothEqualsAndHashCodeOnComparable") // not used in a sorted set/map
     public int compareTo(LiveViolationRecord o) {
         TextRegion mine = getRegion();
         TextRegion theirs = o.getRegion();
