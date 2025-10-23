@@ -74,6 +74,7 @@ public final class LogEntry implements Comparable<LogEntry> {
     }
 
     @Override
+    @SuppressWarnings("PMD.OverrideBothEqualsAndHashCodeOnComparable") // not used in a sorted set/map
     public int compareTo(LogEntry o) {
         return getTimestamp().compareTo(o.getTimestamp());
     }

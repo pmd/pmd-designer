@@ -73,6 +73,7 @@ public class MatchResult<T> implements Comparable<MatchResult<?>> {
 
 
     @Override
+    @SuppressWarnings("PMD.OverrideBothEqualsAndHashCodeOnComparable") // not used in a sorted set/map
     public int compareTo(MatchResult<?> o) {
         return Integer.compare(score, o.score);
     }

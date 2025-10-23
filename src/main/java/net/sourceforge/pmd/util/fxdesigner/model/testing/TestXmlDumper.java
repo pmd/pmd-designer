@@ -4,8 +4,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.model.testing;
 
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -142,9 +140,7 @@ public class TestXmlDumper {
 
 
     public static void dumpXmlTests(Path path, TestCollection collection) throws Exception {
-        try (OutputStream is = Files.newOutputStream(path);
-             Writer out = new OutputStreamWriter(is)) {
-
+        try (Writer out = Files.newBufferedWriter(path)) {
             dumpXmlTests(out, collection);
         }
     }
