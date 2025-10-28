@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
@@ -75,6 +76,8 @@ public class ASTManagerImpl implements ASTManager {
     private final Var<ParseAbortedException> currentException = Var.newSimpleVar(null);
 
     private final Var<Map<String, String>> ruleProperties = Var.newSimpleVar(Collections.emptyMap());
+
+    private @Nullable ClassLoader currentClassloader;
 
     public ASTManagerImpl(DesignerRoot owner) {
         this.designerRoot = owner;
@@ -233,12 +236,14 @@ public class ASTManagerImpl implements ASTManager {
                                                  langProperties,
                                                  NOOP_REPORTER);
             lpRegistry.setValue(newRegistry);
+            currentClassloader = classLoader;
             return newRegistry;
         }
 
         // already created, need to check that the version is the same
         if (!current.getLanguages().getLanguages().contains(version.getLanguage())
-            || !current.getProcessor(version.getLanguage()).getLanguageVersion().equals(version)) {
+            || !current.getProcessor(version.getLanguage()).getLanguageVersion().equals(version)
+            || !Objects.equals(currentClassloader, classLoader)) {
             // current is invalid, recreate it
             current.close();
             lpRegistry.setValue(null);
