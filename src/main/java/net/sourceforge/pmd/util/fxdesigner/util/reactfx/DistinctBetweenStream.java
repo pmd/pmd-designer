@@ -33,7 +33,6 @@ public final class DistinctBetweenStream<I> extends EventStreamBase<I> {
     private final Timer timer;
     private Object previous = NONE;
 
-    @SuppressWarnings("PMD.AssignmentInOperand") // https://github.com/pmd/pmd/issues/6075
     private DistinctBetweenStream(EventStream<I> input, Function<Runnable, Timer> timerFactory) {
         this.input = input;
         this.timer = timerFactory.apply(() -> previous = NONE);
