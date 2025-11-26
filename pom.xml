@@ -608,7 +608,7 @@
         <dependency>
             <groupId>org.fxmisc.richtext</groupId>
             <artifactId>richtextfx</artifactId>
-            <version>0.9.2</version>
+            <version>0.11.7</version>
         </dependency>
 
         <!-- We need two incompatible versions of controlsfx, one for Java 8, and one for Java 9+ -->
