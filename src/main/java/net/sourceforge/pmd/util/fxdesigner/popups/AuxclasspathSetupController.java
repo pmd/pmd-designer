@@ -28,6 +28,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -38,9 +39,11 @@ public class AuxclasspathSetupController implements Initializable {
     private final DesignerRoot designerRoot;
 
     @FXML
-    private Button removeFileButton;
+    private Button removeItemButton;
     @FXML
     private Button selectFilesButton;
+    @FXML
+    private Button selectDirectoryButton;
     @FXML
     private ListView<File> fileListView;
     @FXML
@@ -62,7 +65,7 @@ public class AuxclasspathSetupController implements Initializable {
 
         BooleanBinding noSelection = fileListView.getSelectionModel().selectedItemProperty().isNull();
 
-        removeFileButton.disableProperty().bind(noSelection);
+        removeItemButton.disableProperty().bind(noSelection);
 
         moveItemUpButton.disableProperty().bind(noSelection.or(fileListView.getSelectionModel().selectedIndexProperty().isEqualTo(0)));
 
@@ -76,22 +79,28 @@ public class AuxclasspathSetupController implements Initializable {
         fileListView.setCellFactory(DesignerUtil.simpleListCellFactory(File::getName, File::getAbsolutePath));
 
         selectFilesButton.setOnAction(e -> onSelectFileClicked());
-        removeFileButton.setOnAction(e -> onRemoveFileClicked());
+        selectDirectoryButton.setOnAction(e -> onSelectDirectoryClicked());
+        removeItemButton.setOnAction(e -> onRemoveFileClicked());
         moveItemUpButton.setOnAction(e -> moveUp());
         moveItemDownButton.setOnAction(e -> moveDown());
-
     }
 
 
     private void onSelectFileClicked() {
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("Add files to the auxilliary classpath");
+        chooser.setTitle("Add jar-files to the auxiliary classpath");
         chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Java archives", "*.jar", "*.war", "*.ear"),
-                new FileChooser.ExtensionFilter("Java class files", "*.class")
+                new FileChooser.ExtensionFilter("Java archives", "*.jar", "*.war", "*.ear")
         );
         List<File> files = chooser.showOpenMultipleDialog(designerRoot.getMainStage());
         fileListView.getItems().addAll(files);
+    }
+
+    private void onSelectDirectoryClicked() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Add directory to the auxiliary classpath");
+        File file = chooser.showDialog(designerRoot.getMainStage());
+        fileListView.getItems().addAll(file);
     }
 
 
