@@ -18,7 +18,7 @@
 
 **📦 Dependency updates:**
 <details>
-<summary>87 updates</summary>
+<summary>108 updates</summary>
 
 * [#108](https://github.com/pmd/pmd-designer/pull/108): Bump org.apache.maven.plugins:maven-clean-plugin from 3.3.2 to 3.4.0
 * [#109](https://github.com/pmd/pmd-designer/pull/109): Bump org.apache.maven.plugins:maven-surefire-plugin from 3.2.5 to 3.5.2
@@ -107,6 +107,27 @@
 * [#247](https://github.com/pmd/pmd-designer/pull/247): Bump com.puppycrawl.tools:checkstyle from 10.26.1 to 12.0.0
 * [#248](https://github.com/pmd/pmd-designer/pull/248): Bump org.apache.maven.plugins:maven-enforcer-plugin from 3.6.1 to 3.6.2
 * [#250](https://github.com/pmd/pmd-designer/pull/250): Bump org.checkerframework:checker-qual from 3.51.0 to 3.51.1
+* [#254](https://github.com/pmd/pmd-designer/pull/254): Bump org.apache.maven.plugins:maven-pmd-plugin from 3.27.0 to 3.28.0
+* [#255](https://github.com/pmd/pmd-designer/pull/255): Bump org.codehaus.mojo:exec-maven-plugin from 3.6.0 to 3.6.1
+* [#256](https://github.com/pmd/pmd-designer/pull/256): Bump com.puppycrawl.tools:checkstyle from 12.0.0 to 12.0.1
+* [#259](https://github.com/pmd/pmd-designer/pull/259): Update build-tools from 34 to 35
+* [#262](https://github.com/pmd/pmd-designer/pull/262): Bump org.codehaus.mojo:exec-maven-plugin from 3.6.1 to 3.6.2
+* [#263](https://github.com/pmd/pmd-designer/pull/263): Bump com.puppycrawl.tools:checkstyle from 12.0.1 to 12.1.0
+* [#264](https://github.com/pmd/pmd-designer/pull/264): Bump actions/upload-artifact from 4.6.2 to 5.0.0
+* [#267](https://github.com/pmd/pmd-designer/pull/267): Bump com.puppycrawl.tools:checkstyle from 12.1.0 to 12.1.1
+* [#268](https://github.com/pmd/pmd-designer/pull/268): Bump PMD from 7.17.0 to 7.18.0 for checks
+* [#270](https://github.com/pmd/pmd-designer/pull/270): Bump net.sourceforge.pmd:pmd-lang-test from 7.17.0 to 7.18.0
+* [#271](https://github.com/pmd/pmd-designer/pull/271): Bump junit.version from 6.0.0 to 6.0.1
+* [#272](https://github.com/pmd/pmd-designer/pull/272): Bump org.checkerframework:checker-qual from 3.51.1 to 3.52.0
+* [#274](https://github.com/pmd/pmd-designer/pull/274): Bump com.puppycrawl.tools:checkstyle from 12.1.1 to 12.1.2
+* [#275](https://github.com/pmd/pmd-designer/pull/275): Bump org.apache.maven.plugins:maven-release-plugin from 3.1.1 to 3.2.0
+* [#277](https://github.com/pmd/pmd-designer/pull/277): Bump org.apache.maven.plugins:maven-jar-plugin from 3.4.2 to 3.5.0
+* [#279](https://github.com/pmd/pmd-designer/pull/279): Bump org.apache.commons:commons-lang3 from 3.19.0 to 3.20.0
+* [#280](https://github.com/pmd/pmd-designer/pull/280): Bump actions/checkout from 5.0.0 to 5.0.1
+* [#281](https://github.com/pmd/pmd-designer/pull/281): Bump org.fxmisc.richtext:richtextfx from 0.9.2 to 0.11.7
+* [#283](https://github.com/pmd/pmd-designer/pull/283): Bump actions/checkout from 5.0.1 to 6.0.0
+* [#284](https://github.com/pmd/pmd-designer/pull/284): Bump actions/create-github-app-token from 2.1.4 to 2.2.0
+* [#286](https://github.com/pmd/pmd-designer/pull/286): Bump build-tools from 35 to 36
 
 </details>
 
