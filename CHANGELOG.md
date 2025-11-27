@@ -2,14 +2,11 @@
 
 ## Unreleased
 
-**🚀 New and Noteworthy:**
-
 **🐛 Fixed issues:**
 * Designer doesn't start with Java11 + OpenJFX
 
 **✨ Merged pull requests:**
-
-**📦 Dependency updates:**
+* [#289](https://github.com/pmd/pmd-designer/pull/289): Downgrade org.kordamp.ikonli:ikonli-javafx/ikonli-fontawesome5-pack - [Andreas Dangel](https://github.com/adangel) (@adangel)
 
 See https://github.com/pmd/pmd-designer/milestone/18
 
