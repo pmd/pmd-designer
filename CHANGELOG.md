@@ -18,7 +18,7 @@
 
 **📦 Dependency updates:**
 <details>
-<summary>108 updates</summary>
+<summary>111 updates</summary>
 
 * [#108](https://github.com/pmd/pmd-designer/pull/108): Bump org.apache.maven.plugins:maven-clean-plugin from 3.3.2 to 3.4.0
 * [#109](https://github.com/pmd/pmd-designer/pull/109): Bump org.apache.maven.plugins:maven-surefire-plugin from 3.2.5 to 3.5.2
@@ -53,6 +53,8 @@
 * [#157](https://github.com/pmd/pmd-designer/pull/157): Bump junit5.version from 5.12.1 to 5.12.2
 * [#158](https://github.com/pmd/pmd-designer/pull/158): Bump org.junit.platform:junit-platform-launcher from 1.12.1 to 1.12.2
 * [#159](https://github.com/pmd/pmd-designer/pull/159): Bump org.checkerframework:checker-qual from 3.49.1 to 3.49.2
+* [#161](https://github.com/pmd/pmd-designer/pull/161): Bump org.kordamp.ikonli:ikonli-fontawesome5-pack from 2.4.0 to 12.4.0
+* [#162](https://github.com/pmd/pmd-designer/pull/162): Bump org.kordamp.ikonli:ikonli-javafx from 2.4.0 to 12.4.0
 * [#165](https://github.com/pmd/pmd-designer/pull/165): Bump com.puppycrawl.tools:checkstyle from 10.23.0 to 10.23.1
 * [#166](https://github.com/pmd/pmd-designer/pull/166): Bump net.sourceforge.pmd:pmd-lang-test from 7.12.0 to 7.13.0
 * [#167](https://github.com/pmd/pmd-designer/pull/167): Bump org.checkerframework:checker-qual from 3.49.2 to 3.49.3
@@ -114,6 +116,7 @@
 * [#262](https://github.com/pmd/pmd-designer/pull/262): Bump org.codehaus.mojo:exec-maven-plugin from 3.6.1 to 3.6.2
 * [#263](https://github.com/pmd/pmd-designer/pull/263): Bump com.puppycrawl.tools:checkstyle from 12.0.1 to 12.1.0
 * [#264](https://github.com/pmd/pmd-designer/pull/264): Bump actions/upload-artifact from 4.6.2 to 5.0.0
+* [#265](https://github.com/pmd/pmd-designer/pull/265): Bump kotlin.version from 2.2.20 to 2.2.21
 * [#267](https://github.com/pmd/pmd-designer/pull/267): Bump com.puppycrawl.tools:checkstyle from 12.1.0 to 12.1.1
 * [#268](https://github.com/pmd/pmd-designer/pull/268): Bump PMD from 7.17.0 to 7.18.0 for checks
 * [#270](https://github.com/pmd/pmd-designer/pull/270): Bump net.sourceforge.pmd:pmd-lang-test from 7.17.0 to 7.18.0
