@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-**🚀 New and Noteworthy:**
-
 **🐛 Fixed issues:**
 * [#257](https://github.com/pmd/pmd-designer/issues/257): Refresh language registry when classpath changes
 
@@ -18,7 +16,7 @@
 
 **📦 Dependency updates:**
 <details>
-<summary>111 updates</summary>
+<summary>110 updates</summary>
 
 * [#108](https://github.com/pmd/pmd-designer/pull/108): Bump org.apache.maven.plugins:maven-clean-plugin from 3.3.2 to 3.4.0
 * [#109](https://github.com/pmd/pmd-designer/pull/109): Bump org.apache.maven.plugins:maven-surefire-plugin from 3.2.5 to 3.5.2
@@ -128,9 +126,10 @@
 * [#283](https://github.com/pmd/pmd-designer/pull/283): Bump actions/checkout from 5.0.1 to 6.0.0
 * [#284](https://github.com/pmd/pmd-designer/pull/284): Bump actions/create-github-app-token from 2.1.4 to 2.2.0
 * [#286](https://github.com/pmd/pmd-designer/pull/286): Bump build-tools from 35 to 36
+* [#287](https://github.com/pmd/pmd-designer/pull/287): Bump org.fxmisc.richtext:richtextfx from 0.9.2 to 0.9.3
+* [#288](https://github.com/pmd/pmd-designer/pull/288): Bump org.kordamp.ikonli from 2.4.0 to 2.6.0
 
 </details>
-
 
 See https://github.com/pmd/pmd-designer/milestone/17
 
