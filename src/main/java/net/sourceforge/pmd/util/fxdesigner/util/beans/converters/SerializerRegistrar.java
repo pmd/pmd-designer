@@ -219,8 +219,7 @@ public class SerializerRegistrar {
      * @return A serializer, or null if none can be found
      */
     @SuppressWarnings("unchecked")
-    @Nullable
-    public final Serializer<?> getSerializer(Type genericType) {
+    public final @Nullable Serializer<?> getSerializer(Type genericType) {
         if (converters.containsKey(genericType)) {
             return converters.get(genericType);
         }

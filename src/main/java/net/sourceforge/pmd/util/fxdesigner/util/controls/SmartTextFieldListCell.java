@@ -67,8 +67,7 @@ public abstract class SmartTextFieldListCell<T> extends ListCell<T> {
     protected abstract Var<String> extractEditable(T t);
 
 
-    @Nullable
-    protected String getPrompt() {
+    protected @Nullable String getPrompt() {
         return null;
     }
 

@@ -205,8 +205,7 @@ public class SyntaxHighlightingCodeArea extends CodeArea {
      * style layer in the game. Subclasses are free to override, to get a chance to
      * preserve additional style layers.
      */
-    @NonNull
-    protected StyleSpans<Collection<String>> styleSyntaxHighlightChange(final @Nullable StyleSpans<Collection<String>> oldSyntax,
+    protected @NonNull StyleSpans<Collection<String>> styleSyntaxHighlightChange(final @Nullable StyleSpans<Collection<String>> oldSyntax,
                                                                         final @Nullable StyleSpans<Collection<String>> newSyntax) {
         return newSyntax == null ? emptySpan() : newSyntax;
     }

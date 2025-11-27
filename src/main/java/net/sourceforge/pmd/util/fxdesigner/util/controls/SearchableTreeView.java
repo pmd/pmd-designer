@@ -54,8 +54,7 @@ public class SearchableTreeView<T> extends TreeView<T> {
     public static final int MIN_QUERY_LENGTH = 1;
     private final TreeViewWrapper<T> myWrapper = new TreeViewWrapper<>(this);
 
-    @Nullable
-    private TextField openSearchField;
+    private @Nullable TextField openSearchField;
 
     public SearchableTreeView() {
 

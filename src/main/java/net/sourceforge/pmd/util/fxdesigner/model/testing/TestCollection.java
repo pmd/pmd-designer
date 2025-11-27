@@ -23,8 +23,7 @@ public class TestCollection implements SettingsOwner {
 
     private LiveList<LiveTestCase> stash;
     private final @Nullable ObservableRuleBuilder owner;
-    @Nullable
-    private File origin;
+    private @Nullable File origin;
 
     public TestCollection(@Nullable ObservableRuleBuilder owner, List<LiveTestCase> tests) {
         this.stash = new LiveArrayList<>(tests);
@@ -65,9 +64,8 @@ public class TestCollection implements SettingsOwner {
         }
     }
 
-    @Nullable
     @PersistentProperty
-    public File getOrigin() {
+    public @Nullable File getOrigin() {
         return origin;
     }
 
@@ -75,16 +73,14 @@ public class TestCollection implements SettingsOwner {
         this.origin = origin;
     }
 
-    @Nullable
-    public LiveTestCase getOpenTest() {
+    public @Nullable LiveTestCase getOpenTest() {
         return stash.stream().filter(it -> !it.isFrozen()).findFirst().orElse(null);
     }
 
     /**
      * Opens a test case for write access.
      */
-    @Nullable
-    public LiveTestCase export(int i) {
+    public @Nullable LiveTestCase export(int i) {
         if (0 <= i && i < stash.size()) {
             stash.forEach(LiveTestCase::freeze);
             return stash.get(i).unfreeze();

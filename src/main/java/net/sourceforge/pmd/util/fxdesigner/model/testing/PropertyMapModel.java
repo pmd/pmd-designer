@@ -72,8 +72,7 @@ public class PropertyMapModel {
         });
     }
 
-    @NonNull
-    private ObservableList<PropertyDescriptorSpec> defaultToEmpty(@Nullable ObservableList<PropertyDescriptorSpec> props) {
+    private @NonNull ObservableList<PropertyDescriptorSpec> defaultToEmpty(@Nullable ObservableList<PropertyDescriptorSpec> props) {
         return props == null ? emptyObservableList() : props;
     }
 
@@ -112,8 +111,7 @@ public class PropertyMapModel {
         }
     }
 
-    @NonNull
-    private Map<String, String> computeNonDefault(Map<PropertyDescriptorSpec, Var<String>> map) {
+    private @NonNull Map<String, String> computeNonDefault(Map<PropertyDescriptorSpec, Var<String>> map) {
         return map.entrySet()
                   .stream()
                   .filter(it -> !Objects.equals(it.getValue().getValue(), it.getKey().getValue()))

@@ -69,8 +69,7 @@ public final class SimplePopups {
         return showActionFeedback(owner, icon, message, offsetX, true, type.name().toLowerCase(Locale.ROOT));
     }
 
-    @Nullable
-    private static Node getIconLiteral(AlertType type) {
+    private static @Nullable Node getIconLiteral(AlertType type) {
         @Nullable String iconLit;
         switch (type) {
         case ERROR:

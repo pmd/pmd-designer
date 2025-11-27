@@ -114,8 +114,7 @@ public final class XPathAutocompleteProvider {
     }
 
 
-    @Nullable
-    private Tuple2<Integer, String> getInsertionPointAndQuery(int searchPoint) {
+    private @Nullable Tuple2<Integer, String> getInsertionPointAndQuery(int searchPoint) {
         String input = myCodeArea.getText();
 
         int insertionPoint = getInsertionPoint(searchPoint, input);
