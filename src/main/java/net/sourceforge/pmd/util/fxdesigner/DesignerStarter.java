@@ -42,7 +42,7 @@ public final class DesignerStarter {
         System.exit(ret.getCode());
     }
 
-    @SuppressWarnings("PMD.AvoidCatchingThrowable")
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public static ExitStatus launchGui(String[] args) {
         setSystemProperties();
 
