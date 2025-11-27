@@ -5,12 +5,13 @@
 **🚀 New and Noteworthy:**
 
 **🐛 Fixed issues:**
+* Designer doesn't start with Java11 + OpenJFX
 
 **✨ Merged pull requests:**
 
 **📦 Dependency updates:**
 
-See https://github.com/pmd/pmd-designer/milestone/17
+See https://github.com/pmd/pmd-designer/milestone/18
 
 ## 7.19.0 (2025-11-27)
 
