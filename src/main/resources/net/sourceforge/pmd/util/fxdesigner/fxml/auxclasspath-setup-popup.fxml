@@ -32,13 +32,25 @@
                         styleClass="icon-button"
                         textAlignment="CENTER">
                     <graphic>
-                        <FontIcon iconLiteral="fas-plus"/>
+                        <FontIcon iconLiteral="fas-file-archive"/>
                     </graphic>
                     <tooltip>
                         <Tooltip text="Add new jars"/>
                     </tooltip>
                 </Button>
-                <Button fx:id="removeFileButton"
+                <Button fx:id="selectDirectoryButton"
+                        minWidth="-Infinity"
+                        mnemonicParsing="false"
+                        styleClass="icon-button"
+                        textAlignment="CENTER">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-folder"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Add new directory"/>
+                    </tooltip>
+                </Button>
+                <Button fx:id="removeItemButton"
                         minWidth="-Infinity"
                         mnemonicParsing="false"
                         styleClass="icon-button"
