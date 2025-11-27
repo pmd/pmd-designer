@@ -53,8 +53,6 @@
 * [#157](https://github.com/pmd/pmd-designer/pull/157): Bump junit5.version from 5.12.1 to 5.12.2
 * [#158](https://github.com/pmd/pmd-designer/pull/158): Bump org.junit.platform:junit-platform-launcher from 1.12.1 to 1.12.2
 * [#159](https://github.com/pmd/pmd-designer/pull/159): Bump org.checkerframework:checker-qual from 3.49.1 to 3.49.2
-* [#161](https://github.com/pmd/pmd-designer/pull/161): Bump org.kordamp.ikonli:ikonli-fontawesome5-pack from 2.4.0 to 12.4.0
-* [#162](https://github.com/pmd/pmd-designer/pull/162): Bump org.kordamp.ikonli:ikonli-javafx from 2.4.0 to 12.4.0
 * [#165](https://github.com/pmd/pmd-designer/pull/165): Bump com.puppycrawl.tools:checkstyle from 10.23.0 to 10.23.1
 * [#166](https://github.com/pmd/pmd-designer/pull/166): Bump net.sourceforge.pmd:pmd-lang-test from 7.12.0 to 7.13.0
 * [#167](https://github.com/pmd/pmd-designer/pull/167): Bump org.checkerframework:checker-qual from 3.49.2 to 3.49.3
@@ -127,7 +125,6 @@
 * [#277](https://github.com/pmd/pmd-designer/pull/277): Bump org.apache.maven.plugins:maven-jar-plugin from 3.4.2 to 3.5.0
 * [#279](https://github.com/pmd/pmd-designer/pull/279): Bump org.apache.commons:commons-lang3 from 3.19.0 to 3.20.0
 * [#280](https://github.com/pmd/pmd-designer/pull/280): Bump actions/checkout from 5.0.0 to 5.0.1
-* [#281](https://github.com/pmd/pmd-designer/pull/281): Bump org.fxmisc.richtext:richtextfx from 0.9.2 to 0.11.7
 * [#283](https://github.com/pmd/pmd-designer/pull/283): Bump actions/checkout from 5.0.1 to 6.0.0
 * [#284](https://github.com/pmd/pmd-designer/pull/284): Bump actions/create-github-app-token from 2.1.4 to 2.2.0
 * [#286](https://github.com/pmd/pmd-designer/pull/286): Bump build-tools from 35 to 36
