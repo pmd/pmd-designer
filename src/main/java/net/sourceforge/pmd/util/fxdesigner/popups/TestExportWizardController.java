@@ -36,8 +36,7 @@ import javafx.stage.Stage;
 public final class TestExportWizardController extends AbstractController {
 
     private final Stage myPopupStage;
-    @Nullable
-    private String originalFile;
+    private @Nullable String originalFile;
     @FXML
     private ToolbarTitledPane titledPane;
     @FXML

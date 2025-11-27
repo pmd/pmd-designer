@@ -188,8 +188,7 @@ public class HighlightLayerCodeArea<K extends Enum<K> & LayerId> extends SyntaxH
      * parsing update.
      */
     @Override
-    @NonNull
-    protected final StyleSpans<Collection<String>> styleSyntaxHighlightChange(final @Nullable StyleSpans<Collection<String>> oldSyntax,
+    protected final @NonNull StyleSpans<Collection<String>> styleSyntaxHighlightChange(final @Nullable StyleSpans<Collection<String>> oldSyntax,
                                                                               final @Nullable StyleSpans<Collection<String>> newSyntax) {
 
         StyleSpans<Collection<String>> currentSpans = getStyleSpans(new IndexRange(0, getLength()));

@@ -65,8 +65,7 @@ public class LiveViolationRecord implements SettingsOwner, Comparable<LiveViolat
 
 
     @PersistentProperty
-    @NonNull
-    public TextRegion getRegion() {
+    public @NonNull TextRegion getRegion() {
         return region.getValue();
     }
 
@@ -82,8 +81,7 @@ public class LiveViolationRecord implements SettingsOwner, Comparable<LiveViolat
 
 
     @PersistentProperty
-    @Nullable
-    public String getMessage() {
+    public @Nullable String getMessage() {
         return message.getValue();
     }
 

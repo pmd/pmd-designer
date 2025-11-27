@@ -247,8 +247,7 @@ public class NodeEditionCodeArea extends HighlightLayerCodeArea<StyleLayerIds> i
         };
     }
 
-    @NonNull
-    public Label buildExpectedLabel(IntFunction<Val<Integer>> numViolationsPerLine, int idx) {
+    public @NonNull Label buildExpectedLabel(IntFunction<Val<Integer>> numViolationsPerLine, int idx) {
         Label foo = new Label();
         foo.getStyleClass().addAll("num-violations-gutter-label");
         Val<Integer> num = numViolationsPerLine.apply(idx + 1);

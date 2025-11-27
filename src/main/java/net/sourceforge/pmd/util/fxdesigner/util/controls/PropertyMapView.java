@@ -42,10 +42,8 @@ import javafx.util.Pair;
 public class PropertyMapView extends VBox implements ApplicationComponent {
 
     private static final int LIST_CELL_HEIGHT = 24;
-    @NonNull
-    private final DesignerRoot root;
-    @NonNull
-    private final ListView<Pair<PropertyDescriptorSpec, Var<String>>> view;
+    private final @NonNull DesignerRoot root;
+    private final @NonNull ListView<Pair<PropertyDescriptorSpec, Var<String>>> view;
 
 
 

@@ -42,10 +42,8 @@ import javafx.util.Pair;
 public class ViolationCollectionView extends VBox implements ApplicationComponent {
 
     private static final int LIST_CELL_HEIGHT = 30;
-    @NonNull
-    private final DesignerRoot root;
-    @NonNull
-    private final ListView<LiveViolationRecord> view;
+    private final @NonNull DesignerRoot root;
+    private final @NonNull ListView<LiveViolationRecord> view;
 
 
     static {

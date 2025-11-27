@@ -56,8 +56,7 @@ public final class AuxLanguageRegistry {
                                  : lang.getVersion(split[1]);
     }
 
-    @NonNull
-    public static LanguageVersion defaultLanguageVersion() {
+    public static @NonNull LanguageVersion defaultLanguageVersion() {
         return defaultLanguage().getDefaultVersion();
     }
 
@@ -79,8 +78,7 @@ public final class AuxLanguageRegistry {
         return PlainTextLanguage.getInstance();
     }
 
-    @NonNull
-    public static Language defaultLanguage() {
+    public static @NonNull Language defaultLanguage() {
         Language defaultLanguage = findLanguageByName(DEFAULT_LANGUAGE_NAME);
         return defaultLanguage != null ? defaultLanguage : plainTextLanguage();
     }
@@ -96,8 +94,7 @@ public final class AuxLanguageRegistry {
         return result;
     }
 
-    @Nullable
-    public static synchronized LanguageVersion getLanguageVersionFromExtension(String filename) {
+    public static synchronized @Nullable LanguageVersion getLanguageVersionFromExtension(String filename) {
         if (extensionsToLanguage == null) {
             extensionsToLanguage = getExtensionsToLanguageMap();
         }
@@ -122,39 +119,33 @@ public final class AuxLanguageRegistry {
         return supportedLanguageVersions;
     }
 
-    @NonNull
-    public static LanguageVersion getLanguageVersionByName(String name) {
+    public static @NonNull LanguageVersion getLanguageVersionByName(String name) {
         return getSupportedLanguageVersions().stream()
                                              .filter(it -> it.getName().equals(name))
                                              .findFirst()
                                              .orElse(defaultLanguageVersion());
     }
 
-    @NonNull
-    public static Stream<Language> getSupportedLanguages() {
+    public static @NonNull Stream<Language> getSupportedLanguages() {
         return AUX_LANG_REGISTRY.getLanguages().stream();
     }
 
-    @NonNull
-    public static Language findLanguageByShortName(String shortName) {
+    public static @NonNull Language findLanguageByShortName(String shortName) {
         return getSupportedLanguages().filter(it -> it.getShortName().equals(shortName))
                                       .findFirst()
                                       .orElse(defaultLanguage());
     }
 
-    @Nullable
-    public static Language findLanguageByName(String n) {
+    public static @Nullable Language findLanguageByName(String n) {
         return AUX_LANG_REGISTRY.getLanguageByFullName(n);
     }
 
-    @NonNull
-    public static Language findLanguageByNameOrDefault(String n) {
+    public static @NonNull Language findLanguageByNameOrDefault(String n) {
         Language lang = findLanguageByName(n);
         return lang == null ? defaultLanguage() : lang;
     }
 
-    @Nullable
-    public static Language findLanguageByTerseName(String name) {
+    public static @Nullable Language findLanguageByTerseName(String name) {
         return AUX_LANG_REGISTRY.getLanguageById(name);
     }
 

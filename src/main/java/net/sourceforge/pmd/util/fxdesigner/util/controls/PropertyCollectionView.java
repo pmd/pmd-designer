@@ -49,12 +49,9 @@ import javafx.util.Pair;
 public class PropertyCollectionView extends VBox implements ApplicationComponent {
 
     private static final int LIST_CELL_HEIGHT = 31;
-    @NonNull
-    private final DesignerRoot root;
-    @NonNull
-    private final ListView<PropertyDescriptorSpec> view;
-    @NonNull
-    private final PopOverWrapper<PropertyDescriptorSpec> myEditPopover;
+    private final @NonNull DesignerRoot root;
+    private final @NonNull ListView<PropertyDescriptorSpec> view;
+    private final @NonNull PopOverWrapper<PropertyDescriptorSpec> myEditPopover;
 
 
     static {
