@@ -57,7 +57,7 @@
         <kotlin.compiler.languageVersion>1.9</kotlin.compiler.languageVersion>
         <kotlin.compiler.jvmTarget>1.${java.version}</kotlin.compiler.jvmTarget>
         <kotlin.version>2.2.21</kotlin.version>
-        <kotest.version>5.9.1</kotest.version>
+        <kotest.version>6.0.5</kotest.version>
         <junit.version>6.0.1</junit.version>
 
         <!-- Those have different values based on the profile -->
