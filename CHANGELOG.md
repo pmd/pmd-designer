@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+**🚀 New and Noteworthy:**
+
+**🐛 Fixed issues:**
+
+**✨ Merged pull requests:**
+
+**📦 Dependency updates:**
+
+See https://github.com/pmd/pmd-designer/milestone/17
+
+## 7.19.0 (2025-11-27)
+
 **🐛 Fixed issues:**
 * [#257](https://github.com/pmd/pmd-designer/issues/257): Refresh language registry when classpath changes
 
