@@ -16,7 +16,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.reactfx.util.Either;
 import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
@@ -40,7 +40,6 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
-import net.sourceforge.pmd.util.fxdesigner.util.Tuple3;
 import net.sourceforge.pmd.util.log.PmdReporter;
 
 
@@ -77,37 +76,23 @@ public class ASTManagerImpl implements ASTManager {
 
     private final Var<Map<String, String>> ruleProperties = Var.newSimpleVar(Collections.emptyMap());
 
-    private @Nullable ClassLoader currentClassloader;
-
     public ASTManagerImpl(DesignerRoot owner) {
         this.designerRoot = owner;
 
         // Refresh the AST anytime the text, classloader, or language version changes
         sourceCode.values()
-                  .or(auxclasspathClassLoader.values())
+                  .or(classLoaderProperty().values())
                   .or(languageVersionProperty().values())
-                  .map(tick -> new Tuple3<>(getSourceCode(), getLanguageVersion(), classLoaderProperty().getValue()))
-                  .distinct()
                   .subscribe(tick -> {
-
-                      String source = tick.first;
-                      LanguageVersion version = tick.second;
-                      ClassLoader classLoader = tick.third;
-
-
-                      if (StringUtils.isBlank(source) || version == null) {
-                          compilationUnit.setValue(null);
-                          currentException.setValue(null);
-                          return;
-                      }
-
-                      if (classLoader == null) {
-                          classLoader = ASTManagerImpl.class.getClassLoader();
-                      }
+                      // note: if either of these values would be null (e.g. classloader _is_ null at some point)
+                      // the optional is empty.
+                      Optional<ClassLoader> changedClassLoader = tick.asLeft().filter(Either::isRight).map(Either::getRight);
+                      Optional<LanguageVersion> changedLanguageVersion = Optional.of(tick).filter(Either::isRight).map(Either::getRight);
 
                       Node updated;
                       try {
-                          updated = refreshAST(this, source, version, refreshRegistry(version, classLoader)).orElse(null);
+                          updated = refreshAST(this, getSourceCode(), getLanguageVersion(),
+                                  refreshRegistry(changedLanguageVersion.isPresent(), changedClassLoader.isPresent())).orElse(null);
                           currentException.setValue(null);
                       } catch (ParseAbortedException e) {
                           updated = null;
@@ -214,44 +199,40 @@ public class ASTManagerImpl implements ASTManager {
         return currentException;
     }
 
-
-    private LanguageProcessorRegistry refreshRegistry(LanguageVersion version, ClassLoader classLoader) {
-        LanguageProcessorRegistry current = lpRegistry.getValue();
-        if (current == null) {
-            Map<Language, LanguagePropertyBundle> langProperties = new HashMap<>();
-            LanguagePropertyBundle bundle = version.getLanguage().newPropertyBundle();
-            bundle.setLanguageVersion(version.getVersion());
-            if (bundle instanceof JvmLanguagePropertyBundle) {
-                ((JvmLanguagePropertyBundle) bundle).setClassLoader(classLoader);
-            }
-
-            langProperties.put(version.getLanguage(), bundle);
-
-            LanguageRegistry languages =
-                AuxLanguageRegistry.supportedLangs()
-                                   .getDependenciesOf(version.getLanguage());
-
-            LanguageProcessorRegistry newRegistry =
-                LanguageProcessorRegistry.create(languages,
-                                                 langProperties,
-                                                 NOOP_REPORTER);
-            lpRegistry.setValue(newRegistry);
-            currentClassloader = classLoader;
-            return newRegistry;
+    private LanguageProcessorRegistry createNewRegistry(LanguageVersion version, ClassLoader classLoader) {
+        Map<Language, LanguagePropertyBundle> langProperties = new HashMap<>();
+        LanguagePropertyBundle bundle = version.getLanguage().newPropertyBundle();
+        bundle.setLanguageVersion(version.getVersion());
+        if (bundle instanceof JvmLanguagePropertyBundle) {
+            ((JvmLanguagePropertyBundle) bundle).setClassLoader(classLoader);
         }
 
-        // already created, need to check that the version is the same
-        if (!current.getLanguages().getLanguages().contains(version.getLanguage())
-            || !current.getProcessor(version.getLanguage()).getLanguageVersion().equals(version)
-            || !Objects.equals(currentClassloader, classLoader)) {
+        langProperties.put(version.getLanguage(), bundle);
+
+        LanguageRegistry languages =
+                AuxLanguageRegistry.supportedLangs()
+                        .getDependenciesOf(version.getLanguage());
+
+        return LanguageProcessorRegistry.create(languages,
+                langProperties,
+                NOOP_REPORTER);
+    }
+
+    private LanguageProcessorRegistry refreshRegistry(boolean changedLanguageVersion, boolean changedClassLoader) {
+        LanguageProcessorRegistry current = lpRegistry.getValue();
+        if (current != null && !changedLanguageVersion && !changedClassLoader) {
+            // the current one is fine
+            return current;
+        }
+
+        if (current != null) {
             // current is invalid, recreate it
             current.close();
-            lpRegistry.setValue(null);
-            return refreshRegistry(version, classLoader);
         }
 
-        // the current one is fine
-        return current;
+        LanguageProcessorRegistry newRegistry = createNewRegistry(getLanguageVersion(), classLoaderProperty().getValue());
+        lpRegistry.setValue(newRegistry);
+        return newRegistry;
     }
 
 
