@@ -5,6 +5,7 @@
 **🚀 New and Noteworthy:**
 
 **🐛 Fixed issues:**
+* [#257](https://github.com/pmd/pmd-designer/issues/257): Refresh language registry when classpath changes
 
 **✨ Merged pull requests:**
 * [#168](https://github.com/pmd/pmd-designer/pull/168): Refactor GitHub Actions Workflows - [Andreas Dangel](https://github.com/adangel) (@adangel)
@@ -13,6 +14,7 @@
 * [#207](https://github.com/pmd/pmd-designer/pull/207): \[ci] Cleanup old scripts - [Andreas Dangel](https://github.com/adangel) (@adangel)
 * [#216](https://github.com/pmd/pmd-designer/pull/216): chore: CI Improvements - [Andreas Dangel](https://github.com/adangel) (@adangel)
 * [#251](https://github.com/pmd/pmd-designer/pull/251): chore: Use Java 17 for builds - [Andreas Dangel](https://github.com/adangel) (@adangel)
+* [#257](https://github.com/pmd/pmd-designer/pull/257): Refresh language registry when classpath changes - [Zbynek Konecny](https://github.com/zbynek) (@zbynek)
 
 **📦 Dependency updates:**
 <details>
