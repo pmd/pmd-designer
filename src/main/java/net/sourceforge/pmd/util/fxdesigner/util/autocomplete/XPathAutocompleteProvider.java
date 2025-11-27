@@ -99,7 +99,7 @@ public final class XPathAutocompleteProvider {
                                                             });
 
         EventStream<Integer> keyCombo = EventStreams.eventsOf(myCodeArea, KeyEvent.KEY_PRESSED)
-                                                    .filter(key -> key.isControlDown() && key.getCode().equals(KeyCode.SPACE))
+                                                    .filter(key -> key.isControlDown() && key.getCode() == KeyCode.SPACE)
                                                     .map(searchPoint -> myCodeArea.getCaretPosition());
 
         EventStreams.merge(keyCombo, changesEventStream)
