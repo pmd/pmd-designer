@@ -124,7 +124,7 @@ jobs:
           app-id: ${{ secrets.PMD_ACTIONS_HELPER_ID }}
           private-key: ${{ secrets.PMD_ACTIONS_HELPER_PRIVATE_KEY }}
           owner: pmd
-          repositories: pmd
+          repositories: pmd-designer
           permission-contents: write # create a release
       - name: Create Release
         env:
