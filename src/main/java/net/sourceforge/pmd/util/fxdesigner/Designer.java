@@ -15,6 +15,8 @@ import net.sourceforge.pmd.util.fxdesigner.app.DesignerParams;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRootImpl;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
+import net.sourceforge.pmd.util.fxdesigner.util.IncompatibleJavaFxVersion;
+import net.sourceforge.pmd.util.fxdesigner.util.JavaFxUtil;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -56,6 +58,11 @@ public class Designer extends Application {
 
     public Designer() {
         initStartTimeMillis = System.currentTimeMillis();
+    }
+
+    @Override
+    public void init() throws IncompatibleJavaFxVersion {
+        JavaFxUtil.isCompatibleJavaFxVersion();
     }
 
     @Override

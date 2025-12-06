@@ -976,6 +976,9 @@
                  as well as the dependencies, that are normally provided
             -->
             <id>running</id>
+            <properties>
+                <openjfx.scope>compile</openjfx.scope>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -1009,15 +1012,6 @@
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
-        </profile>
-
-        <profile>
-            <!-- This profile adds openjfx dependencies to the classpath -->
-            <!-- Eg use -Prunning,with-javafx -->
-            <id>with-javafx</id>
-            <properties>
-                <openjfx.scope>compile</openjfx.scope>
-            </properties>
         </profile>
 
         <profile>

@@ -1,11 +1,12 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Designer (Java 17)" type="Application" factoryName="Application">
-    <option name="ALTERNATIVE_JRE_PATH" value="temurin-17" />
+  <configuration default="false" name="Designer (Java 25)" type="Application" factoryName="Application">
+    <option name="ALTERNATIVE_JRE_PATH" value="temurin-25" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
     <option name="MAIN_CLASS_NAME" value="net.sourceforge.pmd.util.fxdesigner.DesignerStarter" />
     <module name="pmd-designer" />
     <option name="PROGRAM_PARAMETERS" value="-v" />
+    <option name="VM_PARAMETERS" value="--enable-native-access=ALL-UNNAMED" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="net.sourceforge.pmd.util.fxdesigner.app.*" />
