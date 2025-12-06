@@ -4,13 +4,13 @@
 
 package net.sourceforge.pmd.util.fxdesigner;
 
-import static net.sourceforge.pmd.util.fxdesigner.util.JavaFxUtil.isCompatibleJavaFxVersion;
-import static net.sourceforge.pmd.util.fxdesigner.util.JavaFxUtil.isJavaFxAvailable;
-import static net.sourceforge.pmd.util.fxdesigner.util.JavaFxUtil.setSystemProperties;
-
 import javax.swing.JOptionPane;
 
+import org.apache.commons.lang3.Strings;
+
 import net.sourceforge.pmd.annotation.InternalApi;
+import net.sourceforge.pmd.util.fxdesigner.util.IncompatibleJavaFxVersion;
+import net.sourceforge.pmd.util.fxdesigner.util.JavaFxUtil;
 
 import javafx.application.Application;
 
@@ -20,14 +20,15 @@ import javafx.application.Application;
 public final class DesignerStarter {
 
     private static final String MISSING_JAVAFX =
-        "You seem to be missing the JavaFX runtime." + System.lineSeparator()
-            + " Please install JavaFX on your system and try again." + System.lineSeparator()
-            + " See https://gluonhq.com/products/javafx/";
+            "You seem to be missing the JavaFX runtime." + System.lineSeparator()
+                    + "Please install JavaFX on your system and try again." + System.lineSeparator()
+                    + "See https://gluonhq.com/products/javafx/" + System.lineSeparator()
+                    + "and https://docs.pmd-code.org/latest/pmd_userdocs_extending_designer_reference.html#installing-running-updating" + System.lineSeparator();
 
     private static final String INCOMPATIBLE_JAVAFX =
-        "You seem to be running an older version of JavaFX runtime." + System.lineSeparator()
-            + " Please install the latest JavaFX on your system and try again." + System.lineSeparator()
-            + " See https://gluonhq.com/products/javafx/";
+            "You seem to be running an incompatible version of JavaFX runtime." + System.lineSeparator()
+                    + "Please install a compatible JavaFX version on your system and try again." + System.lineSeparator()
+                    + "See https://gluonhq.com/products/javafx/" + System.lineSeparator();
 
     private DesignerStarter() {
     }
@@ -42,31 +43,47 @@ public final class DesignerStarter {
         System.exit(ret.getCode());
     }
 
-    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public static ExitStatus launchGui(String[] args) {
-        setSystemProperties();
-
-        String message = null;
-        if (!isJavaFxAvailable()) {
-            message = MISSING_JAVAFX;
-        } else if (!isCompatibleJavaFxVersion()) {
-            message = INCOMPATIBLE_JAVAFX;
-        }
-
-        if (message != null) {
-            System.err.println(message);
-            JOptionPane.showMessageDialog(null, message);
-            return ExitStatus.ERROR;
-        }
+        JavaFxUtil.setSystemProperties();
 
         try {
             Application.launch(Designer.class, args);
-        } catch (Throwable unrecoverable) {
-            unrecoverable.printStackTrace();
+        } catch (RuntimeException unrecoverable) {
+            if (isIncompatibleJavaFxVersion(unrecoverable)) {
+                displayError(INCOMPATIBLE_JAVAFX + unrecoverable.getCause().getMessage());
+            } else {
+                // only print stacktrace for unknown errors
+                unrecoverable.printStackTrace();
+            }
+            return ExitStatus.ERROR;
+        } catch (NoClassDefFoundError classNotFound) {
+            if (isJavaFxUnavailable(classNotFound)) {
+                displayError(MISSING_JAVAFX);
+                System.err.println(classNotFound);
+            } else {
+                // only print stacktrace for unknown errors
+                classNotFound.printStackTrace();
+            }
             return ExitStatus.ERROR;
         }
 
         return ExitStatus.OK;
+    }
+
+    private static boolean isJavaFxUnavailable(NoClassDefFoundError classNotFound) {
+        return classNotFound.getCause() instanceof ClassNotFoundException
+                && Strings.CI.startsWith(classNotFound.getCause().getMessage(), "javafx");
+    }
+
+    private static boolean isIncompatibleJavaFxVersion(RuntimeException exception) {
+        return exception.getCause() instanceof IncompatibleJavaFxVersion
+                || (exception.getCause() != null
+                && exception.getCause().getCause() instanceof IncompatibleJavaFxVersion);
+    }
+
+    private static void displayError(String message) {
+        System.err.println(message);
+        JOptionPane.showMessageDialog(null, message);
     }
 
     public enum ExitStatus {

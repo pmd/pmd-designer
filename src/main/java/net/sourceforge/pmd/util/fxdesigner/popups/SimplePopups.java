@@ -23,7 +23,6 @@ import net.sourceforge.pmd.util.fxdesigner.DesignerVersion;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil;
-import net.sourceforge.pmd.util.fxdesigner.util.JavaFxUtil;
 import net.sourceforge.pmd.util.fxdesigner.util.ResourceUtil;
 
 import javafx.animation.Animation;
@@ -217,7 +216,7 @@ public final class SimplePopups {
                 + "\n"
                 + "\n"
                 + "Java Version:\t\t\t\t" + System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")\n"
-                + "JavaFX Version:\t\t\t" + JavaFxUtil.getJavaFxVersion() + "\n";
+                + "JavaFX Version:\t\t\t" + System.getProperty("javafx.version") + "\n";
 
         textArea.setText(sb);
         scroll.setContent(textArea);
