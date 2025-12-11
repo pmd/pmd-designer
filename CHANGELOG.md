@@ -5,8 +5,10 @@
 **🚀 New and Noteworthy:**
 
 **🐛 Fixed issues:**
+* [#71](https://github.com/pmd/pmd-designer/issues/71): Support JavaFX as module (e.g. via azul jdk+fx)
 
 **✨ Merged pull requests:**
+* [#302](https://github.com/pmd/pmd-designer/pull/302): Improve JavaFX support - [Andreas Dangel](https://github.com/adangel) (@adangel)
 
 **📦 Dependency updates:**
 
