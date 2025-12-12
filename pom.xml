@@ -4,7 +4,7 @@
     <groupId>net.sourceforge.pmd</groupId>
     <artifactId>pmd-designer</artifactId>
     <name>PMD Designer</name>
-    <version>7.19.2-SNAPSHOT</version>
+    <version>7.19.2</version>
 
     <description>The Rule Designer is a graphical tool that helps PMD users develop their custom rules.</description>
     <url>https://pmd.github.io</url>
@@ -20,7 +20,7 @@
         <connection>scm:git:git://github.com/pmd/pmd-designer.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/pmd/pmd-designer.git</developerConnection>
         <url>https://github.com/pmd/pmd-designer</url>
-        <tag>HEAD</tag>
+        <tag>7.19.2</tag>
     </scm>
     <ciManagement>
         <url>https://github.com/pmd/pmd-designer/actions</url>
@@ -44,7 +44,7 @@
     </developers>
 
     <properties>
-        <project.build.outputTimestamp>2025-11-27T19:09:07Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-12-12T10:48:36Z</project.build.outputTimestamp>
 
         <pmd.designer.version>${project.version}</pmd.designer.version> <!-- see DesignerVersion -->
         <pmd.core.version>7.0.0</pmd.core.version> <!-- minimum supported PMD version (API) -->
