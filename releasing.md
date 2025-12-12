@@ -42,13 +42,13 @@
     ```markdown
     ## Unreleased
     
-    **🚀 New and Noteworthy:**
+    **🚀️ New and Noteworthy:**
     
-    **🐛 Fixed issues:**
+    **🐛️ Fixed issues:**
     
-    **✨ Merged pull requests:**
+    **✨️ Merged pull requests:**
     
-    **📦 Dependency updates:**
+    **📦️ Dependency updates:**
     
     See https://github.com/pmd/pmd-designer/milestone/17
     

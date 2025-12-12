@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+**🚀️ New and Noteworthy:**
+
+**🐛️ Fixed issues:**
+
+**✨️ Merged pull requests:**
+
+**📦️ Dependency updates:**
+
+See https://github.com/pmd/pmd-designer/milestone/20
+
 ## 7.19.2 (2025-12-12)
 
 **🐛 Fixed issues:**
