@@ -1,8 +1,6 @@
 # Changelog
 
-## Unreleased
-
-**🚀 New and Noteworthy:**
+## 7.19.2 (2025-12-12)
 
 **🐛 Fixed issues:**
 * [#71](https://github.com/pmd/pmd-designer/issues/71): Support JavaFX as module (e.g. via azul jdk+fx)
@@ -11,6 +9,20 @@
 * [#302](https://github.com/pmd/pmd-designer/pull/302): Improve JavaFX support - [Andreas Dangel](https://github.com/adangel) (@adangel)
 
 **📦 Dependency updates:**
+<details>
+<summary>9 updates</summary>
+
+* [#290](https://github.com/pmd/pmd-designer/pull/290): Bump com.puppycrawl.tools:checkstyle from 12.1.2 to 12.2.0
+* [#292](https://github.com/pmd/pmd-designer/pull/292): Bump org.apache.maven.plugins:maven-resources-plugin from 3.3.1 to 3.4.0
+* [#294](https://github.com/pmd/pmd-designer/pull/294): Bump net.sourceforge.pmd:pmd-lang-test from 7.18.0 to 7.19.0
+* [#297](https://github.com/pmd/pmd-designer/pull/297): Bump org.checkerframework:checker-qual from 3.52.0 to 3.52.1
+* [#299](https://github.com/pmd/pmd-designer/pull/299): Bump org.apache.maven.plugins:maven-source-plugin from 3.3.1 to 3.4.0
+* [#300](https://github.com/pmd/pmd-designer/pull/300): Bump actions/checkout from 6.0.0 to 6.0.1
+* [#301](https://github.com/pmd/pmd-designer/pull/301): Bump openjfx from 17.0.10 to 17.0.17
+* [#304](https://github.com/pmd/pmd-designer/pull/304): Bump actions/create-github-app-token from 2.2.0 to 2.2.1
+* [#305](https://github.com/pmd/pmd-designer/pull/305): Bump actions/setup-java from 5.0.0 to 5.1.0
+
+</details>
 
 See https://github.com/pmd/pmd-designer/milestone/19
 
