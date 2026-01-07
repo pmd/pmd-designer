@@ -12,6 +12,7 @@
 
 #### Clean build from source
 
+* Make sure, you have Java 21+ installed. While we build with Java 21, the Designer still runs with Java 8.
 * Clone the repository
 * Run `./mvnw -Pshading clean verify`
 * The artifact can then be found in the `target` directory 

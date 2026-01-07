@@ -7,6 +7,7 @@
 **🐛️ Fixed issues:**
 
 **✨️ Merged pull requests:**
+* [#316](https://github.com/pmd/pmd-designer/pull/316): chore: Use Java 21 for builds - [Andreas Dangel](https://github.com/adangel) (@adangel)
 
 **📦️ Dependency updates:**
 
