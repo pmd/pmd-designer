@@ -52,7 +52,7 @@
         <openjfx.version>17.0.17</openjfx.version>
         <java.version>8</java.version>
 
-        <pmd.langtest.version>7.20.0</pmd.langtest.version>
+        <pmd.langtest.version>7.21.0</pmd.langtest.version>
         <kotlin.compiler.apiVersion>1.9</kotlin.compiler.apiVersion>
         <kotlin.compiler.languageVersion>1.9</kotlin.compiler.languageVersion>
         <kotlin.compiler.jvmTarget>1.${java.version}</kotlin.compiler.jvmTarget>
