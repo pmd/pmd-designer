@@ -4,15 +4,19 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app.services;
 
+import static java.util.Collections.emptyList;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.latestValue;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStream.vetoableNull;
 
+import java.io.File;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -55,7 +59,7 @@ public class ASTManagerImpl implements ASTManager {
 
     private final DesignerRoot designerRoot;
 
-    private final Var<ClassLoader> auxclasspathClassLoader = Var.newSimpleVar(null);
+    private final Var<List<File>> auxclasspathFiles = Var.newSimpleVar(emptyList());
 
     /**
      * Most up-to-date compilation unit. Is null if the current source cannot be parsed.
@@ -81,18 +85,18 @@ public class ASTManagerImpl implements ASTManager {
 
         // Refresh the AST anytime the text, classloader, or language version changes
         sourceCode.values()
-                  .or(classLoaderProperty().values())
+                  .or(classpathProperty().values())
                   .or(languageVersionProperty().values())
                   .subscribe(tick -> {
-                      // note: if either of these values would be null (e.g. classloader _is_ null at some point)
+                      // note: if either of these values would be null
                       // the optional is empty.
-                      Optional<ClassLoader> changedClassLoader = tick.asLeft().filter(Either::isRight).map(Either::getRight);
+                      Optional<List<File>> changedClasspath = tick.asLeft().filter(Either::isRight).map(Either::getRight);
                       Optional<LanguageVersion> changedLanguageVersion = Optional.of(tick).filter(Either::isRight).map(Either::getRight);
 
                       Node updated;
                       try {
                           updated = refreshAST(this, getSourceCode(), getLanguageVersion(),
-                                  refreshRegistry(changedLanguageVersion.isPresent(), changedClassLoader.isPresent())).orElse(null);
+                                  refreshRegistry(changedLanguageVersion.isPresent(), changedClasspath.isPresent())).orElse(null);
                           currentException.setValue(null);
                       } catch (ParseAbortedException e) {
                           updated = null;
@@ -144,8 +148,8 @@ public class ASTManagerImpl implements ASTManager {
     }
 
     @Override
-    public Var<ClassLoader> classLoaderProperty() {
-        return auxclasspathClassLoader;
+    public Var<List<File>> classpathProperty() {
+        return auxclasspathFiles;
     }
 
     @Override
@@ -199,12 +203,15 @@ public class ASTManagerImpl implements ASTManager {
         return currentException;
     }
 
-    private LanguageProcessorRegistry createNewRegistry(LanguageVersion version, ClassLoader classLoader) {
+    private LanguageProcessorRegistry createNewRegistry(LanguageVersion version, List<File> classpath) {
         Map<Language, LanguagePropertyBundle> langProperties = new HashMap<>();
         LanguagePropertyBundle bundle = version.getLanguage().newPropertyBundle();
         bundle.setLanguageVersion(version.getVersion());
         if (bundle instanceof JvmLanguagePropertyBundle) {
-            ((JvmLanguagePropertyBundle) bundle).setClassLoader(classLoader);
+            bundle.setProperty(JvmLanguagePropertyBundle.AUX_CLASSPATH,
+                classpath.stream()
+                    .map(File::getAbsolutePath)
+                    .collect(Collectors.joining(File.pathSeparator)));
         }
 
         langProperties.put(version.getLanguage(), bundle);
@@ -230,7 +237,7 @@ public class ASTManagerImpl implements ASTManager {
             current.close();
         }
 
-        LanguageProcessorRegistry newRegistry = createNewRegistry(getLanguageVersion(), classLoaderProperty().getValue());
+        LanguageProcessorRegistry newRegistry = createNewRegistry(getLanguageVersion(), classpathProperty().getValue());
         lpRegistry.setValue(newRegistry);
         return newRegistry;
     }
