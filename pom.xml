@@ -58,7 +58,7 @@
         <kotlin.compiler.jvmTarget>1.${java.version}</kotlin.compiler.jvmTarget>
         <kotlin.version>2.2.21</kotlin.version>
         <kotest.version>5.9.1</kotest.version>
-        <junit.version>6.0.2</junit.version>
+        <junit.version>6.0.3</junit.version>
 
         <!-- Those have different values based on the profile -->
         <openjfx.scope>provided</openjfx.scope>
