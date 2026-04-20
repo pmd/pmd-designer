@@ -4,6 +4,8 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app.services;
 
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 import org.reactfx.value.SuspendableVar;
@@ -50,7 +52,7 @@ public interface ASTManager extends ApplicationComponent, SettingsOwner {
     Val<Node> compilationUnitProperty();
 
 
-    Val<ClassLoader> classLoaderProperty();
+    Val<List<File>> classpathProperty();
 
 
     Val<ParseAbortedException> currentExceptionProperty();
