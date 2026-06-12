@@ -10,7 +10,6 @@ import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExce
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.latestValue;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collections;
@@ -28,7 +27,6 @@ import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.internal.util.ClasspathClassLoader; // NOPMD
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
@@ -89,14 +87,6 @@ public class SourceEditorController extends AbstractController {
     private static final Duration AST_REFRESH_DELAY = Duration.ofMillis(100);
     private final ASTManager astManager;
     private final Var<List<File>> auxclasspathFiles = Var.newSimpleVar(emptyList());
-    private final Val<ClassLoader> auxclasspathClassLoader = auxclasspathFiles.<ClassLoader>map(fileList -> {
-        try {
-            return new ClasspathClassLoader(fileList, SourceEditorController.class.getClassLoader());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }).orElseConst(SourceEditorController.class.getClassLoader());
 
     @FXML
     private Button searchButton;
@@ -193,7 +183,7 @@ public class SourceEditorController extends AbstractController {
                   .distinct()
                   .subscribe(nodeEditionCodeArea::updateSyntaxHighlighter);
 
-        ((ASTManagerImpl) astManager).classLoaderProperty().bind(auxclasspathClassLoader);
+        ((ASTManagerImpl) astManager).classpathProperty().bind(auxclasspathFiles);
 
         // default text, will be overwritten by settings restore
         setText(getDefaultText());
