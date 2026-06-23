@@ -9,8 +9,6 @@ import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.lates
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.VetoableEventStream.vetoableNull;
 
 import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,7 +20,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactfx.util.Either;
 import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
@@ -30,7 +27,6 @@ import org.reactfx.value.Var;
 
 import net.sourceforge.pmd.PMDConfiguration;
 import net.sourceforge.pmd.PmdAnalysis;
-import net.sourceforge.pmd.lang.JvmLanguagePropertyBundle;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageProcessor;
 import net.sourceforge.pmd.lang.LanguageProcessorRegistry;
@@ -95,15 +91,13 @@ public class ASTManagerImpl implements ASTManager {
                   .or(classpathProperty().values())
                   .or(languageVersionProperty().values())
                   .subscribe(tick -> {
-                      // note: if either of these values would be null
-                      // the optional is empty.
-                      Optional<List<ClasspathEntry>> changedClasspath = tick.asLeft().filter(Either::isRight).map(Either::getRight);
+                      // note: if either of these values would be null the optional is empty.
                       Optional<LanguageVersion> changedLanguageVersion = Optional.of(tick).filter(Either::isRight).map(Either::getRight);
 
                       Node updated;
                       try {
                           updated = refreshAST(this, getSourceCode(), getLanguageVersion(),
-                                  refreshRegistry(changedLanguageVersion.isPresent(), changedClasspath.isPresent()),
+                                  refreshRegistry(changedLanguageVersion.isPresent()),
                                   classpathProperty().getValue()).orElse(null);
                           currentException.setValue(null);
                       } catch (ParseAbortedException e) {
@@ -211,17 +205,13 @@ public class ASTManagerImpl implements ASTManager {
         return currentException;
     }
 
-    private LanguageProcessorRegistry createNewRegistry(LanguageVersion version, List<ClasspathEntry> classpath) {
+    // Note: This registry is used via languageProcessorProperty() to get access
+    // to DesignerBindings. It doesn't have and need the auxClasspath configuration.
+    // It is not used for generating the AST, see refreshAST() for that.
+    private LanguageProcessorRegistry createNewRegistry(LanguageVersion version) {
         Map<Language, LanguagePropertyBundle> langProperties = new HashMap<>();
         LanguagePropertyBundle bundle = version.getLanguage().newPropertyBundle();
         bundle.setLanguageVersion(version.getVersion());
-        if (bundle instanceof JvmLanguagePropertyBundle) {
-            bundle.setProperty(JvmLanguagePropertyBundle.AUX_CLASSPATH,
-                classpath.stream()
-                    .map(ClasspathEntry::getEntry)
-                    .collect(Collectors.joining(File.pathSeparator)));
-        }
-
         langProperties.put(version.getLanguage(), bundle);
 
         LanguageRegistry languages =
@@ -233,9 +223,9 @@ public class ASTManagerImpl implements ASTManager {
                 NOOP_REPORTER);
     }
 
-    private LanguageProcessorRegistry refreshRegistry(boolean changedLanguageVersion, boolean changedClassLoader) {
+    private LanguageProcessorRegistry refreshRegistry(boolean changedLanguageVersion) {
         LanguageProcessorRegistry current = lpRegistry.getValue();
-        if (current != null && !changedLanguageVersion && !changedClassLoader) {
+        if (current != null && !changedLanguageVersion) {
             // the current one is fine
             return current;
         }
@@ -245,7 +235,7 @@ public class ASTManagerImpl implements ASTManager {
             current.close();
         }
 
-        LanguageProcessorRegistry newRegistry = createNewRegistry(getLanguageVersion(), classpathProperty().getValue());
+        LanguageProcessorRegistry newRegistry = createNewRegistry(getLanguageVersion());
         lpRegistry.setValue(newRegistry);
         return newRegistry;
     }
@@ -304,7 +294,7 @@ public class ASTManagerImpl implements ASTManager {
             }
 
             // Notify that the parse went OK so we can avoid logging very recent exceptions
-            component.raiseParsableSourceFlag(() -> "Param hash: " + Objects.hash(source, version, lpRegistry));
+            component.raiseParsableSourceFlag(() -> "Param hash: " + Objects.hash(source, version, classpath));
 
             return Optional.ofNullable(rule.getRootNode());
         }
