@@ -8,6 +8,7 @@
 
 **✨️ Merged pull requests:**
 * [#316](https://github.com/pmd/pmd-designer/pull/316): chore: Use Java 21 for builds - [Andreas Dangel](https://github.com/adangel) (@adangel)
+* [#319](https://github.com/pmd/pmd-designer/pull/319): chore: Avoid using classpath classloader for auxclasspath - [Andreas Dangel](https://github.com/adangel) (@adangel)
 
 **📦️ Dependency updates:**
 
