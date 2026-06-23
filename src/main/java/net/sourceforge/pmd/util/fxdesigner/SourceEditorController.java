@@ -9,7 +9,6 @@ import static net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry.defau
 import static net.sourceforge.pmd.util.fxdesigner.util.DesignerUtil.sanitizeExceptionMessage;
 import static net.sourceforge.pmd.util.fxdesigner.util.reactfx.ReactfxUtil.latestValue;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collections;
@@ -39,6 +38,7 @@ import net.sourceforge.pmd.util.fxdesigner.model.ObservableRuleBuilder;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveTestCase;
 import net.sourceforge.pmd.util.fxdesigner.model.testing.LiveViolationRecord;
 import net.sourceforge.pmd.util.fxdesigner.popups.AuxclasspathSetupController;
+import net.sourceforge.pmd.util.fxdesigner.popups.ClasspathEntry;
 import net.sourceforge.pmd.util.fxdesigner.popups.SimplePopups;
 import net.sourceforge.pmd.util.fxdesigner.popups.TreeExportWizardController;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
@@ -86,7 +86,7 @@ public class SourceEditorController extends AbstractController {
     private final SuspendableVar<LiveTestCase> currentlyOpenTestCase = Var.suspendable(Var.newSimpleVar(null));
     private static final Duration AST_REFRESH_DELAY = Duration.ofMillis(100);
     private final ASTManager astManager;
-    private final Var<List<File>> auxclasspathFiles = Var.newSimpleVar(emptyList());
+    private final Var<List<ClasspathEntry>> auxclasspath = Var.newSimpleVar(emptyList());
 
     @FXML
     private Button searchButton;
@@ -183,7 +183,7 @@ public class SourceEditorController extends AbstractController {
                   .distinct()
                   .subscribe(nodeEditionCodeArea::updateSyntaxHighlighter);
 
-        ((ASTManagerImpl) astManager).classpathProperty().bind(auxclasspathFiles);
+        ((ASTManagerImpl) astManager).classpathProperty().bind(auxclasspath);
 
         // default text, will be overwritten by settings restore
         setText(getDefaultText());
@@ -351,7 +351,7 @@ public class SourceEditorController extends AbstractController {
 
 
     public void showAuxclasspathSetupPopup() {
-        new AuxclasspathSetupController(getDesignerRoot()).show(getMainStage(), auxclasspathFiles.getValue(), auxclasspathFiles::setValue);
+        new AuxclasspathSetupController(getDesignerRoot()).show(getMainStage(), auxclasspath.getValue(), auxclasspath::setValue);
     }
 
 
@@ -396,13 +396,15 @@ public class SourceEditorController extends AbstractController {
 
 
     @PersistentProperty
-    public List<File> getAuxclasspathFiles() {
-        return auxclasspathFiles.getValue();
+    public List<ClasspathEntry> getAuxclasspath() {
+        return auxclasspath.getValue();
     }
 
 
-    public void setAuxclasspathFiles(List<File> files) {
-        auxclasspathFiles.setValue(files);
+    // Note: This method is used by net.sourceforge.pmd.util.fxdesigner.util.beans.PropertyUtils#setProperty
+    // via reflection...
+    public void setAuxclasspath(List<ClasspathEntry> files) {
+        auxclasspath.setValue(files);
     }
 
 

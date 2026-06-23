@@ -43,6 +43,7 @@ import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
 import net.sourceforge.pmd.util.fxdesigner.app.services.LogEntry.Category;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
+import net.sourceforge.pmd.util.fxdesigner.popups.ClasspathEntry;
 import net.sourceforge.pmd.util.fxdesigner.util.AuxLanguageRegistry;
 import net.sourceforge.pmd.util.log.PmdReporter;
 
@@ -59,7 +60,7 @@ public class ASTManagerImpl implements ASTManager {
 
     private final DesignerRoot designerRoot;
 
-    private final Var<List<File>> auxclasspathFiles = Var.newSimpleVar(emptyList());
+    private final Var<List<ClasspathEntry>> classpath = Var.newSimpleVar(emptyList());
 
     /**
      * Most up-to-date compilation unit. Is null if the current source cannot be parsed.
@@ -90,7 +91,7 @@ public class ASTManagerImpl implements ASTManager {
                   .subscribe(tick -> {
                       // note: if either of these values would be null
                       // the optional is empty.
-                      Optional<List<File>> changedClasspath = tick.asLeft().filter(Either::isRight).map(Either::getRight);
+                      Optional<List<ClasspathEntry>> changedClasspath = tick.asLeft().filter(Either::isRight).map(Either::getRight);
                       Optional<LanguageVersion> changedLanguageVersion = Optional.of(tick).filter(Either::isRight).map(Either::getRight);
 
                       Node updated;
@@ -148,8 +149,8 @@ public class ASTManagerImpl implements ASTManager {
     }
 
     @Override
-    public Var<List<File>> classpathProperty() {
-        return auxclasspathFiles;
+    public Var<List<ClasspathEntry>> classpathProperty() {
+        return classpath;
     }
 
     @Override
@@ -203,14 +204,14 @@ public class ASTManagerImpl implements ASTManager {
         return currentException;
     }
 
-    private LanguageProcessorRegistry createNewRegistry(LanguageVersion version, List<File> classpath) {
+    private LanguageProcessorRegistry createNewRegistry(LanguageVersion version, List<ClasspathEntry> classpath) {
         Map<Language, LanguagePropertyBundle> langProperties = new HashMap<>();
         LanguagePropertyBundle bundle = version.getLanguage().newPropertyBundle();
         bundle.setLanguageVersion(version.getVersion());
         if (bundle instanceof JvmLanguagePropertyBundle) {
             bundle.setProperty(JvmLanguagePropertyBundle.AUX_CLASSPATH,
                 classpath.stream()
-                    .map(File::getAbsolutePath)
+                    .map(ClasspathEntry::getEntry)
                     .collect(Collectors.joining(File.pathSeparator)));
         }
 

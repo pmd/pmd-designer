@@ -4,7 +4,6 @@
 
 package net.sourceforge.pmd.util.fxdesigner.app.services;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +18,7 @@ import net.sourceforge.pmd.lang.document.TextDocument;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.model.ParseAbortedException;
+import net.sourceforge.pmd.util.fxdesigner.popups.ClasspathEntry;
 import net.sourceforge.pmd.util.fxdesigner.util.beans.SettingsOwner;
 
 
@@ -52,7 +52,7 @@ public interface ASTManager extends ApplicationComponent, SettingsOwner {
     Val<Node> compilationUnitProperty();
 
 
-    Val<List<File>> classpathProperty();
+    Val<List<ClasspathEntry>> classpathProperty();
 
 
     Val<ParseAbortedException> currentExceptionProperty();

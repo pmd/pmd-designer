@@ -36,6 +36,8 @@ import org.apache.commons.lang3.reflect.Typed;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.w3c.dom.Element;
 
+import net.sourceforge.pmd.util.fxdesigner.popups.ClasspathEntry;
+
 /**
  * A collection of serializers. Once you register a serializer for a type T,
  * list/set types of any depth with that type T as element type can be serialized
@@ -101,6 +103,7 @@ public class SerializerRegistrar {
         registerMapped(java.sql.Time.class, Long.TYPE, java.sql.Time::getTime, java.sql.Time::new);
         registerMapped(java.sql.Date.class, Long.TYPE, java.sql.Date::getTime, java.sql.Date::new);
 
+        registerMapped(ClasspathEntry.class, String.class, ClasspathEntry::getEntry, ClasspathEntry::new);
         registerMapped(File.class, String.class, File::getPath, File::new);
         registerMapped(Path.class, String.class, Path::toString, Paths::get);
         registerMapped(Class.class, String.class, Class::getName, className -> {

@@ -45,7 +45,7 @@ public class AuxclasspathSetupController implements Initializable {
     @FXML
     private Button selectDirectoryButton;
     @FXML
-    private ListView<File> fileListView;
+    private ListView<ClasspathEntry> fileListView;
     @FXML
     private Button moveItemUpButton;
     @FXML
@@ -76,7 +76,7 @@ public class AuxclasspathSetupController implements Initializable {
 
         moveItemDownButton.disableProperty().bind(noSelection.or(fileListView.getSelectionModel().selectedIndexProperty().isEqualTo(lastIndexBinding)));
 
-        fileListView.setCellFactory(DesignerUtil.simpleListCellFactory(File::getName, File::getAbsolutePath));
+        fileListView.setCellFactory(DesignerUtil.simpleListCellFactory(ClasspathEntry::getDisplay, ClasspathEntry::getTooltip));
 
         selectFilesButton.setOnAction(e -> onSelectFileClicked());
         selectDirectoryButton.setOnAction(e -> onSelectDirectoryClicked());
@@ -93,20 +93,20 @@ public class AuxclasspathSetupController implements Initializable {
                 new FileChooser.ExtensionFilter("Java archives", "*.jar", "*.war", "*.ear")
         );
         List<File> files = chooser.showOpenMultipleDialog(designerRoot.getMainStage());
-        fileListView.getItems().addAll(files);
+        fileListView.getItems().addAll(ClasspathEntry.fromFiles(files));
     }
 
     private void onSelectDirectoryClicked() {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Add directory to the auxiliary classpath");
         File file = chooser.showDialog(designerRoot.getMainStage());
-        fileListView.getItems().addAll(file);
+        fileListView.getItems().addAll(ClasspathEntry.fromFiles(file));
     }
 
 
     private void onRemoveFileClicked() {
-        File f = fileListView.getSelectionModel().getSelectedItem();
-        fileListView.getItems().remove(f);
+        ClasspathEntry entry = fileListView.getSelectionModel().getSelectedItem();
+        fileListView.getItems().remove(entry);
     }
 
 
@@ -133,7 +133,7 @@ public class AuxclasspathSetupController implements Initializable {
             return;
         }
 
-        File selected = fileListView.getSelectionModel().getSelectedItem();
+        ClasspathEntry selected = fileListView.getSelectionModel().getSelectedItem();
 
         // Removing removable element
         fileListView.getItems().remove(selected);
@@ -147,7 +147,7 @@ public class AuxclasspathSetupController implements Initializable {
 
 
     /** Displays the popup. */
-    public void show(Stage parentStage, List<File> currentItems, Consumer<List<File>> onApply) {
+    public void show(Stage parentStage, List<ClasspathEntry> currentItems, Consumer<List<ClasspathEntry>> onApply) {
 
         FXMLLoader fxmlLoader = new FXMLLoader(DesignerUtil.getFxml("auxclasspath-setup-popup"));
 
@@ -169,7 +169,7 @@ public class AuxclasspathSetupController implements Initializable {
 
         fileListView.setItems(FXCollections.observableArrayList(currentItems));
 
-        stage.setTitle("Auxilliary classpath setup");
+        stage.setTitle("Auxiliary classpath setup");
         stage.initOwner(parentStage);
         stage.initModality(Modality.WINDOW_MODAL);
 
