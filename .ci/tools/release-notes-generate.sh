@@ -85,7 +85,7 @@ echo "Found $(echo "$ISSUES_JSON" | jq length) issues/pull requests"
 
 FIXED_ISSUES_JSON="$(echo "$ISSUES_JSON" | jq 'map(select(has("pull_request") | not))')"
 FIXED_ISSUES="$(echo "$FIXED_ISSUES_JSON" | jq --raw-output '.[] | "* [#\(.number)](https://github.com/pmd/pmd-designer/issues/\(.number)): \(.title | gsub("@"; "@<!-- -->") | gsub("\\["; "\\["))"')"
-FIXED_ISSUES="**🐛 Fixed issues:**
+FIXED_ISSUES="**🐛️ Fixed issues:**
 $FIXED_ISSUES
 "
 
@@ -105,7 +105,7 @@ for login in $AUTHORS; do
     PULL_REQUESTS="${PULL_REQUESTS//${search}/${replacement}}"
 done
 
-PULL_REQUESTS="**✨ Merged pull requests:**
+PULL_REQUESTS="**✨️ Merged pull requests:**
 $PULL_REQUESTS
 "
 
@@ -113,12 +113,12 @@ DEPENDENCY_UPDATES_JSON="$(echo "$ISSUES_JSON" | jq 'map(select(has("pull_reques
 DEPENDENCY_UPDATES="$(echo "$DEPENDENCY_UPDATES_JSON" | jq --raw-output '.[] | "* [#\(.number)](https://github.com/pmd/pmd-designer/pull/\(.number)): \(.title | gsub("@"; "@<!-- -->") | gsub("\\["; "\\["))"')"
 DEPENDENCY_UPDATES_COUNT=$(echo "$DEPENDENCY_UPDATES_JSON" | jq length)
 if [ -z "$DEPENDENCY_UPDATES" ]; then
-  DEPENDENCY_UPDATES="**📦 Dependency updates:**
+  DEPENDENCY_UPDATES="**📦️ Dependency updates:**
 
 No dependency updates.
 "
 else
-  DEPENDENCY_UPDATES="**📦 Dependency updates:**
+  DEPENDENCY_UPDATES="**📦️ Dependency updates:**
 <details>
 <summary>$DEPENDENCY_UPDATES_COUNT updates</summary>
 
@@ -153,10 +153,10 @@ echo "Updating $RELEASE_NOTES_FILE now..."
 
 RELEASE_NOTES=$(cat "$RELEASE_NOTES_FILE")
 echo "   adding fixed issues"
-RELEASE_NOTES="$(insert "$RELEASE_NOTES" "**🐛 Fixed issues:**" "**✨ Merged pull requests:**" "$FIXED_ISSUES")"
+RELEASE_NOTES="$(insert "$RELEASE_NOTES" "**🐛️ Fixed issues:**" "**✨️ Merged pull requests:**" "$FIXED_ISSUES")"
 echo "   adding pull requests"
-RELEASE_NOTES="$(insert "$RELEASE_NOTES" "**✨ Merged pull requests:**" "**📦 Dependency updates:**" "$PULL_REQUESTS")"
+RELEASE_NOTES="$(insert "$RELEASE_NOTES" "**✨️ Merged pull requests:**" "**📦️ Dependency updates:**" "$PULL_REQUESTS")"
 echo "   adding dependencies"
-RELEASE_NOTES="$(insert "$RELEASE_NOTES" "**📦 Dependency updates:**" "See https://github.com/pmd/pmd-designer/milestone/$MILESTONE" "$DEPENDENCY_UPDATES")"
+RELEASE_NOTES="$(insert "$RELEASE_NOTES" "**📦️ Dependency updates:**" "See https://github.com/pmd/pmd-designer/milestone/$MILESTONE" "$DEPENDENCY_UPDATES")"
 
 echo "$RELEASE_NOTES" > "$RELEASE_NOTES_FILE"
