@@ -25,7 +25,8 @@ import org.reactfx.value.SuspendableVar;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-import net.sourceforge.pmd.lang.JvmLanguagePropertyBundle;
+import net.sourceforge.pmd.PMDConfiguration;
+import net.sourceforge.pmd.PmdAnalysis;
 import net.sourceforge.pmd.lang.Language;
 import net.sourceforge.pmd.lang.LanguageProcessor;
 import net.sourceforge.pmd.lang.LanguageProcessorRegistry;
@@ -33,11 +34,12 @@ import net.sourceforge.pmd.lang.LanguagePropertyBundle;
 import net.sourceforge.pmd.lang.LanguageRegistry;
 import net.sourceforge.pmd.lang.LanguageVersion;
 import net.sourceforge.pmd.lang.ast.Node;
-import net.sourceforge.pmd.lang.ast.Parser.ParserTask;
-import net.sourceforge.pmd.lang.ast.RootNode;
-import net.sourceforge.pmd.lang.ast.SemanticErrorReporter;
 import net.sourceforge.pmd.lang.document.FileId;
 import net.sourceforge.pmd.lang.document.TextDocument;
+import net.sourceforge.pmd.lang.rule.AbstractRule;
+import net.sourceforge.pmd.lang.rule.RuleSet;
+import net.sourceforge.pmd.reporting.Report;
+import net.sourceforge.pmd.reporting.RuleContext;
 import net.sourceforge.pmd.util.fxdesigner.SourceEditorController;
 import net.sourceforge.pmd.util.fxdesigner.app.ApplicationComponent;
 import net.sourceforge.pmd.util.fxdesigner.app.DesignerRoot;
@@ -89,15 +91,14 @@ public class ASTManagerImpl implements ASTManager {
                   .or(classpathProperty().values())
                   .or(languageVersionProperty().values())
                   .subscribe(tick -> {
-                      // note: if either of these values would be null
-                      // the optional is empty.
-                      Optional<List<ClasspathEntry>> changedClasspath = tick.asLeft().filter(Either::isRight).map(Either::getRight);
+                      // note: if either of these values would be null the optional is empty.
                       Optional<LanguageVersion> changedLanguageVersion = Optional.of(tick).filter(Either::isRight).map(Either::getRight);
 
                       Node updated;
                       try {
                           updated = refreshAST(this, getSourceCode(), getLanguageVersion(),
-                                  refreshRegistry(changedLanguageVersion.isPresent(), changedClasspath.isPresent())).orElse(null);
+                                  refreshRegistry(changedLanguageVersion.isPresent()),
+                                  classpathProperty().getValue()).orElse(null);
                           currentException.setValue(null);
                       } catch (ParseAbortedException e) {
                           updated = null;
@@ -204,17 +205,13 @@ public class ASTManagerImpl implements ASTManager {
         return currentException;
     }
 
-    private LanguageProcessorRegistry createNewRegistry(LanguageVersion version, List<ClasspathEntry> classpath) {
+    // Note: This registry is used via languageProcessorProperty() to get access
+    // to DesignerBindings. It doesn't have and need the auxClasspath configuration.
+    // It is not used for generating the AST, see refreshAST() for that.
+    private LanguageProcessorRegistry createNewRegistry(LanguageVersion version) {
         Map<Language, LanguagePropertyBundle> langProperties = new HashMap<>();
         LanguagePropertyBundle bundle = version.getLanguage().newPropertyBundle();
         bundle.setLanguageVersion(version.getVersion());
-        if (bundle instanceof JvmLanguagePropertyBundle) {
-            bundle.setProperty(JvmLanguagePropertyBundle.AUX_CLASSPATH,
-                classpath.stream()
-                    .map(ClasspathEntry::getEntry)
-                    .collect(Collectors.joining(File.pathSeparator)));
-        }
-
         langProperties.put(version.getLanguage(), bundle);
 
         LanguageRegistry languages =
@@ -226,9 +223,9 @@ public class ASTManagerImpl implements ASTManager {
                 NOOP_REPORTER);
     }
 
-    private LanguageProcessorRegistry refreshRegistry(boolean changedLanguageVersion, boolean changedClassLoader) {
+    private LanguageProcessorRegistry refreshRegistry(boolean changedLanguageVersion) {
         LanguageProcessorRegistry current = lpRegistry.getValue();
-        if (current != null && !changedLanguageVersion && !changedClassLoader) {
+        if (current != null && !changedLanguageVersion) {
             // the current one is fine
             return current;
         }
@@ -238,11 +235,23 @@ public class ASTManagerImpl implements ASTManager {
             current.close();
         }
 
-        LanguageProcessorRegistry newRegistry = createNewRegistry(getLanguageVersion(), classpathProperty().getValue());
+        LanguageProcessorRegistry newRegistry = createNewRegistry(getLanguageVersion());
         lpRegistry.setValue(newRegistry);
         return newRegistry;
     }
 
+    public static class RootNodeCapturingRule extends AbstractRule {
+        private Node rootNode;
+
+        @Override
+        public void apply(Node target, RuleContext ctx) {
+            rootNode = target;
+        }
+
+        public Node getRootNode() {
+            return rootNode;
+        }
+    }
 
     /**
      * Refreshes the compilation unit given the current state of the model.
@@ -252,30 +261,42 @@ public class ASTManagerImpl implements ASTManager {
     private static Optional<Node> refreshAST(ApplicationComponent component,
                                              String source,
                                              LanguageVersion version,
-                                             LanguageProcessorRegistry lpRegistry) throws ParseAbortedException {
+                                             LanguageProcessorRegistry lpRegistry,
+                                             List<ClasspathEntry> classpath) throws ParseAbortedException {
+        PMDConfiguration config = new PMDConfiguration(lpRegistry.getLanguages());
+        config.setIgnoreIncrementalAnalysis(true);
+        config.setAnalysisCacheLocation(null);
+        config.setThreads(0); // important, so that the same RootNodeCapturingRule instance is used
+        config.setDefaultLanguageVersion(version);
 
-        String dummyFilePath = "dummy." + version.getLanguage().getExtensions().get(0);
-        TextDocument textDocument = TextDocument.readOnlyString(source, FileId.fromPathLikeString(dummyFilePath), version);
-
-        ParserTask task = new ParserTask(
-            textDocument,
-            SemanticErrorReporter.noop(),
-            lpRegistry
-        );
-
-        LanguageProcessor processor = lpRegistry.getProcessor(version.getLanguage());
-        RootNode node;
-        try {
-            node = processor.services().getParser().parse(task);
-        } catch (Exception e) {
-            component.logUserException(e, Category.PARSE_EXCEPTION);
-            throw new ParseAbortedException(e);
+        if (classpath != null && !classpath.isEmpty()) {
+            config.prependAuxClasspath(classpath.stream()
+                    .map(ClasspathEntry::getEntry)
+                    .collect(Collectors.joining(File.pathSeparator)));
         }
 
-        // Notify that the parse went OK so we can avoid logging very recent exceptions
+        RootNodeCapturingRule rule = new RootNodeCapturingRule();
+        rule.setLanguage(version.getLanguage());
 
-        component.raiseParsableSourceFlag(() -> "Param hash: " + Objects.hash(source, version, lpRegistry));
+        try (PmdAnalysis pmdAnalysis = PmdAnalysis.create(config)) {
+            pmdAnalysis.addRuleSet(RuleSet.forSingleRule(rule));
 
-        return Optional.of(node);
+            String dummyFilePath = "dummy." + version.getLanguage().getExtensions().get(0);
+            FileId fileId = FileId.fromPathLikeString(dummyFilePath);
+            pmdAnalysis.files().addSourceFile(fileId, source);
+
+            Report report = pmdAnalysis.performAnalysisAndCollectReport();
+
+            if (!report.getProcessingErrors().isEmpty()) {
+                Throwable e = report.getProcessingErrors().get(0).getError();
+                component.logUserException(e, Category.PARSE_EXCEPTION);
+                throw new ParseAbortedException(e);
+            }
+
+            // Notify that the parse went OK so we can avoid logging very recent exceptions
+            component.raiseParsableSourceFlag(() -> "Param hash: " + Objects.hash(source, version, classpath));
+
+            return Optional.ofNullable(rule.getRootNode());
+        }
     }
 }
