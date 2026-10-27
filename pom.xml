@@ -50,6 +50,7 @@
         <pmd.core.version>7.0.0</pmd.core.version> <!-- minimum supported PMD version (API) -->
 
         <openjfx.version>17.0.17</openjfx.version>
+        <controlsfx.version>8.40.18</controlsfx.version>
         <java.version>8</java.version>
 
         <pmd.langtest.version>7.28.0</pmd.langtest.version>
@@ -60,11 +61,8 @@
         <kotest.version>5.9.1</kotest.version>
         <junit.version>6.1.3</junit.version>
 
-        <!-- Those have different values based on the profile -->
+        <!-- javafx is either provided or put on the classpath (in profile running) -->
         <openjfx.scope>provided</openjfx.scope>
-        <pmd.module.scope>runtime</pmd.module.scope>
-
-        <local.lib.repo>${project.basedir}/lib/mvn-repo</local.lib.repo>
 
         <surefire.version>3.6.0</surefire.version>
         <checkstyle.version>14.3.0</checkstyle.version>
@@ -346,16 +344,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>${jar.plugin.version}</version>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <!-- Important for it to work on JRE 9+ -->
-                            <Multi-Release>true</Multi-Release>
-                            <!-- This can't work as we don't include any pmd dependencies -->
-                            <!--<Main-Class>net.sourceforge.pmd.util.fxdesigner.DesignerStarter</Main-Class>-->
-                        </manifestEntries>
-                    </archive>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -411,7 +399,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>3.3.1</version>
                 <configuration>
-                    <releaseProfiles>shading,sign</releaseProfiles>
+                    <releaseProfiles>sign</releaseProfiles>
                     <pushChanges>true</pushChanges>
                     <localCheckout>true</localCheckout>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
@@ -500,13 +488,6 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>local-libs</id>
-            <url>file://${local.lib.repo}</url>
-        </repository>
-    </repositories>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -551,18 +532,21 @@
                 <version>${kotest.version}</version>
             </dependency>
 
-            <!-- dependencies provided by pmd-dist -->
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
                 <version>3.55.1</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>3.21.0</version>
-                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.controlsfx</groupId>
+                <artifactId>controlsfx</artifactId>
+                <version>${controlsfx.version}</version>
             </dependency>
 
         </dependencies>
@@ -615,26 +599,10 @@
             <version>0.9.3</version> <!-- 0.9.3 is the last version that is compatible with Java 8 -->
         </dependency>
 
-        <!-- We need two incompatible versions of controlsfx, one for Java 8, and one for Java 9+ -->
-        <!-- Ideally ControlsFX would release a MR jar but that doesn't seem to be in their priorities: -->
-        <!-- https://github.com/controlsfx/controlsfx/issues/1014 -->
-        <!-- So we need to build it ourselves. But IntelliJ's maven integration doesn't support -->
-        <!-- that very well. -->
-        <!-- The simplest way I found to have it work both in the IDE and in the shaded jar -->
-        <!-- is to build and deploy locally a multi-release jar. -->
-        <!-- Previously the maven build created that Jar, but the IDE was confused and couldn't run the project -->
-        <!-- on JRE 9. -->
-
-        <!-- Using a parent pom and a submodule for the cfx jar doesn't work in IntelliJ and -->
-        <!-- would force us to release to maven central, so to respect all their restrictions. -->
-
-        <!-- Unless controlsfx releases its own MR jar, we have to rebuilt that local jar each time we -->
-        <!-- want an update (there's a pom provided in the lib dir for that). -->
-
         <dependency>
-            <groupId>org.controlsfx.custom</groupId>
-            <artifactId>controlsfx-mr-jar</artifactId>
-            <version>1.0</version>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.oowekyala</groupId>
@@ -664,9 +632,6 @@
             <version>2.4.0</version> <!-- 2.4.0 is the last version that is compatible with Java 8 and later -->
         </dependency>
 
-        <!-- PMD dependencies -->
-        <!-- All those are "provided" to exclude them from the shaded jar -->
-        <!-- When importing project in an IDE, the profiles updates their scope to compile/runtime -->
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-core</artifactId>
@@ -674,19 +639,21 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- PMD language dependencies -->
+        <!-- All those are "runtime" and optional (not transitive). -->
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-apex</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>${pmd.module.scope}</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-java</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>${pmd.module.scope}</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
@@ -694,63 +661,63 @@
             <artifactId>pmd-scala_2.13</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>${pmd.module.scope}</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-swift</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-javascript</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>${pmd.module.scope}</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-jsp</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>${pmd.module.scope}</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-plsql</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>${pmd.module.scope}</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-visualforce</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>${pmd.module.scope}</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-velocity</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>${pmd.module.scope}</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-xml</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>${pmd.module.scope}</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-modelica</artifactId>
             <version>${pmd.core.version}</version>
             <optional>true</optional>
-            <scope>${pmd.module.scope}</scope>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- TEST DEPENDENCIES -->
@@ -803,59 +770,6 @@
     </dependencies>
 
     <profiles>
-        <profile>
-            <id>shading</id>
-            <!-- This profile is NOT active by default, so that import
-                 in IDEs work properly. This is the one to use to build
-                 the JAR that is included in the PMD's distribution.
-
-                 Do not use in conjunction with -Prunning.
-                 -->
-            <properties>
-                <!-- Marks those modules as "provided" to exclude them from the shaded jar -->
-                <!-- pmd-core is handled separately below -->
-                <pmd.module.scope>provided</pmd.module.scope>
-                <openjfx.scope>provided</openjfx.scope>
-            </properties>
-            <build>
-                <plugins>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <configuration>
-
-                            <!-- We can't just use an artifactSet/excludes to exclude pmd dependencies -->
-                            <!-- because it would include their transitive dependencies -->
-
-                            <!-- Merge resource provider files like Ikonli icon resolvers -->
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                            </transformers>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                </plugins>
-            </build>
-            <dependencies>
-                <dependency>
-                    <groupId>net.sourceforge.pmd</groupId>
-                    <artifactId>pmd-core</artifactId>
-                    <version>${pmd.core.version}</version>
-                    <!-- Marks pmd-core modules as "provided" to exclude them from the shaded jar -->
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
         <profile>
             <!-- Profile to build a fat runnable jar. -->
             <!-- It's kind of shitty that we can't select dependencies to include manually, -->
@@ -1002,16 +916,27 @@
             <dependencies>
                 <!-- normally provided by pmd-dist, but not when running directly -->
                 <dependency>
-                    <groupId>org.checkerframework</groupId>
-                    <artifactId>checker-qual</artifactId>
-                    <scope>compile</scope>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                    <version>1.7.36</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
+                    <groupId>org.controlsfx</groupId>
+                    <artifactId>controlsfx</artifactId>
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
+        </profile>
+        <profile>
+            <id>running-pmd-java-opts</id>
+            <activation>
+                <property>
+                    <name>env.PMD_JAVA_OPTS</name>
+                </property>
+            </activation>
+            <properties>
+                <pmd.java.opts>${env.PMD_JAVA_OPTS}</pmd.java.opts>
+            </properties>
         </profile>
 
         <profile>
