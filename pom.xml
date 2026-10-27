@@ -50,7 +50,11 @@
         <pmd.core.version>7.0.0</pmd.core.version> <!-- minimum supported PMD version (API) -->
 
         <openjfx.version>17.0.17</openjfx.version>
-        <controlsfx.version>8.40.18</controlsfx.version>
+        <!--
+             Note: we compile against ControlsFX 11 to be able to use OpenJFX.
+             A CI build job (compile-controlsfx8) will ensure we don't accidentally use ControlsFX 11 only API.
+        -->
+        <controlsfx.version>11.2.6</controlsfx.version>
         <java.version>8</java.version>
 
         <pmd.langtest.version>7.28.0</pmd.langtest.version>
@@ -590,6 +594,14 @@
             <version>0.9.3</version> <!-- 0.9.3 is the last version that is compatible with Java 8 -->
         </dependency>
 
+        <!-- We compile against ControlsFX 11 to be able to use OpenJFX.
+
+             Downstream projects might need to select a version compatible with their Java version
+             e.g. downgrade to 8.40.18 for Java 8.
+
+             See https://central.sonatype.com/artifact/org.controlsfx/controlsfx/versions for available
+             versions.
+        -->
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
@@ -942,6 +954,13 @@
                     </snapshots>
                 </pluginRepository>
             </pluginRepositories>
+        </profile>
+
+        <profile>
+            <id>check-controlsfx8</id>
+            <properties>
+                <controlsfx.version>8.40.18</controlsfx.version>
+            </properties>
         </profile>
     </profiles>
 
