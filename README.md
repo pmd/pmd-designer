@@ -61,18 +61,21 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions to build the project fro
 
 ##### Building a runnable JAR
 
-You can package a runnable jar containing the PMD dependencies with maven. For
-now the only option is to build a jar that contains pmd-core and pmd-java:
+You can package a runnable jar containing the PMD dependencies with maven.
+By default, it contains a couple of languages and openjfx:
 
 ```
-./mvnw clean package -Dfat-java -Dpmd.core.version=7.0.0-SNAPSHOT
+./mvnw clean package -Pfat-jar -Dpmd.core.version=7.0.0-SNAPSHOT
 ```
-The `pmd.core.version` property selects the version of pmd-core *and pmd-java*
+The `pmd.core.version` property selects the version of pmd-core and the version of all the pmd languages
 that will be included. The built jar can then be found in your `target` directory.
+
+You can then run this jar with:
+
+```
+java -jar target/pmd-designer-*-SNAPSHOT-jar-with-dependencies.jar
+```
+
 **Such a jar cannot be used in a PMD distribution** and must be used in a
 standalone fashion, otherwise classpath conflicts may arise.
-You can additionally add `-Dopenjfx.scope=compile` to include openjfx as well.
-
-You should never run the `install` goal with the `-Dfat-java` property! This
-would install the fat jar in your local repo and may cause dependency conflicts.
-
+You can additionally add `-Dopenjfx.scope=provided` to exclude openjfx.

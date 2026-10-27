@@ -644,81 +644,89 @@
 
         <!-- PMD language dependencies -->
         <!-- All those are "runtime" and optional (not transitive). -->
+<!--        <dependency>-->
+<!--            <groupId>net.sourceforge.pmd</groupId>-->
+<!--            <artifactId>pmd-apex</artifactId>-->
+<!--            <version>${pmd.core.version}</version>-->
+<!--            <optional>true</optional>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>net.sourceforge.pmd</groupId>-->
+<!--            <artifactId>pmd-java</artifactId>-->
+<!--            <version>${pmd.core.version}</version>-->
+<!--            <optional>true</optional>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>net.sourceforge.pmd</groupId>-->
+<!--            &lt;!&ndash; Only depend on 2.13 &ndash;&gt;-->
+<!--            <artifactId>pmd-scala_2.13</artifactId>-->
+<!--            <version>${pmd.core.version}</version>-->
+<!--            <optional>true</optional>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>net.sourceforge.pmd</groupId>-->
+<!--            <artifactId>pmd-swift</artifactId>-->
+<!--            <version>${pmd.core.version}</version>-->
+<!--            <optional>true</optional>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>net.sourceforge.pmd</groupId>-->
+<!--            <artifactId>pmd-javascript</artifactId>-->
+<!--            <version>${pmd.core.version}</version>-->
+<!--            <optional>true</optional>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>net.sourceforge.pmd</groupId>-->
+<!--            <artifactId>pmd-jsp</artifactId>-->
+<!--            <version>${pmd.core.version}</version>-->
+<!--            <optional>true</optional>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>net.sourceforge.pmd</groupId>-->
+<!--            <artifactId>pmd-plsql</artifactId>-->
+<!--            <version>${pmd.core.version}</version>-->
+<!--            <optional>true</optional>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>net.sourceforge.pmd</groupId>-->
+<!--            <artifactId>pmd-visualforce</artifactId>-->
+<!--            <version>${pmd.core.version}</version>-->
+<!--            <optional>true</optional>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>net.sourceforge.pmd</groupId>-->
+<!--            <artifactId>pmd-velocity</artifactId>-->
+<!--            <version>${pmd.core.version}</version>-->
+<!--            <optional>true</optional>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>net.sourceforge.pmd</groupId>-->
+<!--            <artifactId>pmd-xml</artifactId>-->
+<!--            <version>${pmd.core.version}</version>-->
+<!--            <optional>true</optional>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>net.sourceforge.pmd</groupId>-->
+<!--            <artifactId>pmd-modelica</artifactId>-->
+<!--            <version>${pmd.core.version}</version>-->
+<!--            <optional>true</optional>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-apex</artifactId>
+            <artifactId>pmd-languages-deps</artifactId>
             <version>${pmd.core.version}</version>
-            <optional>true</optional>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-java</artifactId>
-            <version>${pmd.core.version}</version>
-            <optional>true</optional>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.pmd</groupId>
-            <!-- Only depend on 2.13 -->
-            <artifactId>pmd-scala_2.13</artifactId>
-            <version>${pmd.core.version}</version>
-            <optional>true</optional>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-swift</artifactId>
-            <version>${pmd.core.version}</version>
-            <optional>true</optional>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-javascript</artifactId>
-            <version>${pmd.core.version}</version>
-            <optional>true</optional>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-jsp</artifactId>
-            <version>${pmd.core.version}</version>
-            <optional>true</optional>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-plsql</artifactId>
-            <version>${pmd.core.version}</version>
-            <optional>true</optional>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-visualforce</artifactId>
-            <version>${pmd.core.version}</version>
-            <optional>true</optional>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-velocity</artifactId>
-            <version>${pmd.core.version}</version>
-            <optional>true</optional>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-xml</artifactId>
-            <version>${pmd.core.version}</version>
-            <optional>true</optional>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.pmd</groupId>
-            <artifactId>pmd-modelica</artifactId>
-            <version>${pmd.core.version}</version>
+            <type>pom</type>
             <optional>true</optional>
             <scope>runtime</scope>
         </dependency>
@@ -774,95 +782,64 @@
 
     <profiles>
         <profile>
-            <!-- Profile to build a fat runnable jar. -->
-            <!-- It's kind of shitty that we can't select dependencies to include manually, -->
-            <!-- a gradle script may help. -->
-            <id>fat-java-jar</id>
-            <activation>
-                <property>
-                    <name>fat-java</name>
-                </property>
-            </activation>
+            <id>fat-jar</id>
+            <properties>
+                <openjfx.scope>compile</openjfx.scope>
+                <enforcer.skip>true</enforcer.skip>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <version>${jar.plugin.version}</version>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.8.0</version>
                         <configuration>
+                            <inlineDescriptors>
+                                <inlineDescriptor>
+                                    <id>jar-with-dependencies</id>
+                                    <formats>
+                                        <format>jar</format>
+                                    </formats>
+                                    <includeBaseDirectory>false</includeBaseDirectory>
+                                    <containerDescriptorHandlers>
+                                        <containerDescriptorHandler>
+                                            <!-- required for ikonli and PMD's language services -->
+                                            <handlerName>metaInf-services</handlerName>
+                                        </containerDescriptorHandler>
+                                    </containerDescriptorHandlers>
+                                    <dependencySets>
+                                        <dependencySet>
+                                            <outputDirectory>/</outputDirectory>
+                                            <useProjectArtifact>true</useProjectArtifact>
+                                            <unpack>true</unpack>
+                                            <scope>runtime</scope>
+                                        </dependencySet>
+                                    </dependencySets>
+                                </inlineDescriptor>
+                            </inlineDescriptors>
                             <archive>
+                                <manifest>
+                                    <mainClass>net.sourceforge.pmd.util.fxdesigner.DesignerStarter</mainClass>
+                                </manifest>
                                 <manifestEntries>
                                     <Multi-Release>true</Multi-Release>
-                                    <Main-Class>net.sourceforge.pmd.util.fxdesigner.DesignerStarter</Main-Class>
                                 </manifestEntries>
                             </archive>
-                            <finalName>pmd-designer-fat-${pmd.core.version}</finalName>
-                        </configuration>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <configuration>
-
-                            <!-- Relocate nothing -->
-
-                            <filters>
-                                <!-- Remove any signed jars signatures -->
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.SF</exclude>
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-
-                            <transformers>
-                                <!-- Merge resource provider files like Ikonli icon resolvers -->
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                            </transformers>
                         </configuration>
                         <executions>
                             <execution>
                                 <phase>package</phase>
                                 <goals>
-                                    <goal>shade</goal>
+                                    <goal>single</goal>
                                 </goals>
                             </execution>
                         </executions>
                     </plugin>
                 </plugins>
             </build>
-            <dependencies>
-                <!-- normally provided by pmd-dist, but not when create a fat-jar -->
-                <dependency>
-                    <groupId>org.checkerframework</groupId>
-                    <artifactId>checker-qual</artifactId>
-                    <scope>compile</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
-                    <scope>compile</scope>
-                </dependency>
-                <!-- pmd dependencies -->
-                <dependency>
-                    <groupId>net.sourceforge.pmd</groupId>
-                    <artifactId>pmd-core</artifactId>
-                    <version>${pmd.core.version}</version>
-                    <scope>compile</scope>
-                </dependency>
-                <dependency>
-                    <groupId>net.sourceforge.pmd</groupId>
-                    <artifactId>pmd-java</artifactId>
-                    <version>${pmd.core.version}</version>
-                    <optional>true</optional>
-                    <scope>runtime</scope>
-                </dependency>
-            </dependencies>
         </profile>
+
         <profile>
             <id>sign</id>
             <build>
