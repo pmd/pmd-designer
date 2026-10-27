@@ -895,23 +895,35 @@
             <id>running</id>
             <properties>
                 <openjfx.scope>compile</openjfx.scope>
+                <pmd.java.opts/>
             </properties>
             <build>
+                <defaultGoal>exec:exec</defaultGoal>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>3.6.4</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>java</goal>
-                                </goals>
-                                <phase>deploy</phase>
-                            </execution>
-                        </executions>
                         <configuration>
-                            <mainClass>net.sourceforge.pmd.util.fxdesigner.DesignerStarter</mainClass>
+                            <executable>java</executable>
+                            <classpathScope>runtime</classpathScope>
+                            <commandlineArgs>
+                                ${pmd.java.opts}
+                                --add-opens javafx.controls/javafx.scene.control.skin=ALL-UNNAMED
+                                --add-opens javafx.fxml/com.sun.javafx.fxml.builder=ALL-UNNAMED
+                                --add-opens javafx.graphics/javafx.scene.text=ALL-UNNAMED
+                                --add-opens javafx.graphics/com.sun.javafx.scene.text=ALL-UNNAMED
+                                --add-opens javafx.graphics/com.sun.javafx.text=ALL-UNNAMED
+                                --add-opens javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED
+                                --add-opens javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED
+                                --add-opens javafx.base/com.sun.javafx.runtime=ALL-UNNAMED
+                                --add-opens javafx.base/com.sun.javafx.event=ALL-UNNAMED
+                                --add-opens javafx.graphics/com.sun.javafx.scene.traversal=ALL-UNNAMED
+
+                                -cp %classpath
+                                net.sourceforge.pmd.util.fxdesigner.DesignerStarter
+                                --verbose
+                            </commandlineArgs>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -924,6 +936,18 @@
                     <version>1.7.36</version>
                 </dependency>
             </dependencies>
+        </profile>
+        <profile>
+            <!-- Reuses env var PMD_JAVA_OPTS when running designer via -Prunning -->
+            <id>running-pmd-java-opts</id>
+            <activation>
+                <property>
+                    <name>env.PMD_JAVA_OPTS</name>
+                </property>
+            </activation>
+            <properties>
+                <pmd.java.opts>${env.PMD_JAVA_OPTS}</pmd.java.opts>
+            </properties>
         </profile>
 
         <profile>

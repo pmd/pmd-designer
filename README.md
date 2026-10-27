@@ -31,18 +31,17 @@ If the `bin` directory of your PMD distribution is on your shell's path, then yo
 
 Alternatively, you can launch the program "from source" with Maven. There are two different ways
 1. If you are running an OpenJDK build *without* JavaFX bundled:  
-  `$ ./mvnw -Prunning exec:java` will launch the Designer after compiling it and add the JavaFX dependencies on
-  the classpath.  
+  `$ ./mvnw -Prunning` will launch the Designer with the JavaFX dependencies on the classpath.  
   Note: JavaFX will be on the classpath and not module path, which might behave a bit differently.  
   You can change the version of those dependencies with e.g. `-Dopenjfx.version=21.0.9` for OpenJFX 21.
   See the list of available versions [here](https://search.maven.org/artifact/org.openjfx/javafx).
 
 2. If you are running an OpenJDK build *with* JavaFX bundled (e.g. Azul Zulu, Bellsoft Liberica):  
-  `$ ./mvnw -Prunning exec:java -Dopenjfx.scope=provided` will launch the Designer after compiling it
-  without putting the JavaFX dependencies on the classpath.  
+  `$ ./mvnw -Prunning -Dopenjfx.scope=provided` will launch the Designer without putting the JavaFX
+  dependencies on the classpath.  
   Note: JavaFX will be on the module path and several packages need to be opened for reflection.
-  Since everything (Maven, Designer) runs in the same JVM, the opened packages are defined in
-  `.mvn/jvm.config`. Depending on the Java version, you might need additionally
+  This has been taken care in the exec plugin configuration in the maven profile `running`.
+  Depending on the Java version, you might need additionally
   `MAVEN_OPTS="--enable-native-access=javafx.graphics --sun-misc-unsafe-memory-access=allow"`.
 
 ### Updating
