@@ -338,8 +338,6 @@
                 </dependencies>
             </plugin>
 
-            <!-- We need to tag the jar as multi-release since we shade-in the controlsfx -->
-            <!-- multi-release jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -542,13 +540,6 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.21.0</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.controlsfx</groupId>
-                <artifactId>controlsfx</artifactId>
-                <version>${controlsfx.version}</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -602,7 +593,7 @@
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
-            <scope>provided</scope>
+            <version>${controlsfx.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.oowekyala</groupId>
@@ -920,23 +911,7 @@
                     <artifactId>slf4j-simple</artifactId>
                     <version>1.7.36</version>
                 </dependency>
-                <dependency>
-                    <groupId>org.controlsfx</groupId>
-                    <artifactId>controlsfx</artifactId>
-                    <scope>compile</scope>
-                </dependency>
             </dependencies>
-        </profile>
-        <profile>
-            <id>running-pmd-java-opts</id>
-            <activation>
-                <property>
-                    <name>env.PMD_JAVA_OPTS</name>
-                </property>
-            </activation>
-            <properties>
-                <pmd.java.opts>${env.PMD_JAVA_OPTS}</pmd.java.opts>
-            </properties>
         </profile>
 
         <profile>
