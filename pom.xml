@@ -110,22 +110,7 @@
         </resources>
 
 
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.6.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.sonatype.central</groupId>
-                    <artifactId>central-publishing-maven-plugin</artifactId>
-                    <version>0.11.0</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
-
             <plugin>
                 <groupId>de.jflex</groupId>
                 <artifactId>jflex-maven-plugin</artifactId>
@@ -386,6 +371,7 @@
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.11.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
@@ -644,84 +630,6 @@
 
         <!-- PMD language dependencies -->
         <!-- All those are "runtime" and optional (not transitive). -->
-<!--        <dependency>-->
-<!--            <groupId>net.sourceforge.pmd</groupId>-->
-<!--            <artifactId>pmd-apex</artifactId>-->
-<!--            <version>${pmd.core.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>net.sourceforge.pmd</groupId>-->
-<!--            <artifactId>pmd-java</artifactId>-->
-<!--            <version>${pmd.core.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>net.sourceforge.pmd</groupId>-->
-<!--            &lt;!&ndash; Only depend on 2.13 &ndash;&gt;-->
-<!--            <artifactId>pmd-scala_2.13</artifactId>-->
-<!--            <version>${pmd.core.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>net.sourceforge.pmd</groupId>-->
-<!--            <artifactId>pmd-swift</artifactId>-->
-<!--            <version>${pmd.core.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>net.sourceforge.pmd</groupId>-->
-<!--            <artifactId>pmd-javascript</artifactId>-->
-<!--            <version>${pmd.core.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>net.sourceforge.pmd</groupId>-->
-<!--            <artifactId>pmd-jsp</artifactId>-->
-<!--            <version>${pmd.core.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>net.sourceforge.pmd</groupId>-->
-<!--            <artifactId>pmd-plsql</artifactId>-->
-<!--            <version>${pmd.core.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>net.sourceforge.pmd</groupId>-->
-<!--            <artifactId>pmd-visualforce</artifactId>-->
-<!--            <version>${pmd.core.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>net.sourceforge.pmd</groupId>-->
-<!--            <artifactId>pmd-velocity</artifactId>-->
-<!--            <version>${pmd.core.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>net.sourceforge.pmd</groupId>-->
-<!--            <artifactId>pmd-xml</artifactId>-->
-<!--            <version>${pmd.core.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>net.sourceforge.pmd</groupId>-->
-<!--            <artifactId>pmd-modelica</artifactId>-->
-<!--            <version>${pmd.core.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-languages-deps</artifactId>
