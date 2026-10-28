@@ -50,12 +50,11 @@
         <pmd.core.version>7.0.0</pmd.core.version> <!-- minimum supported PMD version (API) -->
 
         <openjfx.version>17.0.17</openjfx.version>
-        <java.version>8</java.version>
+        <maven.compiler.release>8</maven.compiler.release>
 
-        <pmd.langtest.version>7.28.0</pmd.langtest.version>
+        <pmd.langtest.version>7.28.0</pmd.langtest.version> <!-- used for testing only -->
         <kotlin.compiler.apiVersion>1.9</kotlin.compiler.apiVersion>
         <kotlin.compiler.languageVersion>1.9</kotlin.compiler.languageVersion>
-        <kotlin.compiler.jvmTarget>1.${java.version}</kotlin.compiler.jvmTarget>
         <kotlin.version>2.2.21</kotlin.version>
         <kotest.version>5.9.1</kotest.version>
         <junit.version>6.1.3</junit.version>
@@ -170,7 +169,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.16.0</version>
                 <configuration>
-                    <release>${java.version}</release>
                     <useIncrementalCompilation>false</useIncrementalCompilation>
                 </configuration>
             </plugin>
@@ -295,7 +293,7 @@
                 <configuration>
                     <linkXRef>false</linkXRef>
                     <minimumTokens>100</minimumTokens>
-                    <targetJdk>1.${java.version}</targetJdk>
+                    <targetJdk>${maven.compiler.release}</targetJdk>
                     <excludeRoots>${jflex-output}</excludeRoots>
                     <rulesets>
                         <ruleset>config/pmd-check.xml</ruleset>
@@ -465,7 +463,38 @@
                             </rules>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>enforce-bytecode-version</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <enforceBytecodeVersion>
+                                    <maxJdkVersion>8</maxJdkVersion>
+                                    <ignoredScopes>
+                                        <ignoredScope>test</ignoredScope>
+                                    </ignoredScopes>
+                                    <excludes>
+                                        <!-- we compile against javafx 17, but it will be provided -->
+                                        <exclude>org.openjfx:*</exclude>
+                                    </excludes>
+                                    <ignoreClasses>
+                                        <!-- asm dependency contains a java9 module-info.class -->
+                                        <ignoreClass>module-info</ignoreClass>
+                                    </ignoreClasses>
+                                </enforceBytecodeVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>extra-enforcer-rules</artifactId>
+                        <version>1.12.1</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
