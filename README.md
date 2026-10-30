@@ -31,18 +31,17 @@ If the `bin` directory of your PMD distribution is on your shell's path, then yo
 
 Alternatively, you can launch the program "from source" with Maven. There are two different ways
 1. If you are running an OpenJDK build *without* JavaFX bundled:  
-  `$ ./mvnw -Prunning exec:java` will launch the Designer after compiling it and add the JavaFX dependencies on
-  the classpath.  
+  `$ ./mvnw -Prunning` will launch the Designer with the JavaFX dependencies on the classpath.  
   Note: JavaFX will be on the classpath and not module path, which might behave a bit differently.  
   You can change the version of those dependencies with e.g. `-Dopenjfx.version=21.0.9` for OpenJFX 21.
   See the list of available versions [here](https://search.maven.org/artifact/org.openjfx/javafx).
 
 2. If you are running an OpenJDK build *with* JavaFX bundled (e.g. Azul Zulu, Bellsoft Liberica):  
-  `$ ./mvnw -Prunning exec:java -Dopenjfx.scope=provided` will launch the Designer after compiling it
-  without putting the JavaFX dependencies on the classpath.  
+  `$ ./mvnw -Prunning -Dopenjfx.scope=provided` will launch the Designer without putting the JavaFX
+  dependencies on the classpath.  
   Note: JavaFX will be on the module path and several packages need to be opened for reflection.
-  Since everything (Maven, Designer) runs in the same JVM, the opened packages are defined in
-  `.mvn/jvm.config`. Depending on the Java version, you might need additionally
+  This has been taken care in the exec plugin configuration in the maven profile `running`.
+  Depending on the Java version, you might need additionally
   `MAVEN_OPTS="--enable-native-access=javafx.graphics --sun-misc-unsafe-memory-access=allow"`.
 
 ### Updating
@@ -62,18 +61,21 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions to build the project fro
 
 ##### Building a runnable JAR
 
-You can package a runnable jar containing the PMD dependencies with maven. For
-now the only option is to build a jar that contains pmd-core and pmd-java:
+You can package a runnable jar containing the PMD dependencies with maven.
+By default, it contains a couple of languages and openjfx:
 
 ```
-./mvnw clean package -Dfat-java -Dpmd.core.version=7.0.0-SNAPSHOT
+./mvnw clean package -Pfat-jar -Dpmd.core.version=7.0.0-SNAPSHOT
 ```
-The `pmd.core.version` property selects the version of pmd-core *and pmd-java*
+The `pmd.core.version` property selects the version of pmd-core and the version of all the pmd languages
 that will be included. The built jar can then be found in your `target` directory.
+
+You can then run this jar with:
+
+```
+java -jar target/pmd-designer-*-SNAPSHOT-jar-with-dependencies.jar
+```
+
 **Such a jar cannot be used in a PMD distribution** and must be used in a
 standalone fashion, otherwise classpath conflicts may arise.
-You can additionally add `-Dopenjfx.scope=compile` to include openjfx as well.
-
-You should never run the `install` goal with the `-Dfat-java` property! This
-would install the fat jar in your local repo and may cause dependency conflicts.
-
+You can additionally add `-Dopenjfx.scope=provided` to exclude openjfx.

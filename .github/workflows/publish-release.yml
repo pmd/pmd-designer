@@ -110,7 +110,7 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.PMD_CI_GPG_PASSPHRASE }}
         run: |
           ./mvnw --show-version --errors --batch-mode \
-            -Psign,shading \
+            -Psign \
             deploy
       - name: Prepare Release Notes
         run: |
