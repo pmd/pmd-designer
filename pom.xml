@@ -454,6 +454,8 @@
                                     <excludes>
                                         <!-- we compile against javafx 17, but it will be provided -->
                                         <exclude>org.openjfx:*</exclude>
+                                        <!-- we compile against controlsfx 11.x. CI job check-controlsfx8 tests Java8 compatibility -->
+                                        <exclude>org.controlsfx:controlsfx</exclude>
                                     </excludes>
                                     <ignoreClasses>
                                         <!-- asm dependency contains a java9 module-info.class -->
