@@ -7,6 +7,7 @@
 **🐛️ Fixed issues:**
 
 **✨️ Merged pull requests:**
+* [#429](https://github.com/pmd/pmd-designer/pull/429): chore: Simplify java.version configuration in build, enforce JDK 8 bytecode
 
 **📦️ Dependency updates:**
 

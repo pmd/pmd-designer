@@ -55,12 +55,11 @@
              A CI build job (compile-controlsfx8) will ensure we don't accidentally use ControlsFX 11 only API.
         -->
         <controlsfx.version>11.2.6</controlsfx.version>
-        <java.version>8</java.version>
+        <maven.compiler.release>8</maven.compiler.release>
 
-        <pmd.langtest.version>7.28.0</pmd.langtest.version>
+        <pmd.langtest.version>7.29.0</pmd.langtest.version> <!-- used for testing only -->
         <kotlin.compiler.apiVersion>1.9</kotlin.compiler.apiVersion>
         <kotlin.compiler.languageVersion>1.9</kotlin.compiler.languageVersion>
-        <kotlin.compiler.jvmTarget>1.${java.version}</kotlin.compiler.jvmTarget>
         <kotlin.version>2.2.21</kotlin.version>
         <kotest.version>5.9.1</kotest.version>
         <junit.version>6.1.3</junit.version>
@@ -68,8 +67,8 @@
         <!-- javafx is either provided or put on the classpath (in profile running) -->
         <openjfx.scope>provided</openjfx.scope>
 
-        <surefire.version>3.6.0</surefire.version>
-        <checkstyle.version>14.3.0</checkstyle.version>
+        <surefire.version>3.6.1</surefire.version>
+        <checkstyle.version>14.4.0</checkstyle.version>
         <checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
         <javadoc.plugin.version>3.12.0</javadoc.plugin.version>
         <source.plugin.version>3.4.0</source.plugin.version>
@@ -80,7 +79,7 @@
 
         <pmd.build-tools.version>40</pmd.build-tools.version>
         <pmd.plugin.version>3.28.0</pmd.plugin.version>
-        <pmd.check.version>7.26.0</pmd.check.version>
+        <pmd.check.version>7.29.0</pmd.check.version>
 
         <jflex-output>${project.build.directory}/generated-sources/jflex</jflex-output>
 
@@ -157,7 +156,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.16.0</version>
                 <configuration>
-                    <release>${java.version}</release>
                     <useIncrementalCompilation>false</useIncrementalCompilation>
                 </configuration>
             </plugin>
@@ -193,7 +191,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.2</version>
+                <version>3.7.0</version>
                 <executions>
                     <execution>
                         <id>add-generated-sources</id>
@@ -282,7 +280,7 @@
                 <configuration>
                     <linkXRef>false</linkXRef>
                     <minimumTokens>100</minimumTokens>
-                    <targetJdk>1.${java.version}</targetJdk>
+                    <targetJdk>${maven.compiler.release}</targetJdk>
                     <excludeRoots>${jflex-output}</excludeRoots>
                     <rulesets>
                         <ruleset>config/pmd-check.xml</ruleset>
@@ -399,7 +397,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.6.3</version>
+                <version>3.7.0</version>
                 <executions>
                     <execution>
                         <id>enforce-versions</id>
@@ -441,7 +439,38 @@
                             </rules>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>enforce-bytecode-version</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <enforceBytecodeVersion>
+                                    <maxJdkVersion>8</maxJdkVersion>
+                                    <ignoredScopes>
+                                        <ignoredScope>test</ignoredScope>
+                                    </ignoredScopes>
+                                    <excludes>
+                                        <!-- we compile against javafx 17, but it will be provided -->
+                                        <exclude>org.openjfx:*</exclude>
+                                    </excludes>
+                                    <ignoreClasses>
+                                        <!-- asm dependency contains a java9 module-info.class -->
+                                        <ignoreClass>module-info</ignoreClass>
+                                    </ignoreClasses>
+                                </enforceBytecodeVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>extra-enforcer-rules</artifactId>
+                        <version>1.12.1</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
