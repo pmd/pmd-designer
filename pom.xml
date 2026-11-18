@@ -61,7 +61,7 @@
         <kotlin.compiler.apiVersion>1.9</kotlin.compiler.apiVersion>
         <kotlin.compiler.languageVersion>1.9</kotlin.compiler.languageVersion>
         <kotlin.version>2.2.21</kotlin.version>
-        <kotest.version>5.9.1</kotest.version>
+        <kotest.version>6.2.7</kotest.version>
         <junit.version>6.1.3</junit.version>
 
         <!-- javafx is either provided or put on the classpath (in profile running) -->
