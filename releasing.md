@@ -33,7 +33,7 @@
 
 5.  Verify the release on Github Releases: <https://github.com/pmd/pmd-designer/releases>
     
-    The release notes from `/CHANGELOG.md` should be there. Also, the shaded pmd-designer-*.jar should
+    The release notes from `/CHANGELOG.md` should be there. Also, the pmd-designer-*.jar should
     have been uploaded.
 
 6.  Add a new section at the top in `/CHANGELOG.md` to prepare for the next version.
@@ -50,6 +50,8 @@
     
     **📦️ Dependency updates:**
     
-    See https://github.com/pmd/pmd-designer/milestone/17
+    See https://github.com/pmd/pmd-designer/milestone/23
     
     ```
+
+7.  Rename milestone "next" to the just released version and create a new one named "next": <https://github.com/pmd/pmd-designer/milestones>

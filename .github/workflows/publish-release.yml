@@ -135,7 +135,7 @@ jobs:
           TAG_NAME: ${{ github.event.workflow_run.head_branch }}
           VERSION: ${{ needs.check-version.outputs.VERSION }}
         run: |
-          # Note: The release asset is the shaded jar
+          # Note: The release asset is the normal jar that is also available from maven central
           gh release create "$TAG_NAME" "target/pmd-designer-${VERSION}.jar" \
               --verify-tag \
               --notes-file release_notes.md \
