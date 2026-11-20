@@ -44,11 +44,22 @@ Alternatively, you can launch the program "from source" with Maven. There are tw
   Depending on the Java version, you might need additionally
   `MAVEN_OPTS="--enable-native-access=javafx.graphics --sun-misc-unsafe-memory-access=allow"`.
 
+In both cases, ControlsFX 11.x is put on the classpath by the maven profile `running`.
+
 ### Updating
 
-The latest version of the designer currently **works with PMD 7.0.0 and above**.
-You can simply replace `pmd-designer-7.X.Y.jar` with the [latest build](https://github.com/pmd/pmd-designer/releases/latest)
-in the installation folder of your PMD distribution.
+The latest version of the designer currently **works with PMD 7.0.0 and above** (pmd-core API).
+
+However, since version 7.30.0, the designer doesn't bundle [ControlsFX](https://github.com/controlsfx/controlsfx)
+anymore. ControlsFX is a separate library, which is provided by the start scripts of
+**PMD's binary distribution 7.30.0 and later** (ControlsFX 8.x for Java 8, ControlsFX 11.x for Java 11+).
+
+You can replace `pmd-designer-7.X.Y.jar` with the [latest build](https://github.com/pmd/pmd-designer/releases/latest)
+in the installation folder of your PMD distribution, as long as that distribution is 7.30.0 or later.
+For older PMD distributions, either upgrade PMD or keep using pmd-designer 7.19.x.
+
+If you embed the designer in your own application, add `org.controlsfx:controlsfx` to the classpath.
+It is declared as a regular Maven dependency (11.x); when running on Java 8, select version 8.40.18 instead.
 
 ## Usage
 
