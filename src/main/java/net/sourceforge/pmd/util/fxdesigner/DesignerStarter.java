@@ -30,6 +30,16 @@ public final class DesignerStarter {
                     + "Please install a compatible JavaFX version on your system and try again." + System.lineSeparator()
                     + "See https://gluonhq.com/products/javafx/" + System.lineSeparator();
 
+    private static final String MISSING_CONTROLSFX =
+            "You seem to be missing the ControlsFX library." + System.lineSeparator()
+                    + "If you are using PMD's binary distribution, please use PMD 7.30.0 or later." + System.lineSeparator()
+                    + "Otherwise, add org.controlsfx:controlsfx to the classpath" + System.lineSeparator()
+                    + "(8.40.x for Java 8, 11.x for Java 11+)." + System.lineSeparator()
+                    + "See https://docs.pmd-code.org/latest/pmd_userdocs_extending_designer_reference.html#installing-running-updating" + System.lineSeparator();
+
+    /** A ControlsFX class that exists in both ControlsFX 8.x and 11.x. */
+    private static final String CONTROLSFX_PROBE_CLASS = "org.controlsfx.control.PopOver";
+
     private DesignerStarter() {
     }
 
@@ -45,6 +55,11 @@ public final class DesignerStarter {
 
     public static ExitStatus launchGui(String[] args) {
         JavaFxUtil.setSystemProperties();
+
+        if (isControlsFxMissing()) {
+            displayError(MISSING_CONTROLSFX);
+            return ExitStatus.ERROR;
+        }
 
         try {
             Application.launch(Designer.class, args);
@@ -68,6 +83,30 @@ public final class DesignerStarter {
         }
 
         return ExitStatus.OK;
+    }
+
+    /**
+     * ControlsFX is not bundled into the designer jar. It needs to be on the classpath,
+     * e.g. provided by the start scripts of PMD's binary distribution (7.30.0+).
+     *
+     * <p>Note: if JavaFX itself is missing, this returns false, so that the JavaFX
+     * error handling during launch applies (missing JavaFX is reported first).
+     */
+    private static boolean isControlsFxMissing() {
+        ClassLoader loader = DesignerStarter.class.getClassLoader();
+        try {
+            Class.forName("javafx.scene.control.PopupControl", false, loader);
+        } catch (ClassNotFoundException | LinkageError e) {
+            return false; // JavaFX is missing
+        }
+        try {
+            Class.forName(CONTROLSFX_PROBE_CLASS, false, loader);
+            return false;
+        } catch (ClassNotFoundException e) {
+            return true;
+        } catch (LinkageError e) {
+            return false;
+        }
     }
 
     private static boolean isJavaFxUnavailable(NoClassDefFoundError classNotFound) {
