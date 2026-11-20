@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 7.30.0 (2026-11-20)
 
 **🚀️ New and Noteworthy:**
 * BREAKING CHANGE: ControlsFX is no longer shaded into the pmd-designer jar.
@@ -15,14 +15,68 @@
   `net.sourceforge.pmd.util.fxdesigner` (via `Automatic-Module-Name` in the manifest).
   This is a preparation step towards full JPMS support.
 
-**🐛️ Fixed issues:**
-
 **✨️ Merged pull requests:**
-* [#429](https://github.com/pmd/pmd-designer/pull/429): chore: Simplify java.version configuration in build, enforce JDK 8 bytecode
-* [#430](https://github.com/pmd/pmd-designer/pull/430): build!: Use controlsfx dependency directly
-* [#444](https://github.com/pmd/pmd-designer/pull/444): chore: Add automatic module name net.sourceforge.pmd.util.fxdesigner
+* [#383](https://github.com/pmd/pmd-designer/pull/383): chore: Use client-id for create-github-app-token - [Andreas Dangel](https://github.com/adangel) (@adangel)
+* [#429](https://github.com/pmd/pmd-designer/pull/429): chore: Simplify java.version configuration in build, enforce JDK 8 bytecode - [Andreas Dangel](https://github.com/adangel) (@adangel)
+* [#430](https://github.com/pmd/pmd-designer/pull/430): build!: Use controlsfx dependency directly - [Andreas Dangel](https://github.com/adangel) (@adangel)
+* [#444](https://github.com/pmd/pmd-designer/pull/444): chore: Add automatic module name net.sourceforge.pmd.util.fxdesigner - [Andreas Dangel](https://github.com/adangel) (@adangel)
+* [#445](https://github.com/pmd/pmd-designer/pull/445): feat: Show error message if ControlsFX is missing - [Andreas Dangel](https://github.com/adangel) (@adangel)
 
 **📦️ Dependency updates:**
+<details>
+<summary>48 updates</summary>
+
+* [#377](https://github.com/pmd/pmd-designer/pull/377): Bump actions/checkout from 6.0.3 to 7.0.0
+* [#379](https://github.com/pmd/pmd-designer/pull/379): Bump PMD from 7.25.0 to 7.26.0 for checks
+* [#380](https://github.com/pmd/pmd-designer/pull/380): Bump junit.version from 6.1.0 to 6.1.1
+* [#381](https://github.com/pmd/pmd-designer/pull/381): Bump com.puppycrawl.tools:checkstyle from 13.6.0 to 13.7.0
+* [#382](https://github.com/pmd/pmd-designer/pull/382): Bump actions/setup-java from 5.3.0 to 5.4.0
+* [#384](https://github.com/pmd/pmd-designer/pull/384): Bump org.checkerframework:checker-qual from 4.2.0 to 4.2.1
+* [#385](https://github.com/pmd/pmd-designer/pull/385): Bump actions/setup-java from 5.4.0 to 5.5.0
+* [#388](https://github.com/pmd/pmd-designer/pull/388): Bump junit.version from 6.1.1 to 6.1.2
+* [#389](https://github.com/pmd/pmd-designer/pull/389): Bump com.puppycrawl.tools:checkstyle from 13.7.0 to 13.8.0
+* [#390](https://github.com/pmd/pmd-designer/pull/390): Bump maven from 3.9.14 to 3.9.16
+* [#392](https://github.com/pmd/pmd-designer/pull/392): Bump actions/setup-java from 5.5.0 to 5.6.0
+* [#393](https://github.com/pmd/pmd-designer/pull/393): Bump actions/checkout from 7.0.0 to 7.0.1
+* [#394](https://github.com/pmd/pmd-designer/pull/394): Bump com.puppycrawl.tools:checkstyle from 13.8.0 to 13.10.0
+* [#395](https://github.com/pmd/pmd-designer/pull/395): Bump org.apache.maven.plugins:maven-jar-plugin from 3.5.0 to 3.5.1
+* [#396](https://github.com/pmd/pmd-designer/pull/396): Bump actions/setup-java from 5.6.0 to 5.7.0
+* [#397](https://github.com/pmd/pmd-designer/pull/397): Bump junit.version from 6.1.2 to 6.1.3
+* [#399](https://github.com/pmd/pmd-designer/pull/399): Bump build-tools from 39 to 40
+* [#401](https://github.com/pmd/pmd-designer/pull/401): Bump com.puppycrawl.tools:checkstyle from 13.10.0 to 14.0.0
+* [#402](https://github.com/pmd/pmd-designer/pull/402): Bump net.sourceforge.pmd:pmd-lang-test from 7.26.0 to 7.27.0
+* [#403](https://github.com/pmd/pmd-designer/pull/403): Bump actions/setup-java from 5.7.0 to 6.0.0
+* [#405](https://github.com/pmd/pmd-designer/pull/405): Bump org.apache.maven.plugins:maven-surefire-plugin from 3.5.6 to 3.6.0
+* [#406](https://github.com/pmd/pmd-designer/pull/406): Bump com.puppycrawl.tools:checkstyle from 14.0.0 to 14.1.0
+* [#407](https://github.com/pmd/pmd-designer/pull/407): Bump org.apache.maven.plugins:maven-compiler-plugin from 3.15.0 to 3.16.0
+* [#408](https://github.com/pmd/pmd-designer/pull/408): Downgrade org.checkerframework:checker-qual to 3.55.1
+* [#410](https://github.com/pmd/pmd-designer/pull/410): Bump actions/setup-java from 6.0.0 to 6.0.1
+* [#412](https://github.com/pmd/pmd-designer/pull/412): Bump org.apache.maven.plugins:maven-install-plugin from 3.1.4 to 3.2.0
+* [#413](https://github.com/pmd/pmd-designer/pull/413): Bump org.apache.maven.plugins:maven-deploy-plugin from 3.1.4 to 3.2.0
+* [#414](https://github.com/pmd/pmd-designer/pull/414): Bump org.codehaus.mojo:exec-maven-plugin from 3.6.3 to 3.6.4
+* [#415](https://github.com/pmd/pmd-designer/pull/415): Bump org.codehaus.mojo:build-helper-maven-plugin from 3.6.1 to 3.6.2
+* [#418](https://github.com/pmd/pmd-designer/pull/418): Bump org.apache.commons:commons-lang3 from 3.20.0 to 3.21.0
+* [#419](https://github.com/pmd/pmd-designer/pull/419): Bump net.sourceforge.pmd:pmd-lang-test from 7.27.0 to 7.28.0
+* [#420](https://github.com/pmd/pmd-designer/pull/420): Bump org.apache.maven:apache-maven from 3.9.16 to 3.10.0
+* [#421](https://github.com/pmd/pmd-designer/pull/421): Bump com.puppycrawl.tools:checkstyle from 14.1.0 to 14.3.0
+* [#422](https://github.com/pmd/pmd-designer/pull/422): Bump actions/upload-artifact from 7.0.1 to 7.0.2
+* [#424](https://github.com/pmd/pmd-designer/pull/424): Bump actions/setup-java from 6.0.1 to 6.1.0
+* [#426](https://github.com/pmd/pmd-designer/pull/426): Bump actions/create-github-app-token from 3.2.0 to 3.3.0
+* [#427](https://github.com/pmd/pmd-designer/pull/427): Bump org.sonatype.central:central-publishing-maven-plugin from 0.11.0 to 0.12.0
+* [#428](https://github.com/pmd/pmd-designer/pull/428): Bump org.apache.maven.plugins:maven-surefire-plugin from 3.6.0 to 3.6.1
+* [#431](https://github.com/pmd/pmd-designer/pull/431): Bump PMD from 7.26.0 to 7.29.0 for checks
+* [#432](https://github.com/pmd/pmd-designer/pull/432): Bump com.puppycrawl.tools:checkstyle from 14.3.0 to 14.4.0
+* [#433](https://github.com/pmd/pmd-designer/pull/433): Bump org.apache.maven.plugins:maven-enforcer-plugin from 3.6.3 to 3.7.0
+* [#434](https://github.com/pmd/pmd-designer/pull/434): Bump org.codehaus.mojo:build-helper-maven-plugin from 3.6.2 to 3.7.0
+* [#435](https://github.com/pmd/pmd-designer/pull/435): Bump actions/setup-java from 6.1.0 to 6.2.0
+* [#437](https://github.com/pmd/pmd-designer/pull/437): Bump org.apache.maven:apache-maven from 3.10.0 to 3.10.1
+* [#438](https://github.com/pmd/pmd-designer/pull/438): Bump org.codehaus.mojo:build-helper-maven-plugin from 3.7.0 to 3.8.0
+* [#439](https://github.com/pmd/pmd-designer/pull/439): Bump actions/setup-java from 6.2.0 to 6.3.0
+* [#442](https://github.com/pmd/pmd-designer/pull/442): Bump org.codehaus.mojo:exec-maven-plugin from 3.6.4 to 3.7.0
+* [#443](https://github.com/pmd/pmd-designer/pull/443): Bump org.apache.commons:commons-lang3 from 3.21.0 to 3.22.0
+
+</details>
+
 
 See https://github.com/pmd/pmd-designer/milestone/21
 
