@@ -329,6 +329,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>${jar.plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -762,6 +767,7 @@
                                     <mainClass>net.sourceforge.pmd.util.fxdesigner.DesignerStarter</mainClass>
                                 </manifest>
                                 <manifestEntries>
+                                    <!-- jsoup and ikonli are MR jars -->
                                     <Multi-Release>true</Multi-Release>
                                 </manifestEntries>
                             </archive>

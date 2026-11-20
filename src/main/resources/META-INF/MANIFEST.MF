@@ -1,3 +1,2 @@
 Manifest-Version: 1.0
-Main-Class: net.sourceforge.pmd.util.fxdesigner.DesignerStarter
-Multi-Release: true
+Automatic-Module-Name: net.sourceforge.pmd.util.fxdesigner

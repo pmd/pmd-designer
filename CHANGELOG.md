@@ -6,12 +6,16 @@
 * BREAKING CHANGE: ControlsFX is no longer shaded into the pmd-designer jar.
   It is now a regular dependency (org.controlsfx:controlsfx:11.x). Downstream
   projects running on Java 8 need to select controlsfx 8.40.18 themselves.
+* The pmd-designer jar now declares the automatic module name
+  `net.sourceforge.pmd.util.fxdesigner` (via `Automatic-Module-Name` in the manifest).
+  This is a preparation step towards full JPMS support.
 
 **🐛️ Fixed issues:**
 
 **✨️ Merged pull requests:**
 * [#429](https://github.com/pmd/pmd-designer/pull/429): chore: Simplify java.version configuration in build, enforce JDK 8 bytecode
 * [#430](https://github.com/pmd/pmd-designer/pull/430): build!: Use controlsfx dependency directly
+* [#444](https://github.com/pmd/pmd-designer/pull/444): chore: Add automatic module name net.sourceforge.pmd.util.fxdesigner
 
 **📦️ Dependency updates:**
 
