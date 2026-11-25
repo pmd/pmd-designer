@@ -54,7 +54,7 @@
              Note: we compile against ControlsFX 11 to be able to use OpenJFX.
              A CI build job (compile-controlsfx8) will ensure we don't accidentally use ControlsFX 11 only API.
         -->
-        <controlsfx.version>11.2.6</controlsfx.version>
+        <controlsfx.version>11.2.7</controlsfx.version>
         <maven.compiler.release>8</maven.compiler.release>
 
         <pmd.langtest.version>7.29.0</pmd.langtest.version> <!-- used for testing only -->
